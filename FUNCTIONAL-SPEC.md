@@ -41,6 +41,7 @@ CRM Sync is a server-side customer relationship management system that synchroni
 
 | Component | Platform | Identifier |
 |---|---|---|
+| Setup Wizard | Cloudflare Workers | [`cf-worker-crm-sync.yoonsunlee150.workers.dev/setup`](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) |
 | Backend Worker | Cloudflare Workers | `cf-worker-crm-sync` |
 | Database | Xano | `xerb-qpd6-hd8t.n7.xano.io` |
 | Commerce | Shopify Admin API | `hx-stage.myshopify.com` |

@@ -6,7 +6,8 @@ A tri-directional CRM system that synchronizes customer identity, consent, segme
 
 | Document | Description |
 |---|---|
-| [Setup Guide](#setup-guide) | Step-by-step configuration for all six services |
+| [Setup Wizard](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) | Interactive guided setup — 8 steps with live status checks |
+| [Setup Guide](#setup-guide) | Detailed reference for all six services |
 | [Functional Spec & UAT](FUNCTIONAL-SPEC.md) | Requirements, test plan, compliance matrix, DPO/PMO sign-off |
 
 ## How to Use
@@ -31,7 +32,7 @@ The [Functional Spec](FUNCTIONAL-SPEC.md) contains:
 
 ### For Development / QA
 
-1. Follow the [Setup Guide](#setup-guide) below to configure all services
+1. Start with the [Setup Wizard](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) or follow the [Setup Guide](#setup-guide) below
 2. Run the Pre-UAT checklist in the [Functional Spec](FUNCTIONAL-SPEC.md#72-pre-uat-checklist)
 3. Execute UAT test cases in order (Auth → Consent → Tags → Forms → GA4 → GDPR → Sync → Security)
 4. Obtain DPO and PMO sign-off before production release
