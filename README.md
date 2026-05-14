@@ -687,6 +687,337 @@ For consent event reporting in GA4:
 
 </details>
 
+<details>
+<summary><strong>Alternative: GTM Setup (Google Tag Manager)</strong></summary>
+
+If you prefer managing tags through Google Tag Manager instead of hardcoding gtag.js, use this approach. GTM gives you a visual interface to manage all your tags, triggers, and consent settings.
+
+#### Step 1 — Create a GTM Container
+
+1. Go to [tagmanager.google.com](https://tagmanager.google.com/)
+2. Click **Create Account**
+3. Name it (e.g., "OMEN Site")
+4. Container name: your domain (e.g., `omenphase1-1.webflow.io`)
+5. Target platform: **Web**
+6. Copy your **Container ID** (looks like `GTM-XXXXXXX`)
+
+#### Step 2 — Install GTM on Your Webflow Site
+
+**Head Code** (Webflow Site Settings > Custom Code > Head Code):
+
+```html
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Consent defaults (MUST be before GTM loads GA4) -->
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  'analytics_storage': 'denied',
+  'ad_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'functionality_storage': 'granted',
+  'security_storage': 'granted',
+  'wait_for_update': 500
+});
+</script>
+```
+
+**Body Code** (immediately after `<body>` — Webflow doesn't have a body slot, so add this to Head Code as well):
+
+```html
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+```
+
+Replace `GTM-XXXXXXX` with your Container ID.
+
+#### Step 3 — Create GTM Tags
+
+In GTM, create these tags:
+
+##### Tag 1: GA4 Configuration
+
+| Setting | Value |
+|---|---|
+| Tag Type | Google Tag |
+| Tag ID | `G-XXXXXXXXXX` (your GA4 Measurement ID) |
+| Trigger | Consent Initialization - All Pages |
+
+> Use **Consent Initialization** trigger (not All Pages) so consent defaults are set before GA4 loads.
+
+##### Tag 2: GA4 — Consent Update Event
+
+| Setting | Value |
+|---|---|
+| Tag Type | GA4 Event |
+| Event Name | `consent_update` |
+| Configuration Tag | (your GA4 tag from above) |
+| Event Parameters | `consent_tos`, `consent_privacy`, `consent_cookie`, `consent_marketing`, `consent_method` |
+| Trigger | Custom Event: `consent_update` |
+
+##### Tag 3: GA4 — Newsletter Signup Event
+
+| Setting | Value |
+|---|---|
+| Tag Type | GA4 Event |
+| Event Name | `newsletter_signup` |
+| Configuration Tag | (your GA4 tag from above) |
+| Event Parameters | `email` → `{{DLV - email}}`, `session_id` → `{{DLV - session_id}}`, `signup_timestamp` → `{{DLV - signup_timestamp}}`, `consent_marketing` → `{{DLV - consent_marketing}}`, `crm_user_id` → `{{DLV - crm_user_id}}`, `source_page` → `{{Page Path}}` |
+| Trigger | Custom Event: `newsletter_signup` |
+
+##### Tag 4: GA4 — CRM Tags Updated Event
+
+| Setting | Value |
+|---|---|
+| Tag Type | GA4 Event |
+| Event Name | `crm_tags_updated` |
+| Configuration Tag | (your GA4 tag from above) |
+| Event Parameters | `tags_added` → `{{DLV - tags_added}}`, `tags_removed` → `{{DLV - tags_removed}}`, `campaign_tags` → `{{DLV - campaign_tags}}` |
+| Trigger | Custom Event: `crm_tags_updated` |
+
+#### Step 4 — Create Data Layer Variables
+
+In GTM > Variables > User-Defined Variables, create these **Data Layer Variables**:
+
+| Variable Name | Data Layer Variable Name |
+|---|---|
+| DLV - email | `email` |
+| DLV - session_id | `session_id` |
+| DLV - signup_timestamp | `signup_timestamp` |
+| DLV - consent_marketing | `consent_marketing` |
+| DLV - crm_user_id | `crm_user_id` |
+| DLV - tags_added | `tags_added` |
+| DLV - tags_removed | `tags_removed` |
+| DLV - campaign_tags | `campaign_tags` |
+| DLV - consent_tos | `consent_tos` |
+| DLV - consent_privacy | `consent_privacy` |
+| DLV - consent_cookie | `consent_cookie` |
+| DLV - consent_method | `consent_method` |
+
+#### Step 5 — Create Triggers
+
+| Trigger Name | Type | Event Name |
+|---|---|---|
+| Consent Update | Custom Event | `consent_update` |
+| Newsletter Signup | Custom Event | `newsletter_signup` |
+| CRM Tags Updated | Custom Event | `crm_tags_updated` |
+
+#### Step 6 — Publish
+
+Click **Submit** in GTM to publish your container.
+
+</details>
+
+<details>
+<summary><strong>Newsletter Form: E2E Event Tracking</strong></summary>
+
+This tracks the complete lifecycle of a newsletter form submission — from page view through consent, signup, CRM tagging, and GA4 event — with session continuity and timestamps.
+
+#### Data Flow
+
+```
+User submits newsletter form
+  → dataLayer.push({ event: 'newsletter_signup', ... })
+  → GTM fires GA4 event tag
+  → CRM Footer JS calls POST /ucp/tags (adds 'newsletter_subscribed' tag)
+  → Worker writes to:
+      1. Xano user_tag_map (join: newsletter_subscribed, source: newsletter_form)
+      2. Shopify tagsAdd (customer tag: newsletter_subscribed)
+      3. Shopify metafields (crm_tags list updated)
+      4. Webflow CRM Tags collection (if new tag)
+      5. GA4 Measurement Protocol (user properties + crm_tags_updated event)
+  → consent_records audit entry (newsletter consent, timestamped)
+```
+
+#### Step 1 — Add the Newsletter Bridge Script
+
+Paste this in **Webflow Site Settings > Custom Code > Footer Code**, after the CRM Footer embed and Consent Bridge:
+
+```html
+<!-- CRM Newsletter → GTM/GA4 + CRM Tag Bridge -->
+<script>
+(function() {
+  function getGa4SessionId() {
+    try {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var c = cookies[i].trim();
+        if (c.startsWith('_ga_')) {
+          var parts = c.split('=')[1];
+          if (parts) { var segs = parts.split('.'); if (segs.length >= 3) return segs[2]; }
+        }
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  function getCrmUser() {
+    try {
+      var token = document.cookie.split(';').find(function(c) { return c.trim().startsWith('crm_token='); });
+      if (!token) return null;
+      var payload = JSON.parse(atob(token.trim().split('=')[1].split('.')[1]));
+      return payload;
+    } catch(e) { return null; }
+  }
+
+  function handleNewsletterSubmit(email, formEl) {
+    var now = new Date().toISOString();
+    var sessionId = getGa4SessionId();
+    var user = getCrmUser();
+    var consent = window._crmConsent ? window._crmConsent.getConsent() : null;
+
+    // 1. Push to dataLayer for GTM/GA4
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'newsletter_signup',
+      'email': email,
+      'session_id': sessionId,
+      'signup_timestamp': now,
+      'consent_marketing': consent && consent.marketing ? 'granted' : 'denied',
+      'crm_user_id': user ? String(user.sub) : '',
+      'source_page': window.location.pathname
+    });
+
+    // 2. Tag in CRM (if logged in)
+    if (user && window._crmAuth) {
+      var workerUrl = window._crmAuth.worker || '';
+      var token = document.cookie.split(';').find(function(c) { return c.trim().startsWith('crm_token='); });
+      if (workerUrl && token) {
+        var jwt = token.trim().split('=')[1];
+
+        // Add newsletter_subscribed tag
+        fetch(workerUrl + '/ucp/tags', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+          body: JSON.stringify({
+            tags: (user.tags || []).concat(['newsletter_subscribed', 'newsletter_' + now.slice(0,10)])
+          })
+        }).catch(function(e) { console.error('Newsletter CRM tag failed:', e); });
+
+        // Log as consent event (newsletter opt-in)
+        fetch(workerUrl + '/auth/consent-sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+          body: JSON.stringify({
+            user_id: user.sub,
+            consent_flags: { newsletter: true, marketing: true },
+            consent_version: '1.0',
+            method: 'newsletter_form',
+            consent_id: crypto.randomUUID(),
+            timestamp: now,
+            ga_session_id: sessionId
+          })
+        }).catch(function(e) { console.error('Newsletter consent sync failed:', e); });
+      }
+    }
+
+    // 3. Visual feedback
+    if (formEl) {
+      formEl.style.opacity = '0.6';
+      formEl.style.pointerEvents = 'none';
+      var msg = formEl.querySelector('.w-form-done') || formEl.querySelector('[data-success]');
+      if (msg) msg.style.display = 'block';
+    }
+  }
+
+  // Auto-hook Webflow forms with data-newsletter attribute
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form || !form.hasAttribute('data-newsletter')) return;
+
+    var emailInput = form.querySelector('input[type="email"], input[name="email"]');
+    if (!emailInput || !emailInput.value) return;
+
+    handleNewsletterSubmit(emailInput.value.trim(), form);
+  });
+
+  // Expose for manual use
+  window._crmNewsletter = { submit: handleNewsletterSubmit };
+})();
+</script>
+```
+
+#### Step 2 — Mark Your Webflow Newsletter Form
+
+In the Webflow Designer, select your newsletter form element and add a custom attribute:
+
+| Attribute | Value |
+|---|---|
+| `data-newsletter` | `true` |
+
+The script auto-detects any form with `data-newsletter` and hooks the submit event.
+
+For custom forms or non-Webflow forms, call directly:
+```javascript
+window._crmNewsletter.submit('user@example.com', formElement);
+```
+
+#### Step 3 — What Gets Tracked
+
+Every newsletter submission creates this chain of records:
+
+| System | What's recorded |
+|---|---|
+| **GA4 (via GTM)** | `newsletter_signup` event with email, session_id, timestamp, consent status, CRM user ID, source page |
+| **GA4 (via Measurement Protocol)** | User properties updated: `crm_tags` includes `newsletter_subscribed`, `consent_marketing: granted` |
+| **Xano** | `user_tag_map` entry: `newsletter_subscribed` tag + `newsletter_YYYY-MM-DD` date tag (source: `newsletter_form`) |
+| **Xano** | `consent_records` entry: newsletter consent granted, timestamped, with GA4 session ID |
+| **Shopify** | Customer tag: `newsletter_subscribed` + metafield `crm_tags` updated |
+| **Webflow CMS** | CRM Tags collection item created (if first newsletter subscriber) |
+
+#### Step 4 — GA4 Custom Dimensions for Newsletter
+
+In GA4 Admin, add these event-scoped custom dimensions:
+
+| Dimension name | Event parameter | Scope |
+|---|---|---|
+| Newsletter Email | `email` | Event |
+| GA4 Session ID | `session_id` | Event |
+| Signup Timestamp | `signup_timestamp` | Event |
+| Source Page | `source_page` | Event |
+
+#### Step 5 — Build a Newsletter Audience in GA4
+
+1. Go to **GA4 Admin > Audiences > New Audience**
+2. Create: **Newsletter Subscribers**
+   - Condition: `Users who triggered event: newsletter_signup`
+   - OR user property: `crm_tags contains "newsletter_subscribed"`
+3. This audience auto-syncs to Google Ads for remarketing
+
+#### Step 6 — Verify E2E
+
+1. Open your Webflow site with the newsletter form
+2. Open Chrome DevTools > **Network** tab
+3. Submit the form with a test email
+4. Check that:
+   - `dataLayer` contains the `newsletter_signup` event (Console: `dataLayer.filter(e => e.event === 'newsletter_signup')`)
+   - Network shows `POST /ucp/tags` with `newsletter_subscribed` tag
+   - Network shows `POST /auth/consent-sync` with `method: newsletter_form`
+   - In GTM Preview mode, the `newsletter_signup` trigger fires
+   - In GA4 DebugView, the `newsletter_signup` event appears with all parameters
+   - In Shopify Admin > Customers, the user has `newsletter_subscribed` tag
+   - Worker logs show GA4 Measurement Protocol push
+
+#### Session Continuity
+
+The GA4 session ID (`_ga_` cookie) is captured at the moment of form submission and attached to:
+- The GTM dataLayer event (client-side)
+- The consent_records audit entry (server-side, stored in Xano)
+- The GA4 Measurement Protocol push (server-side)
+
+This means you can join the client-side GA4 session with the server-side CRM event in BigQuery to see the full user journey: which page they were on, how they got there, and what they did after subscribing.
+
+</details>
+
 ---
 
 ## Tab 5: Webflow CMS (Customer Data & Tags)
