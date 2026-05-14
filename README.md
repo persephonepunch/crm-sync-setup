@@ -818,203 +818,157 @@ Click **Submit** in GTM to publish your container.
 </details>
 
 <details>
-<summary><strong>Newsletter Form: E2E Event Tracking</strong></summary>
+<summary><strong>CRM Form Bridge: E2E Event Tracking (Any Form Type)</strong></summary>
 
-This tracks the complete lifecycle of a newsletter form submission — from page view through consent, signup, CRM tagging, and GA4 event — with session continuity and timestamps.
+The CRM Footer embed includes a **generic form bridge** that auto-tags, logs consent, and fires GA4 events for any form — newsletter, waitlist, demo request, contact, quiz, etc. No extra scripts needed.
+
+#### How It Works
+
+Add a `data-crm-form` attribute to any Webflow form. The attribute value becomes the tag name:
+
+```html
+<!-- Newsletter -->
+<form data-crm-form="newsletter">
+  <input type="email" name="email" placeholder="you@example.com" />
+  <button type="submit">Subscribe</button>
+</form>
+
+<!-- Waitlist -->
+<form data-crm-form="waitlist">
+  <input type="email" name="email" />
+  <button type="submit">Join Waitlist</button>
+</form>
+
+<!-- Demo Request -->
+<form data-crm-form="demo_request">
+  <input type="email" name="email" />
+  <button type="submit">Book Demo</button>
+</form>
+```
+
+In Webflow Designer: select the form block → Settings panel → Custom Attributes → add `data-crm-form` with the form type as the value.
 
 #### Data Flow
 
 ```
-User submits newsletter form
-  → dataLayer.push({ event: 'newsletter_signup', ... })
+User submits form (data-crm-form="waitlist")
+  → dataLayer.push({ event: 'crm_form_submit', form_type: 'waitlist', ... })
   → GTM fires GA4 event tag
-  → CRM Footer JS calls POST /ucp/tags (adds 'newsletter_subscribed' tag)
-  → Worker writes to:
-      1. Xano user_tag_map (join: newsletter_subscribed, source: newsletter_form)
-      2. Shopify tagsAdd (customer tag: newsletter_subscribed)
-      3. Shopify metafields (crm_tags list updated)
-      4. Webflow CRM Tags collection (if new tag)
-      5. GA4 Measurement Protocol (user properties + crm_tags_updated event)
-  → consent_records audit entry (newsletter consent, timestamped)
+  → POST /ucp/tags (adds 'waitlist_subscribed' + 'waitlist_2026-05-14' tags)
+  → POST /auth/consent-sync (logs waitlist + marketing consent with GA4 session)
+  → Worker channel flow:
+      1. Xano crm_tags — auto-creates tag (category: campaign)
+      2. Xano user_tag_map — join entry (source: ucp)
+      3. Shopify — tagsAdd + metafields
+      4. Webflow CMS — Tags collection item (if new)
+      5. GA4 — user properties + crm_tags_updated event
+  → consent_records — audit entry with session ID + timestamp
 ```
 
-#### Step 1 — Add the Newsletter Bridge Script
+#### What Gets Created Per Form Type
 
-Paste this in **Webflow Site Settings > Custom Code > Footer Code**, after the CRM Footer embed and Consent Bridge:
+| Form Attribute | Tags Created | Consent Logged | Shopify Tag |
+|---|---|---|---|
+| `data-crm-form="newsletter"` | `newsletter_subscribed`, `newsletter_2026-05-14` | `newsletter: granted` | `accepts_newsletter` |
+| `data-crm-form="waitlist"` | `waitlist_subscribed`, `waitlist_2026-05-14` | `waitlist: granted` | `accepts_waitlist` |
+| `data-crm-form="demo_request"` | `demo_request_subscribed`, `demo_request_2026-05-14` | `demo_request: granted` | `accepts_demo_request` |
+| `data-crm-form="contact"` | `contact_subscribed`, `contact_2026-05-14` | `contact: granted` | `accepts_contact` |
 
-```html
-<!-- CRM Newsletter → GTM/GA4 + CRM Tag Bridge -->
-<script>
-(function() {
-  function getGa4SessionId() {
-    try {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var c = cookies[i].trim();
-        if (c.startsWith('_ga_')) {
-          var parts = c.split('=')[1];
-          if (parts) { var segs = parts.split('.'); if (segs.length >= 3) return segs[2]; }
-        }
-      }
-    } catch(e) {}
-    return null;
-  }
+The date-stamped tag gives you temporal segmentation — see which campaign day drove signups.
 
-  function getCrmUser() {
-    try {
-      var token = document.cookie.split(';').find(function(c) { return c.trim().startsWith('crm_token='); });
-      if (!token) return null;
-      var payload = JSON.parse(atob(token.trim().split('=')[1].split('.')[1]));
-      return payload;
-    } catch(e) { return null; }
-  }
+#### GTM Tag Setup
 
-  function handleNewsletterSubmit(email, formEl) {
-    var now = new Date().toISOString();
-    var sessionId = getGa4SessionId();
-    var user = getCrmUser();
-    var consent = window._crmConsent ? window._crmConsent.getConsent() : null;
+In GTM, create one tag for all form types:
 
-    // 1. Push to dataLayer for GTM/GA4
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      'event': 'newsletter_signup',
-      'email': email,
-      'session_id': sessionId,
-      'signup_timestamp': now,
-      'consent_marketing': consent && consent.marketing ? 'granted' : 'denied',
-      'crm_user_id': user ? String(user.sub) : '',
-      'source_page': window.location.pathname
-    });
+##### Tag: GA4 — CRM Form Submit
 
-    // 2. Tag in CRM (if logged in)
-    if (user && window._crmAuth) {
-      var workerUrl = window._crmAuth.worker || '';
-      var token = document.cookie.split(';').find(function(c) { return c.trim().startsWith('crm_token='); });
-      if (workerUrl && token) {
-        var jwt = token.trim().split('=')[1];
-
-        // Add newsletter_subscribed tag
-        fetch(workerUrl + '/ucp/tags', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
-          body: JSON.stringify({
-            tags: (user.tags || []).concat(['newsletter_subscribed', 'newsletter_' + now.slice(0,10)])
-          })
-        }).catch(function(e) { console.error('Newsletter CRM tag failed:', e); });
-
-        // Log as consent event (newsletter opt-in)
-        fetch(workerUrl + '/auth/consent-sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
-          body: JSON.stringify({
-            user_id: user.sub,
-            consent_flags: { newsletter: true, marketing: true },
-            consent_version: '1.0',
-            method: 'newsletter_form',
-            consent_id: crypto.randomUUID(),
-            timestamp: now,
-            ga_session_id: sessionId
-          })
-        }).catch(function(e) { console.error('Newsletter consent sync failed:', e); });
-      }
-    }
-
-    // 3. Visual feedback
-    if (formEl) {
-      formEl.style.opacity = '0.6';
-      formEl.style.pointerEvents = 'none';
-      var msg = formEl.querySelector('.w-form-done') || formEl.querySelector('[data-success]');
-      if (msg) msg.style.display = 'block';
-    }
-  }
-
-  // Auto-hook Webflow forms with data-newsletter attribute
-  document.addEventListener('submit', function(e) {
-    var form = e.target;
-    if (!form || !form.hasAttribute('data-newsletter')) return;
-
-    var emailInput = form.querySelector('input[type="email"], input[name="email"]');
-    if (!emailInput || !emailInput.value) return;
-
-    handleNewsletterSubmit(emailInput.value.trim(), form);
-  });
-
-  // Expose for manual use
-  window._crmNewsletter = { submit: handleNewsletterSubmit };
-})();
-</script>
-```
-
-#### Step 2 — Mark Your Webflow Newsletter Form
-
-In the Webflow Designer, select your newsletter form element and add a custom attribute:
-
-| Attribute | Value |
+| Setting | Value |
 |---|---|
-| `data-newsletter` | `true` |
+| Tag Type | GA4 Event |
+| Event Name | `crm_form_submit` |
+| Event Parameters | `form_type` → `{{DLV - form_type}}`, `email` → `{{DLV - email}}`, `session_id` → `{{DLV - session_id}}`, `submit_timestamp` → `{{DLV - submit_timestamp}}`, `consent_marketing` → `{{DLV - consent_marketing}}`, `crm_user_id` → `{{DLV - crm_user_id}}`, `source_page` → `{{Page Path}}` |
+| Trigger | Custom Event: `crm_form_submit` |
 
-The script auto-detects any form with `data-newsletter` and hooks the submit event.
+##### Data Layer Variables
 
-For custom forms or non-Webflow forms, call directly:
-```javascript
-window._crmNewsletter.submit('user@example.com', formElement);
-```
-
-#### Step 3 — What Gets Tracked
-
-Every newsletter submission creates this chain of records:
-
-| System | What's recorded |
+| Variable Name | Data Layer Variable Name |
 |---|---|
-| **GA4 (via GTM)** | `newsletter_signup` event with email, session_id, timestamp, consent status, CRM user ID, source page |
-| **GA4 (via Measurement Protocol)** | User properties updated: `crm_tags` includes `newsletter_subscribed`, `consent_marketing: granted` |
-| **Xano** | `user_tag_map` entry: `newsletter_subscribed` tag + `newsletter_YYYY-MM-DD` date tag (source: `newsletter_form`) |
-| **Xano** | `consent_records` entry: newsletter consent granted, timestamped, with GA4 session ID |
-| **Shopify** | Customer tag: `newsletter_subscribed` + metafield `crm_tags` updated |
-| **Webflow CMS** | CRM Tags collection item created (if first newsletter subscriber) |
+| DLV - form_type | `form_type` |
+| DLV - email | `email` |
+| DLV - session_id | `session_id` |
+| DLV - submit_timestamp | `submit_timestamp` |
+| DLV - consent_marketing | `consent_marketing` |
+| DLV - crm_user_id | `crm_user_id` |
 
-#### Step 4 — GA4 Custom Dimensions for Newsletter
+#### GA4 Custom Dimensions
 
 In GA4 Admin, add these event-scoped custom dimensions:
 
 | Dimension name | Event parameter | Scope |
 |---|---|---|
-| Newsletter Email | `email` | Event |
+| Form Type | `form_type` | Event |
+| Form Email | `email` | Event |
 | GA4 Session ID | `session_id` | Event |
-| Signup Timestamp | `signup_timestamp` | Event |
+| Submit Timestamp | `submit_timestamp` | Event |
 | Source Page | `source_page` | Event |
 
-#### Step 5 — Build a Newsletter Audience in GA4
+#### Build GA4 Audiences
 
-1. Go to **GA4 Admin > Audiences > New Audience**
-2. Create: **Newsletter Subscribers**
-   - Condition: `Users who triggered event: newsletter_signup`
-   - OR user property: `crm_tags contains "newsletter_subscribed"`
-3. This audience auto-syncs to Google Ads for remarketing
+Examples:
 
-#### Step 6 — Verify E2E
+| Audience | Condition |
+|---|---|
+| Newsletter Subscribers | `crm_tags contains "newsletter_subscribed"` |
+| Waitlist Signups | `crm_tags contains "waitlist_subscribed"` |
+| Demo Requests | Event: `crm_form_submit` where `form_type = "demo_request"` |
+| All Form Submitters | Event: `crm_form_submit` (any type) |
 
-1. Open your Webflow site with the newsletter form
+These audiences auto-sync to Google Ads for remarketing.
+
+#### Dashboard Visibility
+
+After form submission, the user's UCP Dashboard shows:
+
+| Card | What appears |
+|---|---|
+| **Consent Status** | "Newsletter: Granted" (or whichever form type maps to a known consent column) |
+| **Consent History** | Timestamped row: `waitlist — granted — waitlist_form — 5/14/2026` |
+| **Customer Tags** | `newsletter_subscribed`, `waitlist_subscribed`, date tags |
+| **Retarget Channels** | Email, SMS, Ads, Push light up (marketing consent granted) |
+| **A/B Segment** | Campaign tags shown under "GA4 Synced" |
+
+#### Manual / Programmatic Use
+
+For non-Webflow forms or custom integrations:
+
+```javascript
+// Submit programmatically
+window._crmForms.submit('newsletter', 'user@example.com', formElement);
+window._crmForms.submit('waitlist', 'user@example.com');
+window._crmForms.submit('demo_request', 'user@example.com', document.getElementById('my-form'));
+```
+
+#### Verify E2E
+
+1. Open your Webflow site with a `data-crm-form` form
 2. Open Chrome DevTools > **Network** tab
 3. Submit the form with a test email
-4. Check that:
-   - `dataLayer` contains the `newsletter_signup` event (Console: `dataLayer.filter(e => e.event === 'newsletter_signup')`)
-   - Network shows `POST /ucp/tags` with `newsletter_subscribed` tag
-   - Network shows `POST /auth/consent-sync` with `method: newsletter_form`
-   - In GTM Preview mode, the `newsletter_signup` trigger fires
-   - In GA4 DebugView, the `newsletter_signup` event appears with all parameters
-   - In Shopify Admin > Customers, the user has `newsletter_subscribed` tag
-   - Worker logs show GA4 Measurement Protocol push
+4. Check:
+   - Console: `dataLayer.filter(e => e.event === 'crm_form_submit')` — shows form_type, email, session_id
+   - Network: `POST /ucp/tags` with `{form_type}_subscribed` tag
+   - Network: `POST /auth/consent-sync` with `method: {form_type}_form`
+   - GTM Preview: `crm_form_submit` trigger fires
+   - GA4 DebugView: `crm_form_submit` event with all parameters
+   - Shopify Admin > Customers: user has `accepts_{form_type}` tag
 
 #### Session Continuity
 
-The GA4 session ID (`_ga_` cookie) is captured at the moment of form submission and attached to:
+The GA4 session ID (`_ga_` cookie) is captured at submit time and attached to:
 - The GTM dataLayer event (client-side)
 - The consent_records audit entry (server-side, stored in Xano)
 - The GA4 Measurement Protocol push (server-side)
 
-This means you can join the client-side GA4 session with the server-side CRM event in BigQuery to see the full user journey: which page they were on, how they got there, and what they did after subscribing.
+This lets you join client-side GA4 sessions with server-side CRM events in BigQuery for full journey analysis.
 
 </details>
 
