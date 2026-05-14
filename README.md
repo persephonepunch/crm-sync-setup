@@ -1,4 +1,60 @@
-# CRM Sync Setup Guide
+# CRM Sync
+
+A tri-directional CRM system that synchronizes customer identity, consent, segmentation, and campaign tags across Shopify, Webflow CMS, Xano, and Google Analytics GA4 — with GDPR/CCPA-compliant consent management and real-time tag channel flow.
+
+## Documents
+
+| Document | Description |
+|---|---|
+| [Setup Guide](#setup-guide) | Step-by-step configuration for all six services |
+| [Functional Spec & UAT](FUNCTIONAL-SPEC.md) | Requirements, test plan, compliance matrix, DPO/PMO sign-off |
+
+## How to Use
+
+### For Strategy / Positioning
+
+This system provides a **unified customer data platform** across commerce (Shopify), content (Webflow), and analytics (GA4). Key capabilities:
+
+- **Tri-directional sync** — changes in any channel (Shopify Admin, Webflow CMS, or UCP Dashboard) propagate to all others automatically
+- **Consent-first architecture** — every data processing action is gated by auditable consent with full provenance (timestamp, source, session, IP)
+- **Generic form bridge** — add `data-crm-form="type"` to any form to auto-tag users, log consent, and fire GA4 events with zero custom code
+- **Server-side analytics** — GA4 Measurement Protocol pushes user properties and events from the worker, independent of ad blockers
+
+### For Application Submission
+
+The [Functional Spec](FUNCTIONAL-SPEC.md) contains:
+- Complete API surface (35+ endpoints)
+- GDPR Article mapping (Art. 6, 7, 12, 15, 17, 20, 25, 30, 33)
+- CCPA compliance matrix
+- 49 UAT test cases across 10 categories
+- DPO and PMO signature blocks
+
+### For Development / QA
+
+1. Follow the [Setup Guide](#setup-guide) below to configure all services
+2. Run the Pre-UAT checklist in the [Functional Spec](FUNCTIONAL-SPEC.md#72-pre-uat-checklist)
+3. Execute UAT test cases in order (Auth → Consent → Tags → Forms → GA4 → GDPR → Sync → Security)
+4. Obtain DPO and PMO sign-off before production release
+
+### Quick Test
+
+```bash
+# Health check
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/health
+
+# View config (secrets masked)
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/config
+
+# List all CRM tags
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/tags
+
+# Manual sync trigger
+curl -X POST https://cf-worker-crm-sync.yoonsunlee150.workers.dev/sync/customers
+```
+
+---
+
+# Setup Guide
 
 Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
 
