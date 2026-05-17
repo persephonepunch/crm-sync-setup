@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRM Sync — Webflow App Documentation</title>
+<meta name="description" content="CRM Sync: Multi-tenant CRM with auth, consent management, Adobe AEP, and full-funnel entitlement for Webflow + Shopify.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fafafa;--card:#fff;--border:#e5e5e5;--text:#1a1a1a;--muted:#666;--accent:#4353ff;--accent-hover:#3040e0;--accent-light:#eef0ff;--danger:#d72c0d;--pass:#008060;--tag-bg:#f0f0f0;--shadow:0 1px 3px rgba(0,0,0,0.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1a1a1a;--border:#333;--text:#e5e5e5;--muted:#999;--accent:#6b7bff;--accent-hover:#8b97ff;--accent-light:#1a1d33;--tag-bg:#2a2a2a;--shadow:0 1px 3px rgba(0,0,0,0.3)}}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.container{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+.hero{text-align:center;padding:3rem 0 2.5rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem}
+.hero h1{font-size:2rem;font-weight:700;margin-bottom:0.5rem}
+.hero .tagline{color:var(--muted);font-size:1.0625rem;max-width:560px;margin:0 auto 1.25rem}
+.hero .badges{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.hero .badge{display:inline-flex;align-items:center;gap:0.375rem;padding:0.375rem 0.75rem;background:var(--accent-light);border:1px solid var(--border);border-radius:2rem;font-size:0.75rem;font-weight:600;color:var(--accent)}
+.hero .cta-row{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+.hero .cta{padding:0.625rem 1.5rem;border-radius:0.5rem;font-size:0.875rem;font-weight:600;border:1px solid var(--accent);transition:all 0.15s}
+.hero .cta-primary{background:var(--accent);color:#fff}
+.hero .cta-primary:hover{background:var(--accent-hover);text-decoration:none}
+.hero .cta-secondary{background:var(--card);color:var(--accent)}
+.hero .cta-secondary:hover{background:var(--accent-light);text-decoration:none}
+
+.nav-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-bottom:2.5rem}
+.nav-card{padding:1rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;text-decoration:none;color:var(--text)}
+.nav-card:hover{border-color:var(--accent);background:var(--accent-light);text-decoration:none}
+.nav-card .icon{font-size:1.5rem;margin-bottom:0.375rem}
+.nav-card .label{font-size:0.8125rem;font-weight:600}
+
+section{margin-bottom:2.5rem}
+section>h2{font-size:1.25rem;font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid var(--accent)}
+
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.feature{padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem}
+.feature h3{font-size:0.9375rem;font-weight:600;margin-bottom:0.375rem}
+.feature p{font-size:0.8125rem;color:var(--muted);line-height:1.5}
+
+.config-table{width:100%;border-collapse:collapse;font-size:0.8125rem;margin-bottom:1rem}
+.config-table th,.config-table td{text-align:left;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border)}
+.config-table th{font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);background:var(--tag-bg)}
+.config-table tr:hover{background:var(--tag-bg)}
+.config-table code{font-size:0.75rem;background:var(--tag-bg);padding:0.125rem 0.375rem;border-radius:0.25rem}
+
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+@media(max-width:700px){.pricing-grid{grid-template-columns:1fr}}
+.price-card{padding:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:0.75rem;text-align:center;position:relative}
+.price-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.price-card .plan-name{font-size:0.875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem}
+.price-card .price{font-size:2rem;font-weight:700;margin-bottom:0.25rem}
+.price-card .price span{font-size:0.875rem;font-weight:400;color:var(--muted)}
+.price-card .price-desc{font-size:0.75rem;color:var(--muted);margin-bottom:1rem}
+.price-card ul{list-style:none;text-align:left;margin-bottom:1.25rem}
+.price-card li{font-size:0.8125rem;padding:0.25rem 0;display:flex;align-items:flex-start;gap:0.375rem}
+.price-card li::before{content:"";flex-shrink:0;margin-top:0.375rem;width:6px;height:6px;border-radius:50%;background:var(--pass)}
+.price-card .plan-cta{display:block;padding:0.5rem 1rem;border-radius:0.375rem;font-size:0.8125rem;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:var(--card);transition:all 0.15s}
+.price-card .plan-cta:hover{background:var(--accent);color:#fff;text-decoration:none}
+.price-card.featured .plan-cta{background:var(--accent);color:#fff}
+.price-card.featured .plan-cta:hover{background:var(--accent-hover)}
+.price-card .popular{position:absolute;top:-0.625rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:0.6875rem;font-weight:700;padding:0.125rem 0.75rem;border-radius:2rem;text-transform:uppercase;letter-spacing:0.04em}
+
+.arch-diagram{background:var(--card);border:1px solid var(--border);border-radius:0.5rem;padding:1.25rem;overflow-x:auto;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:0.75rem;line-height:1.6;white-space:pre;color:var(--muted)}
+
+.endpoint-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0.75rem}
+.endpoint{padding:0.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:0.375rem;font-size:0.8125rem}
+.endpoint .method{font-weight:700;font-size:0.6875rem;padding:0.125rem 0.375rem;border-radius:0.25rem;margin-right:0.375rem;text-transform:uppercase}
+.method.get{background:#dff0d8;color:#3c763d}
+.method.post{background:#d9edf7;color:#31708f}
+@media(prefers-color-scheme:dark){.method.get{background:#1a2e1a;color:#6fb36f}.method.post{background:#1a2a3e;color:#6fb3d6}}
+.endpoint .path{font-family:"SF Mono",Monaco,Consolas,monospace;font-size:0.75rem}
+.endpoint .desc{color:var(--muted);font-size:0.75rem;margin-top:0.25rem}
+
+.collapsible{margin-bottom:0.75rem}
+.collapsible-header{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;cursor:pointer;user-select:none;font-weight:600;font-size:0.9375rem}
+.collapsible-header:hover{background:var(--tag-bg)}
+.collapsible-header .chevron{font-size:0.75rem;color:var(--muted);transition:transform 0.2s}
+.collapsible-header.open{border-radius:0.5rem 0.5rem 0 0}
+.collapsible-header.open .chevron{transform:rotate(180deg)}
+.collapsible-body{border:1px solid var(--border);border-top:none;border-radius:0 0 0.5rem 0.5rem;padding:1rem;display:none}
+.collapsible-body.open{display:block}
+.collapsible-header .count{font-size:0.75rem;color:var(--muted);margin-left:auto;font-weight:400}
+
+.tag{display:inline-block;font-size:0.6875rem;font-weight:600;padding:0.125rem 0.375rem;border-radius:0.25rem}
+.tag.implemented{background:#dff0d8;color:#3c763d}
+.tag.high{background:#fde8e8;color:var(--danger)}
+.tag.medium{background:#fef3cd;color:#b98900}
+.tag.low{background:var(--tag-bg);color:var(--muted)}
+@media(prefers-color-scheme:dark){.tag.implemented{background:#1a2e1a;color:#6fb36f}.tag.high{background:#3d1010;color:#ff6b6b}.tag.medium{background:#3d3010;color:#ffd700}}
+
+.req-table{width:100%;border-collapse:collapse;font-size:0.8125rem}
+.req-table th,.req-table td{text-align:left;padding:0.375rem 0.625rem;border-bottom:1px solid var(--border)}
+.req-table th{font-weight:600;font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);background:var(--tag-bg)}
+
+.resources{margin-top:2rem;padding:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem}
+.resources h3{font-size:0.9375rem;font-weight:600;margin-bottom:0.75rem}
+.resources-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem}
+.resources a{display:block;color:var(--accent);font-size:0.8125rem;padding:0.25rem 0}
+
+footer{text-align:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:0.75rem}
+footer a{color:var(--accent)}
+footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
+
+@media(max-width:600px){
+  .container{padding:1rem 1rem 3rem}
+  .hero h1{font-size:1.5rem}
+  .hero .tagline{font-size:0.9375rem}
+  .pricing-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>CRM Sync</h1>
+    <p class="tagline">Multi-tenant CRM with auth, consent management, Adobe AEP integration, and full-funnel entitlement for Webflow + Shopify.</p>
+    <div class="badges">
+      <span class="badge">Webflow App</span>
+      <span class="badge">Shopify App</span>
+      <span class="badge">Cloudflare Worker</span>
+      <span class="badge">Adobe AEP</span>
+      <span class="badge">GDPR/CCPA</span>
+    </div>
+    <div class="cta-row">
+      <a href="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup" target="_blank" class="cta cta-primary">Setup Wizard</a>
+      <a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md" target="_blank" class="cta cta-secondary">Functional Spec</a>
+      <a href="index.html" class="cta cta-secondary">App Checklists</a>
+    </div>
+  </div>
+
+  <!-- Quick Nav -->
+  <div class="nav-cards">
+    <a href="#features" class="nav-card"><div class="icon">&#9889;</div><div class="label">Features</div></a>
+    <a href="#config" class="nav-card"><div class="icon">&#9881;</div><div class="label">Configuration</div></a>
+    <a href="#pricing" class="nav-card"><div class="icon">&#128176;</div><div class="label">Pricing</div></a>
+    <a href="#architecture" class="nav-card"><div class="icon">&#128736;</div><div class="label">Architecture</div></a>
+    <a href="#endpoints" class="nav-card"><div class="icon">&#128279;</div><div class="label">API Endpoints</div></a>
+    <a href="#requirements" class="nav-card"><div class="icon">&#9745;</div><div class="label">Requirements</div></a>
+  </div>
+
+  <!-- Features -->
+  <section id="features">
+    <h2>Features</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <h3>Multi-Tenant SaaS</h3>
+        <p>Per-shop KV config isolation, tenant registry, auto-registration on install. Each Shopify store gets its own config, tokens, and sync schedule.</p>
+      </div>
+      <div class="feature">
+        <h3>Authentication</h3>
+        <p>Email/password, Google OAuth, Shopify Customer Account (PKCE), JWT sessions, idle timeout, password reset, welcome emails, profile management.</p>
+      </div>
+      <div class="feature">
+        <h3>Consent Management</h3>
+        <p>GDPR/CCPA-compliant consent with TOS, cookie, marketing, newsletter, CCPA, and dynamic form types. Append-only audit trail with provenance.</p>
+      </div>
+      <div class="feature">
+        <h3>Tri-Directional Sync</h3>
+        <p>Real-time sync across Shopify, Xano, Webflow CMS, GA4, and Adobe AEP. Cron every 15 min + webhook-driven single-user sync.</p>
+      </div>
+      <div class="feature">
+        <h3>Adobe Experience Platform</h3>
+        <p>Streaming ingestion to AEP with SHA-256 hashed PII, XDM consent mapping, form bridge events, and product upsell commerce events.</p>
+      </div>
+      <div class="feature">
+        <h3>Form Bridge</h3>
+        <p>Add <code>data-crm-form="type"</code> to any HTML form. Auto-creates tags, logs consent, fires GA4 events, and pushes to Adobe AEP.</p>
+      </div>
+      <div class="feature">
+        <h3>Tag System</h3>
+        <p>Structured tags with categories (status, tier, segment, campaign, consent, marketing). Auto-inference, join table architecture, full-channel flow.</p>
+      </div>
+      <div class="feature">
+        <h3>GDPR/CCPA Compliance</h3>
+        <p>Customer redaction, data portability, shop redaction, self-service deletion, consent audit trail. All webhooks HMAC-verified.</p>
+      </div>
+      <div class="feature">
+        <h3>Webflow Extension</h3>
+        <p>CRM Auth Designer Extension with Config, Auth, Embeds, Plan, and Status tabs. Adobe AEP config, embed code generation, health checks.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Config -->
+  <section id="config">
+    <h2>Configuration</h2>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Tenant Config Fields
+        <span class="count">Per-shop KV</span>
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>xano_base_url</code></td><td>string</td><td>Xano API base URL</td></tr>
+            <tr><td><code>xano_api_key</code></td><td>secret</td><td>Xano API key</td></tr>
+            <tr><td><code>shopify_store_domain</code></td><td>string</td><td>e.g., store.myshopify.com</td></tr>
+            <tr><td><code>shopify_admin_token</code></td><td>secret</td><td>Shopify Admin API token (shpua_ prefix)</td></tr>
+            <tr><td><code>shopify_refresh_token</code></td><td>secret</td><td>Shopify refresh token (shprt_ prefix, 90-day TTL)</td></tr>
+            <tr><td><code>shopify_token_expires_at</code></td><td>number</td><td>Unix timestamp for token expiry</td></tr>
+            <tr><td><code>webflow_cms_token</code></td><td>secret</td><td>Webflow CMS API token (via OAuth)</td></tr>
+            <tr><td><code>webflow_collection_id</code></td><td>string</td><td>Webflow Customers collection ID</td></tr>
+            <tr><td><code>webflow_site_id</code></td><td>string</td><td>Webflow site ID (from OAuth)</td></tr>
+            <tr><td><code>ga4_measurement_id</code></td><td>string</td><td>GA4 Measurement ID (G-XXXXXXXXXX)</td></tr>
+            <tr><td><code>ga4_api_secret</code></td><td>secret</td><td>GA4 Measurement Protocol secret</td></tr>
+            <tr><td><code>auth_redirect_origin</code></td><td>string</td><td>CORS allowed origin (Webflow site URL)</td></tr>
+            <tr><td><code>authMethods</code></td><td>object</td><td>Toggle email, Google, Shopify auth</td></tr>
+            <tr><td><code>adobe_aep_enabled</code></td><td>boolean</td><td>Enable Adobe AEP streaming</td></tr>
+            <tr><td><code>adobe_ims_org_id</code></td><td>string</td><td>Adobe IMS Org ID</td></tr>
+            <tr><td><code>adobe_client_id</code></td><td>string</td><td>Adobe OAuth client ID</td></tr>
+            <tr><td><code>adobe_client_secret</code></td><td>secret</td><td>Adobe OAuth client secret</td></tr>
+            <tr><td><code>adobe_aep_dataset_id</code></td><td>string</td><td>AEP streaming dataset ID</td></tr>
+            <tr><td><code>adobe_aep_sandbox</code></td><td>string</td><td>AEP sandbox name (default: prod)</td></tr>
+            <tr><td><code>resend_api_key</code></td><td>secret</td><td>Resend transactional email API key</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        KV Key Structure
+        <span class="count">Multi-tenant</span>
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>Key Pattern</th><th>Contents</th><th>Sensitivity</th></tr></thead>
+          <tbody>
+            <tr><td><code>tenant:{shop}:config</code></td><td>Per-tenant CrmSiteConfig</td><td><span class="tag high">High</span></td></tr>
+            <tr><td><code>tenants:index</code></td><td>JSON array of registered shops</td><td><span class="tag low">Low</span></td></tr>
+            <tr><td><code>platform:config</code></td><td>Shared platform credentials</td><td><span class="tag high">High</span></td></tr>
+            <tr><td><code>tag_table_ids</code></td><td>Xano table IDs for tags</td><td><span class="tag low">Low</span></td></tr>
+            <tr><td><code>sync:customers:last_run</code></td><td>ISO timestamp of last sync</td><td><span class="tag low">Low</span></td></tr>
+            <tr><td><code>adobe_token:{shop}</code></td><td>Cached Adobe IMS access token</td><td><span class="tag high">High</span></td></tr>
+            <tr><td><code>pkce:{state}</code></td><td>PKCE code_verifier (TTL)</td><td><span class="tag medium">Medium</span></td></tr>
+            <tr><td><code>oauth_state:{uuid}</code></td><td>OAuth state + shop (10min TTL)</td><td><span class="tag medium">Medium</span></td></tr>
+            <tr><td><code>reset:{token}</code></td><td>Password reset token (1h/24h TTL)</td><td><span class="tag medium">Medium</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Environment Variables &amp; Secrets
+        <span class="count">wrangler.toml</span>
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>Variable</th><th>Source</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>XANO_BASE_URL</code></td><td>[vars]</td><td>Xano API endpoint</td></tr>
+            <tr><td><code>AUTH_REDIRECT_ORIGIN</code></td><td>[vars]</td><td>CORS origin for auth redirects</td></tr>
+            <tr><td><code>GOOGLE_CLIENT_ID</code></td><td>[vars]</td><td>Google OAuth client ID</td></tr>
+            <tr><td><code>SHOPIFY_STORE_DOMAIN</code></td><td>[vars]</td><td>Default Shopify store domain</td></tr>
+            <tr><td><code>SHOPIFY_SHOP_ID</code></td><td>[vars]</td><td>Shopify shop numeric ID</td></tr>
+            <tr><td><code>SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID</code></td><td>[vars]</td><td>Shopify Customer Account PKCE client</td></tr>
+            <tr><td><code>RESEND_FROM_EMAIL</code></td><td>[vars]</td><td>From address for transactional email</td></tr>
+            <tr><td><code>XANO_API_KEY</code></td><td>secret</td><td>Xano API key</td></tr>
+            <tr><td><code>JWT_SECRET</code></td><td>secret</td><td>JWT signing secret</td></tr>
+            <tr><td><code>GOOGLE_CLIENT_SECRET</code></td><td>secret</td><td>Google OAuth secret</td></tr>
+            <tr><td><code>SHOPIFY_ADMIN_TOKEN</code></td><td>secret</td><td>Auto-set by OAuth install flow</td></tr>
+            <tr><td><code>WEBFLOW_CMS_TOKEN</code></td><td>secret</td><td>Auto-set by Webflow OAuth</td></tr>
+            <tr><td><code>RESEND_API_KEY</code></td><td>secret</td><td>Resend API key</td></tr>
+            <tr><td><code>GA4_API_SECRET</code></td><td>secret</td><td>GA4 Measurement Protocol secret</td></tr>
+            <tr><td><code>ADMIN_KEY</code></td><td>secret</td><td>Bearer token for admin endpoints</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Config Precedence
+      </div>
+      <div class="collapsible-body">
+        <p style="font-size:0.875rem;margin-bottom:0.5rem">Config is resolved per-tenant with the following precedence (highest first):</p>
+        <ol style="font-size:0.8125rem;padding-left:1.5rem;color:var(--muted)">
+          <li><strong>KV Store</strong> &mdash; <code>tenant:{shop}:config</code> (per-tenant overrides)</li>
+          <li><strong>wrangler.toml [vars]</strong> &mdash; Environment variable defaults</li>
+          <li><strong>Wrangler Secrets</strong> &mdash; <code>wrangler secret put</code> values</li>
+        </ol>
+        <p style="font-size:0.8125rem;color:var(--muted);margin-top:0.5rem">Legacy single-tenant mode falls back to the <code>crm_config</code> KV key when no tenant is specified.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing / Entitlement -->
+  <section id="pricing">
+    <h2>Pricing &amp; Entitlement</h2>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="plan-name">Shared</div>
+        <div class="price">$69<span>/mo</span></div>
+        <div class="price-desc">Shared infrastructure</div>
+        <ul>
+          <li>Multi-tenant Cloudflare Worker</li>
+          <li>Shared KV namespace</li>
+          <li>Shared Xano workspace</li>
+          <li>Email + Google + Shopify auth</li>
+          <li>Full consent management</li>
+          <li>GA4 server-side analytics</li>
+          <li>Cron sync (15-min intervals)</li>
+          <li>Webhook-driven single-user sync</li>
+          <li>Form bridge</li>
+          <li>Webflow CMS sync</li>
+        </ul>
+        <a href="#" class="plan-cta">Get Started</a>
+      </div>
+      <div class="price-card featured">
+        <div class="popular">Most Popular</div>
+        <div class="plan-name">Private</div>
+        <div class="price">$325<span>/mo</span></div>
+        <div class="price-desc">Dedicated infrastructure</div>
+        <ul>
+          <li>Everything in Shared, plus:</li>
+          <li>Dedicated Cloudflare Worker</li>
+          <li>Private KV namespace</li>
+          <li>Private Xano workspace</li>
+          <li>Adobe Experience Platform (AEP)</li>
+          <li>Custom domain support</li>
+          <li>Priority support</li>
+          <li>Custom sync intervals</li>
+          <li>Single-tenant mode (legacy key)</li>
+        </ul>
+        <a href="#" class="plan-cta">Get Started</a>
+      </div>
+      <div class="price-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="price">Custom</div>
+        <div class="price-desc">White-glove onboarding</div>
+        <ul>
+          <li>Everything in Private, plus:</li>
+          <li>Salesforce integration</li>
+          <li>HubSpot integration</li>
+          <li>Klaviyo integration</li>
+          <li>Attentive integration</li>
+          <li>Braze integration</li>
+          <li>Custom integrations</li>
+          <li>SLA &amp; dedicated support</li>
+          <li>SSO / SAML</li>
+        </ul>
+        <a href="mailto:ysl@ysl150.com" class="plan-cta">Contact Sales</a>
+      </div>
+    </div>
+
+    <div class="collapsible" style="margin-top:1.5rem">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Entitlement Matrix
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>Feature</th><th>Shared ($69)</th><th>Private ($325)</th><th>Enterprise</th></tr></thead>
+          <tbody>
+            <tr><td>Auth (email, Google, Shopify)</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Consent management</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Tag system</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Shopify sync</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Webflow CMS sync</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>GA4 Measurement Protocol</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Form bridge</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>GDPR/CCPA compliance</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Resend transactional email</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Adobe Experience Platform</td><td>&mdash;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Dedicated infrastructure</td><td>&mdash;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Custom domain</td><td>&mdash;</td><td>&#10003;</td><td>&#10003;</td></tr>
+            <tr><td>Salesforce / HubSpot / Klaviyo</td><td>&mdash;</td><td>&mdash;</td><td>&#10003;</td></tr>
+            <tr><td>Attentive / Braze</td><td>&mdash;</td><td>&mdash;</td><td>&#10003;</td></tr>
+            <tr><td>SLA &amp; dedicated support</td><td>&mdash;</td><td>&mdash;</td><td>&#10003;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+
+    <div class="collapsible">
+      <div class="collapsible-header open" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Multi-Tenant Data Flow
+      </div>
+      <div class="collapsible-body open">
+        <div class="arch-diagram">                    &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+                    &#9474;   UCP Dashboard  &#9474;
+                    &#9474;  (User-Facing)   &#9474;
+                    &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+                             &#9474; POST /ucp/tags
+                             &#9660;
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;     &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;   Webflow   &#9474;&#9668;&#9472;&#9472;&#9472;&#9654;&#9474;  Cloudflare   &#9474;&#9668;&#9472;&#9472;&#9472;&#9654;&#9474;   Shopify   &#9474;
+&#9474;    CMS      &#9474;     &#9474;   Worker      &#9474;     &#9474;   Admin     &#9474;
+&#9474;             &#9474;     &#9474;   + Xano DB   &#9474;     &#9474;             &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;     &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+       &#9474;                    &#9474;                    &#9474;
+       &#9474;         &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;         &#9474;
+       &#9474;         &#9474;          &#9474;          &#9474;         &#9474;
+       &#9474;         &#9660;          &#9660;          &#9660;         &#9474;
+       &#9474;      GA4 MP     Resend    Adobe AEP     &#9474;
+       &#9474;     (Events)   (Email)     (CDP)        &#9474;
+       &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+              All paths converge at Xano (source of truth)</div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Tenant Identity Resolution
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>Ingress</th><th>Tenant ID Source</th></tr></thead>
+          <tbody>
+            <tr><td>Shopify embedded app</td><td>Session &rarr; <code>shop</code> domain</td></tr>
+            <tr><td>Shopify webhooks</td><td><code>X-Shopify-Shop-Domain</code> header</td></tr>
+            <tr><td>Storefront embeds</td><td><code>?shop=</code> query param</td></tr>
+            <tr><td>Webflow extension</td><td><code>?shop=</code> query param</td></tr>
+            <tr><td>OAuth install flow</td><td><code>?shop=</code> query param</td></tr>
+            <tr><td>Cron/scheduled</td><td>Iterates <code>tenants:index</code></td></tr>
+            <tr><td>Admin endpoints</td><td><code>?shop=</code> + Bearer token</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Data Flow Directions
+        <span class="count">7 flows</span>
+      </div>
+      <div class="collapsible-body">
+        <table class="config-table">
+          <thead><tr><th>#</th><th>Direction</th><th>Trigger</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Shopify &rarr; Xano &rarr; Webflow &rarr; GA4</td><td>Cron (*/15 * * * *) or webhook</td></tr>
+            <tr><td>2</td><td>Webflow &rarr; Xano &rarr; Shopify &rarr; GA4</td><td>Webflow CMS item changed webhook</td></tr>
+            <tr><td>3</td><td>UCP &rarr; Xano &rarr; Shopify + Webflow &rarr; GA4</td><td>POST /ucp/tags or POST /tags/user</td></tr>
+            <tr><td>4</td><td>Form Bridge &rarr; UCP &rarr; All</td><td>data-crm-form submission</td></tr>
+            <tr><td>5</td><td>Shopify &rarr; Xano &rarr; Resend</td><td>Customer create (welcome email)</td></tr>
+            <tr><td>6</td><td>Shopify &rarr; Worker (compliance)</td><td>POST /api/webhooks (GDPR)</td></tr>
+            <tr><td>7</td><td>Shopify &rarr; Xano &rarr; Adobe AEP</td><td>Customer update (if AEP enabled)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Endpoints -->
+  <section id="endpoints">
+    <h2>API Endpoints</h2>
+
+    <div class="collapsible">
+      <div class="collapsible-header open" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Auth Endpoints
+      </div>
+      <div class="collapsible-body open">
+        <div class="endpoint-grid">
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/signup</span><div class="desc">Email/password registration with bcrypt</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/login</span><div class="desc">Email/password login with JWT issuance</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/me</span><div class="desc">Current user profile (JWT required)</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/logout</span><div class="desc">Clear session cookie</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/forgot-password</span><div class="desc">Send password reset email</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/reset-password</span><div class="desc">Set new password via reset token</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/profile</span><div class="desc">Update name, language</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/auth/delete-account</span><div class="desc">Self-service account deletion</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/google/login</span><div class="desc">Google OAuth redirect</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/shopify/login</span><div class="desc">Shopify Customer Account PKCE</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/install</span><div class="desc">Shopify App OAuth install</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/auth/webflow/connect</span><div class="desc">Webflow OAuth connect</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Admin Endpoints (Bearer token required)
+      </div>
+      <div class="collapsible-body">
+        <div class="endpoint-grid">
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/config?shop=</span><div class="desc">Read tenant config (secrets masked)</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/config?shop=</span><div class="desc">Write tenant config</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/sync/customers?shop=</span><div class="desc">Trigger full customer sync</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/admin/adobe-schema?shop=</span><div class="desc">Setup Adobe fields on Xano</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/admin/webflow-ensure-fields?shop=</span><div class="desc">Ensure Adobe fields on Webflow CMS</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/webhooks/upsell</span><div class="desc">Product upsell &rarr; AEP event</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        Public Endpoints
+      </div>
+      <div class="collapsible-body">
+        <div class="endpoint-grid">
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/health</span><div class="desc">Worker health check</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/setup</span><div class="desc">Setup wizard (ADMIN_KEY gated)</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/embed/footer</span><div class="desc">Footer embed (auth UI)</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/embed/account</span><div class="desc">Account page embed</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/embed/dashboard</span><div class="desc">UCP dashboard embed</div></div>
+          <div class="endpoint"><span class="method get">GET</span><span class="path">/embed/compliance</span><div class="desc">CCPA/GDPR compliance page</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <span class="chevron">&#9660;</span>
+        GDPR Endpoints (HMAC verified)
+      </div>
+      <div class="collapsible-body">
+        <div class="endpoint-grid">
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/gdpr/data-request</span><div class="desc">Export all user data</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/gdpr/customer-redact</span><div class="desc">Anonymize all PII</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/gdpr/shop-redact</span><div class="desc">Acknowledge shop deletion</div></div>
+          <div class="endpoint"><span class="method post">POST</span><span class="path">/api/webhooks</span><div class="desc">Compliance dispatcher</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Requirements -->
+  <section id="requirements">
+    <h2>Functional Requirements</h2>
+    <p style="font-size:0.8125rem;color:var(--muted);margin-bottom:1rem">Full specification: <a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md" target="_blank">FUNCTIONAL-SPEC.md v1.2</a></p>
+
+    <div id="req-sections"></div>
+  </section>
+
+  <!-- Resources -->
+  <div class="resources">
+    <h3>Resources</h3>
+    <div class="resources-grid">
+      <div>
+        <a href="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup" target="_blank">Setup Wizard</a>
+        <a href="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/health" target="_blank">Worker Health</a>
+        <a href="https://github.com/persephonepunch/crm-sync-setup" target="_blank">GitHub Repository</a>
+        <a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md" target="_blank">Functional Spec (v1.2)</a>
+      </div>
+      <div>
+        <a href="index.html">App Checklists (Shopify + Webflow)</a>
+        <a href="https://pim-sync.pages.dev/privacy" target="_blank">Privacy Policy</a>
+        <a href="https://pim-sync.pages.dev/terms" target="_blank">Terms of Service</a>
+        <a href="mailto:ysl@story-story.ai">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="links">
+      <a href="https://pim-sync.pages.dev/privacy" target="_blank">Privacy Policy</a>
+      <a href="https://pim-sync.pages.dev/terms" target="_blank">Terms of Service</a>
+      <a href="mailto:ysl@story-story.ai">Support</a>
+    </div>
+    <p>CRM Sync v1.2 &mdash; Last updated May 2026</p>
+  </footer>
+
+</div>
+
+<script>
+function toggleCollapsible(header) {
+  var body = header.nextElementSibling;
+  header.classList.toggle("open");
+  body.classList.toggle("open");
+}
+
+var REQ_DATA = [
+  { title: "Authentication (FR-AUTH)", count: 16, items: [
+    "Email/password registration with bcrypt hashing",
+    "Email/password login with JWT issuance",
+    "Google OAuth 2.0 (authorization code flow)",
+    "Shopify Customer Account OAuth (PKCE)",
+    "JWT sessions with configurable max age",
+    "Idle timeout with pre-logout warning",
+    "Password reset via email (Resend)",
+    "Profile update (name, language)",
+    "Account deletion (self-service)",
+    "Auth method toggles (admin-configurable)",
+    "Welcome email for Shopify-origin users",
+    "Welcome vs reset password page variant",
+    "Shopify App OAuth with expiring tokens",
+    "Webflow OAuth (replaces manual CMS token)",
+    "OAuth state CSRF protection",
+    "Shop domain validation"
+  ]},
+  { title: "Consent Management (FR-CONSENT)", count: 11, items: [
+    "TOS consent required on signup",
+    "Cookie consent banner with accept/reject",
+    "Marketing opt-in (configurable)",
+    "CCPA sale-of-data opt-out",
+    "Newsletter subscription consent",
+    "Dynamic consent types from form bridge",
+    "All changes logged to audit trail",
+    "Known types written to user_claims",
+    "Consent visible in UCP Dashboard",
+    "Consent synced to Shopify tags",
+    "Consent pushed to GA4 user properties"
+  ]},
+  { title: "Tag System (FR-TAGS)", count: 7, items: [
+    "Structured tags: status, tier, segment, campaign, consent, marketing",
+    "Tag auto-creation with category inference",
+    "Join table architecture (crm_tags + user_tag_map)",
+    "Flat array on storefront_users.tags for backward compat",
+    "Tags flow through full channel on every mutation",
+    "Default tag seed: 17 tags across 6 categories",
+    "Date-stamped campaign tags from form bridge"
+  ]},
+  { title: "CRM Sync (FR-SYNC)", count: 11, items: [
+    "Shopify → Xano customer upsert",
+    "Xano → Webflow CMS item upsert",
+    "Xano → Shopify metafields + tagsAdd",
+    "Webflow CMS → Xano → Shopify (webhook-driven)",
+    "Cron sync every 15 minutes",
+    "Single-user sync on webhook",
+    "Tag reference field linking collections",
+    "Webflow collection auto-detect/create",
+    "Force sync mode (bypass lastRun cursor)",
+    "Standalone Webflow CMS sync endpoint",
+    "Shopify Admin webhook auto-registration"
+  ]},
+  { title: "Adobe Experience Platform (FR-ADOBE)", count: 15, items: [
+    "Adobe IMS OAuth server-to-server auth",
+    "Per-tenant Adobe credentials in config",
+    "SHA-256 PII hashing (email, phone, name)",
+    "XDM ExperienceEvent schema mapping",
+    "Streaming ingestion to AEP dataset",
+    "KV-cached IMS access tokens with TTL refresh",
+    "Sync status written to Xano user_extras",
+    "Adobe fields synced to Webflow CMS",
+    "Admin endpoint for Xano schema setup",
+    "Triggered on customer update (if enabled)",
+    "Granular XDM consent mapping from CRM tags",
+    "Subscription list parsing from CRM tags",
+    "Form bridge → AEP subscriptionEvent push",
+    "Product upsell → AEP commerce.productListAdds",
+    "Upsell auto-tags + Shopify + GA4 sync"
+  ]},
+  { title: "Multi-Tenant (FR-TENANT)", count: 9, items: [
+    "Per-shop KV config isolation",
+    "Tenant registry (tenants:index)",
+    "Tenant identity resolution from headers/query/body",
+    "getTenantConfig / setTenantConfig functions",
+    "Legacy crm_config fallback for private plan",
+    "Cron iterates all registered tenants",
+    "Per-tenant error isolation",
+    "Tenant auto-registration on first config POST",
+    "Platform-level config for shared credentials"
+  ]},
+  { title: "Pricing & Billing (FR-PRICING)", count: 5, items: [
+    "Three-tier pricing: Shared ($69), Private ($325), Enterprise",
+    "Webflow extension Plan tab with pricing cards",
+    "Check Subscription Status queries tenant config",
+    "Contact Sales mailto link for Enterprise",
+    "Integrations upgrade note (Salesforce, HubSpot, etc.)"
+  ]},
+  { title: "GDPR / Privacy (FR-GDPR)", count: 8, items: [
+    "Customer redaction — anonymize PII across all tables",
+    "Data portability — compile all user data",
+    "Shop redaction — acknowledge shop deletion",
+    "Consent audit trail — append-only with timestamps",
+    "Consent provenance — source, session ID, IP",
+    "Right to deletion — self-service",
+    "HMAC-SHA256 on all GDPR webhook handlers",
+    "Compliance webhook dispatcher at /api/webhooks"
+  ]}
+];
+
+function renderRequirements() {
+  var container = document.getElementById("req-sections");
+  var html = "";
+  REQ_DATA.forEach(function(section) {
+    html += '<div class="collapsible">';
+    html += '<div class="collapsible-header" onclick="toggleCollapsible(this)">';
+    html += '<span class="chevron">&#9660;</span>';
+    html += section.title;
+    html += '<span class="count">' + section.count + ' requirements</span>';
+    html += '</div>';
+    html += '<div class="collapsible-body">';
+    html += '<table class="req-table"><thead><tr><th>#</th><th>Requirement</th><th>Status</th></tr></thead><tbody>';
+    section.items.forEach(function(item, i) {
+      html += '<tr><td>' + (i + 1) + '</td><td>' + item + '</td><td><span class="tag implemented">Implemented</span></td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  });
+  container.innerHTML = html;
+}
+
+renderRequirements();
+</script>
+
+</body>
+</html>
