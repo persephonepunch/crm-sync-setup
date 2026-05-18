@@ -1,7 +1,7 @@
 # CRM Sync — Shopify App Platform Changes
 
 **For:** Product managers, operations teams, and business stakeholders tracking Shopify app compliance
-**Date:** 2026-05-17
+**Date:** 2026-05-18
 
 ---
 

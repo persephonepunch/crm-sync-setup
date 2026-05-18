@@ -1,7 +1,7 @@
 # CRM Sync — Security & Compliance Posture
 
 **For:** Compliance officers, security auditors, and risk assessment teams
-**Date:** 2026-05-17
+**Date:** 2026-05-18
 
 ---
 
@@ -57,14 +57,14 @@ CRM Sync uses four independent authentication mechanisms. Compromising one does 
 
 | Layer | What It Protects | How It Works |
 |-------|-----------------|-------------|
-| **Bearer Token** | All admin and sync endpoints | API requests must include a secret key in the request header |
+| **Bearer Token** | All admin and sync endpoints | API requests must include a secret key in the request header; per-tenant admin keys checked first, platform key as fallback |
 | **JWT Session** | Customer-facing features (profile, consent, tags) | Encrypted cookie issued after login — expires automatically |
 | **HMAC Signature** | All Shopify webhooks and GDPR handlers | Shopify signs each request — the Worker verifies the signature matches |
 | **Cloudflare Access** | Browser access to admin pages | Email-based one-time password verification before any admin page loads |
 
 ### Route Coverage
 
-All 62 API endpoints have been audited. Every endpoint that writes data or accesses admin functions requires authentication. 12 endpoints that were previously unprotected were fixed in the May 2026 security hardening.
+All 67 API endpoints have been audited. Every endpoint that writes data or accesses admin functions requires authentication. 12 endpoints that were previously unprotected were fixed in the May 2026 security hardening. Per-tenant admin keys add granular access control — each tenant can have its own admin key, with the platform key as fallback.
 
 Public endpoints (no auth required): health check, OAuth initiation pages, public embeds, read-only config (secrets masked).
 

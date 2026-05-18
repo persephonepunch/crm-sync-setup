@@ -1,7 +1,7 @@
 # CRM Sync — Why This Architecture Is Safer
 
 **For:** Business leaders, compliance officers, and operations teams evaluating CRM Sync
-**Date:** 2026-05-17
+**Date:** 2026-05-18
 
 ---
 
@@ -57,7 +57,7 @@ Three questions you can answer in under 5 minutes:
 | Removing a partner | Set one toggle to "off" — done in seconds, no developer needed |
 | Rotating a compromised credential | Update the credential in config — same process as any other config change, logged and reversible |
 | Auditing who changed what | Every configuration change is authenticated and can be logged with before/after comparison |
-| Scaling to more stores | Each store has its own isolated configuration — one store's issues cannot affect another |
+| Scaling to more stores | Each store has its own isolated configuration with region-based grouping (US/CA/DE/FR/UK) and per-tenant admin keys — one store's issues cannot affect another |
 
 ### For Risk Assessment
 

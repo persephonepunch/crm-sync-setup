@@ -1187,21 +1187,21 @@ Billing: REST API                         Billing: GraphQL API (App Subscription
 # shopify.app.toml — version-controlled, PR-reviewable, diffable
 name = "CRM Sync"
 client_id = "0e57977712f8a9d270a602848ff95308"
-application_url = "https://cf-worker-crm-sync.persephonepunch.workers.dev"
+application_url = "https://hx-crm-sync.yoonsunlee150.workers.dev"
 embedded = true
 
 [auth]
 redirect_urls = [
-  "https://cf-worker-crm-sync.persephonepunch.workers.dev/auth/callback"
+  "https://hx-crm-sync.yoonsunlee150.workers.dev/auth/callback"
 ]
 
 [webhooks]
-api_version = "2025-04"
+api_version = "2026-07"
 
 [compliance_webhooks]
-customer_deletion_url = "https://cf-worker-crm-sync.../gdpr/customer-redact"
-customer_data_request_url = "https://cf-worker-crm-sync.../gdpr/data-request"
-shop_deletion_url = "https://cf-worker-crm-sync.../gdpr/shop-redact"
+customer_deletion_url = "https://hx-crm-sync.yoonsunlee150.workers.dev/gdpr/customer-redact"
+customer_data_request_url = "https://hx-crm-sync.yoonsunlee150.workers.dev/gdpr/data-request"
+shop_deletion_url = "https://hx-crm-sync.yoonsunlee150.workers.dev/gdpr/shop-redact"
 
 [access_scopes]
 scopes = "read_customers,write_customers,read_orders"

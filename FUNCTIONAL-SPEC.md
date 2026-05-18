@@ -1,8 +1,8 @@
 # CRM Sync — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
-**Version:** 1.2
-**Date:** 2026-05-17
+**Version:** 1.3
+**Date:** 2026-05-18
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Internal — Confidential
 
@@ -24,12 +24,13 @@
 | 1.0 | 2026-05-14 | Engineering | Initial functional spec with UAT test plan |
 | 1.1 | 2026-05-14 | Engineering | Security hardening: HMAC verification on all webhooks/GDPR handlers, OAuth state + shop domain validation, POST /config authentication, secrets stripped from embed HTML, PII console.log removed, compliance webhook dispatcher, welcome email flow, Webflow OAuth |
 | 1.2 | 2026-05-17 | Engineering | Multi-tenant SaaS architecture (per-shop KV isolation), ADMIN_KEY bearer token auth on all admin/write endpoints, Cloudflare Access (Zero Trust) email whitelisting, Adobe Experience Platform streaming integration with SHA-256 PII hashing, three-tier pricing model (Shared/Private/Enterprise), Webflow extension Plan tab and Adobe config UI |
+| 1.3 | 2026-05-18 | Engineering | Region-based tenant groups (US/CA/DE/FR/UK), structured tenant registry (`TenantEntry[]` with region + timestamp), per-tenant admin keys with platform key fallback, UUID-keyed OAuth state (no more global singleton), `tenantKvKey()` helper for all KV operations, `POST /admin/provision-region` with Xano schema replication, `GET/POST /platform/config` for shared credentials, extension `?shop=` on all fetch calls, multi-tenant isolation test suite |
 
 ---
 
 ## 1. Executive Summary
 
-CRM Sync is a multi-tenant server-side customer relationship management SaaS (~7,200+ lines, single-file Cloudflare Worker) that synchronizes user identity, consent, segmentation, and campaign tags across seven integrated services. The system operates with tri-directional data flow between Shopify (commerce), Xano (database), Webflow CMS (content), Google Analytics GA4 (measurement), Adobe Experience Platform (CDP), Resend (transactional email), and a Webflow-embedded frontend. It is a registered Shopify App and Webflow Marketplace App, subject to both platforms' submission and compliance requirements. The system supports multiple tenants (Shopify shops) with isolated KV-backed configuration, and is sold as a SaaS product with Shared ($69/mo), Private ($325/mo), and Enterprise (custom) pricing tiers.
+CRM Sync is a multi-tenant server-side customer relationship management SaaS (~8,000+ lines, single-file Cloudflare Worker) that synchronizes user identity, consent, segmentation, and campaign tags across seven integrated services. The system operates with tri-directional data flow between Shopify (commerce), Xano (database), Webflow CMS (content), Google Analytics GA4 (measurement), Adobe Experience Platform (CDP), Resend (transactional email), and a Webflow-embedded frontend. It is a registered Shopify App and Webflow Marketplace App, subject to both platforms' submission and compliance requirements. The system supports multiple tenants (Shopify shops) with isolated KV-backed configuration, and is sold as a SaaS product with Shared ($69/mo), Private ($325/mo), and Enterprise (custom) pricing tiers.
 
 ### 1.1 Business Objectives
 
@@ -46,8 +47,8 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~7
 
 | Component | Platform | Identifier |
 |---|---|---|
-| Setup Wizard | Cloudflare Workers | [`cf-worker-crm-sync.yoonsunlee150.workers.dev/setup`](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) |
-| Backend Worker | Cloudflare Workers | `cf-worker-crm-sync` |
+| Setup Wizard | Cloudflare Workers | [`hx-crm-sync.yoonsunlee150.workers.dev/setup`](https://hx-crm-sync.yoonsunlee150.workers.dev/setup) |
+| Backend Worker | Cloudflare Workers | `hx-crm-sync` |
 | Database | Xano | `xerb-qpd6-hd8t.n7.xano.io` |
 | Commerce | Shopify Admin API | Per-tenant (e.g., `hx-stage.myshopify.com`) |
 | CMS | Webflow CMS API v2 | Per-tenant (e.g., `omenphase1-1.webflow.io`) |
@@ -64,15 +65,31 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~7
 ### 2.1 Multi-Tenant Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Cloudflare KV (CRM_STATE)                                 │
-│                                                             │
-│  tenant:{shop-a}:config ─► CrmSiteConfig (Shop A)          │
-│  tenant:{shop-b}:config ─► CrmSiteConfig (Shop B)          │
-│  tenants:index          ─► ["shop-a.myshopify.com", ...]   │
-│  platform:config        ─► PlatformConfig (shared creds)   │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  Cloudflare KV (CRM_STATE)                                          │
+│                                                                      │
+│  tenant:{shop-a}:config ─► CrmSiteConfig (Shop A)                   │
+│  tenant:{shop-b}:config ─► CrmSiteConfig (Shop B)                   │
+│  tenant:{shop}:tag_table_ids         ─► Xano table IDs              │
+│  tenant:{shop}:webflow_tags_collection_id ─► Webflow collection ID  │
+│  tenant:{shop}:sync:customers:last_run    ─► ISO timestamp          │
+│  tenants:index ─► TenantEntry[] (shop, region, registered_at)       │
+│  platform:config ─► PlatformConfig (shared creds)                   │
+│  oauth_state:{uuid} ─► { shop, return_to } (10min TTL)              │
+└──────────────────────────────────────────────────────────────────────┘
 ```
+
+**Region-Based Tenant Groups** — tenants are organized by region prefix in their shop domain:
+
+| Region | Naming Convention | Example |
+|--------|-------------------|---------|
+| US | `us-{brand}.myshopify.com` | `us-hx.myshopify.com` |
+| CA | `ca-{brand}.myshopify.com` | `ca-hx.myshopify.com` |
+| DE | `de-{brand}.myshopify.com` | `de-hx.myshopify.com` |
+| FR | `fr-{brand}.myshopify.com` | `fr-hx.myshopify.com` |
+| UK | `uk-{brand}.myshopify.com` | `uk-hx.myshopify.com` |
+
+Region is auto-inferred from the shop domain prefix via `inferRegionFromShop()`, or can be set explicitly via the config POST body or `POST /admin/provision-region`.
 
 **Tenant Identity Resolution** — each ingress identifies the tenant differently:
 
@@ -240,7 +257,7 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | ID | Requirement | Status |
 |---|---|---|
 | FR-TENANT-01 | Per-shop KV config isolation (`tenant:{shop}:config`) | Implemented |
-| FR-TENANT-02 | Tenant registry (`tenants:index` JSON array) | Implemented |
+| FR-TENANT-02 | Structured tenant registry (`tenants:index` as `TenantEntry[]` with shop, region, registered_at) | Implemented |
 | FR-TENANT-03 | Tenant identity resolution from headers/query/body | Implemented |
 | FR-TENANT-04 | `getTenantConfig(env, shop)` / `setTenantConfig(env, shop, config)` | Implemented |
 | FR-TENANT-05 | Legacy `crm_config` fallback for single-tenant (private plan) mode | Implemented |
@@ -248,6 +265,15 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-TENANT-07 | Per-tenant error isolation (one tenant failure does not block others) | Implemented |
 | FR-TENANT-08 | Tenant auto-registration on first config POST or OAuth install | Implemented |
 | FR-TENANT-09 | Platform-level config (`platform:config`) for shared credentials | Implemented |
+| FR-TENANT-10 | Region-based tenant groups (US/CA/DE/FR/UK) with `inferRegionFromShop()` | Implemented |
+| FR-TENANT-11 | `tenantKvKey(shop, key)` helper for all tenant-scoped KV operations | Implemented |
+| FR-TENANT-12 | Per-tenant admin keys (`admin_key` in tenant config) with platform key fallback | Implemented |
+| FR-TENANT-13 | UUID-keyed OAuth state (`oauth_state:{uuid}`) replacing global singleton keys | Implemented |
+| FR-TENANT-14 | `GET/POST /platform/config` for shared credential management | Implemented |
+| FR-TENANT-15 | `POST /admin/provision-region` for Xano schema replication per tenant | Implemented |
+| FR-TENANT-16 | `GET /admin/tenants?region=` with structured entries and region filter | Implemented |
+| FR-TENANT-17 | Backwards-compatible tenant registry migration (flat `string[]` → `TenantEntry[]`) | Implemented |
+| FR-TENANT-18 | Extension `?shop=` on all config POST, embed URL, and test endpoint fetch calls | Implemented |
 
 ### 3.9 Adobe Experience Platform Integration (FR-ADOBE)
 
@@ -341,24 +367,24 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 
 | Key Pattern | Contents | Sensitivity |
 |---|---|---|
-| `tenant:{shop}:config` | Per-tenant CrmSiteConfig (credentials, toggles, Adobe config) | High — contains API keys |
-| `tenants:index` | JSON array of registered shop domains | Low |
+| `tenant:{shop}:config` | Per-tenant CrmSiteConfig (credentials, toggles, Adobe config, admin_key) | High — contains API keys |
+| `tenant:{shop}:tag_table_ids` | Xano table IDs for crm_tags + user_tag_map (per-tenant) | Low |
+| `tenant:{shop}:webflow_tags_collection_id` | Webflow CRM Tags collection ID (per-tenant) | Low |
+| `tenant:{shop}:sync:customers:last_run` | ISO timestamp of last cron sync (per-tenant) | Low |
+| `tenants:index` | `TenantEntry[]` — structured array with `{ shop, region, registered_at }` | Low |
 | `platform:config` | Shared platform credentials (Shopify app secret, shared keys) | High |
-| `tag_table_ids` | Xano table IDs for crm_tags + user_tag_map | Low |
-| `webflow_tags_collection_id` | Webflow CRM Tags collection ID | Low |
-| `sync:customers:last_run` | ISO timestamp of last cron sync | Low |
 | `pkce:{state}` | PKCE code_verifier (TTL, auto-expires) | Medium — OAuth state |
-| `oauth_state:{uuid}` | OAuth state + shop + return_to (10min TTL) | Medium — CSRF nonce |
+| `oauth_state:{uuid}` | OAuth state + shop + return_to (10min TTL, UUID-keyed) | Medium — CSRF nonce |
 | `reset:{token}` | Password reset/welcome token: JSON `{ userId, welcome }` (1h/24h TTL) | Medium — auth token |
 | `adobe_token:{shop}` | Cached Adobe IMS access token (TTL-based) | High — bearer token |
+
+All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper, which returns `tenant:{shop}:{key}` when a shop is provided, or the bare `key` as fallback for legacy single-tenant mode.
 
 #### Legacy Keys (Single-Tenant / Private Plan Fallback)
 
 | Key | Contents | Sensitivity |
 |---|---|---|
 | `crm_config` | Full site config (single-tenant mode) | High — contains API keys |
-| `shopify_oauth_state` | Shopify App OAuth state (5min TTL) | Medium — CSRF nonce |
-| `webflow_oauth_state` | Webflow OAuth state (5min TTL) | Medium — CSRF nonce |
 
 ---
 
@@ -372,7 +398,7 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | Session tokens | JWT with `HS256`, configurable expiry |
 | Token delivery | `httpOnly`, `Secure`, `SameSite=None` cookie |
 | OAuth state (user auth) | Random nonce stored in KV (`oauth_state:{state}`), verified on callback, deleted after use |
-| OAuth state (app install) | Random UUID stored in KV (`shopify_oauth_state`), verified in `handleShopifyAppCallback`, rejected with 403 on mismatch |
+| OAuth state (app install) | Random UUID stored in KV (`oauth_state:{uuid}`), verified in callback, rejected with 403 on mismatch; includes shop domain to prevent cross-tenant collisions |
 | PKCE | S256 code challenge (Shopify Customer Account) |
 | Shop domain validation | `validateShopDomain()` regex on install + callback; rejects non-`.myshopify.com` domains |
 | Idle timeout | Client-side timer with server-validated token expiry |
@@ -385,7 +411,8 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | Protected endpoints | JWT verification required for `/ucp/*`, `/auth/me`, `/auth/profile`, `/auth/delete-account`, `/tags/user`, `/segment/*` |
 | Config endpoint auth | `POST /config` requires `Authorization: Bearer <ADMIN_KEY>` header; checks `ADMIN_KEY` or `SHOPIFY_APP_SECRET` env var |
 | Admin endpoint auth | All `/admin/*` and `/sync/*` endpoints require `Authorization: Bearer <ADMIN_KEY>` header |
-| Tenant isolation | Config reads/writes scoped to `tenant:{shop}:config`; no cross-tenant data access |
+| Per-tenant admin keys | Tenants may set `admin_key` in their config; post-resolution auth gates check tenant key first, platform key as fallback |
+| Tenant isolation | Config reads/writes scoped to `tenant:{shop}:config`; all KV operations use `tenantKvKey()` helper; no cross-tenant data access |
 | CORS | Origin whitelist via `auth_redirect_origin` config |
 | Secret masking | `GET /config` masks all credentials (first 4 + last 4 chars) |
 | Embed HTML isolation | `getPublicCrmConfig()` strips API keys, tokens, and secrets before injecting config into client-side embed HTML (`/embed/footer`, `/embed/compliance`) |
@@ -402,7 +429,7 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 |---|---|
 | Cloudflare Access (Zero Trust) | Email-based OTP access policy on worker admin URLs; whitelist: `ysl@ysl150.com`, `*@story-story.ai` |
 | Access auth domain | `kcoop.cloudflareaccess.com` |
-| CRM Sync Access App | Protects `cf-worker-crm-sync.yoonsunlee150.workers.dev` |
+| CRM Sync Access App | Protects `hx-crm-sync.yoonsunlee150.workers.dev` |
 | PIM Sync Access App | Protects `cf-worker-webflow-sync.yoonsunlee150.workers.dev` |
 | Identity provider | One-Time Pin (OTP) — email verification, no external IdP dependency |
 
@@ -472,7 +499,7 @@ User Action (toggle, form, signup)
 
 | Item | Value |
 |---|---|
-| Worker URL | `https://cf-worker-crm-sync.yoonsunlee150.workers.dev` |
+| Worker URL | `https://hx-crm-sync.yoonsunlee150.workers.dev` |
 | Test Site | `https://omenphase1-1.webflow.io` |
 | Shopify Store | `hx-stage.myshopify.com` |
 | GA4 Property | `G-S7QGFWPZ8X` |
@@ -615,6 +642,15 @@ User Action (toggle, form, signup)
 | UAT-MT-05 | Missing tenant ID returns 400 | 1. `POST /config` without `?shop=` param (in multi-tenant mode) | `400 Missing shop parameter` | [ ] | |
 | UAT-MT-06 | Cron iterates all tenants | 1. Register 2+ tenants 2. Trigger scheduled handler | Sync runs for each tenant in `tenants:index`; per-tenant errors isolated | [ ] | |
 | UAT-MT-07 | Legacy fallback (private plan) | 1. Deploy with no `tenants:index` key 2. `GET /config` (no shop param) | Falls back to `crm_config` key | [ ] | |
+| UAT-MT-08 | Region-based tenant group | 1. `POST /config?shop=us-hx.myshopify.com` 2. Read `tenants:index` | Entry has `region: "us"` (auto-inferred from prefix) | [ ] | |
+| UAT-MT-09 | Tenant registry structured entries | 1. Register 2 tenants 2. `GET /admin/tenants` with bearer | Returns `TenantEntry[]` with `shop`, `region`, `registered_at` | [ ] | |
+| UAT-MT-10 | Tenant registry region filter | 1. Register US + CA tenants 2. `GET /admin/tenants?region=us` | Returns only US-region tenants | [ ] | |
+| UAT-MT-11 | Per-tenant admin key | 1. Set `admin_key` in tenant config 2. Use tenant key on admin endpoint | Tenant key accepted; platform key also still works | [ ] | |
+| UAT-MT-12 | Platform config CRUD | 1. `GET /platform/config` with bearer 2. `POST /platform/config` with bearer | Platform config read/written at `platform:config` KV key | [ ] | |
+| UAT-MT-13 | Region provisioning | 1. `POST /admin/provision-region?shop=us-hx.myshopify.com` with bearer | Xano tables created/verified; tag_table_ids cached in tenant-scoped KV | [ ] | |
+| UAT-MT-14 | Extension ?shop= param | 1. Build extension bundle 2. Inspect `index.js` | All fetch calls include `?shop=` parameter (>= 4 references) | [ ] | |
+| UAT-MT-15 | KV key isolation | 1. Trigger sync for shop A 2. Check KV keys | All KV keys use `tenant:{shop}:` prefix (tag_table_ids, webflow_tags_collection_id, sync:customers:last_run) | [ ] | |
+| UAT-MT-16 | OAuth state isolation | 1. Start Webflow OAuth for two shops simultaneously 2. Complete one callback | Each flow has its own UUID-keyed state; no collision | [ ] | |
 
 ### 7.12 Adobe AEP Integration Tests
 
@@ -655,7 +691,7 @@ User Action (toggle, form, signup)
 | 2 | Xano Meta API schema quirks (POST /field returns 404) | Schema updates require PUT with full schema array | Documented in INTERNAL-SETUP.md |
 | 3 | GA4 Measurement Protocol events are server-side | No browser session stitching without GTM | `user_id` matching bridges server + client events |
 | 4 | Webflow CMS API rate limits | High-volume syncs may be throttled | Cron pages at 100 users per sync |
-| 5 | Single-file worker architecture (~7,200+ lines) | Maintenance complexity | Acceptable for current scope; refactor if adding major features |
+| 5 | Single-file worker architecture (~8,000+ lines) | Maintenance complexity | Acceptable for current scope; refactor if adding major features |
 | 6 | KV eventual consistency | Config changes may take seconds to propagate | Edge-level consistency acceptable for config updates |
 | 7 | Shopify expiring tokens require proactive refresh | `shpua_` tokens expire in 60 min; cron must refresh before expiry | Tracked via `shopify_token_expires_at` in KV config |
 | 8 | POST /config requires auth header after security hardening | Webflow Designer Extension updated to send `Authorization: Bearer` | Extension uses `shopifyAppSecret` as bearer token |
@@ -710,7 +746,7 @@ User Action (toggle, form, signup)
 | 7 | UAT-GA4 tests pass (at least 3/5) | Yes | [ ] |
 | 8 | UAT-SYNC tests pass (at least 3/5) | Yes | [ ] |
 | 9 | UAT-FORM tests pass (at least 3/5) | No — depends on GTM setup | [ ] |
-| 10 | All UAT-MT tests pass (7 tests) | Yes | [ ] |
+| 10 | All UAT-MT tests pass (16 tests) | Yes | [ ] |
 | 11 | UAT-ADOBE tests pass (at least 5/8) | Yes | [ ] |
 | 12 | UAT-PRICE tests pass (at least 3/5) | No — UI-only | [ ] |
 | 13 | No critical or high-severity defects open | Yes | [ ] |
@@ -756,4 +792,4 @@ I have reviewed the functional requirements, test plan, release criteria, and kn
 
 ---
 
-*Document generated 2026-05-14, updated v1.2 2026-05-17. Reflects CRM Sync worker (~7,200+ lines, 60+ route handlers) deployed to `cf-worker-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with Adobe AEP, Cloudflare Access, and three-tier pricing. Security audit: 25 PASS / 0 FAIL / 3 REVIEW.*
+*Document generated 2026-05-14, updated v1.3 2026-05-18. Reflects CRM Sync worker (~8,000+ lines, 64+ route handlers) deployed to `hx-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing. Security audit: 25 PASS / 0 FAIL / 3 REVIEW.*

@@ -1,7 +1,7 @@
 # CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams
 
 **For:** Marketing ops, analytics teams, and CRM administrators planning the transition
-**Date:** 2026-05-17
+**Date:** 2026-05-18
 
 ---
 

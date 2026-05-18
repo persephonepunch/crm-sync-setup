@@ -1,8 +1,8 @@
 # CRM Sync — Security Audit & Paired Data Requirements
 
-**Date:** 2026-05-17
-**Version:** 1.0
-**Worker Version:** ace60178-2c2e-43fc-a714-a91e14b097e2
+**Date:** 2026-05-18
+**Version:** 1.1
+**Worker Version:** dac8f178-f6ed-4a11-96be-f640a67c64ae
 
 ---
 
@@ -10,17 +10,17 @@
 
 ### 1.1 Route Auth Coverage (Post-Hardening)
 
-All 54 routes verified. Every write endpoint and admin endpoint now requires authentication.
+All 67 routes verified. Every write endpoint and admin endpoint now requires authentication. Per-tenant admin keys provide granular access control with platform key fallback.
 
 #### Auth Layers
 
 | Layer | Mechanism | Protects |
 |-------|-----------|----------|
-| **Bearer Token** | `Authorization: Bearer <ADMIN_KEY>` header | All `/admin/*`, `/sync/*`, `/config POST`, `/tags/create`, `/webhooks/upsell` |
+| **Bearer Token** | `Authorization: Bearer <ADMIN_KEY>` or per-tenant `admin_key` | All `/admin/*`, `/sync/*`, `/config POST`, `/tags/create`, `/webhooks/upsell`, `/platform/config` |
 | **Admin Key (query)** | `?key=<ADMIN_KEY>` in URL | `/setup`, `/onboarding`, `/onboarding/setup`, `/settings` |
 | **JWT (user session)** | `httpOnly` cookie, HS256 signed | `/auth/me`, `/auth/profile`, `/auth/delete-account`, `/ucp/*`, `/tags/*`, `/segment/*` |
 | **HMAC-SHA256** | `X-Shopify-Hmac-SHA256` header | `/webhooks/customer-update`, `/webhooks/customer-create`, `/gdpr/*`, `/api/webhooks` |
-| **OAuth State** | KV-stored nonce, single-use | `/auth/callback`, `/auth/webflow/callback`, `/auth/google/callback`, `/auth/shopify/callback` |
+| **OAuth State** | UUID-keyed KV nonce (`oauth_state:{uuid}`), single-use, includes shop | `/auth/callback`, `/auth/webflow/callback`, `/auth/google/callback`, `/auth/shopify/callback` |
 | **Cloudflare Access** | OTP email verification | Worker admin URLs (browser access) |
 
 #### Complete Route Matrix
@@ -89,6 +89,11 @@ All 54 routes verified. Every write endpoint and admin endpoint now requires aut
 | 60 | GET | `/admin/shopify-test` | Bearer token | Admin |
 | 61 | POST | `/sync/customers` | Bearer token | Admin |
 | 62 | POST | `/sync/webflow` | Bearer token | Admin |
+| 63 | GET | `/admin/tenants` | Bearer token | Admin |
+| 64 | GET | `/platform/config` | Bearer token | Admin |
+| 65 | POST | `/platform/config` | Bearer token | Admin |
+| 66 | POST | `/admin/provision-region` | Bearer token | Admin |
+| 67 | POST | `/admin/adobe-schema` | Bearer token | Admin |
 
 #### Notes
 
@@ -208,14 +213,16 @@ Each pair defines: what data crosses the boundary, which direction, what trigger
 
 | Key Pattern | Data | Sensitivity | TTL |
 |------------|------|-------------|-----|
-| `tenant:{shop}:config` | Full CrmSiteConfig with all credentials | HIGH | Persistent |
-| `tenants:index` | Array of registered shop domains | LOW | Persistent |
+| `tenant:{shop}:config` | Full CrmSiteConfig with all credentials + admin_key | HIGH | Persistent |
+| `tenant:{shop}:tag_table_ids` | Xano table IDs (crm_tags + user_tag_map) | LOW | Persistent |
+| `tenant:{shop}:webflow_tags_collection_id` | Webflow CRM Tags collection ID | LOW | Persistent |
+| `tenant:{shop}:sync:customers:last_run` | ISO timestamp of last cron sync | LOW | Persistent |
+| `tenants:index` | `TenantEntry[]` (shop, region, registered_at) | LOW | Persistent |
 | `platform:config` | Shared platform credentials | HIGH | Persistent |
 | `adobe_token:{shop}` | Adobe IMS access token | HIGH | ~24h |
 | `pkce:{state}` | PKCE code_verifier | MEDIUM | 5 min |
-| `oauth_state:{uuid}` | OAuth state + shop | MEDIUM | 10 min |
+| `oauth_state:{uuid}` | OAuth state + shop (UUID-keyed, no global collisions) | MEDIUM | 10 min |
 | `reset:{token}` | Password reset metadata | MEDIUM | 1h / 24h |
-| `sync:customers:last_run` | ISO timestamp | LOW | Persistent |
 
 **Security:** KV encrypted at rest (Cloudflare managed). Secrets masked in GET /config. Short TTLs on auth state.
 
