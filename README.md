@@ -6,7 +6,7 @@ A tri-directional CRM system that synchronizes customer identity, consent, segme
 
 | Document | Description |
 |---|---|
-| [Setup Wizard](https://hx-crm-sync.yoonsunlee150.workers.dev/setup) | Interactive guided setup — 8 steps with live status checks |
+| [Setup Wizard](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) | Interactive guided setup — 8 steps with live status checks |
 | [Setup Guide](#setup-guide) | Detailed reference for all six services |
 | [Functional Spec & UAT](FUNCTIONAL-SPEC.md) | Requirements, test plan, compliance matrix, DPO/PMO sign-off |
 
@@ -32,7 +32,7 @@ The [Functional Spec](FUNCTIONAL-SPEC.md) contains:
 
 ### For Development / QA
 
-1. Start with the [Setup Wizard](https://hx-crm-sync.yoonsunlee150.workers.dev/setup) or follow the [Setup Guide](#setup-guide) below
+1. Start with the [Setup Wizard](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) or follow the [Setup Guide](#setup-guide) below
 2. Run the Pre-UAT checklist in the [Functional Spec](FUNCTIONAL-SPEC.md#72-pre-uat-checklist)
 3. Execute UAT test cases in order (Auth → Consent → Tags → Forms → GA4 → GDPR → Sync → Security)
 4. Obtain DPO and PMO sign-off before production release
@@ -41,16 +41,16 @@ The [Functional Spec](FUNCTIONAL-SPEC.md) contains:
 
 ```bash
 # Health check
-curl https://hx-crm-sync.yoonsunlee150.workers.dev/health
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/health
 
 # View config (secrets masked)
-curl https://hx-crm-sync.yoonsunlee150.workers.dev/config
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/config
 
 # List all CRM tags
-curl https://hx-crm-sync.yoonsunlee150.workers.dev/tags
+curl https://cf-worker-crm-sync.yoonsunlee150.workers.dev/tags
 
 # Manual sync trigger
-curl -X POST https://hx-crm-sync.yoonsunlee150.workers.dev/sync/customers
+curl -X POST https://cf-worker-crm-sync.yoonsunlee150.workers.dev/sync/customers
 ```
 
 ---
