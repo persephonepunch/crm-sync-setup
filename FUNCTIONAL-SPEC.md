@@ -47,8 +47,8 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~8
 
 | Component | Platform | Identifier |
 |---|---|---|
-| Setup Wizard | Cloudflare Workers | [`hx-crm-sync.yoonsunlee150.workers.dev/setup`](https://hx-crm-sync.yoonsunlee150.workers.dev/setup) |
-| Backend Worker | Cloudflare Workers | `hx-crm-sync` |
+| Setup Wizard | Cloudflare Workers | [`cf-worker-crm-sync.yoonsunlee150.workers.dev/setup`](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) |
+| Backend Worker | Cloudflare Workers | `cf-worker-crm-sync` |
 | Database | Xano | `xerb-qpd6-hd8t.n7.xano.io` |
 | Commerce | Shopify Admin API | Per-tenant (e.g., `hx-stage.myshopify.com`) |
 | CMS | Webflow CMS API v2 | Per-tenant (e.g., `omenphase1-1.webflow.io`) |
@@ -429,7 +429,7 @@ All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper,
 |---|---|
 | Cloudflare Access (Zero Trust) | Email-based OTP access policy on worker admin URLs; whitelist: `ysl@ysl150.com`, `*@story-story.ai` |
 | Access auth domain | `kcoop.cloudflareaccess.com` |
-| CRM Sync Access App | Protects `hx-crm-sync.yoonsunlee150.workers.dev` |
+| CRM Sync Access App | Protects `cf-worker-crm-sync.yoonsunlee150.workers.dev` |
 | PIM Sync Access App | Protects `cf-worker-webflow-sync.yoonsunlee150.workers.dev` |
 | Identity provider | One-Time Pin (OTP) — email verification, no external IdP dependency |
 
@@ -499,7 +499,7 @@ User Action (toggle, form, signup)
 
 | Item | Value |
 |---|---|
-| Worker URL | `https://hx-crm-sync.yoonsunlee150.workers.dev` |
+| Worker URL | `https://cf-worker-crm-sync.yoonsunlee150.workers.dev` |
 | Test Site | `https://omenphase1-1.webflow.io` |
 | Shopify Store | `hx-stage.myshopify.com` |
 | GA4 Property | `G-S7QGFWPZ8X` |
@@ -792,4 +792,4 @@ I have reviewed the functional requirements, test plan, release criteria, and kn
 
 ---
 
-*Document generated 2026-05-14, updated v1.3 2026-05-18. Reflects CRM Sync worker (~8,000+ lines, 64+ route handlers) deployed to `hx-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing. Security audit: 25 PASS / 0 FAIL / 3 REVIEW.*
+*Document generated 2026-05-14, updated v1.3 2026-05-18. Reflects CRM Sync worker (~8,000+ lines, 64+ route handlers) deployed to `cf-worker-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing. Security audit: 25 PASS / 0 FAIL / 3 REVIEW.*
