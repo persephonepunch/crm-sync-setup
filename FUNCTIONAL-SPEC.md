@@ -1,8 +1,8 @@
 # CRM Sync — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
-**Version:** 1.3
-**Date:** 2026-05-18
+**Version:** 1.6
+**Date:** 2026-05-20
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Internal — Confidential
 
@@ -25,12 +25,15 @@
 | 1.1 | 2026-05-14 | Engineering | Security hardening: HMAC verification on all webhooks/GDPR handlers, OAuth state + shop domain validation, POST /config authentication, secrets stripped from embed HTML, PII console.log removed, compliance webhook dispatcher, welcome email flow, Webflow OAuth |
 | 1.2 | 2026-05-17 | Engineering | Multi-tenant SaaS architecture (per-shop KV isolation), ADMIN_KEY bearer token auth on all admin/write endpoints, Cloudflare Access (Zero Trust) email whitelisting, Adobe Experience Platform streaming integration with SHA-256 PII hashing, three-tier pricing model (Shared/Private/Enterprise), Webflow extension Plan tab and Adobe config UI |
 | 1.3 | 2026-05-18 | Engineering | Region-based tenant groups (US/CA/DE/FR/UK), structured tenant registry (`TenantEntry[]` with region + timestamp), per-tenant admin keys with platform key fallback, UUID-keyed OAuth state (no more global singleton), `tenantKvKey()` helper for all KV operations, `POST /admin/provision-region` with Xano schema replication, `GET/POST /platform/config` for shared credentials, extension `?shop=` on all fetch calls, multi-tenant isolation test suite |
+| 1.4 | 2026-05-19 | Engineering | UCP/A2A/AP2 protocol endpoints (14 new routes, 81 total), Storefront Cart API checkout with channel attribution, A2A/AP2 consent toggles, embed feature flags (`embeds_enabled`), GA4 UCP events (`ucp_checkout_created`, `ucp_mandate_created`, `ucp_mandate_used`, `ucp_checkout_completed`), auto-provisioned Storefront Access Token, cart embed, Protocol Status UI in account/dashboard embeds, AP2 mandate HMAC signatures |
+| 1.5 | 2026-05-20 | Engineering | Shopify expiring token rotation (mandatory since April 2026), `POST /admin/shopify-refresh` manual refresh endpoint (82 routes), OAuth scopes expanded (`read_products`, `read_orders`), cart embed multi-tenant `SHOP_PARAM` injection, UCP Entitlement (A2A/AP2) toggles in extension Auth tab, scope management via `shopify.app.crm-sync.toml`, webhook API version `2026-04` |
+| 1.6 | 2026-05-20 | Engineering | Token Lifecycle Management specification (§3.14): Shopify expiring token architecture, refresh flow, multi-tenant token storage schema, three-surface token sync (app loader, cron, manual), diagnostic endpoints, embed system updated to fetch+innerHTML pattern with script re-execution |
 
 ---
 
 ## 1. Executive Summary
 
-CRM Sync is a multi-tenant server-side customer relationship management SaaS (~8,000+ lines, single-file Cloudflare Worker) that synchronizes user identity, consent, segmentation, and campaign tags across seven integrated services. The system operates with tri-directional data flow between Shopify (commerce), Xano (database), Webflow CMS (content), Google Analytics GA4 (measurement), Adobe Experience Platform (CDP), Resend (transactional email), and a Webflow-embedded frontend. It is a registered Shopify App and Webflow Marketplace App, subject to both platforms' submission and compliance requirements. The system supports multiple tenants (Shopify shops) with isolated KV-backed configuration, and is sold as a SaaS product with Shared ($69/mo), Private ($325/mo), and Enterprise (custom) pricing tiers.
+CRM Sync is a multi-tenant server-side customer relationship management SaaS (~9,000+ lines, single-file Cloudflare Worker, 82 routes) that synchronizes user identity, consent, segmentation, and campaign tags across seven integrated services. The system operates with tri-directional data flow between Shopify (commerce), Xano (database), Webflow CMS (content), Google Analytics GA4 (measurement), Adobe Experience Platform (CDP), Resend (transactional email), and a Webflow-embedded frontend. It is a registered Shopify App and Webflow Marketplace App, subject to both platforms' submission and compliance requirements. The system supports multiple tenants (Shopify shops) with isolated KV-backed configuration, and is sold as a SaaS product with Shared ($69/mo), Private ($325/mo), and Enterprise (custom) pricing tiers.
 
 ### 1.1 Business Objectives
 
@@ -168,10 +171,13 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-AUTH-10 | Auth method toggles (admin-configurable) | KV config: `authMethods.email/google/shopify` | Implemented |
 | FR-AUTH-11 | Welcome email for Shopify-origin users | Auto-sent on customer create (webhook/cron); detects `!password_hash` | Implemented |
 | FR-AUTH-12 | Welcome vs reset password page variant | `?welcome=1` adjusts title/subtitle/button copy | Implemented |
-| FR-AUTH-13 | Shopify App OAuth with expiring tokens | `GET /auth/install` → `/auth/callback`; `expiring=1`, `shpua_`/`shprt_` | Implemented |
+| FR-AUTH-13 | Shopify App OAuth with mandatory expiring tokens | `GET /auth/install` → `/auth/callback`; `expiring=1` (required since April 2026); scopes: `read_customers,write_customers,read_products,read_orders`; stores `shpua_` access + `shprt_` refresh token | Implemented |
 | FR-AUTH-14 | Webflow OAuth (replaces manual CMS token) | `GET /auth/webflow/connect` → `/auth/webflow/callback` | Implemented |
 | FR-AUTH-15 | OAuth state parameter CSRF protection | State generated, stored in KV, verified on callback, deleted after use | Implemented |
 | FR-AUTH-16 | Shop domain validation | Regex `^[a-zA-Z0-9][a-zA-Z0-9-]*\.myshopify\.com$` on install + callback | Implemented |
+| FR-AUTH-17 | Automatic Shopify token refresh | `refreshShopifyTokenIfNeeded()` called on `*/15 * * * *` cron; refreshes 5 min before expiry; rotates both `shpua_` access token and `shprt_` refresh token | Implemented |
+| FR-AUTH-18 | Manual Shopify token refresh | `POST /admin/shopify-refresh` — force-refreshes token, tests API, returns status; bearer auth required | Implemented |
+| FR-AUTH-19 | Shopify app scope management | Scopes declared in `shopify.app.crm-sync.toml` `[access_scopes]`; deployed via `npx shopify app deploy`; Shopify silently drops undeclared scopes | Implemented |
 
 ### 3.2 Consent Management (FR-CONSENT)
 
@@ -188,6 +194,9 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-CONSENT-09 | Consent state visible in UCP Dashboard | Implemented |
 | FR-CONSENT-10 | Consent state synced to Shopify tags (`accepts_*` / `rejects_*`) | Implemented |
 | FR-CONSENT-11 | Consent state pushed to GA4 user properties | Implemented |
+| FR-CONSENT-12 | A2A Agent Access consent — controls AI agent read access via A2A protocol | Implemented |
+| FR-CONSENT-13 | AP2 Agent Payments consent — controls AI agent checkout via signed mandates | Implemented |
+| FR-CONSENT-14 | AP2 consent gating — mandate creation returns 403 if `consent_ap2` not granted | Implemented |
 
 ### 3.3 Tag System (FR-TAGS)
 
@@ -224,6 +233,8 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-GA4-01 | Server-side GA4 Measurement Protocol push | Implemented |
 | FR-GA4-02 | User properties: `crm_status`, `crm_tier`, `crm_segment`, `crm_tags`, `crm_campaign`, `consent_marketing`, `consent_tos` | Implemented |
 | FR-GA4-03 | Events: `crm_tags_updated`, `crm_sync`, `crm_form_submit` | Implemented |
+| FR-GA4-07 | UCP checkout events: `ucp_checkout_created`, `ucp_checkout_completed` with session_id, a2a_consent, ap2_consent | Implemented |
+| FR-GA4-08 | UCP mandate events: `ucp_mandate_created`, `ucp_mandate_used` with mandate_id, max_amount, scope | Implemented |
 | FR-GA4-04 | Client ID format: `crm-sync.{userId}` for server-originated events | Implemented |
 | FR-GA4-05 | `engagement_time_msec` > 0 for event visibility in reports | Implemented |
 | FR-GA4-06 | DataLayer push from form bridge for GTM tag pickup | Implemented |
@@ -305,6 +316,163 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-PRICING-04 | "Contact Sales" mailto link for Enterprise tier (`ysl@ysl150.com`) | Implemented |
 | FR-PRICING-05 | Integrations upgrade note (Salesforce, HubSpot, Klaviyo, Attentive, Braze) | Implemented |
 
+### 3.11 UCP / A2A Protocol (FR-UCP)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-UCP-01 | UCP Discovery Manifest at `GET /.well-known/ucp` — dynamic capabilities, endpoints, auth methods | Implemented |
+| FR-UCP-02 | A2A Agent Card at `GET /.well-known/agent-card.json` — 5 skills, bearer auth, JSON output | Implemented |
+| FR-UCP-03 | Commerce Identity at `GET /commerce/identity` — unified profile with providers, consent, tags | Implemented |
+| FR-UCP-04 | Product Catalog at `GET /commerce/products?shop=` — Shopify Admin GraphQL, search, pagination, collection filter; `?shop=` required for multi-tenant product resolution | Implemented |
+| FR-UCP-05 | Order Management at `GET /commerce/orders` + `GET /commerce/orders/:id` — JWT auth, KV cache, ownership verification | Implemented |
+| FR-UCP-06 | Checkout Sessions — Storefront Cart API (primary) with Draft Order fallback; `POST /commerce/checkout`, `GET /commerce/checkout/:id`, `POST /commerce/checkout/:id/complete` | Implemented |
+| FR-UCP-07 | AP2 Payment Mandates — HMAC-SHA256 signed mandates with expiry; `POST /commerce/mandates`, `GET /commerce/mandates/:id` | Implemented |
+| FR-UCP-08 | Consent History at `GET /ucp/consent-history` — paginated audit trail | Implemented |
+| FR-UCP-09 | UCP Tag Sync at `POST /ucp/tags` — tags flow through full channel | Implemented |
+| FR-UCP-10 | CORS on all `/commerce/*` routes | Implemented |
+| FR-UCP-11 | UCP manifest `checkout_api` field reflects active API (`storefront_cart` or `admin_draft_order`) | Implemented |
+| FR-UCP-12 | UCP manifest dynamically includes `a2a_agent_access` / `ap2_agent_payments` capabilities when consent enabled | Implemented |
+
+### 3.12 Embed System (FR-EMBED)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-EMBED-01 | Footer consent banner (`/embed/footer`) — GDPR-compliant banner with cookie preferences | Implemented |
+| FR-EMBED-02 | Compliance center (`/embed/compliance`) — data export, deletion, consent history | Implemented |
+| FR-EMBED-03 | Customer account (`/embed/account`) — profile, consent toggles (incl. A2A/AP2), linked providers, Protocol Status | Implemented |
+| FR-EMBED-04 | Customer dashboard (`/embed/dashboard`) — consent status, retarget channels, segment, tags, consent history, Protocol Status | Implemented |
+| FR-EMBED-05 | Product cart + checkout (`/embed/cart`) — product grid with search, variant selector, cart sidebar, UCP checkout; `SHOP_PARAM` injected at serve time for multi-tenant product/checkout API calls | Implemented |
+| FR-EMBED-06 | `embeds_enabled` feature flag — tenant-configurable array controlling which embeds are served (default: all five) | Implemented |
+| FR-EMBED-07 | Disabled embeds return 403 with error message | Implemented |
+| FR-EMBED-08 | Shopify app Embed Codes tab — copy-ready snippets for all 5 embeds with preview links | Implemented |
+
+### 3.13 Storefront Token Provisioning (FR-SF)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-SF-01 | Auto-provision Storefront Access Token on Shopify app auth via `storefrontAccessTokenCreate` | Implemented |
+| FR-SF-02 | Reuse existing "CRM Sync Storefront" token if one exists (no duplicates) | Implemented |
+| FR-SF-03 | Storefront token sent to worker via `POST /config` on every app load | Implemented |
+| FR-SF-04 | Storefront token visible in Settings page (display + reset + manual override) | Implemented |
+| FR-SF-05 | Checkout auto-selects Storefront Cart API when token available, falls back to Draft Orders | Implemented |
+
+### 3.14 Token Lifecycle Management (FR-TOKEN)
+
+#### 3.14.1 Shopify Expiring Token Requirement
+
+As of April 2026, Shopify mandates that all OAuth apps use expiring offline access tokens with rotation. Non-expiring tokens (`shpat_`) return `403`. All CRM Sync Admin API calls — customer sync, product queries, order lookups, webhook registration, and storefront token provisioning — require valid `shpua_` tokens.
+
+| Aspect | Before (deprecated) | After (mandatory) |
+|---|---|---|
+| Token lifetime | Never expires | ~24 hours (Shopify-controlled TTL) |
+| Refresh token | Not issued | Issued alongside access token; rotates on each use |
+| Token prefix | `shpat_` | `shpua_` (OAuth expiring) |
+| Compliance flag | None | `expiring: "1"` in token exchange; `expiringOfflineAccessTokens: true` in app config |
+
+#### 3.14.2 Token Refresh Architecture
+
+| ID | Requirement | Implementation | Status |
+|---|---|---|---|
+| FR-TOKEN-01 | OAuth install exchanges code with `expiring=1` flag | `POST /admin/oauth/access_token` with `expiring: "1"` | Implemented |
+| FR-TOKEN-02 | Store access token, refresh token, and expiry timestamp in tenant KV | `shopify_admin_token`, `shopify_refresh_token`, `shopify_token_expires_at` | Implemented |
+| FR-TOKEN-03 | Auto-refresh before expiry via cron (5-min buffer) | `refreshShopifyTokenIfNeeded()` called by `*/15 * * * *` scheduled handler | Implemented |
+| FR-TOKEN-04 | Rotate refresh token on each use (Shopify requirement) | New `refresh_token` from response saved back to KV | Implemented |
+| FR-TOKEN-05 | Shopify app session sync on every app open | `app.tsx` loader sends `session.accessToken` to CRM worker via `POST /config?shop=` | Implemented |
+| FR-TOKEN-06 | Manual force-refresh endpoint | `POST /admin/shopify-refresh` — bypasses expiry check, tests API, returns status | Implemented |
+| FR-TOKEN-07 | Pre-call refresh on Admin API queries | `shopifyAdminGql()` calls `refreshShopifyTokenIfNeeded()` before every GraphQL request | Implemented |
+| FR-TOKEN-08 | Multi-tenant token isolation | Each tenant's tokens stored independently under `tenant:{shop}:config`; cron iterates all tenants | Implemented |
+| FR-TOKEN-09 | Diagnostic endpoint for token health | `GET /admin/shopify-test` — tests API call, returns token prefix, length, domain, response | Implemented |
+| FR-TOKEN-10 | Settings page token status display | Shows token type (`OAuth (expiring)` / `Admin API`), refresh token presence, expiry countdown, API health | Implemented |
+
+#### 3.14.3 Token Flow Diagram
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   TOKEN ACQUISITION                       │
+│                                                          │
+│  OAuth Install ──► POST /admin/oauth/access_token        │
+│                    (code + expiring=1)                    │
+│                         │                                │
+│                         ▼                                │
+│              ┌─────────────────────┐                     │
+│              │  access_token       │ (shpua_, ~24h TTL)  │
+│              │  refresh_token      │ (one-time use)      │
+│              │  expires_in         │ (seconds)           │
+│              └────────┬────────────┘                     │
+│                       ▼                                  │
+│              KV: tenant:{shop}:config                    │
+└──────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────┐
+│                   TOKEN REFRESH (3 surfaces)              │
+│                                                          │
+│  1. Cron (*/15 * * * *)                                  │
+│     └─ refreshShopifyTokenIfNeeded() per tenant          │
+│        └─ Skip if > 5 min to expiry                      │
+│                                                          │
+│  2. Shopify App Loader (on every app open)               │
+│     └─ POST /config?shop= with session.accessToken       │
+│                                                          │
+│  3. Manual (Settings page button)                        │
+│     └─ POST /admin/shopify-refresh (force=true)          │
+│                                                          │
+│  All paths ──► POST /admin/oauth/access_token            │
+│                (grant_type=refresh_token)                 │
+│                         │                                │
+│                         ▼                                │
+│              ┌─────────────────────┐                     │
+│              │  NEW access_token   │                     │
+│              │  NEW refresh_token  │ (old one invalid)   │
+│              │  NEW expires_in     │                     │
+│              └────────┬────────────┘                     │
+│                       ▼                                  │
+│              KV: tenant:{shop}:config (overwritten)      │
+└──────────────────────────────────────────────────────────┘
+```
+
+#### 3.14.4 Required OAuth Scopes
+
+| Scope | Purpose | Declared In |
+|---|---|---|
+| `read_customers` | Customer sync, identity lookup | `shopify.app.crm-sync.toml` |
+| `write_customers` | Customer creation, tag/metafield writes | `shopify.app.crm-sync.toml` |
+| `customer_read_customers` | Customer Account API reads | `shopify.app.crm-sync.toml` |
+| `customer_write_customers` | Customer Account API writes | `shopify.app.crm-sync.toml` |
+| `read_products` | Shop embed product grid | `shopify.app.crm-sync.toml` |
+| `read_orders` | Order history in dashboard | `shopify.app.crm-sync.toml` |
+
+Scopes must be declared in `shopify.app.crm-sync.toml` under `[access_scopes]`. Shopify silently drops undeclared scopes. Deploy scope changes via `npx shopify app deploy --config=shopify.app.crm-sync.toml`.
+
+#### 3.14.5 Embed Loading Pattern
+
+All embed endpoints (`/embed/footer`, `/embed/account`, `/embed/dashboard`, `/embed/compliance`, `/embed/cart`) use the fetch+innerHTML pattern with script re-execution. The Shopify app generates embed snippets with short variable names to prevent code editor line-wrapping:
+
+```html
+<div id="crm-{embed}-embed"></div>
+<script>
+(function(){
+  var W='{workerUrl}';
+  fetch(W+'/embed/{embed}?shop={shop}')
+    .then(function(r){return r.text()})
+    .then(function(h){
+      var c=document.getElementById('crm-{embed}-embed');
+      if(!c)return;
+      c.innerHTML=h;
+      c.querySelectorAll('script').forEach(function(old){
+        var ns=document.createElement('script');
+        if(old.src){ns.src=old.src}
+        else{ns.textContent=old.textContent}
+        if(old.type){ns.type=old.type}
+        old.parentNode.replaceChild(ns,old);
+      });
+    })
+    .catch(function(e){console.error('CRM embed failed',e)});
+})();
+</script>
+```
+
+Account and dashboard endpoints support dual-format responses: `text/html` (default, for fetch+innerHTML) and `text/javascript` (when `Sec-Fetch-Dest: script`, for `<script src>` loading). Standalone preview mode includes a Sign In fallback that redirects to Google OAuth when the footer embed is absent.
+
 ---
 
 ## 4. Data Model
@@ -377,6 +545,9 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | `oauth_state:{uuid}` | OAuth state + shop + return_to (10min TTL, UUID-keyed) | Medium — CSRF nonce |
 | `reset:{token}` | Password reset/welcome token: JSON `{ userId, welcome }` (1h/24h TTL) | Medium — auth token |
 | `adobe_token:{shop}` | Cached Adobe IMS access token (TTL-based) | High — bearer token |
+| `tenant:{shop}:checkout:{session_id}` | UCP checkout session state (24h TTL) | Medium — purchase data |
+| `tenant:{shop}:mandate:{mandate_id}` | AP2 payment mandate with HMAC signature (per-expiry TTL) | Medium — purchase auth |
+| `tenant:{shop}:orders:{customer_id}` | Cached order list (5min TTL) | Low — read cache |
 
 All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper, which returns `tenant:{shop}:{key}` when a shop is provided, or the bare `key` as fallback for legacy single-tenant mode.
 
@@ -402,7 +573,7 @@ All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper,
 | PKCE | S256 code challenge (Shopify Customer Account) |
 | Shop domain validation | `validateShopDomain()` regex on install + callback; rejects non-`.myshopify.com` domains |
 | Idle timeout | Client-side timer with server-validated token expiry |
-| Expiring offline tokens | `expiring=1` sent in Shopify token exchange; `shpua_` (60-min) + `shprt_` (90-day) stored |
+| Expiring offline tokens | Mandatory since April 2026; `expiring=1` in token exchange; `shpua_` access token (Shopify-controlled TTL) + `shprt_` refresh token stored; auto-refreshed via cron with 5-min buffer; `POST /admin/shopify-refresh` for manual force-refresh |
 
 ### 5.2 API Security
 
@@ -445,7 +616,7 @@ All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper,
 | Data retention | Consent records: append-only, no TTL (audit requirement) |
 | Right to erasure | Full PII anonymization across all tables on redact |
 | Data portability | `POST /gdpr/data-request` compiles complete user record |
-| Token security | Refresh tokens (`shprt_`) stored in KV; access tokens (`shpua_`) have 60-min TTL |
+| Token security | Refresh tokens (`shprt_`) stored in KV; access tokens (`shpua_`) auto-refreshed before expiry; non-expiring tokens return 403 since April 2026 |
 | Adobe token caching | IMS access tokens cached in KV with TTL; auto-refreshed on expiry |
 
 ---
@@ -460,7 +631,7 @@ User Action (toggle, form, signup)
   ├─► consent_records (append-only audit entry)
   │     └─ user_id, type, granted/revoked, timestamp, source, session_id, ip
   │
-  ├─► user_claims (known columns only: tos, privacy, cookie, marketing, newsletter)
+  ├─► user_claims (known columns: tos, privacy, cookie, marketing, newsletter, a2a, ap2)
   │
   ├─► Shopify tags (accepts_{type} / rejects_{type})
   │
@@ -477,6 +648,8 @@ User Action (toggle, form, signup)
 | Marketing | `consent_marketing` | `accepts_marketing` | `consent_marketing` | Yes |
 | Newsletter | `consent_newsletter` | `newsletter_subscribed` | — | Yes |
 | CCPA | `consent_ccpa` | — | — | Yes |
+| A2A Agent Access | `consent_a2a` | `accepts_a2a` | — | Yes |
+| AP2 Agent Payments | `consent_ap2` | `accepts_ap2` | — | Yes |
 | Dynamic (form) | Audit trail only | `accepts_{type}` | — | Automatic |
 
 ### 6.3 Audit Trail Schema (`consent_records`)
@@ -652,7 +825,30 @@ User Action (toggle, form, signup)
 | UAT-MT-15 | KV key isolation | 1. Trigger sync for shop A 2. Check KV keys | All KV keys use `tenant:{shop}:` prefix (tag_table_ids, webflow_tags_collection_id, sync:customers:last_run) | [ ] | |
 | UAT-MT-16 | OAuth state isolation | 1. Start Webflow OAuth for two shops simultaneously 2. Complete one callback | Each flow has its own UUID-keyed state; no collision | [ ] | |
 
-### 7.12 Adobe AEP Integration Tests
+### 7.12 UCP / Commerce Protocol Tests
+
+| ID | Test Case | Steps | Expected Result | Pass/Fail | Notes |
+|---|---|---|---|---|---|
+| UAT-UCP-01 | UCP Discovery Manifest | `GET /.well-known/ucp?shop=x` | 200 with `protocol_version`, `capabilities`, `endpoints`, `authentication`, `Cache-Control: max-age=3600` | [ ] | |
+| UAT-UCP-02 | A2A Agent Card | `GET /.well-known/agent-card.json?shop=x` | 200 with `name`, `version`, `skills` (>= 5), `authentication` | [ ] | |
+| UAT-UCP-03 | Commerce Identity (auth) | `GET /commerce/identity` with valid JWT | 200 with `providers`, `consent_status` (incl. a2a, ap2), `tags` | [ ] | |
+| UAT-UCP-04 | Commerce Identity (unauth) | `GET /commerce/identity` without JWT | 401 | [ ] | |
+| UAT-UCP-05 | Product Catalog | `GET /commerce/products?shop=x` | 200 with `products[]` and `pageInfo` | [ ] | |
+| UAT-UCP-06 | Product search | `GET /commerce/products?shop=x&query=test&first=5` | 200 with filtered results | [ ] | |
+| UAT-UCP-07 | Orders (unauth) | `GET /commerce/orders?shop=x` | 401 | [ ] | |
+| UAT-UCP-08 | Checkout create (unauth) | `POST /commerce/checkout` without JWT | 401 | [ ] | |
+| UAT-UCP-09 | Checkout create (empty items) | `POST /commerce/checkout` with `line_items: []` | 400 | [ ] | |
+| UAT-UCP-10 | Mandate create (unauth) | `POST /commerce/mandates` without JWT | 401 | [ ] | |
+| UAT-UCP-11 | Mandate AP2 consent gate | `POST /commerce/mandates` with JWT but `consent_ap2 = false` | 403 "AP2 agent payments consent required" | [ ] | |
+| UAT-UCP-12 | CORS on commerce routes | `OPTIONS /commerce/*` | `Access-Control-Allow-Methods` includes POST | [ ] | |
+| UAT-UCP-13 | Embed feature flag (enabled) | `GET /embed/cart?shop=x` (cart in `embeds_enabled`) | 200 | [ ] | |
+| UAT-UCP-14 | Embed feature flag (disabled) | `GET /embed/cart?shop=x` (cart removed from `embeds_enabled`) | 403 | [ ] | |
+| UAT-UCP-15 | Cart embed renders | `GET /embed/cart?shop=x` | HTML with product grid, search, cart sidebar | [ ] | |
+| UAT-UCP-16 | Checkout API field in manifest | `GET /.well-known/ucp?shop=x` | `checkout_api` = `storefront_cart` or `admin_draft_order` | [ ] | |
+| UAT-UCP-17 | A2A/AP2 capabilities in manifest | Enable a2a+ap2 consent, then `GET /.well-known/ucp` | Capabilities include `a2a_agent_access`, `ap2_agent_payments` | [ ] | |
+| UAT-UCP-18 | Storefront token auto-provisioned | Open Shopify app, check Settings | `shopify_storefront_token` field populated | [ ] | |
+
+### 7.13 Adobe AEP Integration Tests
 
 | ID | Test Case | Steps | Expected Result | Pass/Fail | Notes |
 |---|---|---|---|---|---|
@@ -681,6 +877,27 @@ User Action (toggle, form, signup)
 | UAT-PRICE-04 | Adobe config in extension | 1. Click "Settings" tab 2. Scroll to Adobe section | Adobe AEP toggle, IMS Org ID, Client ID, Client Secret, Dataset ID, Sandbox fields visible | [ ] | |
 | UAT-PRICE-05 | Integrations upgrade note | 1. View Settings tab | "Salesforce, HubSpot, Klaviyo, Attentive, Braze — upgrade required" note displayed | [ ] | |
 
+### 7.14 Token Lifecycle Tests
+
+| ID | Test Case | Steps | Expected Result | Pass/Fail | Notes |
+|---|---|---|---|---|---|
+| UAT-TKN-01 | OAuth install issues expiring token | 1. `GET /admin/shopify-install?shop=hx-stage.myshopify.com` 2. Complete OAuth flow | Token exchange includes `expiring=1`; KV stores `shpua_` access token, refresh token, and `shopify_token_expires_at` | [ ] | |
+| UAT-TKN-02 | Token type display | 1. Open `/settings` 2. Check Shopify section | Token Type shows `OAuth (expiring)` for `shpua_` prefix; Refresh Token shows `Present` | [ ] | |
+| UAT-TKN-03 | Manual force-refresh | 1. `POST /admin/shopify-refresh` with bearer auth | Returns `{ refreshed: true, tokenPrefix: "shpua_...", apiResult: "OK" }`; new token saved to KV | [ ] | |
+| UAT-TKN-04 | Force-refresh unauthed | 1. `POST /admin/shopify-refresh` without auth header | `401 Unauthorized` | [ ] | |
+| UAT-TKN-05 | API diagnostic endpoint | 1. `GET /admin/shopify-test` with bearer auth | Returns token prefix, length, domain, and API call result | [ ] | |
+| UAT-TKN-06 | Cron auto-refresh | 1. Set `shopify_token_expires_at` to 3 minutes from now in KV 2. Trigger scheduled handler | `refreshShopifyTokenIfNeeded()` fires (within 5-min buffer); new token and expiry saved to KV | [ ] | |
+| UAT-TKN-07 | Cron skips if not near expiry | 1. Set `shopify_token_expires_at` to 2 hours from now 2. Trigger scheduled handler | `refreshShopifyTokenIfNeeded()` returns early; no token exchange call | [ ] | |
+| UAT-TKN-08 | Multi-tenant token isolation | 1. Register 2 tenants with different tokens 2. Force-refresh tenant A | Tenant A gets new token; tenant B's token unchanged | [ ] | |
+| UAT-TKN-09 | App loader session sync | 1. Open Shopify app (triggers `app.tsx` loader) 2. Check CRM worker KV | `shopify_admin_token` updated with fresh `session.accessToken` | [ ] | |
+| UAT-TKN-10 | Storefront token provisioned | 1. Open Shopify app (triggers loader) 2. Check KV | `shopify_storefront_token` populated via `storefrontAccessTokenCreate` | [ ] | |
+| UAT-TKN-11 | Expired token returns 403 | 1. Set `shopify_admin_token` to a known-expired `shpua_` token 2. `GET /commerce/products?shop=x` | API call fails with 401/403; error logged | [ ] | |
+| UAT-TKN-12 | Missing refresh token skips refresh | 1. Remove `shopify_refresh_token` from KV 2. Trigger cron | `refreshShopifyTokenIfNeeded()` returns early; no error thrown | [ ] | |
+| UAT-TKN-13 | Embed snippet format | 1. Open Shopify app → Embed Codes tab | All snippets use fetch+innerHTML pattern with `var W=` and `var S=` (no bare long URLs) | [ ] | |
+| UAT-TKN-14 | Embed dual-format (HTML) | 1. `fetch('/embed/account?shop=x')` | Response Content-Type: `text/html`; contains styles, markup, and `<script>` tags | [ ] | |
+| UAT-TKN-15 | Embed dual-format (JS) | 1. `<script src="/embed/account?shop=x">` (browser sends `Sec-Fetch-Dest: script`) | Response Content-Type: `text/javascript`; self-injecting JS loader | [ ] | |
+| UAT-TKN-16 | Standalone Sign In fallback | 1. Open `/embed/dashboard` directly in browser 2. Click Sign In | Redirects to `/auth/google/login?return_to=...` (fallback, no footer embed needed) | [ ] | |
+
 ---
 
 ## 8. Known Limitations & Risks
@@ -691,14 +908,17 @@ User Action (toggle, form, signup)
 | 2 | Xano Meta API schema quirks (POST /field returns 404) | Schema updates require PUT with full schema array | Documented in INTERNAL-SETUP.md |
 | 3 | GA4 Measurement Protocol events are server-side | No browser session stitching without GTM | `user_id` matching bridges server + client events |
 | 4 | Webflow CMS API rate limits | High-volume syncs may be throttled | Cron pages at 100 users per sync |
-| 5 | Single-file worker architecture (~8,000+ lines) | Maintenance complexity | Acceptable for current scope; refactor if adding major features |
+| 5 | Single-file worker architecture (~9,000+ lines, 81 routes) | Maintenance complexity | Acceptable for current scope; refactor if adding major features |
 | 6 | KV eventual consistency | Config changes may take seconds to propagate | Edge-level consistency acceptable for config updates |
-| 7 | Shopify expiring tokens require proactive refresh | `shpua_` tokens expire in 60 min; cron must refresh before expiry | Tracked via `shopify_token_expires_at` in KV config |
+| 7 | Shopify expiring tokens require proactive refresh (mandatory since April 2026) | `shpua_` tokens expire on a Shopify-controlled TTL; non-expiring tokens return 403 | Auto-refreshed via `*/15 * * * *` cron with 5-min buffer; `POST /admin/shopify-refresh` for manual force-refresh; tracked via `shopify_token_expires_at` in KV config |
 | 8 | POST /config requires auth header after security hardening | Webflow Designer Extension updated to send `Authorization: Bearer` | Extension uses `shopifyAppSecret` as bearer token |
 | 9 | Adobe AEP streaming ingestion is eventual | AEP may take minutes to reflect streamed events in profiles | Sync status tracked in `user_extras`; audit log in `adobe_sync_log` |
 | 10 | Adobe IMS token caching in KV | Cached tokens may survive worker restarts | TTL-based expiry ensures refresh; manual invalidation via KV delete |
 | 11 | Cloudflare Access OTP email delivery | OTP emails may not arrive for some email providers | Verified with `ysl@ysl150.com`; add alternative IdP if needed |
 | 12 | Multi-tenant cron scales linearly | Each tenant adds sync time to cron handler | Per-tenant timeout isolation; consider parallel execution at scale |
+| 13 | Storefront Cart API requires storefront token | Channel attribution only works with Cart API, not Draft Orders | Auto-provisioned on app auth; Draft Order fallback when unavailable |
+| 14 | SSE streaming not yet implemented (Task 6) | A2A Agent Card declares `streaming: false` | Agent interactions are request/response only; SSE planned for next sprint |
+| 15 | AP2 mandates require explicit consent | Customers must enable AP2 in account preferences before agents can create mandates | 403 returned with actionable message guiding user to enable consent |
 
 ---
 
@@ -748,7 +968,8 @@ User Action (toggle, form, signup)
 | 9 | UAT-FORM tests pass (at least 3/5) | No — depends on GTM setup | [ ] |
 | 10 | All UAT-MT tests pass (16 tests) | Yes | [ ] |
 | 11 | UAT-ADOBE tests pass (at least 5/8) | Yes | [ ] |
-| 12 | UAT-PRICE tests pass (at least 3/5) | No — UI-only | [ ] |
+| 12 | UAT-UCP tests pass (at least 12/18) | Yes | [ ] |
+| 13 | UAT-PRICE tests pass (at least 3/5) | No — UI-only | [ ] |
 | 13 | No critical or high-severity defects open | Yes | [ ] |
 | 14 | DPO sign-off on consent architecture | Yes | [ ] |
 | 15 | PMO sign-off on release scope | Yes | [ ] |
@@ -792,4 +1013,4 @@ I have reviewed the functional requirements, test plan, release criteria, and kn
 
 ---
 
-*Document generated 2026-05-14, updated v1.3 2026-05-18. Reflects CRM Sync worker (~8,000+ lines, 64+ route handlers) deployed to `cf-worker-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing. Security audit: 25 PASS / 0 FAIL / 3 REVIEW.*
+*Document generated 2026-05-14, updated v1.5 2026-05-20. Reflects CRM Sync worker (~9,000+ lines, 82 route handlers) deployed to `cf-worker-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with UCP/A2A/AP2 protocol compliance, Storefront Cart API checkout, A2A/AP2 consent toggles, embed feature flags, mandatory Shopify expiring token rotation, region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing.*
