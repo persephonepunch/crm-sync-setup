@@ -1124,6 +1124,272 @@ The extension generates four embed snippets:
 
 ---
 
+## Tab 8: A2A — Agent-to-Agent Protocol
+
+### What is this?
+
+A2A (Agent-to-Agent) is Google's open protocol for AI agents to discover and communicate with each other. CRM Sync implements A2A so that external AI agents — shopping assistants, support bots, recommendation engines — can programmatically discover your store's capabilities, read customer profiles, browse products, and check order history.
+
+**Two discovery endpoints:**
+
+1. **UCP Discovery Manifest** (`GET /.well-known/ucp`) — Declares all capabilities the worker supports (identity linking, consent management, product catalog, checkout, orders, analytics, etc.). Capabilities are generated dynamically based on which services are configured for the tenant.
+
+2. **A2A Agent Card** (`GET /.well-known/agent-card.json`) — A standard agent card that AI platforms use to discover CRM Sync as a commerce service agent. Declares 5 skills: Identity Linking, Consent Management, Customer Tag Sync, Product Catalog, and Checkout Session.
+
+**Commerce API endpoints exposed via A2A:**
+
+| Endpoint | Method | Auth | What it does |
+|---|---|---|---|
+| `/commerce/identity` | GET | JWT | Unified customer profile with linked providers (email, Google, Shopify), consent status, tags, segment |
+| `/commerce/products` | GET | Public | Search product catalog with pagination and collection filtering |
+| `/commerce/orders` | GET | JWT | List customer's order history (cached 5 min) |
+| `/commerce/orders/:id` | GET | JWT | Single order detail with line items and fulfillment status |
+| `/ucp/consent-history` | GET | JWT | Paginated consent audit trail |
+| `/ucp/tags` | POST | JWT | Add/remove customer tags (flows to Shopify, Webflow CMS, GA4) |
+
+**Customer consent required:** A2A access is gated behind the `consent_a2a` flag. Customers must explicitly enable "A2A Agent Access" in their account preferences before any AI agent can read their profile or commerce data. The consent toggle appears in the Account page and Dashboard embeds.
+
+When A2A consent is enabled, the UCP manifest dynamically adds `a2a_agent_access` to its capabilities list.
+
+<details>
+<summary><strong>Setup Steps</strong></summary>
+
+#### A2A works out of the box — no extra configuration needed.
+
+Once your worker is deployed with the services configured (Tabs 1–7), the discovery endpoints are automatically available.
+
+#### Step 1 — Verify Discovery Endpoints
+
+```bash
+# UCP Discovery Manifest
+curl https://your-worker.workers.dev/.well-known/ucp
+
+# A2A Agent Card
+curl https://your-worker.workers.dev/.well-known/agent-card.json
+```
+
+The UCP manifest lists all capabilities based on your configured services. The Agent Card describes the 5 skills an AI agent can use.
+
+#### Step 2 — Enable A2A Consent (Per Customer)
+
+Customers enable A2A access from their account page or dashboard. The toggle is labeled **"A2A Agent Access"** with the description: "Allow AI agents to read your profile and consent via A2A protocol."
+
+You can also set the default consent state for new customers from the Webflow extension's **Auth** tab under "Default Consent Options."
+
+#### Step 3 — Test the Commerce Identity Endpoint
+
+```bash
+# Get a JWT token first (via login)
+TOKEN=$(curl -s -X POST https://your-worker.workers.dev/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"testpass123"}' | jq -r '.token')
+
+# Query the commerce identity endpoint
+curl -H "Authorization: Bearer $TOKEN" \
+  https://your-worker.workers.dev/commerce/identity
+```
+
+Response includes linked providers, consent status (including `a2a` and `ap2` flags), tags, segment, and language preference.
+
+#### Step 4 — Test Product Catalog
+
+```bash
+# Public endpoint — no auth required
+curl "https://your-worker.workers.dev/commerce/products?shop=your-store.myshopify.com&query=shirt&first=10"
+
+# Filter by collection
+curl "https://your-worker.workers.dev/commerce/products?shop=your-store.myshopify.com&collection=summer-2026"
+```
+
+#### Step 5 — Test Order History
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  https://your-worker.workers.dev/commerce/orders
+```
+
+</details>
+
+### Agent Card Schema
+
+The Agent Card at `/.well-known/agent-card.json` follows the A2A spec:
+
+```json
+{
+  "name": "CRM Sync Commerce Agent",
+  "description": "Multi-tenant customer identity, consent, and commerce orchestration across 7 services",
+  "version": "1.0",
+  "protocol_version": "0.1",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "authentication": {
+    "schemes": ["bearer"],
+    "credentials": {
+      "bearer": {
+        "description": "JWT token from /auth/login, /auth/google/callback, or /auth/shopify/callback, or admin key"
+      }
+    }
+  },
+  "skills": [
+    { "id": "identity-linking", "name": "Identity Linking", ... },
+    { "id": "consent-management", "name": "Consent Management", ... },
+    { "id": "tag-sync", "name": "Customer Tag Sync", ... },
+    { "id": "product-catalog", "name": "Product Catalog", ... },
+    { "id": "checkout-session", "name": "Checkout Session", ... }
+  ]
+}
+```
+
+---
+
+## Tab 9: AP2 — Agent Payments Protocol
+
+### What is this?
+
+AP2 (Agent Payments Protocol) ensures that AI agents **cannot make purchases without explicit human authorization**. It extends the A2A protocol with cryptographically signed payment mandates — a customer must create a mandate (spending limit + scope + expiry) before any agent can initiate a checkout on their behalf.
+
+**How it works:**
+
+```
+Customer enables AP2 consent in account preferences
+  → Customer creates a mandate: "Up to $100 for any product, expires in 24h"
+  → Worker generates HMAC-SHA256 signed mandate, stores in KV
+  → AI agent calls POST /commerce/checkout with mandate_id
+  → Worker validates: mandate is active, not expired, covers the purchase amount/scope
+  → If valid: Shopify checkout created via Storefront Cart API
+  → If invalid: 403 with reason (expired, exceeded, wrong scope)
+  → Mandate usage logged to consent audit trail + GA4
+```
+
+**AP2 consent gate:** If `consent_ap2` is not granted, `POST /commerce/mandates` returns `403 "AP2 agent payments consent required"`. The customer must enable it first.
+
+**Endpoints:**
+
+| Endpoint | Method | Auth | What it does |
+|---|---|---|---|
+| `/commerce/mandates` | POST | JWT | Create a new payment mandate |
+| `/commerce/mandates/:id` | GET | JWT or Admin | Retrieve mandate status and details |
+| `/commerce/checkout` | POST | JWT | Create checkout session (optionally with `mandate_id`) |
+| `/commerce/checkout/:id` | GET | JWT or Admin | Get checkout session status |
+
+**Mandate schema:**
+
+```json
+{
+  "mandate_id": "uuid",
+  "customer_id": 123,
+  "type": "purchase",
+  "max_amount": "100.00",
+  "currency": "USD",
+  "scope": "all | collection:summer-2026 | product:gid://shopify/Product/123",
+  "status": "active | used | expired | revoked",
+  "created_at": "2026-05-24T10:00:00Z",
+  "expires_at": "2026-05-25T10:00:00Z",
+  "signature": "base64-hmac-sha256"
+}
+```
+
+**GA4 events fired:**
+- `ucp_mandate_created` — when a mandate is created (includes `mandate_id`, `max_amount`, `currency`, `scope`)
+- `ucp_mandate_used` — when a mandate is used for checkout
+- `ucp_checkout_created` — when a checkout session is created
+- `ucp_checkout_completed` — when a checkout session completes
+
+<details>
+<summary><strong>Setup Steps</strong></summary>
+
+#### AP2 works out of the box — no extra configuration beyond Shopify (Tab 3).
+
+Mandates use the tenant's JWT secret for HMAC-SHA256 signing. Checkout uses the Storefront Cart API (with Draft Order fallback).
+
+#### Step 1 — Enable AP2 Consent (Per Customer)
+
+Customers enable AP2 from their account page. The toggle is labeled **"AP2 Agent Payments"** with the description: "Allow AI agents to create checkout sessions using signed mandates."
+
+You can set the default for new customers in the Webflow extension's **Auth** tab.
+
+#### Step 2 — Create a Payment Mandate
+
+```bash
+TOKEN="<customer-jwt>"
+
+curl -X POST https://your-worker.workers.dev/commerce/mandates \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_amount": "100.00",
+    "currency": "USD",
+    "scope": "all",
+    "expires_in_hours": 24
+  }'
+```
+
+Response (`201`):
+```json
+{
+  "mandate_id": "a1b2c3d4-...",
+  "customer_id": 123,
+  "type": "purchase",
+  "max_amount": "100.00",
+  "currency": "USD",
+  "scope": "all",
+  "status": "active",
+  "created_at": "2026-05-24T10:00:00Z",
+  "expires_at": "2026-05-25T10:00:00Z",
+  "signature": "base64..."
+}
+```
+
+#### Step 3 — Create a Checkout with Mandate
+
+```bash
+curl -X POST https://your-worker.workers.dev/commerce/checkout \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "line_items": [
+      { "variant_id": "gid://shopify/ProductVariant/123", "quantity": 1 }
+    ],
+    "mandate_id": "a1b2c3d4-..."
+  }'
+```
+
+The worker validates the mandate covers the purchase before creating the Shopify checkout.
+
+#### Step 4 — Check Mandate Status
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  https://your-worker.workers.dev/commerce/mandates/a1b2c3d4-...
+```
+
+#### Step 5 — Verify in Dashboard
+
+After creating a mandate and checkout, the customer's UCP Dashboard shows:
+- **Consent Status**: "AP2 Agent Payments: Granted"
+- **Consent History**: Timestamped entries for `mandate_created` and `mandate_used`
+- **Protocol Status**: AP2 capability listed as active
+
+</details>
+
+### Security Model
+
+| Control | Implementation |
+|---|---|
+| Consent gating | `consent_ap2` must be `true` before any mandate creation |
+| Cryptographic signing | HMAC-SHA256 with tenant JWT secret; signature covers `mandate_id:customer_id:max_amount:expires_at` |
+| Expiry enforcement | Mandates stored in KV with TTL matching `expires_in_hours` (default 24h); auto-deleted on expiry |
+| Ownership verification | Customers can only view their own mandates; admin key required for cross-customer access |
+| Amount validation | Checkout with mandate validates purchase total against `max_amount` |
+| Scope restriction | Mandates can be scoped to `all`, a specific collection, or a specific product |
+| Audit trail | All mandate events logged to `consent_records` and pushed to GA4 |
+| Tenant isolation | Mandates stored at `tenant:{shop}:mandate:{id}` — no cross-tenant access |
+
+---
+
 ## Quick Reference
 
 All credentials in one place. Use the Webflow App Config tab or `wrangler.toml` / `wrangler secret put`.
