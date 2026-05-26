@@ -52,7 +52,7 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~9
 
 | Component | Platform | Identifier |
 |---|---|---|
-| Setup Wizard | Cloudflare Workers | [`cf-worker-crm-sync.yoonsunlee150.workers.dev/setup`](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) |
+| Setup Wizard | Cloudflare Workers | [`crm.story-story.ai/setup`](https://crm.story-story.ai/setup) |
 | Backend Worker | Cloudflare Workers | `cf-worker-crm-sync` |
 | Database | Xano | `xerb-qpd6-hd8t.n7.xano.io` |
 | Commerce | Shopify Admin API | Per-tenant (e.g., `hx-stage.myshopify.com`) |
@@ -668,7 +668,7 @@ All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper,
 |---|---|
 | Cloudflare Access (Zero Trust) | Email-based OTP access policy on worker admin URLs; whitelist: `ysl@ysl150.com`, `*@story-story.ai` |
 | Access auth domain | `kcoop.cloudflareaccess.com` |
-| CRM Sync Access App | Protects `cf-worker-crm-sync.yoonsunlee150.workers.dev` |
+| CRM Sync Access App | Protects `crm.story-story.ai` |
 | PIM Sync Access App | Protects `cf-worker-webflow-sync.yoonsunlee150.workers.dev` |
 | Identity provider | One-Time Pin (OTP) — email verification, no external IdP dependency |
 
@@ -740,7 +740,7 @@ User Action (toggle, form, signup)
 
 | Item | Value |
 |---|---|
-| Worker URL | `https://cf-worker-crm-sync.yoonsunlee150.workers.dev` |
+| Worker URL | `https://crm.story-story.ai` |
 | Test Site | `https://omenphase1-1.webflow.io` |
 | Shopify Store | `hx-stage.myshopify.com` |
 | GA4 Property | `G-S7QGFWPZ8X` |
@@ -1081,4 +1081,4 @@ I have reviewed the functional requirements, test plan, release criteria, and kn
 
 ---
 
-*Document generated 2026-05-14, updated v1.7 2026-05-21. Reflects CRM Sync worker (~9,400 lines, 78 route handlers) deployed to `cf-worker-crm-sync.yoonsunlee150.workers.dev`. Multi-tenant SaaS with UCP/A2A/AP2 protocol compliance, A2A/AP2 consent toggles, 4 embed endpoints (footer, compliance, account, dashboard), Shopify client credentials token provisioning, mandatory expiring token rotation, region-based tenant groups, per-tenant admin keys, Adobe AEP, Cloudflare Access, and three-tier pricing. Product display and cart/checkout handled externally by Shopify Web Components + PIM grid worker (`cf-worker-webflow-sync`).*
+*Document generated 2026-05-14, updated v1.8 2026-05-26. Reflects CRM Sync worker (~9,500 lines, 81 route handlers) deployed to `crm.story-story.ai`. Multi-tenant SaaS with UCP/A2A/AP2 protocol compliance, A2A/AP2 consent toggles, 4 embed endpoints (footer, compliance, account, dashboard), Shopify client credentials token provisioning, mandatory expiring token rotation, region-based tenant groups, per-tenant admin keys, self-service admin key rotation, Adobe AEP, and three-tier pricing. Product display and cart/checkout handled externally by Shopify Web Components + PIM grid worker (`cf-worker-webflow-sync`).*

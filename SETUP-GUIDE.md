@@ -1,6 +1,6 @@
 # CRM Sync Setup Guide
 
-> **Getting started?** Use the interactive [Setup Wizard](https://cf-worker-crm-sync.yoonsunlee150.workers.dev/setup) — it walks you through each step with direct links and live status checks.
+> **Getting started?** Use the interactive [Setup Wizard](https://crm.story-story.ai/setup) — it walks you through each step with direct links and live status checks.
 
 Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
 
