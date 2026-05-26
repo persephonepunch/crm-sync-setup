@@ -1127,6 +1127,43 @@ The extension generates four embed snippets:
 
 ---
 
+## Pricing Tiers & Upgrade Exceptions
+
+### Shared Plan ($69/mo) — Stakeholder B
+Multi-tenant. You use the hosted CRM Sync worker. API keys are entered via the Webflow extension Config tab and stored in the shared worker's KV (isolated per shop). The Plan tab shows your current plan and active features. Custom Worker Setup is locked.
+
+Billing is via Shopify App Billing — charges appear on your Shopify invoice.
+
+### Private Worker Plan ($325/mo or custom license) — Stakeholder C
+You deploy your own Cloudflare Worker instance. **The following UI elements behave differently:**
+
+- **Custom Worker Setup**: Unlocked. You enter your own Worker URL and CDN domain.
+- **Plan tab**: Informational only. You already have full access to all features.
+- **"Upgrade to unlock" prompts**: Hidden. All integrations (Adobe AEP, custom OAuth domains) are self-managed.
+- **Subscription billing**: Not through Shopify App Billing. Billed separately per license agreement.
+
+**Fee responsibility on Private Worker plans:**
+
+| Cost | Who pays |
+|---|---|
+| CRM Sync license | You (per agreement with App Creator) |
+| Cloudflare Workers + KV | Your Cloudflare account |
+| Xano database | Your Xano account |
+| Shopify API access | Your Shopify Partner/app account |
+| Resend transactional email | Your Resend account |
+| Google OAuth + GA4 | Your Google Cloud project |
+| Adobe AEP (if enabled) | Your Adobe contract |
+
+**To activate Private plan features:** Set `plan` to `"private"` in your tenant config:
+```bash
+curl -X POST https://YOUR-WORKER.workers.dev/config?shop=YOUR-STORE.myshopify.com \
+  -H "Authorization: Bearer YOUR_ADMIN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"plan":"private"}'
+```
+
+---
+
 ## Quick Reference
 
 All credentials in one place. Use the Webflow App Config tab or `wrangler.toml` / `wrangler secret put`.

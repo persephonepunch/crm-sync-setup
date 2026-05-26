@@ -316,6 +316,37 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-PRICING-03 | "Check Subscription Status" queries tenant config for active features | Implemented |
 | FR-PRICING-04 | "Contact Sales" mailto link for Enterprise tier (`ysl@ysl150.com`) | Implemented |
 | FR-PRICING-05 | Integrations upgrade note (Salesforce, HubSpot, Klaviyo, Attentive, Braze) | Implemented |
+| FR-PRICING-06 | Stakeholder C (Private Worker) upgrade exception — see §3.10.1 | Implemented |
+
+#### 3.10.1 Upgrade Exception: Private Worker Purchasers (Stakeholder C)
+
+Stakeholders who deploy their own Cloudflare Worker instance ("Private Worker" tier) are **exempt from the Plan tab's locked-feature gating** because they control their own infrastructure. The following UI behaviors differ by stakeholder:
+
+| UI Element | Stakeholder B (Shared) | Stakeholder C (Own Worker) |
+|---|---|---|
+| **Plan tab — Current Plan** | Shows "Shared" at $69/mo | Shows "Private" — detected by `plan` field in tenant config |
+| **Plan tab — pricing cards** | All three tiers shown with upgrade path | Informational only — they already have full access |
+| **Custom Worker Setup** | `[LOCKED]` — "Available on Private ($325/mo)" | Unlocked — Custom Worker URL and CDN Domain fields visible |
+| **OAuth redirect URIs** | Fixed to shared worker domain | Editable — points to their own worker |
+| **"Upgrade plan to unlock →"** (Config tab, Adobe section) | Links to Plan tab | Hidden — all integrations are self-managed |
+| **Setup Wizard — upgrade tip** | "Upgrade to Private or Enterprise" link shown | Hidden or shows "You're on a self-hosted plan" |
+| **Subscription billing** | Managed via Shopify App Billing (appears on merchant invoice) | **No Shopify billing** — billed separately (annual license or custom agreement) |
+| **Fees** | $69/mo (Shared) or $325/mo (Private managed) | License fee per agreement — Cloudflare, Xano, and third-party costs are the customer's responsibility |
+
+**Detection logic:** The extension reads the `plan` field from `GET /config`. When `plan === "private"` or `plan === "enterprise"`, `updatePlanUI()` unlocks the Custom Worker Setup section and adjusts the badge. Stakeholder C sets this field in their own KV config during initial deployment.
+
+**Fee responsibility for Stakeholder C:**
+
+| Cost | Who pays |
+|---|---|
+| CRM Sync license | Customer (per agreement with App Creator) |
+| Cloudflare Workers (compute + KV) | Customer's Cloudflare account |
+| Xano database | Customer's Xano account |
+| Shopify app charges | Customer's Shopify account |
+| Resend email | Customer's Resend account |
+| Google OAuth / GA4 | Customer's Google Cloud project |
+| Adobe AEP (if enabled) | Customer's Adobe contract |
+| Custom domain SSL | Customer's domain registrar |
 
 ### 3.11 UCP / A2A Protocol (FR-UCP)
 
