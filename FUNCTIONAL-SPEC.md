@@ -1,8 +1,8 @@
 # CRM Sync — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
-**Version:** 1.7
-**Date:** 2026-05-21
+**Version:** 1.8
+**Date:** 2026-05-26
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Internal — Confidential
 
@@ -29,6 +29,7 @@
 | 1.5 | 2026-05-20 | Engineering | Shopify expiring token rotation (mandatory since April 2026), `POST /admin/shopify-refresh` manual refresh endpoint (82 routes), OAuth scopes expanded (`read_products`, `read_orders`), cart embed multi-tenant `SHOP_PARAM` injection, UCP Entitlement (A2A/AP2) toggles in extension Auth tab, scope management via `shopify.app.crm-sync.toml`, webhook API version `2026-04` |
 | 1.6 | 2026-05-20 | Engineering | Token Lifecycle Management specification (§3.14): Shopify expiring token architecture, refresh flow, multi-tenant token storage schema, three-surface token sync (app loader, cron, manual), diagnostic endpoints, embed system updated to fetch+innerHTML pattern with script re-execution |
 | 1.7 | 2026-05-21 | Engineering | Removed `/embed/cart` route and Product Cart embed — storefront and cart handled by Shopify Web Components + PIM grid (`cf-worker-webflow-sync`), reducing worker to ~9,400 lines / 78 routes; client credentials grant for own-store token provisioning; `sanitizeDomain()` applied at all ingress points; domain trailing-comma fix; Shopify Dev Dashboard terminology alignment (removed all `shpat_`/`shpua_`/`shprt_` prefix assumptions) |
+| 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
 
 ---
 
@@ -317,6 +318,7 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-PRICING-04 | "Contact Sales" mailto link for Enterprise tier (`ysl@ysl150.com`) | Implemented |
 | FR-PRICING-05 | Integrations upgrade note (Salesforce, HubSpot, Klaviyo, Attentive, Braze) | Implemented |
 | FR-PRICING-06 | Stakeholder C (Private Worker) upgrade exception — see §3.10.1 | Implemented |
+| FR-PRICING-07 | Stakeholder C self-service admin key rotation — see §3.10.2 | Implemented |
 
 #### 3.10.1 Upgrade Exception: Private Worker Purchasers (Stakeholder C)
 
@@ -347,6 +349,40 @@ Stakeholders who deploy their own Cloudflare Worker instance ("Private Worker" t
 | Google OAuth / GA4 | Customer's Google Cloud project |
 | Adobe AEP (if enabled) | Customer's Adobe contract |
 | Custom domain SSL | Customer's domain registrar |
+
+#### 3.10.2 Self-Service Admin Key Management (Persona C)
+
+Private Worker operators (Stakeholder C) need admin key management **independent of any Shopify instance** to support multi-tenant Shopify deployments from a single worker. The system uses a two-tier key hierarchy:
+
+**Key hierarchy:**
+
+| Key | Storage | Who sets it | Who can rotate | Scope |
+|---|---|---|---|---|
+| **Root key** (`ADMIN_KEY`) | Cloudflare secret | App Creator (A) at deploy time via `wrangler secret put` | Only via Cloudflare CLI/API | Irrevocable bootstrap key |
+| **Rotatable key** | KV (`admin_key:rotatable`) | Persona C via API | Persona C (self-service) | Runtime-rotatable, revocable by root |
+
+**API endpoints:**
+
+| Method | Endpoint | Auth required | Description |
+|---|---|---|---|
+| `POST` | `/admin/rotate-key` | Root OR current rotatable key | Generate or set a new rotatable key. Accepts optional `{ key: "..." }` (min 20 chars) or auto-generates 48-char hex. Previous rotatable key is immediately invalidated. |
+| `GET` | `/admin/rotate-key` | Root OR current rotatable key | Returns metadata: `has_rotatable_key`, `created_at`, `rotated_at`, `rotations`, `key_preview` (first 6 + last 4 chars). Never returns the full key. |
+| `DELETE` | `/admin/rotate-key` | Root key **only** | Revokes the rotatable key entirely. Only the root `ADMIN_KEY` can perform this action (prevents lockout). |
+
+**Auth resolution order** (applies to all admin endpoints):
+1. Root `ADMIN_KEY` (Cloudflare secret) — always valid
+2. Rotatable key (KV-stored) — valid when set, checked on every request
+3. `SHOPIFY_APP_SECRET` — legacy fallback
+4. Tenant tokens (`crm_t_*`) — shop-scoped, checked on config endpoints only
+
+**Multi-tenant Shopify use case:** Persona C deploys one worker, connects multiple Shopify stores, and issues `crm_t_` tenant tokens per store. The rotatable admin key lets them manage all stores without needing Cloudflare CLI access. Key rotation doesn't affect existing tenant tokens.
+
+**Security constraints:**
+- Custom keys must be ≥ 20 characters
+- Only one rotatable key exists at a time (rotation replaces the previous one)
+- Root key cannot be rotated via API (requires `wrangler secret put`)
+- Rotatable key revocation (`DELETE`) requires root key (prevents a compromised rotatable key from locking out the operator)
+- Key metadata (rotation count, timestamps) is stored separately from the key value
 
 ### 3.11 UCP / A2A Protocol (FR-UCP)
 

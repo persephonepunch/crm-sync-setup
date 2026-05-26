@@ -1162,6 +1162,44 @@ curl -X POST https://YOUR-WORKER.workers.dev/config?shop=YOUR-STORE.myshopify.co
   -d '{"plan":"private"}'
 ```
 
+### Self-Service Admin Key Rotation (Persona C)
+
+Private Worker operators can rotate their admin key via API without needing the Cloudflare CLI. This is independent of any Shopify instance — useful when managing multiple Shopify stores from one worker.
+
+**Key hierarchy:**
+- **Root key** (`ADMIN_KEY`): Set once via `wrangler secret put` at deploy time. Cannot be rotated via API.
+- **Rotatable key**: Created and managed via `/admin/rotate-key`. Works alongside the root key on all admin endpoints.
+
+**Create or rotate a key:**
+```bash
+# Auto-generate a new key
+curl -X POST https://YOUR-WORKER.workers.dev/admin/rotate-key \
+  -H "Authorization: Bearer YOUR_CURRENT_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Or bring your own key (minimum 20 characters)
+curl -X POST https://YOUR-WORKER.workers.dev/admin/rotate-key \
+  -H "Authorization: Bearer YOUR_CURRENT_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"key":"your-custom-key-at-least-20-chars"}'
+```
+
+**Check current key status:**
+```bash
+curl https://YOUR-WORKER.workers.dev/admin/rotate-key \
+  -H "Authorization: Bearer YOUR_KEY"
+# Returns: has_rotatable_key, created_at, rotated_at, rotations, key_preview
+```
+
+**Revoke rotatable key (root key only):**
+```bash
+curl -X DELETE https://YOUR-WORKER.workers.dev/admin/rotate-key \
+  -H "Authorization: Bearer YOUR_ROOT_ADMIN_KEY"
+```
+
+> **Important:** Rotating the key immediately invalidates the previous rotatable key. The root `ADMIN_KEY` always remains valid. Existing tenant tokens (`crm_t_*`) are not affected by key rotation.
+
 ---
 
 ## Quick Reference
