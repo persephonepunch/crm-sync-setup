@@ -1,9 +1,10 @@
 # CRM Sync — Clean Room Utility & Security Rules
 
-**Version:** 1.0
+**Version:** 1.1 — Cloudflare-Native Architecture
 **Date:** 2026-05-27
 **Classification:** Internal — Confidential
 **Compliance:** GDPR Art. 6/9, CCPA §1798.140, CPRA, UK DPA 2018
+**Infrastructure:** Cloudflare D1 + R2 + Durable Objects (same network as Hydrogen/Worker)
 
 ---
 
@@ -65,24 +66,261 @@ A clean room makes the same matching possible **without sharing raw PII**.
 
 ---
 
-## 3. Clean Room Providers (Ranked by Fit)
+## 3. Architecture: Cloudflare-Native Clean Room
 
-| Provider | How it works | Best for | Cost |
-|---|---|---|---|
-| **AWS Clean Rooms** | Both parties load to separate S3 buckets in same AWS region; SQL queries run on encrypted data; only aggregates leave | You + NielsenIQ/Circana (both support AWS) | $0 + AWS compute |
-| **Snowflake Data Clean Rooms** | Native Snowflake sharing with governance policies; no data copying | Circana Unify (already on Snowflake) | Snowflake credits |
-| **Google Ads Data Hub** | Match first-party data against Google ad impressions | Google Ads attribution (GCLID matching) | Free with Google Ads |
-| **LiveRamp** | Identity resolution as a service; RampID links hashed emails across partners | Cross-platform identity stitching | $50K+/year |
-| **Habu** | Multi-cloud clean room orchestration | Multiple partners simultaneously | $100K+/year |
-| **InfoSum** | Decentralized — data never moves; federated queries | Maximum privacy (EU-preferred) | Custom |
+CRM Sync implements a **self-hosted clean room** on Cloudflare's edge infrastructure — the same network that hosts the Shopify Hydrogen storefront (Oxygen Workers) and the CRM Sync worker. No AWS, Snowflake, or third-party clean room service required.
 
-### Recommended stack for CRM Sync:
+### 3.1 Why Cloudflare-Native
+
+| Factor | External Clean Room (AWS/Snowflake) | Cloudflare-Native |
+|---|---|---|
+| **Data residency** | Data leaves your infrastructure | Data stays on your Cloudflare account |
+| **Cost** | AWS compute + storage per query | D1: free tier 5M reads/day; R2: free egress |
+| **Network** | Cross-cloud hops (CF → AWS → CF) | Same edge network as Hydrogen + Worker |
+| **Latency** | Partner-dependent setup time | Instant — same-stack queries |
+| **Control** | Governed by provider's policies | You own the governance rules entirely |
+| **Multi-tenant** | Separate accounts per tenant | Same D1 database, tenant-scoped queries |
+
+### 3.2 Component Mapping
 
 ```
-Tier 1 (start here):    Google Ads Data Hub (free) — GCLID attribution
-Tier 2 (add next):      AWS Clean Rooms — NielsenIQ/Circana matching
-Tier 3 (enterprise):    LiveRamp + Snowflake — cross-platform identity graph
+┌─────────────────────────────────────────────────────────────────┐
+│  CLOUDFLARE-NATIVE CLEAN ROOM                                    │
+│                                                                   │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐ │
+│  │  D1 (SQLite)    │  │  R2 (Objects)   │  │  Durable Objects   │ │
+│  │                 │  │                 │  │                    │ │
+│  │  Query engine   │  │  Upload staging │  │  Session isolation │ │
+│  │  Pre-approved   │  │  Audit archive  │  │  Per-partner       │ │
+│  │  SQL templates  │  │  Parquet/CSV    │  │  state machine     │ │
+│  │  Aggregation    │  │  Export archive  │  │  TTL enforcement   │ │
+│  │  thresholds     │  │  Consent proofs  │  │  Rate limiting     │ │
+│  └────────┬───────┘  └────────┬───────┘  └─────────┬──────────┘ │
+│           │                   │                     │             │
+│           └─────────┬─────────┘                     │             │
+│                     │                               │             │
+│  ┌──────────────────▼───────────────────────────────▼───────────┐ │
+│  │  CRM Sync Worker (existing)                                    │ │
+│  │  /admin/clean-room/*  routes                                   │ │
+│  │  + hashPII() (existing, line ~2252)                            │ │
+│  │  + validateCleanRoomPayload() (new)                            │ │
+│  └──────────────────────────────────────────────────────────────┘ │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────────┐ │
+│  │  KV (CRM_STATE — existing)                                     │ │
+│  │  • Partner access tokens (encrypted)                           │ │
+│  │  • Rate limit counters                                         │ │
+│  │  • Session metadata                                            │ │
+│  └──────────────────────────────────────────────────────────────┘ │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+### 3.3 wrangler.toml Bindings
+
+```toml
+# D1 — Clean room query engine (SQLite at the edge)
+[[d1_databases]]
+binding = "CLEAN_ROOM_DB"
+database_name = "crm-clean-room"
+database_id = "..."  # Set after `wrangler d1 create crm-clean-room`
+
+# R2 — Upload staging + audit archive (already used for analytics exports)
+[[r2_buckets]]
+binding = "ANALYTICS_EXPORTS"
+bucket_name = "crm-analytics-exports"
+
+# Durable Objects — Per-partner session isolation
+[durable_objects]
+bindings = [
+  { name = "CLEAN_ROOM_SESSION", class_name = "CleanRoomSession" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["CleanRoomSession"]
+```
+
+### 3.4 D1 Schema
+
+```sql
+-- Partner uploads (their hashed data loaded into D1 for matching)
+CREATE TABLE IF NOT EXISTS partner_uploads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT NOT NULL,
+  partner TEXT NOT NULL,           -- "nielseniq", "circana", "google_adh"
+  hashed_email TEXT NOT NULL,
+  attributes TEXT,                 -- JSON: POS data, panel segments, etc.
+  uploaded_at TEXT DEFAULT (datetime('now')),
+  expires_at TEXT NOT NULL,        -- Auto-delete after 90 days
+  UNIQUE(session_id, partner, hashed_email)
+);
+
+-- CRM uploads (our hashed data, loaded per-session)
+CREATE TABLE IF NOT EXISTS crm_uploads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT NOT NULL,
+  hashed_email TEXT NOT NULL,
+  segments TEXT,                   -- JSON array
+  order_data TEXT,                 -- JSON: order_count_30d, order_total_30d, etc.
+  channel_source TEXT,
+  has_mandate INTEGER DEFAULT 0,
+  consent_scope TEXT NOT NULL,
+  consent_granted_at TEXT NOT NULL,
+  uploaded_at TEXT DEFAULT (datetime('now')),
+  UNIQUE(session_id, hashed_email)
+);
+
+-- Query results (aggregated outputs only)
+CREATE TABLE IF NOT EXISTS query_results (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT NOT NULL,
+  query_template TEXT NOT NULL,    -- "attribution_lift", "segment_overlap", etc.
+  result TEXT NOT NULL,            -- JSON: aggregated, non-PII output
+  computed_at TEXT DEFAULT (datetime('now')),
+  match_rate REAL,
+  records_matched INTEGER,
+  aggregation_threshold_met INTEGER DEFAULT 1
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_partner_session ON partner_uploads(session_id);
+CREATE INDEX IF NOT EXISTS idx_partner_email ON partner_uploads(hashed_email);
+CREATE INDEX IF NOT EXISTS idx_crm_session ON crm_uploads(session_id);
+CREATE INDEX IF NOT EXISTS idx_crm_email ON crm_uploads(hashed_email);
+CREATE INDEX IF NOT EXISTS idx_partner_expires ON partner_uploads(expires_at);
+```
+
+### 3.5 Durable Object: CleanRoomSession
+
+```typescript
+// Each clean room analysis runs inside an isolated Durable Object
+// Partner = NielsenIQ, Circana, or Google ADH
+// Session = one analysis window (e.g., "attribution_lift for May 2026")
+
+export class CleanRoomSession implements DurableObject {
+  private state: DurableObjectState;
+  private env: Env;
+
+  constructor(state: DurableObjectState, env: Env) {
+    this.state = state;
+    this.env = env;
+  }
+
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+
+    switch (url.pathname) {
+      case "/init":
+        return this.initSession(request);
+      case "/load-crm-data":
+        return this.loadCRMData(request);
+      case "/load-partner-data":
+        return this.loadPartnerData(request);
+      case "/run-query":
+        return this.runQuery(request);
+      case "/status":
+        return this.getStatus();
+      case "/destroy":
+        return this.destroySession();
+      default:
+        return new Response("Not found", { status: 404 });
+    }
+  }
+
+  private async initSession(request: Request): Promise<Response> {
+    const body = await request.json() as {
+      partner: string;
+      analysis: string;
+      tenant_shop: string;
+      expires_at: string;
+    };
+
+    await this.state.storage.put("session", {
+      ...body,
+      status: "initialized",
+      created_at: new Date().toISOString(),
+      crm_loaded: false,
+      partner_loaded: false,
+    });
+
+    // Set alarm for auto-expiry (90 days max)
+    const expiresAt = new Date(body.expires_at).getTime();
+    await this.state.storage.setAlarm(expiresAt);
+
+    return Response.json({ ok: true, status: "initialized" });
+  }
+
+  private async runQuery(request: Request): Promise<Response> {
+    const session = await this.state.storage.get("session") as any;
+    if (!session?.crm_loaded || !session?.partner_loaded) {
+      return Response.json({ ok: false, error: "Both datasets must be loaded" }, { status: 400 });
+    }
+
+    const { template } = await request.json() as { template: string };
+
+    // Execute pre-approved query template against D1
+    const result = await executeQueryTemplate(
+      this.env.CLEAN_ROOM_DB,
+      session.session_id || this.state.id.toString(),
+      template
+    );
+
+    // Archive result to R2
+    await this.env.ANALYTICS_EXPORTS.put(
+      `audit/clean-room/${new Date().getFullYear()}/${session.session_id || this.state.id}/${template}.json`,
+      JSON.stringify(result)
+    );
+
+    return Response.json(result);
+  }
+
+  // Auto-cleanup on alarm (TTL expired)
+  async alarm(): Promise<void> {
+    await this.destroySession();
+  }
+
+  private async destroySession(): Promise<Response> {
+    const session = await this.state.storage.get("session") as any;
+    const sessionId = session?.session_id || this.state.id.toString();
+
+    // Delete all session data from D1
+    await this.env.CLEAN_ROOM_DB.prepare(
+      "DELETE FROM partner_uploads WHERE session_id = ?"
+    ).bind(sessionId).run();
+
+    await this.env.CLEAN_ROOM_DB.prepare(
+      "DELETE FROM crm_uploads WHERE session_id = ?"
+    ).bind(sessionId).run();
+
+    // Log deletion in audit trail
+    await this.env.ANALYTICS_EXPORTS.put(
+      `audit/clean-room/deletions/${sessionId}.json`,
+      JSON.stringify({
+        session_id: sessionId,
+        deleted_at: new Date().toISOString(),
+        reason: "ttl_expired",
+      })
+    );
+
+    await this.state.storage.deleteAll();
+    return Response.json({ ok: true, status: "destroyed" });
+  }
+}
+```
+
+### 3.6 External Partner Integration
+
+For partners that require **their own** clean room infrastructure (AWS Clean Rooms, Snowflake), the worker acts as a **clean room client** — uploading hashed data to the partner's environment:
+
+| Partner | Their infrastructure | CRM Sync role |
+|---|---|---|
+| **NielsenIQ Connect** | AWS Clean Rooms / S3 drop | Upload hashed CSV to their S3; they run queries |
+| **Circana Unify** | Snowflake Data Clean Rooms | Upload hashed JSON via API; they run queries |
+| **Google Ads Data Hub** | BigQuery | Upload via GA4 Measurement Protocol; Google runs queries |
+| **Self-hosted** | Cloudflare D1 (this spec) | Both datasets loaded into D1; we run queries |
+
+The Cloudflare-native clean room handles **self-hosted analysis**. Partner-hosted clean rooms use the existing analytics export delivery pipeline (see `ANALYTICS-EXPORT-SPEC.md`).
 
 ---
 
@@ -517,13 +755,13 @@ WHERE crm.channel_source = 'google_ads'
 
 ## 8. Implementation on Existing Stack
 
-### Worker: Clean Room Upload Endpoint
+### Worker: Clean Room Session Endpoints
 
 ```
-POST /admin/clean-room/upload
+POST /admin/clean-room/session
 Authorization: Bearer {ADMIN_KEY}
 Body: {
-  "provider": "aws_clean_rooms",    // or "snowflake", "google_adh"
+  "partner": "nielseniq",           // or "circana", "google_adh", "self"
   "analysis": "attribution_lift",   // pre-approved query template
   "date_range": { "from": "2026-04-01", "to": "2026-05-27" },
   "shop": "hx-stage.myshopify.com"  // tenant scoping
@@ -531,24 +769,45 @@ Body: {
 
 Response: {
   "ok": true,
-  "upload_id": "cru_a1b2c3d4",
+  "session_id": "cru_a1b2c3d4",
   "records": 4821,
   "records_excluded_no_consent": 1203,
   "pii_validation": "passed",
   "manifest_hash": "sha256:e5f6g7...",
-  "destination": "s3://crm-clean-room-uploads/2026-05-27/cru_a1b2c3d4.parquet",
+  "destination": "d1://crm-clean-room/session/cru_a1b2c3d4",
   "expires_at": "2026-08-25T00:00:00Z"
 }
 ```
 
-### Worker: Clean Room Results Endpoint
-
 ```
-GET /admin/clean-room/results?upload_id=cru_a1b2c3d4
+POST /admin/clean-room/partner-upload
 Authorization: Bearer {ADMIN_KEY}
+Content-Type: application/json
+Body: {
+  "session_id": "cru_a1b2c3d4",
+  "partner": "nielseniq",
+  "records": [
+    { "hashed_email": "a1b2c3...", "attributes": { "units_sold": 4, ... } }
+  ]
+}
 
 Response: {
-  "upload_id": "cru_a1b2c3d4",
+  "ok": true,
+  "records_loaded": 12450,
+  "session_status": "partner_loaded"
+}
+```
+
+```
+POST /admin/clean-room/query
+Authorization: Bearer {ADMIN_KEY}
+Body: {
+  "session_id": "cru_a1b2c3d4",
+  "template": "attribution_lift"    // pre-approved template only
+}
+
+Response: {
+  "session_id": "cru_a1b2c3d4",
   "status": "completed",
   "analysis": "attribution_lift",
   "results": { ... },               // aggregated, non-PII outputs
@@ -557,6 +816,85 @@ Response: {
   "records_matched": 1644,
   "records_total": 4821,
   "aggregation_threshold_met": true
+}
+```
+
+```
+GET /admin/clean-room/results?session_id=cru_a1b2c3d4
+Authorization: Bearer {ADMIN_KEY}
+
+Response: {
+  "session_id": "cru_a1b2c3d4",
+  "status": "completed",
+  "queries": [ ... ],               // all query results for this session
+  "data_expires_at": "2026-08-25T00:00:00Z",
+  "audit_url": "r2://audit/clean-room/2026/cru_a1b2c3d4/"
+}
+```
+
+```
+DELETE /admin/clean-room/session?session_id=cru_a1b2c3d4
+Authorization: Bearer {ADMIN_KEY}
+
+Response: {
+  "ok": true,
+  "session_id": "cru_a1b2c3d4",
+  "status": "destroyed",
+  "records_deleted": { "crm": 4821, "partner": 12450, "results": 3 }
+}
+```
+
+### D1 Query Execution (replaces external clean room compute)
+
+```typescript
+// Pre-approved query templates executed against D1
+async function executeQueryTemplate(
+  db: D1Database,
+  sessionId: string,
+  template: string
+): Promise<QueryResult> {
+  const queries: Record<string, string> = {
+    attribution_lift: `
+      SELECT
+        c.channel_source,
+        COUNT(DISTINCT c.hashed_email) as crm_customers,
+        COUNT(DISTINCT CASE WHEN p.hashed_email IS NOT NULL
+          THEN c.hashed_email END) as also_bought_retail,
+        ROUND(100.0 * COUNT(DISTINCT CASE WHEN p.hashed_email IS NOT NULL
+          THEN c.hashed_email END) / COUNT(DISTINCT c.hashed_email), 1) as match_pct
+      FROM crm_uploads c
+      LEFT JOIN partner_uploads p ON c.hashed_email = p.hashed_email
+        AND c.session_id = p.session_id
+      WHERE c.session_id = ?1
+      GROUP BY c.channel_source
+      HAVING COUNT(DISTINCT c.hashed_email) >= 50
+    `,
+    segment_overlap: `
+      SELECT
+        json_each.value as segment,
+        COUNT(DISTINCT c.hashed_email) as segment_size,
+        COUNT(DISTINCT CASE WHEN p.hashed_email IS NOT NULL
+          THEN c.hashed_email END) as retail_match
+      FROM crm_uploads c, json_each(c.segments)
+      LEFT JOIN partner_uploads p ON c.hashed_email = p.hashed_email
+        AND c.session_id = p.session_id
+      WHERE c.session_id = ?1
+      GROUP BY json_each.value
+      HAVING COUNT(DISTINCT c.hashed_email) >= 50
+    `,
+    // ... additional templates
+  };
+
+  const sql = queries[template];
+  if (!sql) throw new Error(`Unknown query template: ${template}`);
+
+  const result = await db.prepare(sql).bind(sessionId).all();
+  return {
+    template,
+    rows: result.results,
+    aggregation_threshold_met: true,
+    computed_at: new Date().toISOString(),
+  };
 }
 ```
 
@@ -570,9 +908,9 @@ Same pattern as analytics export — Xano does the heavy lifting:
 3. Map Shopify SKUs → UPCs
 4. Hash all PII (hashPII function — shared normalization)
 5. Run PII leak validation
-6. Format as Parquet (AWS Clean Rooms) or JSON (Snowflake)
+6. Format as JSON for D1 insert (self-hosted) or CSV/Parquet (partner-hosted)
 7. Insert into integration_queue → webhook to Worker
-8. Worker uploads to S3/Snowflake and triggers clean room computation
+8. Worker loads data into D1 (self-hosted) or uploads to partner S3/API (partner-hosted)
 ```
 
 ---
@@ -585,8 +923,8 @@ Every clean room operation generates an immutable audit record:
 interface CleanRoomAuditEntry {
   audit_id: string;                    // UUID
   operation: "upload" | "query" | "result" | "delete" | "consent_revocation";
-  upload_id: string;
-  provider: string;                    // "aws_clean_rooms" | "snowflake" | "google_adh"
+  session_id: string;
+  provider: string;                    // "cloudflare_d1" | "partner_s3" | "partner_api" | "google_adh"
   tenant_shop: string;
   initiated_by: string;               // admin key preview or "system_cron"
   
@@ -644,9 +982,10 @@ interface CleanRoomAuditEntry {
 
 ```
 1. IMMEDIATE (0-1 hours)
-   ├─ Revoke partner API credentials
-   ├─ Delete all data from clean room environment
-   ├─ Log incident in audit trail
+   ├─ Revoke partner API credentials (KV delete)
+   ├─ DELETE FROM partner_uploads / crm_uploads WHERE session involves partner
+   ├─ Destroy Durable Object sessions for affected partner
+   ├─ Log incident in R2 audit trail
    └─ Notify DPO
 
 2. ASSESSMENT (1-24 hours)
@@ -676,11 +1015,13 @@ interface CleanRoomAuditEntry {
 1. User submits deletion request via POST /auth/delete-account
 2. Worker processes account deletion (existing flow)
 3. ADDITIONALLY:
-   ├─ Query all active clean room uploads containing user's hashed_email
-   ├─ For each active upload:
-   │   POST {provider}/api/delete-records
-   │   Body: { match_keys: [hashed_email] }
-   ├─ Log deletion requests in audit trail
+   ├─ Query D1: SELECT session_id FROM crm_uploads WHERE hashed_email = ?
+   ├─ For each session with matching records:
+   │   DELETE FROM crm_uploads WHERE hashed_email = ? AND session_id = ?
+   │   DELETE FROM partner_uploads WHERE hashed_email = ? AND session_id = ?
+   ├─ For partner-hosted clean rooms:
+   │   POST {partner}/api/delete-records { match_keys: [hashed_email] }
+   ├─ Log all deletions in R2 audit trail
    └─ Confirm deletion within 72 hours
-4. Cron cleanup: verify deletion confirmed by each provider
+4. Cron cleanup: verify D1 deletion complete + partner confirmations received
 ```
