@@ -30,6 +30,8 @@
 | 1.6 | 2026-05-20 | Engineering | Token Lifecycle Management specification (§3.14): Shopify expiring token architecture, refresh flow, multi-tenant token storage schema, three-surface token sync (app loader, cron, manual), diagnostic endpoints, embed system updated to fetch+innerHTML pattern with script re-execution |
 | 1.7 | 2026-05-21 | Engineering | Removed `/embed/cart` route and Product Cart embed — storefront and cart handled by Shopify Web Components + PIM grid (`cf-worker-webflow-sync`), reducing worker to ~9,400 lines / 78 routes; client credentials grant for own-store token provisioning; `sanitizeDomain()` applied at all ingress points; domain trailing-comma fix; Shopify Dev Dashboard terminology alignment (removed all `shpat_`/`shpua_`/`shprt_` prefix assumptions) |
 | 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
+| 1.9 | 2026-05-28 | Engineering | Shopify embedded admin app dashboard fixed (§3.15, FR-APP): URL-driven tab navigation (`?tab=Config\|Embeds\|Settings`) replacing client-only `useState`, so tabs switch via real navigation and work even before/without client hydration; native Polaris `s-page` + `s-button` tab strip; Config/Embeds/Settings consolidated into the single `/app` route (removed standalone `app.embeds`/`app.settings` routes and `s-app-nav`); save form hardened with hidden `intent` field for pre-hydration POST |
+| 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
 
 ---
 
@@ -412,7 +414,7 @@ Private Worker operators (Stakeholder C) need admin key management **independent
 | FR-EMBED-05 | ~~Product cart + checkout (`/embed/cart`)~~ | Removed (v1.7) — storefront and cart handled by Shopify Web Components + PIM grid (`cf-worker-webflow-sync`) |
 | FR-EMBED-06 | `embeds_enabled` feature flag — tenant-configurable array controlling which embeds are served (default: all four) | Implemented |
 | FR-EMBED-07 | Disabled embeds return 403 with error message | Implemented |
-| FR-EMBED-08 | Shopify app Embed Codes tab — copy-ready snippets for all 4 embeds with preview links | Implemented |
+| FR-EMBED-08 | Shopify admin app **Embeds** tab (within the consolidated `/app` dashboard — see §3.15) — copy-ready snippets for all 4 embeds with copy-to-clipboard | Implemented |
 
 ### 3.13 Storefront Token Provisioning (FR-SF)
 
@@ -540,6 +542,22 @@ All embed endpoints (`/embed/footer`, `/embed/account`, `/embed/dashboard`, `/em
 ```
 
 Account and dashboard endpoints support dual-format responses: `text/html` (default, for fetch+innerHTML) and `text/javascript` (when `Sec-Fetch-Dest: script`, for `<script src>` loading). Standalone preview mode includes a Sign In fallback that redirects to Google OAuth when the footer embed is absent.
+
+### 3.15 Shopify Admin Embedded App (FR-APP)
+
+The merchant-facing control panel renders embedded in the Shopify admin (App Bridge), served by the React Router worker `hx-crm-sync` (`application_url` in `shopify.app.crm-sync.toml`). It is a single route (`/app`, `app/routes/app._index.tsx`) presenting three tabs.
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-APP-01 | Single `/app` route renders the CRM Sync dashboard inside a native Polaris `s-page` (heading "CRM Sync") | Implemented |
+| FR-APP-02 | Three tabs — **Config**, **Embeds**, **Settings** — rendered as a native `s-button` strip (active tab `variant="primary"`, others `variant="tertiary"`) | Implemented |
+| FR-APP-03 | Active tab is driven by the `?tab=` query param (not client-only React state), so switching works via real navigation even before/without client-side hydration | Implemented |
+| FR-APP-04 | Tab links preserve all existing query params (`shop`, `host`, `embedded`, `id_token`) so App Bridge stays authenticated across the switch | Implemented |
+| FR-APP-05 | **Config** tab — Shopify token status cards (API connection, token, type, API test), Re-install OAuth + Open Worker Settings actions, and read-only integration config (secrets masked) | Implemented |
+| FR-APP-06 | **Embeds** tab — copy-ready fetch+innerHTML snippets for all 4 embeds with copy-to-clipboard (see FR-EMBED-08) | Implemented |
+| FR-APP-07 | **Settings** tab — update-config form (Xano, Google, Webflow, Resend, GA4, Shopify secret/storefront) and Danger Zone reset; form carries a hidden `intent=save` field so the native POST works pre-hydration | Implemented |
+| FR-APP-08 | Navigation is in-page tabs only — no `s-app-nav`; standalone `/app/embeds` and `/app/settings` routes are removed (consolidated into `/app`) | Implemented |
+| FR-APP-09 | Unauthenticated `GET /app` returns the Shopify embedded auth bounce (410/302), never a 404/500 | Implemented |
 
 ---
 
@@ -871,6 +889,11 @@ User Action (toggle, form, signup)
 | UAT-SEC-18 | Admin endpoint valid auth | 1. `POST /admin/webflow-ensure-fields?shop=x` with valid bearer | `200` with fields result | [ ] | |
 | UAT-SEC-19 | Cloudflare Access blocks unauthenticated browser | 1. Open worker admin URL in incognito browser | Redirected to `kcoop.cloudflareaccess.com` OTP login | [ ] | |
 | UAT-SEC-20 | Cloudflare Access allows whitelisted email | 1. Authenticate with `ysl@ysl150.com` via OTP | Access granted to worker admin pages | [ ] | |
+| UAT-SEC-21 | Mandate read fail-closed (no auth) | 1. `GET /commerce/mandates/{id}` without `Authorization` header | `401 unauthorized` — never leaks `404` mandate existence (regression guard: `handleMandateGet` must pass the real `env` to `verifyBearerToken`, not a synthetic `{ADMIN_KEY}` env) | [ ] | |
+| UAT-SEC-22 | Mandate read fail-closed (bad bearer) | 1. `GET /commerce/mandates/{id}` with `Authorization: Bearer not-a-real-key` | `401 unauthorized` | [ ] | |
+| UAT-SEC-23 | Permission gates reject invalid bearer | 1. `GET /config`, `POST /config`, `POST /sync/customers`, `GET /admin/tenants` each with a bogus bearer | All `401` (token ≠ `ADMIN_KEY`/tenant/rotatable key) | [ ] | |
+
+> Automated coverage for UAT-SEC-21..23 and the mandate gates lives in `tests/smoke-test.sh` (`npm run test:smoke`) under **Mandates & Permissions (fail-closed)** — checks `MND-01..04` and `PERM-01..04`.
 
 ### 7.11 Multi-Tenant Tests
 
@@ -965,6 +988,22 @@ User Action (toggle, form, signup)
 | UAT-TKN-14 | Embed dual-format (HTML) | 1. `fetch('/embed/account?shop=x')` | Response Content-Type: `text/html`; contains styles, markup, and `<script>` tags | [ ] | |
 | UAT-TKN-15 | Embed dual-format (JS) | 1. `<script src="/embed/account?shop=x">` (browser sends `Sec-Fetch-Dest: script`) | Response Content-Type: `text/javascript`; self-injecting JS loader | [ ] | |
 | UAT-TKN-16 | Standalone Sign In fallback | 1. Open `/embed/dashboard` directly in browser 2. Click Sign In | Redirects to `/auth/google/login?return_to=...` (fallback, no footer embed needed) | [ ] | |
+
+---
+
+### 7.15 Shopify Admin App Dashboard Tests (FR-APP)
+
+Automated regression coverage: `tests/shopify-app.test.sh` (`npm run test:app`).
+
+| ID | Test Case | Steps | Expected Result | Pass/Fail | Notes |
+|---|---|---|---|---|---|
+| UAT-APP-01 | Dashboard renders | 1. Open app from Shopify admin (Apps → CRM Sync) | Native `s-page` "CRM Sync" with Config / Embeds / Settings `s-button` tab strip; Config active by default | [ ] | |
+| UAT-APP-02 | Tab switch via URL | 1. Click **Embeds** tab | URL gains `?tab=Embeds`; content swaps to embed snippets; **Settings** likewise → `?tab=Settings` | [ ] | |
+| UAT-APP-03 | Tabs work without client state | 1. Load `/app?tab=Settings` directly (or with JS disabled) | Settings tab renders server-side — does not depend on client-only `useState`/`onClick` | [ ] | |
+| UAT-APP-04 | Auth params preserved | 1. Switch between tabs 2. Inspect URL | `shop`, `host`, `embedded`, `id_token` params retained across the switch (App Bridge stays authenticated) | [ ] | |
+| UAT-APP-05 | Settings save | 1. Settings tab 2. Fill a field 3. Save Changes | Config POSTed to worker `/config`; hidden `intent=save` ensures submit works pre-hydration | [ ] | |
+| UAT-APP-06 | Single-route consolidation | 1. Request `/app/embeds` and `/app/settings` | Routes do not exist — all three tabs served from `/app` | [ ] | |
+| UAT-APP-07 | Unauthenticated bounce | 1. `GET /app` (app worker `hx-crm-sync`) without a session | Shopify embedded auth bounce (`410`/`302`), never `404`/`500` | [ ] | |
 
 ---
 
