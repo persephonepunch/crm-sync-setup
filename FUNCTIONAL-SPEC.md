@@ -32,6 +32,7 @@
 | 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
 | 1.9 | 2026-05-28 | Engineering | Shopify embedded admin app dashboard fixed (§3.15, FR-APP): URL-driven tab navigation (`?tab=Config\|Embeds\|Settings`) replacing client-only `useState`, so tabs switch via real navigation and work even before/without client hydration; native Polaris `s-page` + `s-button` tab strip; Config/Embeds/Settings consolidated into the single `/app` route (removed standalone `app.embeds`/`app.settings` routes and `s-app-nav`); save form hardened with hidden `intent` field for pre-hydration POST |
 | 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
+| 1.13 | 2026-06-02 | Engineering | **AI/API DevOps App Harness model + gating simplification + versioning (§2.0, §5.0, §12):** documented the two-plane harness (Cloudflare Workers compile/integration ⇄ Xano K8s/Docker/Redis data; both Shopify + Webflow apps compile on Cloudflare; CORS-restricted domains, CI/CD, edge scaling; Data Channels/API-AI/Skills/Schema/JSON Feeds). **Gating simplified:** `ADMIN_KEY` is the canonical gateway (free self-setup); `SHOPIFY_APP_SECRET` **dropped as an admin login** (HMAC-only) and the Shopify app migrated to `ADMIN_KEY`; `keyEq` trims whitespace; fail-open is local-dev-only. **Custom-DNS upsell** (shared `story-story.ai` → own namespace e.g. `ysl150.com`). Added the **Versioning Model** (§12). |
 | 1.12 | 2026-06-02 | Engineering | **Multi-tenant scaling conventions + Stakeholder Forward-Deploy Harness (§3.17, FR-ENV/FR-LOC/FR-FDH):** three deploy channels (Dev/Stage/Prod) with per-hostname env/deploy-team labels (editable in portal; ownable by the Webflow Publish Refactor); localization extended to a geo model (NA/EMEA/APAC/LATAM) — markets US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR with locale+currency, prefix/suffix shop naming + country-TLD inference, entitlement currency defaulted per market; deploy→state binding surfaced (Webflow UI + Xano Data) in the portal; `/setup` Agentic Commerce readiness + portal env/localization banners; `GET /env-label`; Webflow extension shows env·team chip + Config Portal link |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 
@@ -70,6 +71,27 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~9
 ---
 
 ## 2. System Architecture
+
+### 2.0 AI/API DevOps App Harness — System Model
+
+Two planes, three surfaces, one deploy harness.
+
+```
+   Surfaces:   Webflow / React App        Shopify App        (admin tooling / CLI)
+                      │                        │                      │
+                      └──────────── all compiled & served on ─────────┘
+                                          ▼
+   Compile/Integration plane:   CLOUDFLARE WORKERS
+        CORS-restricted domains · CI/CD deploy · edge scaling
+        connects → Data Channels · API/AI · Skills · Data Schema · JSON Feeds
+                                          ▼
+   Data plane:                   XANO  (Kubernetes / Docker / Redis)
+        source of truth: entitlements, consent, claims, change bus, channel cursors
+```
+
+- **Cloudflare Workers = the compile/integration plane.** *Both* the Shopify app (`hx-crm-sync`, React Router) and the Webflow/React app (CRM Auth extension + `/settings` portal) **compile and run on Cloudflare** — one compute plane for both surfaces. The worker connects the five integration surfaces: **Data Channels** (channel adapters + change bus), **API/AI** (UCP A2A/AP2 + EdDSA offline tokens), **Skills** (entitlement `features[]`), **Data Schema** (Xano tables + Data-Funnel mappings/rules), **JSON Feeds** (`/channels`, `/.well-known/ucp`, manifests).
+- **Xano = the data plane** (Kubernetes / Docker / Redis): the authoritative store for entitlements (190–194), consent, claims, the change bus, and channel cursors.
+- **Domains are CORS-restricted, deployed via CI/CD, and scale at the edge.** The shared configuration URL is **`story-story.ai`**; a tenant can run the portal on its **own DNS namespace** (e.g. `ysl150.com`) as a **paid upsell** (Private/Enterprise). The gateway credential is **`ADMIN_KEY`** — anyone can stand up their **own** instance *free* by setting their own `ADMIN_KEY`; the shared/custom-DNS tiers are the monetized layers on top.
 
 ### 2.1 Multi-Tenant Architecture
 
@@ -779,6 +801,21 @@ All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper,
 
 ## 5. Security Controls
 
+### 5.0 Authentication & Gating Model
+
+`ADMIN_KEY` is the **canonical gateway credential**. Setting your own `ADMIN_KEY` stands up a free, self-hosted instance; the shared and custom-DNS tiers are the monetized layers on top.
+
+| Credential | Used by | Channel | Notes |
+|---|---|---|---|
+| **`ADMIN_KEY`** | operator / admin tooling / both apps | `?key=` and `Bearer` | the gateway; canonical admin auth |
+| **Rotatable key** (`admin_key:rotatable`) | self-service rotation (Persona C) | `Bearer` / `?key=` | set via `POST /admin/rotate-key` (records `admin_key:meta`) |
+| **Tenant token** (`crm_t_…`) | Webflow extension / Stakeholder B | `Bearer` | shop-scoped, revocable (KV) |
+| **`SHOPIFY_APP_SECRET`** | Shopify **webhook HMAC only** | — | **no longer an admin login** (dropped v1.13); the Shopify app now authenticates with `ADMIN_KEY` |
+
+- **`keyEq` trims** both sides of every comparison, so a stray trailing newline/space (e.g. a secret pasted into the Cloudflare dashboard Value box) never causes a false mismatch.
+- **Cloudflare Access** (zero-trust) layers over the admin-key gate on the HTML admin pages (`/setup`, `/settings`, `/onboarding`) on the `*.workers.dev` host; the JSON API enforces the key directly.
+- **Fail-open is local-dev only** — the gate opens only when *no* admin credential is configured at all (never in production, where `ADMIN_KEY` is set).
+
 ### 5.1 Authentication Security
 
 | Control | Implementation |
@@ -1263,6 +1300,22 @@ I have reviewed the functional requirements, test plan, release criteria, and kn
 | **Signature** | _________________________ |
 | **Date** | _________________________ |
 | **Conditions** | _________________________ |
+
+---
+
+## 12. Versioning Model
+
+Five distinct version axes, each with its own record:
+
+| Axis | Scope | Recorded in | Bumped by |
+|---|---|---|---|
+| **Spec / doc** | this document | revision history (§ top) | manual (currently v1.13) |
+| **Worker deploy** | the running worker | Cloudflare Version IDs | every `wrangler deploy` |
+| **Entitlement `state_version`** | per subject | `entitlements` (190) | every entitlement write (drives the version-monotonic consent guard) |
+| **Signing-key version** | offline-token signer | `entitlement_signing_keys` (192), `next→active→retired` | `POST /entitlement/signing-keys/rotate` |
+| **Admin-key rotation** | the gateway credential | `admin_key:meta` (rotations/timestamps) | `POST /admin/rotate-key` (a manual dashboard secret edit does **not** record meta) |
+
+Rules: `state_version` is strictly monotonic per subject and is the consistency clock for consent across channels; signing-key and admin-key rotations are non-destructive (overlap windows); spec version is bumped in lockstep with material capability changes.
 
 ---
 
