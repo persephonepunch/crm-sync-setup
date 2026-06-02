@@ -709,7 +709,7 @@ Dev (Engineering)  ──►  Stage (Agency Consulting)  ──►  Prod / UAT (
 | `entitlements` | 190 | **Source of truth** — per `(subject_type, subject_ref)`: `plan_tier`, `features[]`, `caps`, `consent`, `state`, `state_version` | Low — permission/consent state |
 | `entitlement_keys` | 191 | Config API key registry (hash only); non-destructive rolling | Medium — key hashes |
 | `entitlement_signing_keys` | 192 | EdDSA keypairs for offline tokens (public key + `private_key_ref`; `next→active→retired`) | High — signer references |
-| `entitlement_changes` | 193 | Ordered change event bus; int `id` = poll cursor | Low — versioned snapshots |
+| `entitlement_changes` | 193 | Ordered change event bus + **legal log** (append-only, int `id` = cursor); now records **actor attribution** — `actor`, `actor_type` (admin\|agent\|user\|system), `mandate_id` — so the log answers who-did-what-to-whom | Low — versioned snapshots, no PII/PCI |
 | `channel_sync_state` | 194 | Per-channel reconcile cursor + status (`cloudflare`/`shopify`/`google`/`adobe`/`sap`/`nielsen`) | Low |
 
 #### Entitlement `consent` field (Table 190)
