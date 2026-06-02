@@ -1127,6 +1127,50 @@ The extension generates four embed snippets:
 
 ---
 
+## Tab 8: Agentic Commerce — Entitlements, Consent & Enterprise Add-ons
+
+### What is this?
+
+The **value-prop layer**: Agentic Commerce Checkout (who/which agent may transact, and under what consent) plus optional **per-Org enterprise data-layer / ERP add-ons** (Adobe AEP, SAP S/4HANA, NielsenIQ/Circana). It is operated entirely from the **`/settings` console** — no code changes, no deploy. All config saves to KV and takes effect immediately.
+
+> The console is double-gated: it sits behind **Cloudflare Access** (your zero-trust login) and the **admin key**. Open it as `https://<worker>/settings?key=<ADMIN_KEY>` after authenticating with Access.
+
+### One-time setup
+
+1. **Scoped read key** — mint an `entitlement:read` key in Xano and provide it as `XANO_ENTITLEMENT_KEY`. You can paste it into the console (Xano section → *Entitlement Read Key* → **Set**, masked) or set it as a worker secret. The high-volume entitlement read path uses this scoped key, never the master metadata key.
+2. **Signing key** — in the console's **Agentic Commerce Core** card, click **Generate** to create the EdDSA signing key (channels verify entitlement tokens offline with its public half). Use **Rotate** later for a zero-downtime, non-destructive roll.
+3. **Channels** — the **Core** card shows each channel's cadence (real-time vs batch), connector status, cursor, and last-synced, with a **Sync** button. Cloudflare/Shopify/GA4 are real-time (project on every change); batch channels reconcile every 15 minutes.
+
+### Entitlements & consent
+
+- An entitlement is one record per subject (`tenant` / `user` / `agent`) with `plan_tier`, `features[]`, `caps` (a2a / ap2 / mandate_max_amount / channels), and an explicit **`consent`** object. It carries a monotonic `state_version`.
+- **Consent never regresses:** every channel only moves a subject forward in version, so a slow 15-minute batch system can never overwrite a newer consent the real-time channels already applied. Revoking an entitlement drops every channel's projection and denies checkout offline.
+- Consent is projected identically everywhere — granular **GA4 Consent Mode v2**, Shopify metafields, and the add-on connectors.
+
+### Enterprise add-ons (per Org)
+
+In the **Enterprise Add-ons** card, configure each integration the Org has entitled (an add-on is active only when its `feature` is in the entitlement's `features[]`):
+
+| Add-on | Feature key | Point the connector at |
+|---|---|---|
+| Adobe AEP | `adobe_aep` | your AEP HTTP streaming endpoint |
+| SAP S/4HANA | `sap` | your OData / integration-middleware endpoint |
+| NielsenIQ / Circana | `nielsen` | your measurement ingestion endpoint |
+
+Each connector is `{ url, key, enabled }`; the worker POSTs the versioned entitlement+consent record there. Onboarding a new Org or stack (Salesforce, Braze, Attentive, …) is configuration, not code.
+
+### Header / Footer embed codes
+
+The console's **Header / Footer Embed Codes** card provides copy-paste snippets: the **Head** snippet sets GA4 Consent Mode defaults; the **Footer** snippet loads the enabled embeds. Paste into Webflow → Site Settings → Custom Code.
+
+### Verify
+
+Run `scripts/verify-entitlement.sh` with the admin key to exercise the whole stack end-to-end (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) with PASS/FAIL output.
+
+> **Clean Room note:** the privacy-preserving Clean Room (see `CLEAN-ROOM-SPEC.md`) is a *consumer* of this consent — it gates match-job inclusion on `consent.clean_room` at the current version. It is a separate concern (data matching → aggregates), not part of consent propagation.
+
+---
+
 ## Pricing Tiers & Upgrade Exceptions
 
 ### Shared Plan ($69/mo) — Stakeholder B

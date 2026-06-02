@@ -32,6 +32,7 @@
 | 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
 | 1.9 | 2026-05-28 | Engineering | Shopify embedded admin app dashboard fixed (§3.15, FR-APP): URL-driven tab navigation (`?tab=Config\|Embeds\|Settings`) replacing client-only `useState`, so tabs switch via real navigation and work even before/without client hydration; native Polaris `s-page` + `s-button` tab strip; Config/Embeds/Settings consolidated into the single `/app` route (removed standalone `app.embeds`/`app.settings` routes and `s-app-nav`); save form hardened with hidden `intent` field for pre-hydration POST |
 | 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
+| 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 
 ---
 
@@ -561,6 +562,63 @@ The merchant-facing control panel renders embedded in the Shopify admin (App Bri
 
 ---
 
+### 3.16 Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (FR-ENT)
+
+**Business goal.** Agentic Commerce Checkout is the core product; per-Enterprise-Org data-layer / ERP integrations are billable add-on customization on top of it. The entitlement is both the **enforcement** mechanism and the **packaging/billing** mechanism — an Org unlocks add-ons by what its entitlement grants (`plan_tier` + `features[]`).
+
+#### 3.16.1 Entitlement core (source of truth)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-01 | Xano is the authoritative store of entitlements (tables 190–194): one row per `(subject_type, subject_ref)` where subject is `tenant` \| `user` \| `agent`, carrying `plan_tier`, `features[]`, `caps`, `consent`, lifecycle `state`, and a monotonic `state_version` | Implemented |
+| FR-ENT-02 | `GET /entitlement?subject_ref=` and `POST /entitlement` (admin-gated); state machine `pending → active → suspended → revoked` enforced (409 on illegal transition); `state_version` bumped on every write | Implemented |
+| FR-ENT-03 | Every entitlement write appends an ordered event to the change bus (`entitlement_changes`, int `id` = poll cursor) with the new snapshot + resolved target channels | Implemented |
+| FR-ENT-04 | A2A authorize is gated on `caps.a2a` (active entitlement) and the requested mandate is bounded to `caps.mandate_max_amount` before writing `linked_agents` (188) | Implemented |
+| FR-ENT-05 | AP2 checkout is gated on `caps.ap2` + a valid offline token + `amount ≤ mandate_max_amount`; order recorded in `agent_orders` (189) with `mandate_id` | Implemented |
+| FR-ENT-06 | Revoke cascade: revoking an entitlement emits a change → channels drop their projection → subsequent checkout is denied **offline** | Implemented |
+
+#### 3.16.2 Keys & offline tokens
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-10 | EdDSA (Ed25519) signing keys; channels verify a signed entitlement token **offline** with the public key — no Xano round-trip on the hot path; tamper / expiry / alg-downgrade rejected | Implemented |
+| FR-ENT-11 | Non-destructive signing-key rotation `next → active → retired` with an overlap window: old-kid tokens verify until `not_after`; the retired private key is deleted immediately; zero downtime | Implemented |
+| FR-ENT-12 | Scoped `entitlement:read` config key (`XANO_ENTITLEMENT_KEY`) rides the high-volume read path; the master metadata key is never used for entitlement reads. Least-privilege; KV-editable + masked in the console | Implemented |
+
+#### 3.16.3 Omni-channel projection & version-monotonic consent resolution
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-20 | Channel adapters poll the change bus from a per-channel cursor (`channel_sync_state`, 194), apply, and advance the cursor — never backwards; a stale channel catches up purely from `?since={cursor}` | Implemented |
+| FR-ENT-21 | **Version-monotonic resolution:** each channel tracks the last-applied `state_version` per subject and applies a change only if strictly newer; older/equal versions are skipped. **Consent never regresses** regardless of arrival order or cadence; replay/re-delivery are idempotent no-ops | Implemented |
+| FR-ENT-22 | **Cadence classes:** `realtime` channels (Cloudflare, Shopify, GA4) project on every entitlement write; `batch` channels (Adobe, SAP, Nielsen) reconcile on the 15-min cron. Monotonic resolution makes the two cadences provably non-divergent | Implemented |
+| FR-ENT-23 | Channel adapters: **Cloudflare** (KV entitlement mirror + re-issued offline token), **Shopify** (customer/shop metafields + status/plan tags), **GA4/Google** (Consent Mode v2 + Signals audience properties) | Implemented |
+| FR-ENT-24 | `POST /channels/{channel}/sync`, `/state`, and `/replay {since}` (admin-gated) for operate/observe/recover | Implemented |
+
+#### 3.16.4 First-class versioned consent
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-30 | Consent is an explicit `consent` object on the entitlement (and in the offline token), versioned by `state_version`, so every channel projects the **same** consent | Implemented |
+| FR-ENT-31 | Google projection maps granular **Consent Mode v2** (`ad_user_data` / `ad_personalization` / `analytics_storage` / `ad_storage`): explicit consent wins per-signal, else state-derived (`revoked`/`suspended` → denied) | Implemented |
+
+#### 3.16.5 Enterprise add-ons (per-Org, feature-gated)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-40 | Adobe AEP, SAP S/4HANA, NielsenIQ/Circana are `batch` channels that apply a change only if the entitlement's `features[]` includes the add-on key (`adobe_aep` / `sap` / `nielsen`); else skipped | Implemented |
+| FR-ENT-41 | Each add-on POSTs the canonical versioned entitlement+consent record to the Org's own connector endpoint (`addon_connectors[channel] = { url, key, enabled }`) — onboarding a new Org or stack is configuration, not code | Implemented |
+
+#### 3.16.6 Operations console (non-developer accessible)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENT-50 | `/settings` console (admin-gated, behind Cloudflare Access) surfaces: all credentials (masked, Set/Reset/reveal); entitlement core (active signing key + Generate/Rotate; per-channel cadence/cursor/status/last-synced + Sync); enterprise add-on connectors per Org; Header/Footer embed codes | Implemented |
+| FR-ENT-51 | All console config lives in KV and takes effect immediately on save — no deploy, no code change; defaults fall back to environment values; resets are non-destructive | Implemented |
+| FR-ENT-52 | `scripts/verify-entitlement.sh` exercises the full stack with the admin key (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) and reports PASS/FAIL | Implemented |
+
+---
+
 ## 4. Data Model
 
 ### 4.1 Xano Tables
@@ -574,6 +632,17 @@ The merchant-facing control panel renders embedded in the Shopify admin (App Bri
 | `crm_tags` | Dynamic | Tag definitions (name, slug, category) | No |
 | `user_tag_map` | Dynamic | User ↔ Tag join table (source, timestamp) | No (references user_id) |
 | `adobe_sync_log` | 187 | Adobe AEP sync audit trail | Yes — email hash, ECID, sync status |
+| `linked_agents` | 188 | Agentic record-keeping: linked agents + active mandate | No (references user_id) |
+| `agent_orders` | 189 | Agent order/checkout history with `mandate_id` | Low — purchase metadata |
+| `entitlements` | 190 | **Source of truth** — per `(subject_type, subject_ref)`: `plan_tier`, `features[]`, `caps`, `consent`, `state`, `state_version` | Low — permission/consent state |
+| `entitlement_keys` | 191 | Config API key registry (hash only); non-destructive rolling | Medium — key hashes |
+| `entitlement_signing_keys` | 192 | EdDSA keypairs for offline tokens (public key + `private_key_ref`; `next→active→retired`) | High — signer references |
+| `entitlement_changes` | 193 | Ordered change event bus; int `id` = poll cursor | Low — versioned snapshots |
+| `channel_sync_state` | 194 | Per-channel reconcile cursor + status (`cloudflare`/`shopify`/`google`/`adobe`/`sap`/`nielsen`) | Low |
+
+#### Entitlement `consent` field (Table 190)
+
+Explicit, versioned consent object projected identically to every channel (Consent Mode v2 + agentic grants), e.g. `{ ad_user_data, ad_personalization, analytics_storage, ad_storage, marketing, a2a, ap2 }`. Bumps with `state_version` on every change.
 
 #### Adobe Fields on `user_extras` (Table 182)
 
@@ -607,6 +676,13 @@ The merchant-facing control panel renders embedded in the Shopify admin (App Bri
 | `custom` | `crm_tags` | `list.single_line_text_field` | All tag slugs |
 | `custom` | `crm_consent_marketing` | `boolean` | `accepts_marketing` tag presence |
 | `custom` | `crm_consent_tos` | `boolean` | `accepts_tou` tag presence |
+| `entitlement` | `state` | `single_line_text_field` | Entitlement lifecycle state (Shopify channel projection) |
+| `entitlement` | `plan_tier` | `single_line_text_field` | Entitlement plan tier |
+| `entitlement` | `caps` | `json` | Entitlement caps (a2a/ap2/channels/mandate_max_amount) |
+| `entitlement` | `consent` | `json` | Versioned consent object (same consent every channel sees) |
+| `entitlement` | `state_version` | `number_integer` | Monotonic version (drives the no-regression guard) |
+
+> Customer-subject entitlements also project status/plan **tags** (`entitlement:active`, `plan:{tier}`); tenant-subject entitlements project the same fields as **shop** metafields via `metafieldsSet`.
 
 ### 4.3 Webflow CMS Collections
 
@@ -634,6 +710,12 @@ The merchant-facing control panel renders embedded in the Shopify admin (App Bri
 | `tenant:{shop}:checkout:{session_id}` | UCP checkout session state (24h TTL) | Medium — purchase data |
 | `tenant:{shop}:mandate:{mandate_id}` | AP2 payment mandate with HMAC signature (per-expiry TTL) | Medium — purchase auth |
 | `tenant:{shop}:orders:{customer_id}` | Cached order list (5min TTL) | Low — read cache |
+| `signing:active_kid` | Active EdDSA signing key id | Medium |
+| `signing:sk:{kid}` | Private signing JWK (worker-held signer; never returned) | High — private key |
+| `signing:pk:{kid}` | Public signing JWK (cached for offline verify; evicts at `not_after`) | Low — public key |
+| `applied:{channel}:{subject_ref}` | Last-applied `state_version` per channel+subject (the version-monotonic consent guard) | Low |
+| `ent:mirror:{subject_ref}` | Cloudflare projection of the entitlement snapshot | Low — permission/consent state |
+| `ent:token:{subject_ref}` | Cached offline entitlement token (TTL = token exp) | Medium — signed token |
 
 All tenant-scoped KV keys are generated via the `tenantKvKey(shop, key)` helper, which returns `tenant:{shop}:{key}` when a shop is provided, or the bare `key` as fallback for legacy single-tenant mode.
 
@@ -749,6 +831,20 @@ User Action (toggle, form, signup)
 | `session_id` | string | GA4 session ID (if available) |
 | `ip_address` | string | Request IP (for legal provenance) |
 | `created_at` | timestamp | Immutable creation time |
+
+### 6.4 Consent Control Plane vs. Consumers (Clean Room relationship)
+
+The entitlement/consent engine (§3.16) is the **consent control plane** — the authoritative, versioned source of who consented to what, propagated to every channel with the version-monotonic guarantee that consent never regresses across cadences.
+
+Other subsystems are **consumers** of that consent rather than independent owners of it:
+
+- **Clean Room** (`CLEAN-ROOM-SPEC.md`) is a *downstream consumer*, not a competing reconciliation. It is a privacy-preserving data **match** (D1 + R2 + Durable Objects → non-reversible aggregates), a fundamentally different concern from consent **state propagation**. Its `clean_room` consent scope, consent verification at export (§5.3), and revocation flow (§5.4) should be driven by the versioned consent: gate a record's inclusion on `consent.clean_room == granted` at the current `state_version`, so the revoke cascade automatically excludes withdrawn records from future match jobs. `clean_room` is a candidate future `batch` channel.
+- **Distinct vendor roles:** NielsenIQ/Circana appear as Clean Room *match partners* (compare hashed datasets → aggregates) **and** as add-on *projection channels* (push the versioned entitlement/consent record to their ingestion endpoint) — two separate integrations with the same vendor.
+
+| Concern | Owner |
+|---|---|
+| Authoritative consent state + propagation (no regression, mixed cadence) | Consent control plane (§3.16) |
+| Privacy-preserving cross-party match → aggregates (no PII egress) | Clean Room (consumer) |
 
 ---
 
