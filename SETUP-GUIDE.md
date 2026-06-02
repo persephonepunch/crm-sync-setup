@@ -1163,9 +1163,47 @@ Each connector is `{ url, key, enabled }`; the worker POSTs the versioned entitl
 
 The console's **Header / Footer Embed Codes** card provides copy-paste snippets: the **Head** snippet sets GA4 Consent Mode defaults; the **Footer** snippet loads the enabled embeds. Paste into Webflow → Site Settings → Custom Code.
 
+### Deploy channels & deploy teams
+
+The portal is self-identifying per **deploy channel**, resolved by the hostname you open it on — one worker, three channels:
+
+| Channel | Hostname pattern | Default deploy team |
+|---|---|---|
+| **Dev** | `localhost` / `*dev*` | Engineering |
+| **Stage** | `*.workers.dev` | Agency Consulting Team |
+| **Prod / UAT** | production custom domain (`crm.story-story.ai`) | QA · Product Management / DPO · PMO · Deploy On-Prem |
+
+The environment·team banner shows at the top of `/settings` and `/setup`. Rename a channel's team in the **Environment / Deploy Team** card (saved per hostname). These values can later be owned by the Webflow Publish Refactor (the publish target *is* the environment). The Webflow extension header shows the same chip + a **Config Portal ↗** link.
+
+### Localization (markets & geos)
+
+Each tenant has a **market**, grouped by geo for scale:
+
+| Geo | Markets (locale · currency) |
+|---|---|
+| **NA** | US en-US·USD · CA en-CA·CAD |
+| **EMEA** | UK en-GB·GBP · DE de-DE·EUR · FR fr-FR·EUR |
+| **APAC** | AU en-AU·AUD · NZ en-NZ·NZD · SG en-SG·SGD · JP ja-JP·JPY |
+| **LATAM** | MX es-MX·MXN · BR pt-BR·BRL |
+
+The market is inferred from the shop name (**prefix or suffix**: `us-acme`, `acme-au`) or a country TLD, and overridable in the **Localization (Market)** card (geo-grouped selector). It sets the locale and the **default currency for agent mandates/caps** (e.g. an AU tenant defaults to AUD). Add more markets under any geo without code changes.
+
+### Forward-Deploy Harness
+
+Changes move **forward through the three channels**, with each stakeholder operating its own channel from the portal — no code access required downstream:
+
+```
+Dev (Engineering) ──► Stage (Agency Consulting) ──► Prod / UAT (QA · Product Mgmt / DPO · PMO · On-Prem)
+   build + verify         configure + UAT prep            sign-off + production operation
+```
+
+- Each channel binds its own **Webflow (UI)** and **Xano (Data)** state targets — both shown in the `/settings` env banner (a deploy reaches state in both systems).
+- Each channel is operated via `/settings` (KV config, effective on save — no deploy) and gated per stakeholder by **Cloudflare Access** (zero-trust) layered over the admin key.
+- Validate any channel with the verification script (use `--read-only` on Stage/Prod to avoid mutations); `/setup` shows Agentic Commerce readiness with a Config Portal deep-link.
+
 ### Verify
 
-Run `scripts/verify-entitlement.sh` with the admin key to exercise the whole stack end-to-end (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) with PASS/FAIL output.
+Run `scripts/verify-entitlement.sh` with the admin key to exercise the whole stack end-to-end (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) with PASS/FAIL output. On Stage/Prod use `--read-only` — it performs no mutations (only reads + a non-mutating verify against the seeded entitlement).
 
 > **Clean Room note:** the privacy-preserving Clean Room (see `CLEAN-ROOM-SPEC.md`) is a *consumer* of this consent — it gates match-job inclusion on `consent.clean_room` at the current version. It is a separate concern (data matching → aggregates), not part of consent propagation.
 
