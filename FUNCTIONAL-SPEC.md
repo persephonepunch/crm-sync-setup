@@ -32,6 +32,7 @@
 | 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
 | 1.9 | 2026-05-28 | Engineering | Shopify embedded admin app dashboard fixed (§3.15, FR-APP): URL-driven tab navigation (`?tab=Config\|Embeds\|Settings`) replacing client-only `useState`, so tabs switch via real navigation and work even before/without client hydration; native Polaris `s-page` + `s-button` tab strip; Config/Embeds/Settings consolidated into the single `/app` route (removed standalone `app.embeds`/`app.settings` routes and `s-app-nav`); save form hardened with hidden `intent` field for pre-hydration POST |
 | 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
+| 1.12 | 2026-06-02 | Engineering | **Multi-tenant scaling conventions + Stakeholder Forward-Deploy Harness (§3.17, FR-ENV/FR-LOC/FR-FDH):** three deploy channels (Dev/Stage/Prod) with per-hostname env/deploy-team labels (editable in portal; ownable by the Webflow Publish Refactor); localization extended to a geo model (NA/EMEA/APAC/LATAM) — markets US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR with locale+currency, prefix/suffix shop naming + country-TLD inference, entitlement currency defaulted per market; deploy→state binding surfaced (Webflow UI + Xano Data) in the portal; `/setup` Agentic Commerce readiness + portal env/localization banners; `GET /env-label`; Webflow extension shows env·team chip + Config Portal link |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 
 ---
@@ -281,7 +282,7 @@ For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)`
 | FR-TENANT-07 | Per-tenant error isolation (one tenant failure does not block others) | Implemented |
 | FR-TENANT-08 | Tenant auto-registration on first config POST or OAuth install | Implemented |
 | FR-TENANT-09 | Platform-level config (`platform:config`) for shared credentials | Implemented |
-| FR-TENANT-10 | Region-based tenant groups (US/CA/DE/FR/UK) with `inferRegionFromShop()` | Implemented |
+| FR-TENANT-10 | Region/market tenant groups with `inferRegionFromShop()` — geo-grouped localization (NA/EMEA/APAC/LATAM: US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR). See §3.17.2 (FR-LOC) | Implemented |
 | FR-TENANT-11 | `tenantKvKey(shop, key)` helper for all tenant-scoped KV operations | Implemented |
 | FR-TENANT-12 | Per-tenant admin keys (`admin_key` in tenant config) with platform key fallback | Implemented |
 | FR-TENANT-13 | UUID-keyed OAuth state (`oauth_state:{uuid}`) replacing global singleton keys | Implemented |
@@ -615,7 +616,56 @@ The merchant-facing control panel renders embedded in the Shopify admin (App Bri
 |---|---|---|
 | FR-ENT-50 | `/settings` console (admin-gated, behind Cloudflare Access) surfaces: all credentials (masked, Set/Reset/reveal); entitlement core (active signing key + Generate/Rotate; per-channel cadence/cursor/status/last-synced + Sync); enterprise add-on connectors per Org; Header/Footer embed codes | Implemented |
 | FR-ENT-51 | All console config lives in KV and takes effect immediately on save — no deploy, no code change; defaults fall back to environment values; resets are non-destructive | Implemented |
-| FR-ENT-52 | `scripts/verify-entitlement.sh` exercises the full stack with the admin key (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) and reports PASS/FAIL | Implemented |
+| FR-ENT-52 | `scripts/verify-entitlement.sh` exercises the full stack with the admin key (entitlement CRUD + state machine, sign/verify/tamper, rotation, channel sync/replay, revoke cascade) and reports PASS/FAIL; `--read-only` mode performs no mutations (safe on shared/prod) | Implemented |
+
+---
+
+### 3.17 Multi-Tenant Scaling Conventions & Stakeholder Forward-Deploy Harness (FR-ENV / FR-LOC / FR-FDH)
+
+Three orthogonal, configurable axes scale the multi-tenant platform; each is named and editable from the config portal (no code change).
+
+#### 3.17.1 Deploy channels (Dev / Stage / Prod) + stakeholder mapping (FR-ENV)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-ENV-01 | Three deploy channels resolved per **request hostname** (one worker, many hostnames): `localhost`/`*dev*` → **Dev**, `*.workers.dev` → **Stage**, the production custom domain → **Prod/UAT** | Implemented |
+| FR-ENV-02 | Per-host **environment/deploy-team labels** (`environment_labels`: host → `{ env, team, note }`) editable in `/settings`; resolved by `getEnvLabel`; the Webflow Publish Refactor can own these values (publish target = environment) | Implemented |
+| FR-ENV-03 | Stakeholder → channel mapping (defaults): **Dev = Engineering**, **Stage = Agency Consulting Team**, **Prod/UAT = QA · Product Management / DPO · PMO · Deploy On-Prem Team** | Implemented |
+| FR-ENV-04 | `GET /env-label` (admin or tenant token) returns the current host's env/team; the Webflow extension renders an env·team chip + a Config Portal deep-link | Implemented |
+
+#### 3.17.2 Localization / market with geo scaling (FR-LOC)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-LOC-01 | Localization is a geo-grouped market model: **NA** (US/CA), **EMEA** (UK/DE/FR), **APAC** (AU/NZ/SG/JP), **LATAM** (MX/BR) — each region → `{ geo, locale, languages, currency, country }` | Implemented |
+| FR-LOC-02 | Market inferred from shop **prefix or suffix** (`us-acme`, `acme-us`, `acme_au`) or country TLD (`.com.au`, `.co.uk`, `.co.nz`, `.com.mx`, …); overridable in `/settings` (geo-grouped selector) | Implemented |
+| FR-LOC-03 | Entitlement `caps.currency` defaults from the tenant's market (US→USD, UK→GBP, DE/FR→EUR, AU→AUD, JP→JPY, MX→MXN, …) when not set | Implemented |
+| FR-LOC-04 | Model scales by adding market entries under any geo without code-path changes | Implemented |
+
+#### 3.17.3 Deploy → state management binding (Webflow UI + Xano Data)
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-FDH-01 | A deploy reaches state in two systems — **Webflow (UI)** and **Xano (Data)**. The portal env banner surfaces this environment's UI target (Webflow site) and Data target (Xano workspace) | Implemented |
+
+#### 3.17.4 Stakeholder Forward-Deploy Harness (FR-FDH)
+
+The harness is the path that carries a change **forward through the three channels** while each stakeholder operates its own channel from the config portal — no code access required downstream.
+
+```
+Dev (Engineering)  ──►  Stage (Agency Consulting)  ──►  Prod / UAT (QA · Product Mgmt / DPO · PMO · On-Prem)
+   build + verify          configure + UAT prep              sign-off + production operation
+        │                        │                                   │
+        └─ each channel: own hostname + env/team label, own Webflow (UI) + Xano (Data) state targets,
+           operated via /settings (KV config, no deploy) and validated with verify-entitlement.sh
+```
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-FDH-02 | Each channel is self-identifying (env/team banner on `/settings` + `/setup`) and self-serviceable (portal config in KV, effective on save) | Implemented |
+| FR-FDH-03 | Promotion is forward-only across Dev → Stage → Prod; each channel binds its own Webflow (UI) + Xano (Data) state targets | Implemented |
+| FR-FDH-04 | Validation harness per channel: `verify-entitlement.sh` (full or `--read-only`) + the TDD static suite; `/setup` shows Agentic Commerce readiness with a Config Portal deep-link | Implemented |
+| FR-FDH-05 | Access control per stakeholder via Cloudflare Access (zero-trust) layered over the admin-key gate on the portal | Implemented |
 
 ---
 
