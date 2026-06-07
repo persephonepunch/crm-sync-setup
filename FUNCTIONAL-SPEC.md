@@ -34,6 +34,7 @@
 | 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
 | 1.13 | 2026-06-02 | Engineering | **AI/API DevOps App Harness model + gating simplification + versioning (§2.0, §5.0, §12):** documented the two-plane harness (Cloudflare Workers compile/integration ⇄ Xano K8s/Docker/Redis data; both Shopify + Webflow apps compile on Cloudflare; CORS-restricted domains, CI/CD, edge scaling; Data Channels/API-AI/Skills/Schema/JSON Feeds). **Gating simplified:** `ADMIN_KEY` is the canonical gateway (free self-setup); `SHOPIFY_APP_SECRET` **dropped as an admin login** (HMAC-only) and the Shopify app migrated to `ADMIN_KEY`; `keyEq` trims whitespace; fail-open is local-dev-only. **Custom-DNS upsell** (shared `story-story.ai` → own namespace e.g. `ysl150.com`). Added the **Versioning Model** (§12). |
 | 1.12 | 2026-06-02 | Engineering | **Multi-tenant scaling conventions + Stakeholder Forward-Deploy Harness (§3.17, FR-ENV/FR-LOC/FR-FDH):** three deploy channels (Dev/Stage/Prod) with per-hostname env/deploy-team labels (editable in portal; ownable by the Webflow Publish Refactor); localization extended to a geo model (NA/EMEA/APAC/LATAM) — markets US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR with locale+currency, prefix/suffix shop naming + country-TLD inference, entitlement currency defaulted per market; deploy→state binding surfaced (Webflow UI + Xano Data) in the portal; `/setup` Agentic Commerce readiness + portal env/localization banners; `GET /env-label`; Webflow extension shows env·team chip + Config Portal link |
+| 1.14 | 2026-06-07 | Engineering | **Shopify token grant types & self-heal recovery (§3.14.6, FR-TOKEN-11..13):** documented both supported grants — Refresh Token (merchant OAuth) and Client Credentials (own-store, no refresh token) — and automatic selection. Added the **dead-refresh-token self-heal**: a refresh grant that returns `400 "requires an active refresh_token"` now clears the dead token and falls through to Client Credentials, recovering without an OAuth re-install (prior symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty). Added on-`401` mid-request refresh+retry so a token failing before its recorded expiry self-heals, plus a failure-reference table. |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 
 ---
@@ -477,6 +478,9 @@ As of April 2026, Shopify mandates that all OAuth apps use expiring offline acce
 | FR-TOKEN-08 | Multi-tenant token isolation | Each tenant's tokens stored independently under `tenant:{shop}:config`; cron iterates all tenants | Implemented |
 | FR-TOKEN-09 | Diagnostic endpoint for token health | `GET /admin/shopify-test` — tests API call, returns token prefix, length, domain, response | Implemented |
 | FR-TOKEN-10 | Settings page token status display | Shows token type (`OAuth (expiring)` / `Admin API`), refresh token presence, expiry countdown, API health | Implemented |
+| FR-TOKEN-11 | Client Credentials grant for own-store apps (no refresh token) | When a tenant has no `shopify_refresh_token`, `refreshShopifyTokenIfNeeded()` mints a 24h token via `grant_type=client_credentials` | Implemented |
+| FR-TOKEN-12 | Self-heal fallback when a refresh token is dead | A failed `grant_type=refresh_token` (HTTP 400 "requires an active refresh_token") clears the stored refresh token and falls through to the Client Credentials grant — recovery without re-install | Implemented |
+| FR-TOKEN-13 | Recover on 401 mid-request, not just before expiry | Public commerce endpoints force a token refresh and retry once on a `401/403`, so a token that fails before its recorded expiry still self-heals | Implemented |
 
 #### 3.14.3 Token Flow Diagram
 
@@ -566,6 +570,37 @@ All embed endpoints (`/embed/footer`, `/embed/account`, `/embed/dashboard`, `/em
 ```
 
 Account and dashboard endpoints support dual-format responses: `text/html` (default, for fetch+innerHTML) and `text/javascript` (when `Sec-Fetch-Dest: script`, for `<script src>` loading). Standalone preview mode includes a Sign In fallback that redirects to Google OAuth when the footer embed is absent.
+
+#### 3.14.6 Grant Types & Self-Heal Recovery
+
+CRM Sync supports **two** Shopify token grant types, selected automatically per tenant. Both call `POST https://{shop}/admin/oauth/access_token`; the worker never stores or transmits long-lived static credentials in plaintext outside the tenant KV record.
+
+| Grant | Used when | Token lifetime | Refresh token | Recovery |
+|---|---|---|---|---|
+| **Refresh Token** (`grant_type=refresh_token`) | Merchant-installed apps (OAuth code flow) | ~24h | Yes — single-use, rotates on every refresh | Re-install OAuth if the chain breaks |
+| **Client Credentials** (`grant_type=client_credentials`) | Own-store / single-merchant apps with no refresh token | ~24h | No — re-minted on demand | Automatic; no manual step |
+
+**Selection logic** — `refreshShopifyTokenIfNeeded()`:
+
+1. If the tenant has a `shopify_refresh_token` **and** a recorded expiry, use the **Refresh Token** grant (skip if more than the 5-minute buffer remains, unless forced).
+2. Otherwise, use the **Client Credentials** grant to mint a fresh 24h token.
+
+**Dead-refresh self-heal (FR-TOKEN-12).** Shopify rotates refresh tokens single-use — each refresh returns a new one and invalidates the old. If a rotation's replacement is ever lost, the stored refresh token becomes permanently invalid and the grant returns `400 {"error":"invalid_request","error_description":"This request requires an active refresh_token"}` — even though the locally recorded expiry still looks valid. When this happens, the worker:
+
+1. Logs the failure and **deletes** the dead `shopify_refresh_token` / `shopify_refresh_token_expires_at` from the tenant KV record.
+2. **Falls through** to the Client Credentials grant, minting a working 24h token.
+3. Persists the new token + expiry; subsequent refreshes use Client Credentials going forward.
+
+This converts what was previously an outage requiring an OAuth re-install (symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty results) into a transparent recovery. Combined with the on-`401` retry (FR-TOKEN-13), a token that fails *before* its recorded expiry also recovers within a single request.
+
+**Failure reference**
+
+| Symptom | Cause | Resolution |
+|---|---|---|
+| All product searches return zero results; cart/checkout/orders fail; UI otherwise healthy | Admin token invalid (expired or revoked) | Self-heals on next call (FR-TOKEN-13); else force-refresh |
+| Refresh grant returns `400 … active refresh_token` | Refresh-token rotation chain broken | Auto-recovers via Client Credentials fallback (FR-TOKEN-12) |
+| `403: Non-expiring access tokens` | Legacy non-expiring token | Re-install OAuth (expiring) or switch to Client Credentials |
+| Client Credentials grant fails | Missing/invalid app client secret in tenant KV | Restore `shopify_app_secret` in tenant config |
 
 ### 3.15 Shopify Admin Embedded App (FR-APP)
 
