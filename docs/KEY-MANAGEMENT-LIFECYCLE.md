@@ -1,8 +1,8 @@
 # CRM Sync — Key Management Lifecycle
 
-**Version:** 1.0
-**Date:** 2026-05-26
-**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish
+**Version:** 1.1
+**Date:** 2026-06-11 (v1.0: 2026-05-26)
+**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens
 
 ---
 
@@ -30,6 +30,7 @@
 | **RESEND_API_KEY** | Cloudflare secret | Transactional email | No | Yes — per Resend account |
 | **GA4_API_SECRET** | Cloudflare secret or KV | Analytics | No | Yes — per GA4 property |
 | **WEBFLOW_CMS_TOKEN** | KV (auto-set by OAuth) | CMS writes | Auto-set by Webflow OAuth | Yes — per Webflow site |
+| **Market site token** | KV `market_cms_token:{region}` | One market's Webflow site | Re-set via API (write-only) | Yes — one per market clone |
 
 ---
 
@@ -118,6 +119,35 @@ curl -X POST https://crm.story-story.ai/admin/rotate-key \
 - Change root ADMIN_KEY
 - Modify worker code or deploy
 - Access other Cloudflare secrets (JWT_SECRET, etc.)
+
+> **Verified in practice (2026-06-11):** the full delegation lifecycle — root-authenticated
+> create, masked status check (`GET /admin/rotate-key` returns a `key_preview` only, never
+> the key), delegate authentication on admin endpoints, self-rotation, and root-only
+> revocation (`DELETE /admin/rotate-key`) — is exercised and confirmed on stage. Rotating
+> or revoking the delegate key never invalidates the root key or tenant tokens.
+
+### 4.4 Market Site Tokens (multi-site localization)
+
+Each localized market (e.g. a per-country Webflow site clone) authenticates with its
+**own site-scoped token**, because Webflow site tokens cannot cross sites:
+
+```bash
+# Store a market's site token (write-only field; created in that site's
+# Webflow settings → Apps & Integrations → API access)
+curl -X POST https://crm.story-story.ai/admin/markets \
+  -H "Authorization: Bearer $ADMIN_OR_DELEGATE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"region":"ca","cms_token":"<site token>"}'
+```
+
+Security properties:
+- **Write-only**: no endpoint ever returns the token. Reads show a `"(set)"` flag only.
+- **Stored apart from config**: KV `market_cms_token:{region}`, never inside the market
+  config object that `GET /admin/markets` returns.
+- **Scoped blast radius**: a leaked market token exposes exactly one site — not the
+  primary site, not the worker, not other markets.
+- **Content gating**: public localized-export endpoints serve only `reviewed`/`published`
+  translation overrides; machine-translation drafts cannot leak through any public surface.
 
 ---
 
