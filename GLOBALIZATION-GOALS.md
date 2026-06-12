@@ -77,11 +77,11 @@ its current state. States:
 
 ## 5. Commerce-platform surfaces
 
-- [ ] **[PARKED]** Shopify-rendered surface localization (checkout,
+- [ ] **[PENDING]** Shopify-rendered surface localization (checkout,
       notification emails) via the Translations API (resource GID +
-      enabled ISO locale + content digest). Fully specified including
-      scope additions and the merchant re-consent step; deferred until the
-      omni-channel scope is defined.
+      enabled ISO locale + content digest). Scope now **approved**
+      (omni-channel scope defined); execution scheduled alongside the
+      planned app-credential refresh so it rides one merchant re-consent.
 - [ ] **[PENDING]** Edge page translation option (streaming HTML rewrite +
       cached machine translation) — proven pattern on a sibling production
       property; candidate for instant market previews ahead of content
