@@ -162,11 +162,21 @@ recorded.**
 - [ ] Auth anomaly summary: 401 spikes per surface, fail-closed verification
       (no fail-open paths in admin auth).
 - [ ] Consent integrity: state_version monotonicity spot-check across
-      channels; signals eligibility vs. consent state.
+      channels; signals eligibility vs. consent state; consent allow/deny
+      tally.
+- [ ] **Cross-channel data scope (appendix):** the Data-Scope Matrix —
+      every outbound flow by data class, destination, consent class — with
+      the egress audit sweep result (an undeclared external write fails it).
+- [ ] **Channel cursor lag:** per-channel how-far-behind-the-bus, so a
+      stalled or never-synced projection is visible at a glance.
 - [ ] Scaling thresholds: tenants/markets added; when crossing tier
       boundaries (shared → private → enterprise), re-run §C for the new
       isolation boundary.
 - [ ] Report is signed by the Security Human and filed with the DPO package.
+
+> The matrix appendix, channel cursor lag, and consent tally are emitted
+> live by the platform's governance report so this section assembles from
+> real data, not by hand.
 
 ---
 
