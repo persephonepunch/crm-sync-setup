@@ -32,6 +32,7 @@
 | 1.8 | 2026-05-26 | Engineering | Self-service admin key rotation (§3.10.2, FR-PRICING-07): two-tier key hierarchy (root + rotatable), `POST/GET/DELETE /admin/rotate-key` endpoints, Persona C multi-tenant Shopify key management independent of Shopify OAuth install; rotatable key accepted across all admin auth surfaces (`verifyBearerToken`, `verifyAdminKey`, `verifyBearerOrTenantToken`) |
 | 1.9 | 2026-05-28 | Engineering | Shopify embedded admin app dashboard fixed (§3.15, FR-APP): URL-driven tab navigation (`?tab=Config\|Embeds\|Settings`) replacing client-only `useState`, so tabs switch via real navigation and work even before/without client hydration; native Polaris `s-page` + `s-button` tab strip; Config/Embeds/Settings consolidated into the single `/app` route (removed standalone `app.embeds`/`app.settings` routes and `s-app-nav`); save form hardened with hidden `intent` field for pre-hydration POST |
 | 1.10 | 2026-05-28 | Engineering | Security: fixed fail-open auth on AP2 mandate reads (`handleMandateGet`) — it passed a synthetic `{ADMIN_KEY: cfg.adminKey}` env to `verifyBearerToken`, tripping the "no keys configured = open" dev shortcut when the per-tenant key was empty, so unauthenticated reads leaked `404` (mandate existence) instead of `401`. Now passes the real `env` + tenant + rotatable keys (fail-closed). Smoke test repointed to the CRM worker (`cf-worker-crm-sync`) with `GET /config`→401 and `/setup`→302 (Cloudflare Access) expectations, stale `/embed/cart` checks removed, and a new **Mandates & Permissions** section (UAT-SEC-21..23) |
+| 1.15 | 2026-06-12 | Engineering | **Agency → Client Deploy Handoff + Interactive Key Rotation (§13, FR-HANDOFF-01..05):** normative handoff checklist (public `AGENCY-HANDOFF.md`): re-mint-never-transfer credential transfer in dependency order, Interactive Key Rotation ceremony (Security Human executes, Agent verifies + documents; fingerprint-only audit records), rotation triggers (handoff/90d/personnel/incident/scope), Legal/Compliance-PII package (PII map, processor chain, access matrix incl. agents, custody evidence), quarterly Security-Scaling Report |
 | 1.13 | 2026-06-02 | Engineering | **AI/API DevOps App Harness model + gating simplification + versioning (§2.0, §5.0, §12):** documented the two-plane harness (Cloudflare Workers compile/integration ⇄ Xano K8s/Docker/Redis data; both Shopify + Webflow apps compile on Cloudflare; CORS-restricted domains, CI/CD, edge scaling; Data Channels/API-AI/Skills/Schema/JSON Feeds). **Gating simplified:** `ADMIN_KEY` is the canonical gateway (free self-setup); `SHOPIFY_APP_SECRET` **dropped as an admin login** (HMAC-only) and the Shopify app migrated to `ADMIN_KEY`; `keyEq` trims whitespace; fail-open is local-dev-only. **Custom-DNS upsell** (shared `story-story.ai` → own namespace e.g. `ysl150.com`). Added the **Versioning Model** (§12). |
 | 1.12 | 2026-06-02 | Engineering | **Multi-tenant scaling conventions + Stakeholder Forward-Deploy Harness (§3.17, FR-ENV/FR-LOC/FR-FDH):** three deploy channels (Dev/Stage/Prod) with per-hostname env/deploy-team labels (editable in portal; ownable by the Webflow Publish Refactor); localization extended to a geo model (NA/EMEA/APAC/LATAM) — markets US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR with locale+currency, prefix/suffix shop naming + country-TLD inference, entitlement currency defaulted per market; deploy→state binding surfaced (Webflow UI + Xano Data) in the portal; `/setup` Agentic Commerce readiness + portal env/localization banners; `GET /env-label`; Webflow extension shows env·team chip + Config Portal link |
 | 1.14 | 2026-06-07 | Engineering | **Shopify token grant types & self-heal recovery (§3.14.6, FR-TOKEN-11..13):** documented both supported grants — Refresh Token (merchant OAuth) and Client Credentials (own-store, no refresh token) — and automatic selection. Added the **dead-refresh-token self-heal**: a refresh grant that returns `400 "requires an active refresh_token"` now clears the dead token and falls through to Client Credentials, recovering without an OAuth re-install (prior symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty). Added on-`401` mid-request refresh+retry so a token failing before its recorded expiry self-heals, plus a failure-reference table. |
@@ -1351,6 +1352,51 @@ Five distinct version axes, each with its own record:
 | **Admin-key rotation** | the gateway credential | `admin_key:meta` (rotations/timestamps) | `POST /admin/rotate-key` (a manual dashboard secret edit does **not** record meta) |
 
 Rules: `state_version` is strictly monotonic per subject and is the consistency clock for consent across channels; signing-key and admin-key rotations are non-destructive (overlap windows); spec version is bumped in lockstep with material capability changes.
+
+---
+
+## 13. Agency → Client Deploy Handoff (Interactive Key Rotation)
+
+The handoff from implementing agency to client infrastructure is a **security
+ceremony with a paper trail**, not a credential copy. Normative checklist:
+**`AGENCY-HANDOFF.md`** (published in the public spec repo). Summary of the
+binding rules:
+
+**FR-HANDOFF-01 — Re-mint, never transfer.** Every credential in the stack is
+replaced on client infrastructure in dependency order (CI deploy token →
+dispatch PAT → worker shared secrets → ADMIN_KEY root + rotatable → tenant
+tokens → Xano keys (master + scoped entitlement:read) → Shopify app secret →
+Webflow site tokens → entitlement signing keys). Handoff is complete when the
+credential inventory shows zero agency-fingerprinted credentials alive.
+
+**FR-HANDOFF-02 — Interactive Key Rotation.** Rotation is executed by a named
+**Security Human** (dashboard or CLI, in person); the **Agent** (AI/automation)
+prepares the runbook, verifies old-dead/new-alive on every consumer surface,
+and writes the audit record. Agents never mint, hold, or transport production
+credentials. Audit entries record date, credential, action, executed_by,
+verified_by, reason, SHA-256[:8] fingerprints (never secrets), overlap window,
+and consumers updated.
+
+**FR-HANDOFF-03 — Rotation triggers.** Handoff, 90-day cadence, personnel
+change, suspected incident, or credential scope change.
+
+**FR-HANDOFF-04 — Compliance artifacts.** The handoff produces the DPO
+package: PII map (identity store, commerce customers, consent records,
+analytics user properties), processor chain for the DPA annex, subject-rights
+rails (HMAC-verified data_request/redact, version-monotonic consent), the
+post-handoff access matrix (humans AND agents), and the rotation audit trail
+as custody evidence.
+
+**FR-HANDOFF-05 — Security-Scaling Report.** Quarterly (or per market
+launch): credential inventory diff with ages (flag >90d), ceremonies
+performed, tenant token census, 401-anomaly summary, consent state_version
+monotonicity spot-check, and tier-boundary re-isolation (re-run FR-HANDOFF-01
+when crossing shared → private → enterprise).
+
+Relationship to existing controls: builds on §3.10.2 (self-service admin key
+rotation), the §12 versioning axes (admin-key meta + signing-key versions are
+the machine-readable half of the audit trail), and §5/§9 (security controls,
+compliance matrix).
 
 ---
 
