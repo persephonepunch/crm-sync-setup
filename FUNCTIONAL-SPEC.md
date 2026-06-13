@@ -38,6 +38,7 @@
 | 1.14 | 2026-06-07 | Engineering | **Shopify token grant types & self-heal recovery (§3.14.6, FR-TOKEN-11..13):** documented both supported grants — Refresh Token (merchant OAuth) and Client Credentials (own-store, no refresh token) — and automatic selection. Added the **dead-refresh-token self-heal**: a refresh grant that returns `400 "requires an active refresh_token"` now clears the dead token and falls through to Client Credentials, recovering without an OAuth re-install (prior symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty). Added on-`401` mid-request refresh+retry so a token failing before its recorded expiry self-heals, plus a failure-reference table. |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 | 1.16 | 2026-06-13 | Engineering | **DevOps modular build strategy + dynamic data "loops" (§2.5, §3.18, FR-BUILD-01..06):** documented the independently-deployable module model (CRM Sync / PIM Sync / Webflow extension / Shopify app / public docs — each its own worker, config, and KV; no synchronous cross-module calls; a storefront runs PIM-only or CRM-only, CRM embeds gated server-side by `embeds_enabled` returning an **empty 200** + `X-CRM-Embed-Disabled`, never an error body) and the **dynamic data loops** that keep resources fresh without blocking reads or coupling modules (export→ingest→publish headless rail, event-driven `content-drain`, stale-while-revalidate + in-isolate single-flight read caches, token self-heal, version-monotonic consent projection). PDP perf: `/product` + shop-catalog SWR/single-flight (cold ~1.8 s×3 → ~240 ms). Header/footer non-destructive rules + enforcing harness suite. |
+| 1.17 | 2026-06-13 | Engineering | **Chatbot FAQ answer cascade (§3.19, FR-FAQ-01..06):** documented the tiered `/commerce/faq` cascade (Shopify KB → guide-list → weighted Xano FAQ → blog-intent → locale-filtered vectorized KB → Botpress KB → blog last-resort). The Botpress KB — which merges the multilingual product PDFs with the FAQs and matches cross-lingually — is now a **locale-gated last-resort fallback**, not the primary source: as primary it surfaced foreign-language (e.g. Vietnamese) manual chunks and garbled title matches that preempted clean answers. Added `passageLocaleOk()` script/ASCII gating + a prose-length floor, and the guide-list intent that returns the full PDF catalog. `BOTPRESS_PAT`-gated (absent → structured cascade runs alone). |
 
 ---
 
@@ -786,6 +787,22 @@ Dev (Engineering)  ──►  Stage (Agency Consulting)  ──►  Prod / UAT (
 | FR-BUILD-04 | Read resources stay fresh via stale-while-revalidate + in-isolate single-flight (serve stale instantly, refresh in background; concurrent misses coalesce to one origin assembly) | `/product`, shop catalog, `/embed/footer` | Implemented |
 | FR-BUILD-05 | Headless build resources refresh via the export→ingest→publish loop (token-gated feed + content fingerprint cron + `repository_dispatch`) | `/export`, fingerprint cron | Implemented |
 | FR-BUILD-06 | Header/footer embeds are non-destructive: worker is source of truth, additive published contracts, revalidate-friendly cache, superseded UI hidden (not page-deleted); enforced by a static test suite | `header-footer-automation` skill + `header-footer-nondestructive` harness suite | Implemented |
+
+### 3.19 Chatbot FAQ Answer Cascade (FR-FAQ)
+
+The conversational FAQ tool (`/commerce/faq`) answers from a **tiered cascade** — the
+first confident, locale-correct answer wins. The structured/AEO sources are tried
+first; the Botpress Knowledge Base (which merges the multilingual product PDFs with
+the FAQs) is a **locale-gated last-resort fallback**, never the primary source.
+
+| ID | Requirement | Method | Status |
+|---|---|---|---|
+| FR-FAQ-01 | Answers resolve through an ordered cascade; first confident hit wins | Shopify KB → guide-list → weighted Xano FAQ → blog-intent → vectorized KB → Botpress KB → blog last-resort | Implemented |
+| FR-FAQ-02 | The vectorized KB (articles + PDF manuals) is **always filtered by the conversation's content locale** so foreign-language chunks never bleed into an answer | persona/market-resolved `contentLocale` on the vector query | Implemented |
+| FR-FAQ-03 | "List the guides/manuals" intent returns the full PDF catalog, not a single nearest match | guide-list intent → `kb_manuals` catalog (`answer_source: manual_list`) | Implemented |
+| FR-FAQ-04 | The Botpress KB is a **last-resort fallback**, reached only when every structured/AEO tier misses — it does not preempt locale-filtered answers | cascade step 2.5 (`!answer && faqs.length === 0`) | Implemented |
+| FR-FAQ-05 | Botpress passages are **locale-gated**: scripts the locale never uses are rejected (CJK/Hangul/Cyrillic/Arabic/Thai/kana; Vietnamese for non-`vi`), English requires predominantly-ASCII prose, plus a minimum-prose floor so bare title matches don't win | `passageLocaleOk()` + length floor | Implemented |
+| FR-FAQ-06 | The Botpress tier is feature-gated by the `BOTPRESS_PAT` secret; absent → the structured cascade runs alone (no hard dependency) | `cf-worker-crm-sync` secret | Implemented |
 
 ---
 
