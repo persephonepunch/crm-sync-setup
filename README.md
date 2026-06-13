@@ -4,6 +4,10 @@
 Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
 
 > **What is CRM Sync?** It connects six services together: a **server** (Cloudflare Worker) that runs your auth and sync logic, a **database** (Xano) that stores users and tag relationships, a **store** (Shopify) for customer sync, **analytics** (Google GA4) for tracking consent and user segments, **email** (Resend) for transactional emails, and a **CMS** (Webflow) that displays user data and manages campaigns. You configure each one, then the Webflow App ties them together.
+>
+[CRM Sync](https://crm-sync.webflow.io/)
+[PIM Sync](https://apps.shopify.com/pim-sync)
+[Shopify Checklist](https://shopify-checklist.pages.dev/)
 
 ---
 
