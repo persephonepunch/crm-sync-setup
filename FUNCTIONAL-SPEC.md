@@ -37,6 +37,7 @@
 | 1.12 | 2026-06-02 | Engineering | **Multi-tenant scaling conventions + Stakeholder Forward-Deploy Harness (§3.17, FR-ENV/FR-LOC/FR-FDH):** three deploy channels (Dev/Stage/Prod) with per-hostname env/deploy-team labels (editable in portal; ownable by the Webflow Publish Refactor); localization extended to a geo model (NA/EMEA/APAC/LATAM) — markets US/CA/UK/DE/FR/AU/NZ/SG/JP/MX/BR with locale+currency, prefix/suffix shop naming + country-TLD inference, entitlement currency defaulted per market; deploy→state binding surfaced (Webflow UI + Xano Data) in the portal; `/setup` Agentic Commerce readiness + portal env/localization banners; `GET /env-label`; Webflow extension shows env·team chip + Config Portal link |
 | 1.14 | 2026-06-07 | Engineering | **Shopify token grant types & self-heal recovery (§3.14.6, FR-TOKEN-11..13):** documented both supported grants — Refresh Token (merchant OAuth) and Client Credentials (own-store, no refresh token) — and automatic selection. Added the **dead-refresh-token self-heal**: a refresh grant that returns `400 "requires an active refresh_token"` now clears the dead token and falls through to Client Credentials, recovering without an OAuth re-install (prior symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty). Added on-`401` mid-request refresh+retry so a token failing before its recorded expiry self-heals, plus a failure-reference table. |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
+| 1.16 | 2026-06-13 | Engineering | **DevOps modular build strategy + dynamic data "loops" (§2.5, §3.18, FR-BUILD-01..06):** documented the independently-deployable module model (CRM Sync / PIM Sync / Webflow extension / Shopify app / public docs — each its own worker, config, and KV; no synchronous cross-module calls; a storefront runs PIM-only or CRM-only, CRM embeds gated server-side by `embeds_enabled` returning an **empty 200** + `X-CRM-Embed-Disabled`, never an error body) and the **dynamic data loops** that keep resources fresh without blocking reads or coupling modules (export→ingest→publish headless rail, event-driven `content-drain`, stale-while-revalidate + in-isolate single-flight read caches, token self-heal, version-monotonic consent projection). PDP perf: `/product` + shop-catalog SWR/single-flight (cold ~1.8 s×3 → ~240 ms). Header/footer non-destructive rules + enforcing harness suite. |
 
 ---
 
@@ -180,6 +181,56 @@ KV Store (tenant:{shop}:config) > wrangler.toml [vars] > Wrangler Secrets
 ```
 
 For multi-tenant mode, config is resolved per-shop: `getTenantConfig(env, shop)` reads `tenant:{shop}:config` from KV, then merges with environment variable defaults. Legacy single-tenant mode falls back to the `crm_config` key.
+
+### 2.5 DevOps Modular Build Strategy & Dynamic Data "Loops"
+
+The platform is built as **independently deployable modules** wired together by
+**dynamic data "loops"** — closed feedback cycles that keep each module's data
+resources fresh *without* coupling the modules at request time. The build strategy
+gives the blast-radius isolation; the loops give the consistency.
+
+**Modular build strategy.** Each surface is its own deployable unit — own build
+pipeline, own config, own storage — and none calls another synchronously on the
+request path:
+
+| Module | Unit | Deploy | Storage | Standalone? |
+|---|---|---|---|---|
+| CRM Sync | `cf-worker-crm-sync` | `wrangler deploy` (own `wrangler.toml`) | KV `CRM_STATE` | ✅ chat / auth / consent / KB |
+| PIM Sync | `cf-worker-webflow-sync` | `wrangler deploy` (own `wrangler.toml`) | KV `WEBFLOW_SYNC_STATE` | ✅ catalog / PDP / cart / search |
+| Webflow extension | `crm-auth` (Designer extension) | extension publish | — | ✅ (client of CRM Sync) |
+| Shopify app | `hx-crm-sync` (React Router) | `npm run deploy:app` | — | ✅ (admin dashboard) |
+| Public docs | `crm-sync-setup` | static Pages | — | ✅ |
+
+- **No runtime cross-calls.** PIM Sync and CRM Sync are independent clients of the
+  same backends (Xano workspace 4, Shopify) — verified both directions; neither
+  fetches the other. The sole link is the outbound, failure-tolerant `content-drain`
+  event (below).
+- **Graceful standalone degradation.** A storefront can run PIM-only or CRM-only.
+  CRM embeds are gated server-side by the `embeds_enabled` allowlist; a disabled
+  embed returns an **empty `200`** + `X-CRM-Embed-Disabled` (never an error body),
+  and the storefront loaders are catch-guarded — so a missing module is a clean
+  no-op, not a site-wide breakage.
+- **Independent versioning & blast radius.** Each module deploys on its own cadence;
+  separate `wrangler.toml`, separate KV, separate Version IDs — a deploy to one
+  cannot break another.
+
+**Dynamic data "loops."** Data resources stay current through recurring,
+self-correcting loops rather than blocking reads or manual refresh. Each loop is
+owned by exactly one module and is **non-blocking** (background revalidate,
+fire-and-forget event, or scheduled cron):
+
+| Loop | Trigger | Cycle | Keeps fresh |
+|---|---|---|---|
+| Export → ingest → publish (headless rail) | content/catalog change + fingerprint cron | Shopify → Xano → token-gated `/export` feed → `repository_dispatch` → static build | Headless market builds |
+| Event-driven content-drain | `content.changed` | PIM Sync → `POST /events/content-drain` → CRM Sync metaobject / KB mirror | KB / AEO mirror |
+| Stale-while-revalidate read cache | read miss / age > soft-TTL | serve cached (or stale) instantly → background refresh (`ctx.waitUntil`) + in-isolate single-flight | `/product`, shop catalog, `/embed/footer` |
+| Token self-heal | `401` / dead refresh token | refresh grant → fall through to client-credentials → retry | Shopify Admin tokens |
+| Consent projection | per-channel change | version-monotonic poll-on-change + cursor replay | Omni-channel consent state |
+
+The two halves pair like this: the **modular build** keeps failure domains separate,
+while the **loops** are the only glue between them — event-driven or cache-driven, and
+always non-blocking, so a resource stays warm and consistent without any request
+waiting on another module to respond.
 
 ---
 
@@ -724,6 +775,17 @@ Dev (Engineering)  ──►  Stage (Agency Consulting)  ──►  Prod / UAT (
 | FR-FDH-03 | Promotion is forward-only across Dev → Stage → Prod; each channel binds its own Webflow (UI) + Xano (Data) state targets | Implemented |
 | FR-FDH-04 | Validation harness per channel: `verify-entitlement.sh` (full or `--read-only`) + the TDD static suite; `/setup` shows Agentic Commerce readiness with a Config Portal deep-link | Implemented |
 | FR-FDH-05 | Access control per stakeholder via Cloudflare Access (zero-trust) layered over the admin-key gate on the portal | Implemented |
+
+### 3.18 Modular Build Strategy & Dynamic Data Loops (FR-BUILD)
+
+| ID | Requirement | Method | Status |
+|---|---|---|---|
+| FR-BUILD-01 | Each surface is an independently deployable module (separate worker, config, storage); no synchronous cross-module calls on the request path | Own `wrangler.toml` + KV per worker (`cf-worker-crm-sync` / `cf-worker-webflow-sync`) | Implemented |
+| FR-BUILD-02 | A storefront runs standalone (PIM-only or CRM-only); CRM embeds gated by `embeds_enabled`, disabled → empty `200` + `X-CRM-Embed-Disabled` (never an error body the loaders would inject as text) | `/embed/*` gate | Implemented |
+| FR-BUILD-03 | Cross-module data sharing is via dynamic loops, not runtime calls: outbound, failure-tolerant `content.changed` projection | `POST /events/content-drain` | Implemented |
+| FR-BUILD-04 | Read resources stay fresh via stale-while-revalidate + in-isolate single-flight (serve stale instantly, refresh in background; concurrent misses coalesce to one origin assembly) | `/product`, shop catalog, `/embed/footer` | Implemented |
+| FR-BUILD-05 | Headless build resources refresh via the export→ingest→publish loop (token-gated feed + content fingerprint cron + `repository_dispatch`) | `/export`, fingerprint cron | Implemented |
+| FR-BUILD-06 | Header/footer embeds are non-destructive: worker is source of truth, additive published contracts, revalidate-friendly cache, superseded UI hidden (not page-deleted); enforced by a static test suite | `header-footer-automation` skill + `header-footer-nondestructive` harness suite | Implemented |
 
 ---
 
