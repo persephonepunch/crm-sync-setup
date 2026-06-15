@@ -1,7 +1,7 @@
 # CRM Sync — Security & Compliance Posture
 
 **For:** Compliance officers, security auditors, and risk assessment teams
-**Date:** 2026-05-18
+**Date:** 2026-06-15
 
 ---
 
@@ -48,6 +48,26 @@ E-commerce businesses connect to 5-15 external platforms (Shopify, Google Analyt
 | Customer requests deletion | GDPR handler anonymizes data across all connected systems and logs confirmation |
 | Auditor asks for processing records | Consent log (append-only) + per-platform sync log = complete GDPR Art. 30 record |
 | Config change with no record of who or when | Every configuration change requires authentication and can be logged with before/after comparison |
+
+### 4. Agent-Safe Credential Operations (Interactive Key Ceremony)
+
+CRM Sync is built and operated with AI agents in the loop. That raises a question
+most stacks never answer: **what stops an automated agent from minting, reading, or
+leaking a production secret?** Our answer is structural, not a policy reminder —
+every privileged credential operation (mint, rotate, revoke, set) runs as a
+**two-role ceremony**.
+
+| Risk | How CRM Sync Handles It |
+|------|------------------------|
+| An automation/AI agent could mint or read a production credential | Privileged credential commands are **blocked for the agent** by a permission classifier; only a named **Security Human** executes them interactively. The agent prepares the runbook and verifies the result — it never runs the mint |
+| A secret ends up in a log, transcript, or model context | The new key's value is written **straight to a `chmod 600` file or piped into the secrets manager** — never printed. Read-back surfaces return a masked preview (`564bbe…9298`) or a `(set)` flag only |
+| A botched rotation orphans the root key | Rotation is **additive**: a rotatable key lives alongside the root key, which never moves. A failed ceremony cannot lock anyone out; the root is the always-valid fallback |
+| "Who rotated what, when?" with no provable trail | Each ceremony files an **append-only audit record** carrying SHA-256 fingerprints (never the secret): date, credential, action, executed-by, verified-by, old→new fingerprint, reason, consumers updated. The trail is itself safe to publish |
+| Agent access outlives the engagement | The post-handoff access matrix covers **humans *and* agents**; tier-boundary re-isolation re-mints every credential when crossing shared → private → enterprise |
+
+The full ceremony — flow diagram, trust-boundary model, and audit-record schema —
+is documented in **`docs/KEY-MANAGEMENT-LIFECYCLE.md` §9** and specified normatively
+in **`FUNCTIONAL-SPEC.md` §13 (FR-HANDOFF-02)**.
 
 ---
 

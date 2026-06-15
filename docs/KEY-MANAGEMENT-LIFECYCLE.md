@@ -1,8 +1,8 @@
 # CRM Sync — Key Management Lifecycle
 
-**Version:** 1.1
-**Date:** 2026-06-11 (v1.0: 2026-05-26)
-**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens
+**Version:** 1.2
+**Date:** 2026-06-15 (v1.1: 2026-06-11; v1.0: 2026-05-26)
+**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens, **Interactive Key Ceremony (agent-safe credential operations)**
 
 ---
 
@@ -377,4 +377,133 @@ curl -X POST https://crm.{prod-domain}/admin/rotate-key \
 - **Never** commit secrets to git (use `.dev.vars` locally, `wrangler secret put` remotely)
 - Stage and prod use **separate** KV namespaces — no cross-contamination
 - Consulting team gets **rotatable key only** — never root, never CLI access
+
+---
+
+## 9. Interactive Key Ceremony (Agent-Safe Credential Operations)
+
+> **Primary feature.** Every privileged credential operation in this stack — mint,
+> rotate, revoke, set — runs as a **two-role ceremony**: a named **Security Human**
+> *executes* the privileged command; an **Agent** (AI/automation, e.g. Claude Code)
+> *prepares, verifies, and records* but **never mints, holds, or transports a secret.**
+> This is the normative procedure behind `FUNCTIONAL-SPEC.md` §13 FR-HANDOFF-02.
+
+### 9.1 Why this exists
+
+A capable coding/ops agent is a force multiplier for everything *except* secret
+custody. The moment an agent can mint or read a production credential, that secret's
+blast radius includes the model's context window, the transcript, and any log it
+touches. The ceremony removes the agent from the secret path by construction — not by
+policy reminder — so the agent stays maximally useful (it writes the runbook, runs
+every verification probe, files the audit record) while the secret never enters a
+surface it shouldn't.
+
+Three properties make it safe **by construction**, not by good behaviour:
+
+1. **The agent never executes the privileged write.** A permission classifier blocks
+   credential-minting commands; only the Security Human's interactive invocation runs
+   it. A blocked mint is *handed to the operator* — never worked around.
+2. **The secret never enters the transcript.** The new key's value is written straight
+   to disk (`~/.crm-*-key`, `chmod 600`) or piped directly into `wrangler secret put`.
+   Read-back surfaces return a **masked preview** (`564bbe…9298`) or a `"(set)"` flag —
+   never the value.
+3. **Additive-only, verified-first.** The agent reads the endpoint's source first to
+   confirm the operation is *additive* (the rotatable key lives at KV
+   `admin_key:rotatable`, alongside — never replacing — the root `ADMIN_KEY`), so a
+   failed or interrupted ceremony can never orphan the root credential.
+
+### 9.2 The ceremony flow
+
+```
+  ┌──────────────┐        ┌─────────────────────┐        ┌──────────────────┐
+  │ SECURITY     │        │  AGENT               │        │ PERMISSION       │
+  │ HUMAN        │        │  (AI / automation)   │        │ CLASSIFIER       │
+  └──────┬───────┘        └──────────┬───────────┘        └────────┬─────────┘
+         │                           │                             │
+         │   1. "rotate the key"     │                             │
+         │ ─────────────────────────▶│                             │
+         │                           │  2. READ source first       │
+         │                           │     (endpoint additive?     │
+         │                           │      root untouched?)       │
+         │                           │                             │
+         │                           │  3. attempt the mint  ──────▶│
+         │                           │                             │ 4. BLOCK
+         │                           │◀──────  denied  ────────────│   (credential
+         │                           │                             │    minting)
+         │   5. agent hands command  │                             │
+         │◀──── back to operator ────│                             │
+         │                           │                             │
+   6. RUN interactively              │                             │
+   curl -X POST …/admin/rotate-key   │                             │
+   -H "Authorization: Bearer         │                             │
+      $(cat ~/.crm-admin-key)"       │                             │
+         │                           │                             │
+   7. response field ──▶ written     │                             │
+      straight to ~/.crm-*-key       │                             │
+      (chmod 600, never printed)     │                             │
+         │                           │                             │
+         │   8. "done"               │                             │
+         │ ─────────────────────────▶│                             │
+         │                           │  9. VERIFY (no secret seen): │
+         │                           │   • GET /admin/rotate-key →  │
+         │                           │     masked preview only      │
+         │                           │   • probe real endpoint      │
+         │                           │     (/admin/markets → 200)   │
+         │                           │   • old key → 401 (dead)     │
+         │                           │   • check rotations: N meta  │
+         │                           │                             │
+         │                           │ 10. RECORD audit entry       │
+         │                           │     (fingerprint only,       │
+         │                           │      no key value)           │
+         ▼                           ▼                             ▼
+```
+
+### 9.3 The trust boundary (who-can-touch-what)
+
+Every arrow that **creates** a secret is executed by the Human; every arrow that
+**checks** one is executed by the Agent. The root key never leaves the Cloudflare
+secret store — rotation happens one rung down (`admin_key:rotatable`), which is why a
+botched ceremony can't lock anyone out.
+
+```
+   ROOT  ── Cloudflare secret ─────────────  CLI only, Security Human, never moves
+    │      (ADMIN_KEY)
+    │  POST /admin/rotate-key  (Human runs interactively; Agent blocked)
+    ▼
+ ROTATABLE ── KV: admin_key:rotatable ─────  delegate / agency, self-rotates,
+    │                                         root-revocable (DELETE)
+    │  POST /admin/provision-token
+    ▼
+ TENANT (crm_t_*) ── KV per-shop ──────────  client B, shop-scoped, no admin access
+
+   AGENT scope ▒▒▒▒  verify + record only — never mints, never holds a value
+```
+
+### 9.4 Audit record format
+
+Every ceremony files one append-only record. It carries **fingerprints, never
+secrets** (`sha256(value)[:8]`), so the trail is itself safe to publish:
+
+| Field | Example | Notes |
+|---|---|---|
+| `date` | `2026-06-11T16:49:00Z` | UTC, ceremony completion |
+| `credential` | `admin_key:rotatable` | logical name, not value |
+| `action` | `rotate` | mint \| rotate \| revoke \| set |
+| `executed_by` | `security-human:ysl` | who ran the interactive command |
+| `verified_by` | `agent:claude-code` | who probed old-dead / new-alive |
+| `old_fp` → `new_fp` | `1a2b3c4d` → `564bbe92` | sha256[:8]; proves change without exposure |
+| `reason` | `quarterly-cadence` | handoff \| 90d \| personnel \| incident \| scope |
+| `overlap_window` | `0s (instant cutover)` | how long both keys were valid |
+| `consumers_updated` | `worker secret; Actions secret` | every surface that had to change |
+
+### 9.5 Operator rules (reaffirmed)
+
+- Secrets only via `$(cat ~/.file)` — never inline, never printed, never committed.
+- A classifier-blocked privileged command is **handed to the operator** (run
+  interactively), not worked around or retried with the guard disabled.
+- Source is read **before** any retry, to confirm the operation is additive and the
+  root credential is untouched.
+- Local key inventory lives in `chmod 600` dotfiles (`~/.crm-admin-key` root,
+  `~/.crm-agency-key` delegate, per-market site tokens) — never in the repo, never in
+  chat.
 - Client (B) gets **tenant token only** — no admin access of any kind

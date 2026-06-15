@@ -1,8 +1,8 @@
 # CRM Sync — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
-**Version:** 1.8
-**Date:** 2026-05-26
+**Version:** 1.18
+**Date:** 2026-06-15
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Internal — Confidential
 
@@ -38,6 +38,7 @@
 | 1.14 | 2026-06-07 | Engineering | **Shopify token grant types & self-heal recovery (§3.14.6, FR-TOKEN-11..13):** documented both supported grants — Refresh Token (merchant OAuth) and Client Credentials (own-store, no refresh token) — and automatic selection. Added the **dead-refresh-token self-heal**: a refresh grant that returns `400 "requires an active refresh_token"` now clears the dead token and falls through to Client Credentials, recovering without an OAuth re-install (prior symptom: all Shopify-backed tools — product search, cart, checkout, orders — silently return empty). Added on-`401` mid-request refresh+retry so a token failing before its recorded expiry self-heals, plus a failure-reference table. |
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 | 1.16 | 2026-06-13 | Engineering | **DevOps modular build strategy + dynamic data "loops" (§2.5, §3.18, FR-BUILD-01..06):** documented the independently-deployable module model (CRM Sync / PIM Sync / Webflow extension / Shopify app / public docs — each its own worker, config, and KV; no synchronous cross-module calls; a storefront runs PIM-only or CRM-only, CRM embeds gated server-side by `embeds_enabled` returning an **empty 200** + `X-CRM-Embed-Disabled`, never an error body) and the **dynamic data loops** that keep resources fresh without blocking reads or coupling modules (export→ingest→publish headless rail, event-driven `content-drain`, stale-while-revalidate + in-isolate single-flight read caches, token self-heal, version-monotonic consent projection). PDP perf: `/product` + shop-catalog SWR/single-flight (cold ~1.8 s×3 → ~240 ms). Header/footer non-destructive rules + enforcing harness suite. |
+| 1.18 | 2026-06-15 | Engineering | **Interactive Key Ceremony promoted to a primary feature (§1.1, §13 FR-HANDOFF-02; `KEY-MANAGEMENT-LIFECYCLE.md` §9):** agent-safe credential operations documented end-to-end — every privileged key mint/rotate/revoke/set runs as a two-role ceremony where a named Security Human *executes* (interactively) and an Agent *prepares/verifies/records* but never mints, holds, or transports a secret. Safe-by-construction: permission-classifier blocks agent-side mints (handed to the operator, never worked around), secret values written straight to `chmod 600` files / piped into the secrets manager (read-back masked to `(set)`/preview), additive-only rotation (`admin_key:rotatable` alongside an immovable root). Added the ceremony flow + trust-boundary diagrams and the fingerprint-only (`sha256[:8]`) audit-record schema; featured in `SECURITY-POSTURE.md` §"Agent-Safe Credential Operations". |
 | 1.17 | 2026-06-13 | Engineering | **Chatbot FAQ answer cascade (§3.19, FR-FAQ-01..06):** documented the tiered `/commerce/faq` cascade (Shopify KB → guide-list → weighted Xano FAQ → blog-intent → locale-filtered vectorized KB → Botpress KB → blog last-resort). The Botpress KB — which merges the multilingual product PDFs with the FAQs and matches cross-lingually — is now a **locale-gated last-resort fallback**, not the primary source: as primary it surfaced foreign-language (e.g. Vietnamese) manual chunks and garbled title matches that preempted clean answers. Added `passageLocaleOk()` script/ASCII gating + a prose-length floor, and the guide-list intent that returns the full PDF catalog. `BOTPRESS_PAT`-gated (absent → structured cascade runs alone). |
 
 ---
@@ -56,6 +57,7 @@ CRM Sync is a multi-tenant server-side customer relationship management SaaS (~9
 - Adobe Experience Platform streaming ingestion with SHA-256 hashed PII
 - Self-service user control panel (UCP) for consent and preference management
 - Tiered SaaS pricing with Shopify App Billing integration
+- **Agent-safe credential operations** — privileged key mint/rotate/revoke runs as an Interactive Key Ceremony (Security Human executes, Agent verifies and records; secrets never enter logs, transcripts, or agent context), with a fingerprint-only audit trail (§13, FR-HANDOFF-02; `KEY-MANAGEMENT-LIFECYCLE.md` §9)
 
 ### 1.2 Deployment Environment
 
@@ -1471,6 +1473,11 @@ launch): credential inventory diff with ages (flag >90d), ceremonies
 performed, tenant token census, 401-anomaly summary, consent state_version
 monotonicity spot-check, and tier-boundary re-isolation (re-run FR-HANDOFF-01
 when crossing shared → private → enterprise).
+
+The full ceremony procedure — the human-executes/agent-verifies flow diagram, the
+trust-boundary model, and the fingerprint-only audit-record schema — is documented
+in **`KEY-MANAGEMENT-LIFECYCLE.md` §9 (Interactive Key Ceremony)** and surfaced as a
+featured capability in **`SECURITY-POSTURE.md`**.
 
 Relationship to existing controls: builds on §3.10.2 (self-service admin key
 rotation), the §12 versioning axes (admin-key meta + signing-key versions are
