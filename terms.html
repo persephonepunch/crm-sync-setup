@@ -6,17 +6,24 @@
 <title>Terms of Service — CRM Sync</title>
 <meta name="description" content="Terms of Service for CRM Sync / UCP Purchase Agent by Story Story AI. The agreement governing use of the app and platform.">
 <style>
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#ffffff;--card:#f7f7f7;--border:#e5e5e5;--text:#1a1a1a;--muted:#666;--accent:#4353ff;--accent-hover:#3040e0;--tag-bg:#f0f0f0;--shadow:0 1px 3px rgba(0,0,0,0.08)}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+body{font-family:'General Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 
-.container{max-width:720px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+.container{max-width:760px;margin:0 auto;padding:3rem 1.5rem 4rem}
 
-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
-header h1{font-size:1.75rem;font-weight:700;margin-bottom:0.25rem}
-header .meta{font-size:0.8125rem;color:var(--muted)}
+header{margin-bottom:1.5rem}
+header h1{font-size:clamp(2.5rem,6vw,3.5rem);font-weight:600;letter-spacing:-0.02em;line-height:1.05;margin-bottom:0.5rem;color:#111}
+header .meta{font-size:0.875rem;color:var(--muted)}
+
+.lang-bar{display:inline-flex;flex-wrap:wrap;gap:0.25rem;border:1px solid var(--border);border-radius:999px;padding:0.25rem;margin-bottom:2.5rem}
+.lang-tab{font-family:inherit;font-size:0.875rem;font-weight:500;color:var(--muted);background:transparent;border:0;border-radius:999px;padding:0.5rem 1.1rem;cursor:pointer;line-height:1;white-space:nowrap;transition:color .15s ease,background .15s ease}
+.lang-tab:hover{color:var(--text)}
+.lang-tab.active{background:#111;color:#fff}
+.lang-note{font-size:0.8125rem;color:var(--muted);background:var(--card);border-left:3px solid var(--accent);border-radius:0 0.25rem 0.25rem 0;padding:0.625rem 0.875rem;margin-bottom:2rem}
 
 h2{font-size:1.125rem;font-weight:700;margin:2rem 0 0.75rem;padding-bottom:0.375rem;border-bottom:1px solid var(--border)}
 h3{font-size:0.9375rem;font-weight:600;margin:1.25rem 0 0.5rem}
@@ -57,6 +64,16 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
     <h1>Terms of Service</h1>
     <p class="meta">CRM Sync &middot; UCP Purchase Agent &mdash; Effective Date: June 15, 2026 &middot; Last Updated: June 15, 2026</p>
   </header>
+
+  <div class="lang-bar" role="tablist" aria-label="Language">
+    <button type="button" class="lang-tab active" data-lang="en">English</button>
+    <button type="button" class="lang-tab" data-lang="fr">Français</button>
+    <button type="button" class="lang-tab" data-lang="ko">한국어</button>
+    <button type="button" class="lang-tab" data-lang="zh-Hans">中文(简体)</button>
+    <button type="button" class="lang-tab" data-lang="zh-Hant">中文(繁體)</button>
+    <button type="button" class="lang-tab" data-lang="ja">日本語</button>
+  </div>
+  <p class="lang-note" id="lang-note" hidden></p>
 
   <div class="toc">
     <h3>Contents</h3>
@@ -189,6 +206,19 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
     </div>
     <p>CRM Sync &mdash; Story Story AI &middot; Last updated June 2026</p>
   </footer>
+
+  <script>
+  (function(){
+    var tabs=document.querySelectorAll('.lang-tab'),note=document.getElementById('lang-note');
+    var msg={fr:'La traduction française arrive bientôt — la version anglaise est affichée ci-dessous.',ko:'한국어 번역이 곧 제공됩니다 — 아래에 영어 버전이 표시됩니다.','zh-Hans':'简体中文翻译即将推出 — 下方显示英文版本。','zh-Hant':'繁體中文翻譯即將推出 — 下方顯示英文版本。',ja:'日本語訳は近日公開予定です — 以下に英語版を表示しています。'};
+    tabs.forEach(function(t){t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var l=t.getAttribute('data-lang');
+      if(l==='en'){note.hidden=true;note.textContent='';}else{note.hidden=false;note.textContent=msg[l]||'';}
+    });});
+  })();
+  </script>
 
 </div>
 
