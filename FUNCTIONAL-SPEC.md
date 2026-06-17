@@ -4,7 +4,7 @@
 **Version:** 1.19
 **Date:** 2026-06-17
 **Status:** Draft — Pending DPO & PMO Review
-**Classification:** Internal — Confidential
+**Classification:** Public
 
 ---
 
