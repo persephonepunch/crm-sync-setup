@@ -1,8 +1,8 @@
 # CRM Sync — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
-**Version:** 1.18
-**Date:** 2026-06-15
+**Version:** 1.19
+**Date:** 2026-06-17
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Internal — Confidential
 
@@ -39,6 +39,7 @@
 | 1.11 | 2026-06-02 | Engineering | **Agentic Commerce — Data Entitlement, Consent Engine & Enterprise Add-ons (§3.16, FR-ENT):** Xano-authoritative entitlements (tables 190–194) as source of truth for tenant/user/agent permissions + consent; EdDSA (Ed25519) offline-verifiable tokens with non-destructive `next→active→retired` signing-key rotation; scoped `entitlement:read` key (`XANO_ENTITLEMENT_KEY`) on the read path (never the master meta key); omni-channel poll-on-change projection (Cloudflare/Shopify/GA4 real-time + Adobe/SAP/Nielsen batch) with **version-monotonic consent resolution** (per-`(channel,subject)` `state_version` guard → consent never regresses across mixed cadences) + cursor replay; **first-class versioned consent** (GA4 Consent Mode v2) carried in snapshot + token; enterprise add-ons gated by `entitlement.features[]` with per-Org connectors; `/settings` operations console; Clean Room re-scoped as a downstream consumer of versioned consent (§6.4) |
 | 1.16 | 2026-06-13 | Engineering | **DevOps modular build strategy + dynamic data "loops" (§2.5, §3.18, FR-BUILD-01..06):** documented the independently-deployable module model (CRM Sync / PIM Sync / Webflow extension / Shopify app / public docs — each its own worker, config, and KV; no synchronous cross-module calls; a storefront runs PIM-only or CRM-only, CRM embeds gated server-side by `embeds_enabled` returning an **empty 200** + `X-CRM-Embed-Disabled`, never an error body) and the **dynamic data loops** that keep resources fresh without blocking reads or coupling modules (export→ingest→publish headless rail, event-driven `content-drain`, stale-while-revalidate + in-isolate single-flight read caches, token self-heal, version-monotonic consent projection). PDP perf: `/product` + shop-catalog SWR/single-flight (cold ~1.8 s×3 → ~240 ms). Header/footer non-destructive rules + enforcing harness suite. |
 | 1.18 | 2026-06-15 | Engineering | **Interactive Key Ceremony promoted to a primary feature (§1.1, §13 FR-HANDOFF-02; `KEY-MANAGEMENT-LIFECYCLE.md` §9):** agent-safe credential operations documented end-to-end — every privileged key mint/rotate/revoke/set runs as a two-role ceremony where a named Security Human *executes* (interactively) and an Agent *prepares/verifies/records* but never mints, holds, or transports a secret. Safe-by-construction: permission-classifier blocks agent-side mints (handed to the operator, never worked around), secret values written straight to `chmod 600` files / piped into the secrets manager (read-back masked to `(set)`/preview), additive-only rotation (`admin_key:rotatable` alongside an immovable root). Added the ceremony flow + trust-boundary diagrams and the fingerprint-only (`sha256[:8]`) audit-record schema; featured in `SECURITY-POSTURE.md` §"Agent-Safe Credential Operations". |
+| 1.19 | 2026-06-17 | Engineering | **Cost Architecture — Token-Maxing Resolution (§3.20, FR-COST-01..06):** documented the cost model that resolves agentic commerce's "token maxing" (runaway LLM-token + per-request/egress spend). Data Resolution (joins/reconciliation/entity serving) + encryption/key logic run on the **fixed-fee, no-egress Xano plane** (§2.0's Xano K8s/Docker/Redis data plane); the cache-fed agent loop (Anthropic *Tool Runner* as a read-only consumer) stays thin and never re-derives data by re-prompting. Unbounded-volume work lands on a flat cost floor while token spend stays bounded — the economic basis for the flat FR-PRICING (§3.10) tiers, pairing cost predictability with the security boundary (keys/crypto never egress; §3.16, §13). |
 | 1.17 | 2026-06-13 | Engineering | **Chatbot FAQ answer cascade (§3.19, FR-FAQ-01..06):** documented the tiered `/commerce/faq` cascade (Shopify KB → guide-list → weighted Xano FAQ → blog-intent → locale-filtered vectorized KB → Botpress KB → blog last-resort). The Botpress KB — which merges the multilingual product PDFs with the FAQs and matches cross-lingually — is now a **locale-gated last-resort fallback**, not the primary source: as primary it surfaced foreign-language (e.g. Vietnamese) manual chunks and garbled title matches that preempted clean answers. Added `passageLocaleOk()` script/ASCII gating + a prose-length floor, and the guide-list intent that returns the full PDF catalog. `BOTPRESS_PAT`-gated (absent → structured cascade runs alone). |
 
 ---
@@ -805,6 +806,42 @@ the FAQs) is a **locale-gated last-resort fallback**, never the primary source.
 | FR-FAQ-04 | The Botpress KB is a **last-resort fallback**, reached only when every structured/AEO tier misses — it does not preempt locale-filtered answers | cascade step 2.5 (`!answer && faqs.length === 0`) | Implemented |
 | FR-FAQ-05 | Botpress passages are **locale-gated**: scripts the locale never uses are rejected (CJK/Hangul/Cyrillic/Arabic/Thai/kana; Vietnamese for non-`vi`), English requires predominantly-ASCII prose, plus a minimum-prose floor so bare title matches don't win | `passageLocaleOk()` + length floor | Implemented |
 | FR-FAQ-06 | The Botpress tier is feature-gated by the `BOTPRESS_PAT` secret; absent → the structured cascade runs alone (no hard dependency) | `cf-worker-crm-sync` secret | Implemented |
+
+---
+
+### 3.20 Cost Architecture — Token-Maxing Resolution (FR-COST)
+
+**The business challenge — "token maxing."** Agentic commerce runs on two metered
+meters: LLM **tokens** and rate-limited platform **APIs** (Shopify, GA4). Naïve agent
+stacks re-prompt the model to reason over raw data and round-trip that data through
+per-request / per-GB-**egress** cloud services — so cost scales with traffic and *maxes
+out* unpredictably. Token-maxing (runaway model + egress spend) is the single biggest
+reason agentic deployments overrun budget.
+
+**The resolution.** Push **Data Resolution** (entity joins, reconciliation, lookups,
+serving the resolved object) and **encryption / key logic** onto **Xano**, which bills a
+**fixed monthly fee with no egress and no per-request metering** (the Xano K8s/Docker/Redis
+data plane, §2.0). The LLM/agent loop stays thin and **cache-fed** — it consumes
+pre-resolved objects through MCP tools (the Anthropic *Tool Runner* loop is a **read-only
+consumer**, never re-deriving data by re-prompting). The unbounded-volume work lands on a
+**flat cost floor**; token spend stays bounded. This is what makes the flat FR-PRICING
+(§3.10) tiers defensible — the cost floor is fixed, not metered.
+
+| ID | Requirement | Method | Status |
+|---|---|---|---|
+| FR-COST-01 | Data Resolution (joins, reconciliation, entity serving) executes on the fixed-fee Xano plane, never by LLM re-prompting | Xano Functions / Tasks / Triggers (§2.0) | Implemented |
+| FR-COST-02 | Repeat reads are served from fixed-cost caches so identical queries don't re-spend tokens / API quota | Cloudflare KV edge cache + Xano cache; stale-while-revalidate + single-flight (§2.5) | Implemented |
+| FR-COST-03 | Encryption + key-resolution ("key logic builders") run server-side **inside** the fixed-fee / no-egress boundary; keys never egress to metered services or the agent context | Xano-resident EdDSA signing keys + entitlement crypto (§3.16); Interactive Key Ceremony (§13) | Implemented |
+| FR-COST-04 | AI/API token spend is bounded per session — the agent consumes resolved objects via MCP tools; no unbounded re-prompting over raw data | MCP brain tools + Tool Runner consumer loop | Implemented |
+| FR-COST-05 | No-egress data movement: resolution, joins, and cross-app sync stay within the Xano plane (in / within / out is un-metered), so volume adds no egress cost | Xano fixed-fee model; cross-app sync via Xano outbox (PIM ⇄ CRM boundary) | Implemented / Planned |
+| FR-COST-06 | Cost is predictable per tier (flat Xano fee + bounded token budget) — the economic basis of the flat pricing tiers | cross-ref FR-PRICING (§3.10) | Spec |
+
+**Why Xano specifically (vs metered cloud):** fixed fee = predictable; no egress = data
+movement doesn't meter; managed Functions = the "encryption key logic builders" that keep
+crypto and key resolution *inside* the cost-flat, egress-free, governed boundary. The result
+pairs **cost predictability with the security boundary** — the heavy, unbounded
+data-resolution + crypto sits on one fixed-fee plane while the variable-cost model loop stays
+thin, so traffic growth doesn't multiply spend.
 
 ---
 
