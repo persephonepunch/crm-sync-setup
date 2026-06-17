@@ -202,6 +202,7 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
     <li><strong>Authentication:</strong> JWT sessions with configurable expiry, idle timeout with warning</li>
     <li><strong>Webhook verification:</strong> HMAC-SHA256 signature verification on all Shopify webhooks and GDPR handlers</li>
     <li><strong>Admin access:</strong> Bearer token (<code>ADMIN_KEY</code>) required on all admin and write endpoints</li>
+    <li><strong>Key management &amp; rotation:</strong> Scoped, revocable access credentials (admin-equivalent delegate keys and tenant-scoped <code>crm_t_</code> tokens) with independent rotation, fail-closed authorization, and a documented key-rotation lifecycle &mdash; secrets never appear in logs, transcripts, or read-backs (see <a href="terms.html#access-governance">Access-Governance Model</a>)</li>
     <li><strong>Zero Trust:</strong> Cloudflare Access with email-based OTP on worker admin URLs</li>
     <li><strong>OAuth security:</strong> State parameter CSRF protection, PKCE for Shopify Customer Account, shop domain validation</li>
     <li><strong>Secret masking:</strong> <code>GET /config</code> masks all credentials; embed HTML strips all API keys</li>
