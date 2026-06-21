@@ -41,6 +41,7 @@
 | 1.18 | 2026-06-15 | Engineering | **Interactive Key Ceremony promoted to a primary feature (§1.1, §13 FR-HANDOFF-02; `KEY-MANAGEMENT-LIFECYCLE.md` §9):** agent-safe credential operations documented end-to-end — every privileged key mint/rotate/revoke/set runs as a two-role ceremony where a named Security Human *executes* (interactively) and an Agent *prepares/verifies/records* but never mints, holds, or transports a secret. Safe-by-construction: permission-classifier blocks agent-side mints (handed to the operator, never worked around), secret values written straight to `chmod 600` files / piped into the secrets manager (read-back masked to `(set)`/preview), additive-only rotation (`admin_key:rotatable` alongside an immovable root). Added the ceremony flow + trust-boundary diagrams and the fingerprint-only (`sha256[:8]`) audit-record schema; featured in `SECURITY-POSTURE.md` §"Agent-Safe Credential Operations". |
 | 1.19 | 2026-06-17 | Engineering | **Cost Architecture — Token-Maxing Resolution (§3.20, FR-COST-01..06):** documented the cost model that resolves agentic commerce's "token maxing" (runaway LLM-token + per-request/egress spend). Data Resolution (joins/reconciliation/entity serving) + encryption/key logic run on the **fixed-fee, no-egress Xano plane** (§2.0's Xano K8s/Docker/Redis data plane); the cache-fed agent loop (Anthropic *Tool Runner* as a read-only consumer) stays thin and never re-derives data by re-prompting. Unbounded-volume work lands on a flat cost floor while token spend stays bounded — the economic basis for the flat FR-PRICING (§3.10) tiers, pairing cost predictability with the security boundary (keys/crypto never egress; §3.16, §13). |
 | 1.17 | 2026-06-13 | Engineering | **Chatbot FAQ answer cascade (§3.19, FR-FAQ-01..06):** documented the tiered `/commerce/faq` cascade (Shopify KB → guide-list → weighted Xano FAQ → blog-intent → locale-filtered vectorized KB → Botpress KB → blog last-resort). The Botpress KB — which merges the multilingual product PDFs with the FAQs and matches cross-lingually — is now a **locale-gated last-resort fallback**, not the primary source: as primary it surfaced foreign-language (e.g. Vietnamese) manual chunks and garbled title matches that preempted clean answers. Added `passageLocaleOk()` script/ASCII gating + a prose-length floor, and the guide-list intent that returns the full PDF catalog. `BOTPRESS_PAT`-gated (absent → structured cascade runs alone). |
+| 1.20 | 2026-06-21 | Engineering | **Globalized Commerce — Agentic Settlement Layer + Glossary (Payments surface):** added the market/rail/settlement-socket/mandate layer surfaced on the **Payments** operator screen (`/embed/payments`; tabs Rails·Sockets·Mandates·History). Two-tier market model — Tier-1 Stripe-Funnel **ratified** (JP/KR) vs Tier-2 Guarded-Modular **incubating/blocked** — with a fail-closed runtime guardrail (`assertMarketActive`) **and** a pre-deploy guard, so a non-ratified market cannot reach active settlement dispatch. Pluggable per-Country/Bank **settlement sockets** (Stripe / Kakao / domestic PG, health-gated) extend the socket-links pattern to money; Merchant-of-Record split (`platform_local` / `platform_xborder`); JWE-+-Auth-Me credential binding before capture. `GET /commerce/markets` now stamps each market's real lifecycle; new `GET /commerce/settlement/sockets`. Added the **Glossary — Globalized Commerce** (markets/rails/lifecycle, sockets/MoR, mandates, settlement state; the two-"ratify" distinction). |
 
 ---
 
@@ -1520,6 +1521,47 @@ Relationship to existing controls: builds on §3.10.2 (self-service admin key
 rotation), the §12 versioning axes (admin-key meta + signing-key versions are
 the machine-readable half of the audit trail), and §5/§9 (security controls,
 compliance matrix).
+
+---
+
+## Glossary — Globalized Commerce
+
+Vocabulary for the agentic, cross-border settlement layer surfaced on the **Payments** operator screen (`/embed/payments` → tabs **Rails · Sockets · Mandates · History**). This layer routes an agentic purchase from market discovery to capture-to-bank while Shopify stays the system of record.
+
+### Markets & rails *(tab: Rails)*
+| Term | Definition |
+|---|---|
+| **Market** | A shopper country (ISO alpha-2). Each market resolves to a default rail + settlement currency. |
+| **Rail** | The settlement pathway for a purchase: `ucp` / `mpp` (Shopify-native, payment-agnostic), `kakaopay`, `samsungpay` (wallet), `stripe_jp`. |
+| **Settlement currency** | The currency a rail pays out in (e.g. KRW, JPY), independent of the store/presentment currency Shopify records. |
+| **Market lifecycle** | Governance state of a market's bespoke settlement rail: **RATIFIED** (live — human-approved to take real money), **INCUBATING** (built but not yet activated; cannot settle), **OPEN** (no bespoke rail — settles natively via Shopify/`ucp`), **BLOCKED** (sanctioned — never settable). |
+| **Ratification** | The one-time human governance action that flips a market `incubating → ratified`. Enforced fail-closed at runtime (`assertMarketActive`) and pre-deploy (deploy guard). Distinct from a transaction's *capture* (see History). |
+
+### Settlement sockets *(tab: Sockets)*
+| Term | Definition |
+|---|---|
+| **Settlement socket** | A pluggable Country/Bank connector that captures money to a bank — Stripe, Kakao Pay, a domestic PG (e.g. KG Inicis). The same "socket" abstraction used for data joins, applied to money. |
+| **Acquirer / PSP** | The payment service provider behind a socket that moves funds to card networks / bank rails (Visa/MC; KFTC in Korea). |
+| **Merchant of Record (MoR)** | The legal entity that owns the transaction: `platform_local` (the platform's in-market entity) or `platform_xborder` (the platform's cross-border Stripe-eligible entity, e.g. US/JP/UK). The wallet (Samsung/Kakao tokenization) is never the MoR. |
+| **Health** | Whether a socket's acquirer is configured and reachable (credentials present + health check passes) — shown as *healthy* / *down*. |
+
+### Mandates & agents *(tab: Mandates)*
+| Term | Definition |
+|---|---|
+| **AP2 mandate** | A cryptographically signed authorization (Agent Payments Protocol) permitting an AI agent to transact on a shopper's behalf within explicit limits. |
+| **Agent** | The AI agent authorized under a mandate. |
+| **Cap** | The spending ceiling (max amount) bound to a mandate. |
+| **Scope** | The product types / categories a mandate may purchase. |
+| **Human-present vs autonomous** | Whether the final payment requires on-device human approval (e.g. Samsung Pay biometric) or may be executed server-side by the agent under the mandate (e.g. Kakao Pay). |
+
+### Settlement history *(tab: History)*
+| Term | Definition |
+|---|---|
+| **Capture** | The per-transaction money event: the Merchant of Record settles the authorized purchase onto a bank-connected rail. |
+| **Settlement state** | The money lifecycle of a transaction: `captured`, `refunded`, `returned`, `failed`. |
+| **Binding (JWE + Auth Me)** | The trust step that ties a wallet credential (delivered as a JWE token) to the same authenticated identity (Xano Auth Me) that holds the mandate — asserted before any capture. |
+
+> **Two "ratify"s, kept distinct.** *Market ratification* (Rails) is a once-per-market governance flip — "this market may settle." *Settlement capture* (History) is a per-transaction money event by the Merchant of Record. The system never uses the same word for both.
 
 ---
 
