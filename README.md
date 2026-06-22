@@ -8,6 +8,7 @@ Everything you need to get your CRM system running. Complete each section in ord
 [CRM Sync](https://crm-sync.webflow.io/)
 [PIM Sync](https://apps.shopify.com/pim-sync)
 [Shopify Checklist](https://shopify-checklist.pages.dev/)
+[Strategy] (https://miro.com/app/board/uXjVHDMJNpA=/?share_link_id=653901982235)
 
 ---
 
