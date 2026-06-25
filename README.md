@@ -1,7 +1,7 @@
-# CRM Sync Setup Guide
+# CRM Sync — PWA & Native App Commerce Setup Guide
 
 
-Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
+Ship your CRM as an installable **PWA** and **native app** (iOS · Android · desktop) on Shopify + Webflow + Xano — with auth, real-time consent, GA4, and agent permissions. Everything you need to get it running; complete each section in order — each one builds on the last.
 
 > **What is CRM Sync?** It connects six services together: a **server** (Cloudflare Worker) that runs your auth and sync logic, a **database** (Xano) that stores users and tag relationships, a **store** (Shopify) for customer sync, **analytics** (Google GA4) for tracking consent and user segments, **email** (Resend) for transactional emails, and a **CMS** (Webflow) that displays user data and manages campaigns. You configure each one, then the Webflow App ties them together.
 >
