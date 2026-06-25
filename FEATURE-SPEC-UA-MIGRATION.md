@@ -664,7 +664,9 @@ CRM Sync's stack divides cleanly into three execution phases. Each phase has dis
 │  ├─ Webflow Semantic Design (styles, variables, classes)            │
 │  ├─ Webflow Publish APIs (site publish, CMS push)                   │
 │  ├─ Consent banner + DataLayer (gtag consent_mode v2)               │
-│  └─ Embed scripts (UCP dashboard, footer, compliance page)          │
+│  ├─ Embed scripts (UCP dashboard, footer, compliance page)          │
+│  ├─ Installable PWA (/configure shell + manifest + service worker)  │
+│  └─ Cross-device event bus (crm-events.js → GTM / GA4 / Merchant)   │
 ├─────────────────────────────────────────────────────────────────────┤
 │  COMPILE TIME (Build / CI)                                          │
 │  Runs: developer machine or CI pipeline, before deploy              │
@@ -675,7 +677,8 @@ CRM Sync's stack divides cleanly into three execution phases. Each phase has dis
 │  ├─ React Compiler (automatic memoization, semantic validation)     │
 │  ├─ Wrangler (Cloudflare Workers build + deploy)                    │
 │  ├─ Webflow Extension Bundler (webflow extension bundle)            │
-│  └─ Compliance Harness (tests/compliance-harness.ts)                │
+│  ├─ Compliance Harness (tests/compliance-harness.ts)                │
+│  └─ Capacitor + Electron (native build — iOS / Android / desktop)   │
 ├─────────────────────────────────────────────────────────────────────┤
 │  DYNAMIC SERVER (Edge Runtime / API)                                │
 │  Runs: Cloudflare Workers V8 isolate or Xano API runtime            │
@@ -683,6 +686,7 @@ CRM Sync's stack divides cleanly into three execution phases. Each phase has dis
 │                                                                     │
 │  Tools:                                                             │
 │  ├─ Cloudflare Workers (request handling, routing, auth)            │
+│  ├─ PWA shell + manifest + SW + /get + /crm-events.js + /edge/geo   │
 │  ├─ Cloudflare KV (config storage, state, token cache)              │
 │  ├─ Wrangler Secrets (ADMIN_KEY, JWT_SECRET, API keys)              │
 │  ├─ Xano Auth (user registration, login, JWT issuance)              │
