@@ -78,7 +78,7 @@ CRM Sync uses four independent authentication mechanisms. Compromising one does 
 | Layer | What It Protects | How It Works |
 |-------|-----------------|-------------|
 | **Bearer Token** | All admin and sync endpoints | API requests must include a secret key in the request header; per-tenant admin keys checked first, platform key as fallback |
-| **JWT Session** | Customer-facing features (profile, consent, tags) | Encrypted cookie issued after login — expires automatically |
+| **JWT Session** | Customer-facing features (profile, consent, tags) | Signed token issued after login — expires automatically **and is revoked server-side on logout** (denylist with token-lifetime TTL), so a cached copy cannot outlive the session |
 | **HMAC Signature** | All Shopify webhooks and GDPR handlers | Shopify signs each request — the Worker verifies the signature matches |
 | **Cloudflare Access** | Browser access to admin pages | Email-based one-time password verification before any admin page loads |
 
@@ -87,6 +87,23 @@ CRM Sync uses four independent authentication mechanisms. Compromising one does 
 All 67 API endpoints have been audited. Every endpoint that writes data or accesses admin functions requires authentication. 12 endpoints that were previously unprotected were fixed in the May 2026 security hardening. Per-tenant admin keys add granular access control — each tenant can have its own admin key, with the platform key as fallback.
 
 Public endpoints (no auth required): health check, OAuth initiation pages, public embeds, read-only config (secrets masked).
+
+### Session Revocation & Self-Service Owner Keys (July 2026)
+
+Two hardening rounds extended the authentication model beyond expiry-based sessions:
+
+- **Server-side logout revocation.** Logout now denylists the session token at the server
+  (hashed, TTL matched to the token's remaining lifetime). Previously a logged-out session
+  remained technically valid until natural expiry; a token cached in browser storage or
+  history could re-authenticate on a shared machine. Authenticated team surfaces also
+  receive the session token at click time, hold it in memory only, and scrub it from URLs.
+- **Self-service owner keys.** Each app owner holds a dedicated per-store credential they
+  mint, rotate, and revoke themselves through an entitlement-gated wizard — ownership is
+  granted by purchase, never self-assigned. The key value is shown exactly once at mint;
+  rotation writes the replacement before revoking predecessors (no keyless failure mode);
+  every event lands in a per-store, fingerprint-only, append-only audit ledger. The
+  platform operates the key system but never holds the key value. Full treatment:
+  `docs/KEY-MANAGEMENT-LIFECYCLE.md` §13.
 
 ---
 

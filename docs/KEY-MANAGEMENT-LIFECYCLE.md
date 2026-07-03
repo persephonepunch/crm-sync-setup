@@ -1,8 +1,8 @@
 # CRM Sync — Key Management Lifecycle
 
-**Version:** 1.4
-**Date:** 2026-06-22 (v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26)
-**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens, **Interactive Key Ceremony (agent-safe credential operations)**, **`.env`/CLI-as-AI-exposure-surface threat model**, **organizational RACI + tech→business ownership**, **regulated-industry glossary**, **GraphQL/server-side migration significance**
+**Version:** 1.5
+**Date:** 2026-07-03 (v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26)
+**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens, **Interactive Key Ceremony (agent-safe credential operations)**, **`.env`/CLI-as-AI-exposure-surface threat model**, **organizational RACI + tech→business ownership**, **regulated-industry glossary**, **GraphQL/server-side migration significance**, **self-service tenant key management (app owners, §13)**, **server-side session revocation**
 **Companion:** `KEY-CEREMONY-LOOP-REVIEW.md` — recurring, non-custodial automation checklist that continuously attests this lifecycle (the QA/Compliance *verify* lane as a `/loop`).
 
 ---
@@ -65,6 +65,17 @@ escalating from execution on the technical floor to **business risk ownership**.
 - **CISO** (or Head of Security / VP Eng) is **Accountable for residual risk** — a business function.
 - **DPO** is Consulted; the **Agent** is never A or R for a write.
 - Two lines must never collapse: **executor ≠ attester**, and **Accountable ≠ the doer**.
+
+**Self-service tenant key management (§13).** *Challenge:* every key reset routed through
+the platform operator makes the operator a bottleneck — and a custodian — for credentials
+that rightfully belong to each app owner. *Solution:* the purchased product **includes the
+key system**: owners run their own lifecycle through an entitlement-gated wizard; the
+platform demonstrates it but never holds the key.
+- One dedicated key per store; ownership proven by **purchase-granted entitlement**, never self-assigned.
+- Rotation is **mint-before-revoke** — a mid-flight failure can never leave the owner keyless.
+- The key is returned **exactly once** at mint; list views show fingerprints only.
+- Every rotate/revoke lands in a per-store, **fingerprint-only append-only audit ledger**.
+- Login sessions are **revoked server-side on logout** (denylist), so a cached session cannot outlive its logout.
 
 ---
 
@@ -815,3 +826,64 @@ stay distinct**, and **Accountability (A) must sit with a business risk owner, n
 person doing the work (R)**. If a single founder wears every hat, the **Agent's
 non-custodial verify-and-record role becomes the de-facto second control** — which is
 why the ceremony is designed to hold even at headcount = 1.
+
+---
+
+## 13. Self-Service Tenant Key Management (App Owners)
+
+*Added v1.5 (2026-07-03). The buyer-facing tier of the key hierarchy: every app purchase
+includes a dedicated per-store admin credential that the **owner** — not the platform —
+mints, rotates, revokes, and audits.*
+
+### 13.1 Position in the key hierarchy
+
+| Tier | Credential | Held by | Reset blast radius |
+|---|---|---|---|
+| Platform root | worker root admin key | Platform operator only | Everything (full dependent rotation) |
+| Delegate | rotatable admin key | Platform / consulting ops | The delegate only |
+| **App owner** | **per-store tenant token** | **The purchasing owner only** | **That one store only** |
+
+The platform root and delegate tiers are covered by §§3–9. This section covers the third
+tier, which is the one sold with the product: the owner's dedicated key.
+
+### 13.2 The owner lifecycle (wizard)
+
+Owners manage their key through a guided wizard — sign in, confirm the store, generate.
+The design constraints mirror the ceremony's invariants, translated to self-service:
+
+1. **Entitlement-gated ownership.** A signed-in identity may manage a store's keys only if
+   its entitlement record — written by **purchase**, not self-serviceable — lists that
+   store. A login alone never escalates to key access.
+2. **Shown once.** The key value is returned exactly once at mint. Every subsequent view
+   is a truncated fingerprint (`sha256[:8]`) and a masked preview. Losing the key means
+   rotating it — by design, there is nothing to "look up."
+3. **Mint-before-revoke rotation.** The replacement key is written before predecessors are
+   deleted, so no failure mode leaves the store keyless (the self-service analogue of
+   §9's additive-only rule).
+4. **Incident revoke.** Any single key can be killed by fingerprint without a replacement —
+   the owner's kill switch for a suspected leak.
+5. **Append-only audit.** Every rotate/revoke appends a fingerprint-only record (date,
+   action, actor, old → new fingerprints) to a per-store ledger the owner can read in the
+   wizard — the same record shape a ceremony files (§9.5), produced automatically.
+
+### 13.3 Session integrity underneath the wizard
+
+The wizard is only as trustworthy as the login in front of it:
+
+- **Server-side logout revocation.** Logging out denylists the session token at the
+  server (hash, TTL = remaining token lifetime). A cached copy of the session — browser
+  storage, history, a shared machine — dies with the logout instead of surviving to its
+  natural expiry.
+- **Click-time token passing.** Authenticated surfaces receive the session token at
+  interaction time and hold it in memory; it is scrubbed from URLs and never persisted by
+  the receiving page.
+
+### 13.4 Why this is the product, not a feature
+
+A SaaS contract asks the customer to trust the vendor's custody of credentials and a
+document's promise about it. This model inverts custody: the platform operates the key
+*system* — mint, rotation, revocation, audit — while the customer holds the key *value*.
+The operator cannot leak what it never held; the owner cannot be locked out of what only
+they possess. Peer teams extend the same property to their agents: agents act under
+scoped, revocable mandates and never hold the owner's key (§9.1's non-custodial rule,
+applied to the customer's own automation).
