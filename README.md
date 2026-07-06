@@ -9,6 +9,7 @@ Ship your CRM as an installable **PWA** and **native app** (iOS · Android · de
 [PIM Sync](https://apps.shopify.com/pim-sync)
 [Shopify Checklist](https://shopify-checklist.pages.dev/)
 [Strategy] (https://miro.com/app/board/uXjVHDMJNpA=/?share_link_id=653901982235)
+[Accessibility & Machine-Index Spec](FEATURE-SPEC-ACCESSIBILITY-INDEX.md)
 
 ---
 
