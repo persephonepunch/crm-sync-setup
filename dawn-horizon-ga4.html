@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dawn → Horizon — Agentic Cart Functions Guideline &amp; Checklist</title>
+<meta name="description" content="Dawn → Horizon migration guideline: agentic cart Functions, plus why GraphQL + GA4 Consent-Mode-v2 signals fuse into one consent-gated, agent-addressable data plane — and why compliance & permissions enforcement is a revenue/trust benefit.">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/dawn-horizon-ga4.html">
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="Dawn → Horizon + GraphQL/GA4 — one seismic migration">
+<meta property="og:description" content="Move Dawn → Horizon with agentic cart Functions. Why REST→GraphQL + GA4 Consent-Mode-v2 signals fuse into one consent-gated, agent-addressable data plane — and why compliance & permissions enforcement is a revenue, trust & reputation benefit.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/dawn-horizon-ga4.html">
+<meta property="og:image" content="https://crm-sync.dev/brand/crm-sync/logos/og-dawn-horizon-ga4.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CRM Sync — Dawn → Horizon + GraphQL/GA4, one seismic migration">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dawn → Horizon + GraphQL/GA4 — one seismic migration">
+<meta name="twitter:description" content="REST→GraphQL + GA4 Consent-Mode-v2 fuse into one consent-gated, agent-addressable data plane. Compliance & permissions = revenue, trust, reputation.">
+<meta name="twitter:image" content="https://crm-sync.dev/brand/crm-sync/logos/og-dawn-horizon-ga4.png">
+<style>
+  :root{
+    --ink:#0a0a0a; --paper:#ffffff;
+    --g1:#f4f4f4; --g2:#e6e6e6; --g3:#cfcfcf; --g4:#9a9a9a; --g5:#5c5c5c;
+    --rule:#111;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+  body{margin:0; background:var(--paper); color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:920px; margin:0 auto; padding:56px 40px 96px}
+  header{border-bottom:2px solid var(--rule); padding-bottom:20px; margin-bottom:32px}
+  .kicker{font:600 11px/1 "Roboto Mono",ui-monospace,Menlo,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--g5)}
+  h1{font-size:29px; line-height:1.15; margin:14px 0 8px; font-weight:800; letter-spacing:-.4px}
+  .sub{color:var(--g5); font-size:15px; max-width:64ch}
+  .meta{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font:600 11px/1 "Roboto Mono",monospace; letter-spacing:.08em; color:var(--g5)}
+  .meta b{color:var(--ink)}
+  h2{font-size:12px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; margin:44px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--g3)}
+  h3{font-size:15px; margin:22px 0 4px; font-weight:700}
+  p{margin:8px 0}
+  .lede{font-size:16px}
+  .callout{border-left:3px solid var(--ink); padding:14px 18px; background:var(--g1); margin:14px 0; font-size:14px}
+  .callout.warn{border-left-style:double; border-left-width:6px}
+  table{width:100%; border-collapse:collapse; margin:10px 0 4px; font-size:13.5px}
+  caption{caption-side:top; text-align:left; color:var(--g5); font-size:12px; margin-bottom:8px}
+  th,td{text-align:left; vertical-align:top; padding:11px 13px; border-bottom:1px solid var(--g2)}
+  thead th{border-bottom:2px solid var(--rule); font-size:11px; letter-spacing:.1em; text-transform:uppercase}
+  tbody th{font-weight:600; width:26%}
+  .mono{font-family:"Roboto Mono",ui-monospace,Menlo,monospace; font-size:12.5px}
+  .dim{color:var(--g5)}
+  ol.rules{counter-reset:r; list-style:none; padding:0; margin:8px 0}
+  ol.rules li{position:relative; padding:10px 0 10px 46px; border-bottom:1px solid var(--g2)}
+  ol.rules li::before{counter-increment:r; content:counter(r,decimal-leading-zero); position:absolute; left:0; top:10px;
+    font:700 12px/1 "Roboto Mono",monospace; color:var(--paper); background:var(--ink); padding:5px 7px; border-radius:2px}
+  ol.rules b{font-weight:700}
+  .flow{font:12.5px/1.7 "Roboto Mono",monospace; margin:10px 0}
+  .flow .row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .flow .box{padding:5px 10px; border:1px solid var(--g3); background:var(--g1)}
+  .flow .box.k{border:2px solid var(--ink); font-weight:700; background:var(--g2)}
+  .flow .ar{color:var(--g4)}
+  /* checklist */
+  .cl{margin:6px 0 2px}
+  .cl-group{font:700 12px/1 "Roboto Mono",monospace; letter-spacing:.12em; text-transform:uppercase; margin:22px 0 8px; color:var(--ink)}
+  .cl-item{display:flex; gap:12px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--g2)}
+  .box-cb{flex:0 0 auto; width:16px; height:16px; border:2px solid var(--ink); margin-top:2px}
+  .cl-item .txt{font-size:14px}
+  .cl-item .txt .t{font-weight:600}
+  .cl-item .txt .d{color:var(--g5); font-size:12.5px; margin-top:2px}
+  .pill{display:inline-block; font:600 10px/1 "Roboto Mono",monospace; letter-spacing:.08em; text-transform:uppercase;
+    border:1px solid var(--g4); color:var(--g5); padding:3px 6px; border-radius:2px; margin-left:8px; vertical-align:middle}
+  .pill.hard{border-color:var(--ink); color:var(--paper); background:var(--ink)}
+  .cta{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin:26px 0 0; padding:22px 24px; border:2px solid var(--ink)}
+  .cta .t{font-weight:700; font-size:16px}
+  .cta .d{color:var(--g5); font-size:13px; margin-top:2px}
+  .btns{display:flex; gap:10px; flex-wrap:wrap}
+  a.btn{display:inline-block; text-decoration:none; color:var(--paper); background:var(--ink); padding:11px 18px; font:600 13px/1 -apple-system,sans-serif; border:2px solid var(--ink)}
+  a.btn:hover{background:var(--paper); color:var(--ink)}
+  a.btn.ghost{color:var(--ink); background:var(--paper)}
+  a.btn.ghost:hover{color:var(--paper); background:var(--ink)}
+  footer{margin-top:52px; padding-top:16px; border-top:1px solid var(--g3); color:var(--g4); font-size:12px; display:flex; justify-content:space-between}
+  @media (max-width:680px){ .wrap{padding:32px 20px} .cta{flex-direction:column; align-items:flex-start} tbody th{width:auto} }
+  @media print{ .wrap{padding:0} .cta,table,.callout,.cl-item{break-inside:avoid} h2{break-after:avoid} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Migration Guideline · Storefront</div>
+    <h1>Dawn → Horizon: Agentic Cart Functions</h1>
+    <p class="sub">Move the legacy Dawn storefront (business logic in client JS + Script Editor) to Horizon's thin, blocks-native presentation — with cart, pricing, and checkout logic re-homed to server-side Shopify Functions and the Tool Runner, driveable by an agent under an AP2 mandate.</p>
+    <div class="meta">
+      <span>Pillar <b>1 + 8</b> · Forward-Deploy Backlog</span>
+      <span>Stack: <b>Orthogonal</b> (Xano / JWE / Tool Runner)</span>
+      <span>API pin: <b>2026-04</b></span>
+    </div>
+  </header>
+
+  <div class="callout warn">
+    <b>Immovable clock.</b> Shopify <b>Script Editor</b> is removed as of <b>2026-06-30</b>. Any reorder/hide-payment, shipping, or line-item-discount Script still live means that checkout logic has <b>silently stopped</b>. Pillar 1 (checkout-touching) and Pillar 8 (all Scripts → Functions) are the urgent thread — do these before the broader theme rebuild.
+  </div>
+
+  <div class="kicker" style="margin-top:44px">Point of Difference</div>
+  <h2 style="margin-top:8px; border-top:none; padding-top:0">GraphQL + GA4 Signals — one seismic move, not two chores</h2>
+  <p class="lede">Enterprises are forced through two migrations they treat as unrelated: <strong>REST → GraphQL</strong> (2026 sunset) and <strong>GA4 Consent Mode v2 signals</strong> (four signals — <span class="mono">ad_storage</span>, <span class="mono">analytics_storage</span>, <span class="mono">ad_user_data</span>, <span class="mono">ad_personalization</span> — mandatory in the EEA). The seismic recognition: they are the <em>same</em> migration to one thing — a <strong>consent-gated, agent-addressable data plane</strong>.</p>
+  <table>
+    <caption>Neither migration delivers the agent-ready plane alone; the value is the fusion.</caption>
+    <thead><tr><th>Move</th><th>Delivers</th><th>Missing alone</th></tr></thead>
+    <tbody>
+      <tr><th>REST → GraphQL</th><td>Typed, bulk, server-resolved data — machine-addressable, no REST rot</td><td>Reach without permission — the agent can query but not know what it may do</td></tr>
+      <tr><th>GA4 Consent Mode v2</th><td>Consent as a first-class signal on every event</td><td>Permission without reach — data still un-queryable at scale</td></tr>
+      <tr><th><b>Fused</b></th><td><b>Every datum machine-addressable AND consent-qualified</b> — exactly what autonomous AI workflows need</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>The fusion is only safe on the trust foundation this stack already carries:</p>
+  <table>
+    <thead><tr><th>Foundation</th><th>What it guarantees for AI workflows</th></tr></thead>
+    <tbody>
+      <tr><th>Orthogonal Trust</th><td>Consent ⊥ access — the axes compose without coupling; the agent carries <b>zero trust</b></td></tr>
+      <tr><th>Hexagonal Trust</th><td>GraphQL plane behind ports; every consumer (agent, GA4, ESB, CDP, storefront) crosses <b>one consent-enforcing port</b></td></tr>
+      <tr><th>Loop Engineering</th><td>The agent's query loop <b>re-checks consent every iteration, fail-closed</b> — trust re-earned per loop, never inherited</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>Enterprise unlock:</b> AI workflows that are <b>powerful</b> (reach all the data) and <b>safe</b> (consent lineage for GDPR Art. 28 / CPRA, re-verified per loop) — most stacks force that trade-off; the fused plane removes it. It <b>coexists with your ESB / CDP</b> — the GraphQL loop feeds Adobe AEP and the ESB, it doesn't replace them.</div>
+
+  <div class="kicker" style="margin-top:44px">Compliance &amp; Permissions</div>
+  <h2 style="margin-top:8px; border-top:none; padding-top:0">Enforcement is a benefit — revenue, trust, reputation</h2>
+  <p class="lede">Compliance and permissions are not a cost center or a checkbox. Enforced at the data plane — fail-closed, per-loop — they <strong>protect revenue, compound trust, and defend reputation</strong>. Lead with the benefit; the mechanism is only how it is guaranteed.</p>
+  <table>
+    <caption>Read the benefit first (column 1); the capability and enforcement are the proof.</caption>
+    <thead><tr><th>Benefit</th><th>Capability</th><th>Enforcement</th></tr></thead>
+    <tbody>
+      <tr><th>Ad ROAS preserved</th><td>Consent Mode v2 signals keep measurement + remarketing <em>legal</em> — lost consent = lost signal = wasted spend</td><td>4 signals required, fail-closed before analytics fire</td></tr>
+      <tr><th>Promotions run legally</th><td>Omnibus 30-day prior-lowest price — discount in the EU without fines or "fake sale" penalties</td><td>price-history ledger, read-gated</td></tr>
+      <tr><th>Market access retained</th><td>Data rights (opt-out, export, delete) — the price of selling in the EU / California at all</td><td>wired to live endpoints, fail-closed</td></tr>
+      <tr><th>Safe delegation → new revenue</th><td>Scoped, revocable per-tenant tokens + capability permissions — sell to teams and agencies without exposure</td><td>data-plane; revoke = instant 401</td></tr>
+      <tr><th>Agentic revenue, no rogue-agent risk</th><td>AP2 mandate + agent permissions — unlock autonomous purchase safely</td><td>per-loop re-check, fail-closed</td></tr>
+      <tr><th>Enterprise deals unlocked</th><td>PII-free audit trail — provable governance is what enterprise procurement requires before it can buy</td><td>audit by construction</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>The reframe:</b> permissions enforcement converts compliance from risk and cost into <b>revenue enablement and a trust asset</b>. The governance is the reason the data is <b>safe to open</b> — which is the core offer: accessibility, made safe by construction.</div>
+
+  <h2>1 · Why Horizon fits the Orthogonal Stack</h2>
+  <p class="lede">Horizon is <strong>blocks-first</strong>: a <span class="mono">blocks/</span> directory, nested blocks via <span class="mono">{% content_for 'blocks' %}</span>, per-component <span class="mono">{% stylesheet %}</span>/<span class="mono">{% javascript %}</span>, no framework runtime. That posture — <em>thin presentation, logic pushed out</em> — is the native Shopify endpoint for the stack, not a fight against it.</p>
+  <table>
+    <caption>Each row is Dawn coupling absorbed by one orthogonal layer.</caption>
+    <thead><tr><th>Dawn coupling (what breaks)</th><th>Orthogonal layer that absorbs it</th></tr></thead>
+    <tbody>
+      <tr><th>Business rules in section <span class="mono">&lt;script&gt;</span> / Script Editor</th><td>Execution → <b>Tool Runner</b> (worker) + Shopify <b>Functions</b></td></tr>
+      <tr><th>Cart / price math recomputed in browser</th><td>Data plane → <b>server-resolved</b> (cart-transform / draft order)</td></tr>
+      <tr><th>Product data hardcoded in Liquid</th><td>Source of truth → hydrate from <b>Xano PIM</b> via GraphQL</td></tr>
+      <tr><th>Auth &amp; gating in theme JS</th><td>Identity → <b>JWE claim</b>, derived server-side, never in Liquid</td></tr>
+      <tr><th>Brand look re-built per surface</th><td>Look → <b>Design Sync</b> theme.css keys Horizon + all surfaces</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2 · Agentic Cart Functions — Guideline</h2>
+  <p>Two audiences hit the same cart: a <strong>human</strong> on the Horizon storefront and an <strong>agent</strong> acting under a mandate. The rule is that <em>both cross the same server-side boundary</em> — no logic path exists only in the browser.</p>
+
+  <h3>2.1 · Script → Function replacement map</h3>
+  <table>
+    <thead><tr><th>Legacy Script (removed 2026-06-30)</th><th>Shopify Function</th><th>Runs at</th></tr></thead>
+    <tbody>
+      <tr><th>Reorder / hide payment methods</th><td class="mono">payment_customization</td><td>checkout</td></tr>
+      <tr><th>Reorder / hide / rename shipping</th><td class="mono">delivery_customization</td><td>checkout</td></tr>
+      <tr><th>Line-item / order discount</th><td class="mono">product_discount / order_discount</td><td>cart + checkout</td></tr>
+      <tr><th>Bundle / merge / expand lines</th><td class="mono">cart_transform</td><td>cart</td></tr>
+      <tr><th>Block invalid carts</th><td class="mono">cart_checkout_validation</td><td>cart + checkout</td></tr>
+    </tbody>
+  </table>
+  <p class="dim" style="font-size:13px">Functions are Wasm, run server-side on Shopify's infra, and are <b>deterministic + input-bounded</b> — which is exactly why an agent can be allowed to trigger them: the merchant's rules hold regardless of who or what filled the cart.</p>
+
+  <h3>2.2 · The agentic cart path</h3>
+  <div class="flow">
+    <div class="row"><span class="box k">JWE claim</span><span class="ar">→</span><span class="box">AP2 mandate (consent-to-purchase)</span><span class="ar">→</span><span class="box k">Tool Runner</span></div>
+    <div class="row" style="margin-top:6px"><span class="ar">→</span><span class="box mono">add_to_cart</span><span class="ar">→</span><span class="box mono">cart_transform + discount</span><span class="ar">→</span><span class="box mono">agentic_checkout</span><span class="ar">→</span><span class="box k">Functions enforce</span></div>
+  </div>
+  <p>The agent never asserts price, discount, or identity. It calls a <em>tool</em>; the tool decrypts the JWE claim, checks caps at the data plane, and submits a cart. Merchant Functions then apply pricing, payment, and shipping rules on the server — the same rules a human would hit. The <strong>AP2 mandate</strong> is the user's scoped, revocable authorization for the agent to transact, re-checked on each loop (fail-closed).</p>
+
+  <h3>2.3 · Rules</h3>
+  <ol class="rules">
+    <li><b>No money math in the browser.</b> Price, tax, discount, and shipping totals are server-resolved (Function or draft order). Liquid renders the resolved number; it never computes it.</li>
+    <li><b>One cart boundary for human and agent.</b> The Tool Runner's <span class="mono">add_to_cart</span>/<span class="mono">checkout</span> tools hit the same Cart/Checkout as the storefront — never a private, unguarded path.</li>
+    <li><b>Agent authority = mandate, not session.</b> Authorization comes from the decrypted AP2 mandate + caps, re-verified every tool call. A prior grant is never inherited across the loop.</li>
+    <li><b>Deterministic rules live in Functions.</b> Anything that must hold for every cart (discounts, payment/shipping gating, bundle logic) is a Wasm Function — not worker code, not theme JS.</li>
+    <li><b>Orchestration lives in the Tool Runner.</b> Multi-step, stateful, or cross-system logic (PIM lookup, consent, settlement rail choice) is a worker tool — not a Function (Functions are input-bounded and side-effect-free).</li>
+    <li><b>Catalog from PIM, not Liquid.</b> PDP/collection hydrate from Xano via GraphQL; no product data hardcoded in templates.</li>
+    <li><b>Consent gates the cart, not just analytics.</b> The AP2 mandate + Consent Mode v2 signals must be present before an agent transacts; absent consent = fail-closed.</li>
+    <li><b>Present as Horizon blocks.</b> Cart, upsell, and PDP UI are theme blocks with per-component CSS/JS — thin presentation over the server-resolved state, themed by Design Sync tokens.</li>
+  </ol>
+
+  <h2>3 · Migration Checklist</h2>
+  <p class="dim" style="font-size:13px">Work top-to-bottom. Groups A–B are the hard-dated urgent thread; C–F are the Q3 spine.</p>
+
+  <div class="cl-group">A · Step-0 Audit <span class="pill hard">Do first</span></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Inventory Script Editor scripts</span><div class="d">Every payment / shipping / discount Script → one checklist row in group B.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Grep theme for inline <span class="mono">&lt;script&gt;</span> business logic</span><div class="d">Cart math, gating, price recompute, eligibility rules living in section/asset JS.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Find REST calls &amp; hardcoded catalog data</span><div class="d">Mark each for GraphQL + PIM hydration (group E).</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">List per-locale theme forks</span><div class="d">Route to edge-translate instead of forked templates.</div></div></div>
+
+  <div class="cl-group">B · Scripts → Functions <span class="pill hard">2026-06-30</span></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Payment Script → <span class="mono">payment_customization</span></span><div class="d">Reorder / hide / rename methods, moved server-side.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Shipping Script → <span class="mono">delivery_customization</span></span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Discount Script → <span class="mono">product_discount</span> / <span class="mono">order_discount</span></span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Bundle / merge logic → <span class="mono">cart_transform</span></span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Cart guards → <span class="mono">cart_checkout_validation</span></span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Deploy Functions + confirm active on live checkout</span><div class="d">Verify each merchant rule fires with a real test cart, not just unit input.</div></div></div>
+
+  <div class="cl-group">C · Agentic cart wiring</div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Tool Runner <span class="mono">add_to_cart</span> / <span class="mono">checkout</span> hit the same Cart API</span><div class="d">No private agent-only cart path.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">AP2 mandate created + scoped + revocable</span><div class="d"><span class="mono">create_mandate</span> → consent-to-purchase, bound to the JWE actor.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Caps re-checked every tool call (fail-closed)</span><div class="d">Loop Engineering: trust re-earned per iteration, never inherited.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Redact tokens/mandates from tool-call logs</span></div></div>
+
+  <div class="cl-group">D · Horizon theme rebuild</div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Rebuild sections as Horizon blocks</span><div class="d"><span class="mono">blocks/</span> + <span class="mono">content_for 'blocks'</span>; per-component <span class="mono">{% stylesheet %}</span>/<span class="mono">{% javascript %}</span>.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Presentation is thin — no business logic in blocks</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Wire Design Sync <span class="mono">theme.css</span> / tokens into the theme</span><div class="d">One primary color keys the surface; UIkit BEM overlay for semantic/AEO structure.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Validate all Liquid</span><div class="d"><span class="mono">validate_theme</span> — strip hallucinated syntax before deploy.</div></div></div>
+
+  <div class="cl-group">E · Data &amp; identity spine <span class="pill">Q3 2026</span></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Hydrate PDP / collection from Xano PIM via GraphQL</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Edge-cache inventory/price reads (<span class="mono">search_products</span>)</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">GID + portable UUID on every funnel entity</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Server-side consent events keyed by UUID (CPRA / CMv2)</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">EU Omnibus 30-day prior-lowest price ledger</span></div></div>
+
+  <div class="cl-group">F · Security &amp; verify</div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Managed install + token exchange (no pasted custom-app token)</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Secrets in worker only; key-rotation cadence live</span></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">E2E: human checkout + agent checkout both pass the same Functions</span><div class="d">Same discounts, same payment/shipping gating, same totals.</div></div></div>
+  <div class="cl-item"><span class="box-cb"></span><div class="txt"><span class="t">Pin API <span class="mono">2026-04</span>; CI bump + version watch</span></div></div>
+
+  <div class="cta">
+    <div>
+      <div class="t">Theme this in Brand Studio</div>
+      <div class="d">One primary color + tokens key the Horizon theme and every other surface.</div>
+    </div>
+    <div class="btns">
+      <a class="btn" href="https://crm-sync.webflow.io/#brand-studio=crm-sync">Open Brand Studio →</a>
+      <a class="btn ghost" href="https://crm-sync.webflow.io/product">View Product →</a>
+    </div>
+  </div>
+
+  <footer>
+    <span>CRM Sync · Forward-Deploy · Pillars 1 &amp; 8</span>
+    <span>Monochrome · print / PDF ready</span>
+  </footer>
+
+</div>
+</body>
+</html>

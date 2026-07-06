@@ -10,6 +10,7 @@ Ship your CRM as an installable **PWA** and **native app** (iOS · Android · de
 [Shopify Checklist](https://shopify-checklist.pages.dev/)
 [Strategy] (https://miro.com/app/board/uXjVHDMJNpA=/?share_link_id=653901982235)
 [Accessibility & Machine-Index Spec](FEATURE-SPEC-ACCESSIBILITY-INDEX.md)
+[Dawn → Horizon + GraphQL/GA4 Brief](dawn-horizon-ga4.html)
 
 ---
 
