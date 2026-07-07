@@ -1,0 +1,102 @@
+{%- comment -%}
+============================================================================
+  CRM Sync · UIkit responsive navbar for design-sync.myshopify.com
+  Renders the Shopify Menu (linklists) as a UIkit navbar with an offcanvas
+  drawer on mobile. Monochrome + cyan accent, Roboto / Roboto Mono.
+
+  PASTE IN TWO PLACES — the loader goes in the <head> (the "helmet"),
+  the markup goes in the body:
+
+  1) HEAD  → Online Store → Themes → Edit code → theme.liquid, inside <head>
+             (or Theme settings → Custom Code → Head).  Everything in
+             PART 1 below (fonts + UIkit CSS + deferred UIkit JS + theme CSS).
+
+  2) BODY  → where the nav should render — a section, a Custom Liquid block
+             at the top of the layout, or theme.liquid right after <body>.
+             Everything in PART 2 below.
+
+  Menu handle: change 'main-menu' if your Shopify navigation uses another
+  handle (Shopify admin → Content → Menus).
+============================================================================
+{%- endcomment -%}
+
+{%- comment -%} ==================== PART 1 · HEAD (helmet) ====================
+  LAYER 2 · Look  = fonts + UIkit CSS + the theme override below.
+  LAYER 1 · Behavior = the Higher-Order Stack loader (stack-loader.js): it
+    brings GA4 (Tier A, Consent-Mode-v2, pulled from the Config app — NOT
+    hardcoded) + UIkit JS (Tier B, via data-use). The Brand Designer loads
+    the SAME file with data-use="uikit,petite-vue,gsap".
+  The GA4 measurement ID is read from the worker Config (per-shop KV); the
+  Measurement Protocol secret stays server-side under the Key Ceremony.
+{%- endcomment -%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.6/dist/css/uikit.min.css">
+<script
+  src="https://persephonepunch.github.io/crm-sync-setup/stack-loader.js"
+  data-use="uikit"
+  data-config="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/config?shop={{ shop.permanent_domain }}"></script>
+<style>
+  /* theme override — scoped to .dsx-nav / #dsx-offcanvas so it can't clobber the theme */
+  .dsx-nav{--cyan:#06b6d4}
+  .dsx-nav .uk-navbar-container{background:#fff;border-bottom:1px solid #e6e6e6;font-family:"Roboto",-apple-system,system-ui,sans-serif}
+  .dsx-nav .uk-logo{display:flex;align-items:center;gap:10px;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;
+    font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#0a0a0a;font-size:16px}
+  .dsx-nav .uk-logo .mark{width:26px;height:26px;border:1.5px solid #0a0a0a;background:#cfe9f4;
+    display:inline-flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.02em}
+  .dsx-nav .uk-navbar-nav>li>a{font-family:"Roboto",sans-serif;font-size:15px;letter-spacing:0;
+    text-transform:none;color:#5c5c5c;min-height:64px;padding:0 14px;border-bottom:2px solid transparent}
+  .dsx-nav .uk-navbar-nav>li>a:hover,.dsx-nav .uk-navbar-nav>li.uk-active>a{color:#0a0a0a;border-bottom-color:var(--cyan)}
+  .dsx-nav .dsx-login{color:#5c5c5c;font-size:15px;padding:0 12px}
+  .dsx-nav .dsx-login:hover{color:#0a0a0a}
+  .dsx-cta{background:#0a0a0a;color:#fff;border:1.5px solid #0a0a0a;border-radius:2px;font-family:"Roboto",sans-serif;
+    font-weight:600;text-transform:none;font-size:14px;line-height:34px;padding:0 16px}
+  .dsx-cta:hover{background:#fff;color:#0a0a0a}
+  .dsx-nav .uk-navbar-toggle{color:#0a0a0a;padding:0 4px}
+  /* offcanvas drawer — light theme to match the site */
+  #dsx-offcanvas .uk-offcanvas-bar{background:#fff;color:#0a0a0a;border-left:1.5px solid #0a0a0a;font-family:"Roboto",sans-serif}
+  #dsx-offcanvas .uk-nav-header{color:#5c5c5c;font-family:"Roboto Mono",monospace;letter-spacing:.2em;font-size:11px}
+  #dsx-offcanvas .uk-nav-default>li>a{color:#0a0a0a;font-size:16px;padding:14px 0;border-bottom:1px solid #e6e6e6}
+  #dsx-offcanvas .uk-nav-default>li>a:hover{color:var(--cyan)}
+  #dsx-offcanvas .uk-nav-default>li.uk-active>a{color:#0a0a0a}
+  #dsx-offcanvas .uk-offcanvas-close{color:#0a0a0a}
+  #dsx-offcanvas .dsx-cta{display:block;text-align:center;margin-top:16px;line-height:44px}
+</style>
+
+{%- comment -%} ==================== PART 2 · BODY (markup) ==================== {%- endcomment -%}
+<div class="dsx-nav">
+  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
+    <div class="uk-navbar-left">
+      <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}">
+        <span class="mark">CRM</span> {{ shop.name | default: 'CRM Sync' }}
+      </a>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav uk-visible@m">
+        {%- for link in linklists['main-menu'].links -%}
+          <li{% if link.active %} class="uk-active"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endfor -%}
+        <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();window.crmDocsModal.open(0);}">Docs</a></li>
+      </ul>
+      <a class="dsx-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a class="uk-button dsx-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
+      <a class="uk-navbar-toggle uk-hidden@m" href="#dsx-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
+    </div>
+  </nav>
+
+  <div id="dsx-offcanvas" uk-offcanvas="overlay: true; flip: true">
+    <div class="uk-offcanvas-bar">
+      <button class="uk-offcanvas-close" type="button" uk-close aria-label="Close menu"></button>
+      <ul class="uk-nav uk-nav-default">
+        <li class="uk-nav-header">Menu</li>
+        {%- for link in linklists['main-menu'].links -%}
+          <li{% if link.active %} class="uk-active"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endfor -%}
+        <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();UIkit.offcanvas('#dsx-offcanvas').hide();window.crmDocsModal.open(0);}">Docs</a></li>
+        <li><a href="{{ routes.account_login_url }}">Log in</a></li>
+        <li><a class="uk-button dsx-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
