@@ -88,8 +88,10 @@
 
 {%- comment -%} ==================== PART 2 · BODY (markup) ==================== {%- endcomment -%}
 <div class="crm-nav">
-  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left"
+  <nav class="uk-navbar-container uk-navbar-transparent"
        role="navigation" aria-label="Primary" data-crm-region="primary-nav">
+   <div class="uk-container uk-container-xlarge">
+    <div uk-navbar="align: left">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}">
         <span class="mark">CRM</span> {{ shop.name | default: 'CRM Sync' }}
@@ -111,6 +113,8 @@
       <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
       <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>
+    </div>
+   </div>
   </nav>
 
   <div id="crm-nav-offcanvas" uk-offcanvas="overlay: true; flip: true">
@@ -146,8 +150,10 @@
 ============================================================================ {%- endcomment -%}
 {%- comment -%}  --- uncomment to switch to the Webflow-collection source ---
 <div class="crm-nav" v-scope="Nav()" @mounted="load">
-  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left"
+  <nav class="uk-navbar-container uk-navbar-transparent"
        role="navigation" aria-label="Primary" data-crm-region="primary-nav">
+   <div class="uk-container uk-container-xlarge">
+    <div uk-navbar="align: left">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}"><span class="mark">CRM</span> {{ shop.name }}</a>
     </div>
@@ -165,6 +171,8 @@
       <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
       <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>
+    </div>
+   </div>
   </nav>
   <div id="crm-nav-offcanvas" uk-offcanvas="overlay: true; flip: true">
     <div class="uk-offcanvas-bar">
