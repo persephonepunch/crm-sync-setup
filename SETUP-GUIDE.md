@@ -1211,7 +1211,7 @@ Run `scripts/verify-entitlement.sh` with the admin key to exercise the whole sta
 
 ## Pricing Tiers & Upgrade Exceptions
 
-### Shared Plan ($69/mo) — Stakeholder B
+### Shared Plan ($90 one-time download, from $69) — Stakeholder B
 Multi-tenant. You use the hosted CRM Sync worker. API keys are entered via the Webflow extension Config tab and stored in the shared worker's KV (isolated per shop). The Plan tab shows your current plan and active features. Custom Worker Setup is locked.
 
 Billing is via Shopify App Billing — charges appear on your Shopify invoice.
