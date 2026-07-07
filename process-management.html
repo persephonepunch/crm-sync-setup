@@ -1,51 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Process Management Guide — Webflow · Xano · Cloudflare · Shopify</title>
-  <meta name="description" content="Public process management guide for a multi-platform commerce stack, with the June 3 2026 Shopify outage and June 4 Klaviyo failure as case studies." />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css" />
-  <style>
-    body { margin: 0; background: #fff; }
-    .markdown-body {
-      box-sizing: border-box;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 32px 24px 80px;
-    }
-    .bar {
-      max-width: 900px; margin: 0 auto; padding: 12px 24px;
-      font: 13px/1.5 -apple-system, system-ui, sans-serif; color: #57606a;
-      border-bottom: 1px solid #d0d7de;
-    }
-    .bar a { color: #0969da; text-decoration: none; }
-    @media (max-width: 767px) { .markdown-body { padding: 16px; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Process Management Guide — Webflow · Xano · Cloudflare · Shopify</title>
+<meta name="description" content="Process management guide for a multi-platform commerce stack: platform roles, the data-layer split, event-driven automation, and the outage runbook — with the June 3 2026 Shopify outage and June 4 Klaviyo failure as case studies.">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/process-management.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="Process Management Guide — multi-platform outage resilience">
+<meta property="og:description" content="Shopify is a channel, not your database. Roles, the data-layer split, event-driven automation, and the outage runbook.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/process-management.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./doc.css">
 </head>
-<body>
-  <div class="bar">
-    <a href="./">← Docs index</a> ·
-    <a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md">View source on GitHub</a> ·
-    <a href="./PROCESS-MANAGEMENT-DATA-LAYER.md">Raw markdown</a>
+<body
+  data-md="./PROCESS-MANAGEMENT-DATA-LAYER.md"
+  data-kicker="Process · Platform Engineering"
+  data-sub="When you operate across independent platforms, the most dangerous move is letting one of them be both your **source of truth** and your **runtime dependency**. The June 3 2026 global Shopify outage — and Klaviyo's failure the next day — are the case studies. This defines the role each platform plays, how data flows between them, and the runbook that keeps you running when a platform you don't control goes dark."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md"
+  data-pdf="./process-management.pdf">
+  <div class="wrap">
+    <header id="hero" class="hero"><span class="doc-status">Loading…</span></header>
+    <article id="doc" class="doc"></article>
   </div>
-  <article id="content" class="markdown-body">Loading…</article>
-
+  <footer class="docfoot">
+    <span>CRM Sync · Webflow · Xano · Cloudflare · Shopify</span>
+    <span>Monochrome · print / PDF ready</span>
+  </footer>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-  <script>
-    fetch('./PROCESS-MANAGEMENT-DATA-LAYER.md', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function (md) {
-        marked.setOptions({ gfm: true, breaks: false });
-        document.getElementById('content').innerHTML = marked.parse(md);
-        document.title = (document.querySelector('#content h1') || {}).textContent || document.title;
-      })
-      .catch(function (e) {
-        document.getElementById('content').innerHTML =
-          '<p>Could not load the guide (' + e.message + '). ' +
-          'Read it <a href="./PROCESS-MANAGEMENT-DATA-LAYER.md">as raw markdown</a> or ' +
-          '<a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md">on GitHub</a>.</p>';
-      });
-  </script>
+  <script src="./doc.js"></script>
 </body>
 </html>
