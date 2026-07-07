@@ -54,18 +54,22 @@
   /* theme override — scoped to .crm-nav / #crm-nav-offcanvas so it can't clobber the theme */
   .crm-nav{--cyan:#06b6d4}
   .crm-nav .uk-navbar-container{background:#fff;border-bottom:1px solid #e6e6e6;font-family:"Roboto",-apple-system,system-ui,sans-serif}
-  .crm-nav .uk-logo{display:flex;align-items:center;gap:10px;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;
-    font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#0a0a0a;font-size:16px}
-  .crm-nav .uk-logo .mark{width:26px;height:26px;border:1.5px solid #0a0a0a;background:#cfe9f4;
-    display:inline-flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.02em}
-  .crm-nav .uk-navbar-nav>li>a{font-family:"Roboto",sans-serif;font-size:15px;letter-spacing:0;
-    text-transform:none;color:#5c5c5c;min-height:64px;padding:0 14px;border-bottom:2px solid transparent}
+  .crm-nav .uk-navbar-nav{flex-wrap:nowrap}
+  /* utils cluster right-justified; the CTA may wrap to a second row when tight */
+  .crm-nav .uk-navbar-right{flex-wrap:wrap;justify-content:flex-end;align-items:center;row-gap:6px;gap:2px}
+  .crm-nav .uk-navbar-center .uk-navbar-nav{justify-content:center}
+  .crm-nav .uk-logo{display:flex;align-items:center;gap:8px;white-space:nowrap;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;
+    font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#0a0a0a;font-size:14px}
+  .crm-nav .uk-logo .mark{width:22px;height:22px;border:1.5px solid #0a0a0a;background:#cfe9f4;
+    display:inline-flex;align-items:center;justify-content:center;font-size:8px;letter-spacing:.02em}
+  .crm-nav .uk-navbar-nav>li>a{font-family:"Roboto",sans-serif;font-size:13.5px;letter-spacing:0;
+    text-transform:none;color:#5c5c5c;min-height:56px;padding:0 9px;border-bottom:2px solid transparent}
   .crm-nav .uk-navbar-nav>li>a:hover,.crm-nav .uk-navbar-nav>li.uk-active>a{color:#0a0a0a;border-bottom-color:var(--cyan)}
-  .crm-nav .crm-nav-login{color:#5c5c5c;font-size:15px;padding:0 12px}
+  .crm-nav .crm-nav-login{color:#5c5c5c;font-size:13.5px;padding:0 8px}
   .crm-nav .crm-nav-login:hover{color:#0a0a0a}
-  .crm-nav .crm-nav-search{color:#0a0a0a;padding:0 10px}
+  .crm-nav .crm-nav-search{color:#0a0a0a;padding:0 7px}
   .crm-nav .crm-nav-search:hover{color:var(--cyan)}
-  .crm-nav .crm-nav-cart{position:relative;color:#0a0a0a;padding:0 10px}
+  .crm-nav .crm-nav-cart{position:relative;color:#0a0a0a;padding:0 7px}
   .crm-nav .crm-nav-cart:hover{color:var(--cyan)}
   .crm-nav .crm-nav-cart-count{position:absolute;top:12px;right:0;min-width:16px;height:16px;
     display:inline-flex;align-items:center;justify-content:center;background:var(--cyan);color:#fff;
@@ -73,7 +77,7 @@
   .crm-nav .crm-nav-cart-count[hidden]{display:none}
   #crm-nav-offcanvas .crm-nav-cart{color:#0a0a0a}
   .crm-nav-cta{background:#0a0a0a;color:#fff;border:1.5px solid #0a0a0a;border-radius:2px;font-family:"Roboto",sans-serif;
-    font-weight:600;text-transform:none;font-size:14px;line-height:34px;padding:0 16px}
+    font-weight:600;text-transform:none;font-size:13px;line-height:30px;padding:0 12px}
   .crm-nav-cta:hover{background:#fff;color:#0a0a0a}
   .crm-nav .uk-navbar-toggle{color:#0a0a0a;padding:0 4px}
   /* offcanvas drawer — light theme to match the site */
@@ -83,7 +87,9 @@
   #crm-nav-offcanvas .uk-nav-default>li>a:hover{color:var(--cyan)}
   #crm-nav-offcanvas .uk-nav-default>li.uk-active>a{color:#0a0a0a}
   #crm-nav-offcanvas .uk-offcanvas-close{color:#0a0a0a}
-  #crm-nav-offcanvas .crm-nav-cta{display:block;text-align:center;margin-top:16px;line-height:44px}
+  #crm-nav-offcanvas .uk-nav-default>li>a.crm-nav-cta{display:block;text-align:center;margin-top:16px;
+    line-height:44px;background:#0a0a0a;color:#fff}
+  #crm-nav-offcanvas .uk-nav-default>li>a.crm-nav-cta:hover{background:#0a0a0a;color:#fff}
 </style>
 
 {%- comment -%} ==================== PART 2 · BODY (markup) ==================== {%- endcomment -%}
@@ -97,13 +103,15 @@
         <span class="mark">CRM</span> {{ shop.name | default: 'CRM Sync' }}
       </a>
     </div>
-    <div class="uk-navbar-right">
-      <ul class="uk-navbar-nav uk-visible@m">
+    <div class="uk-navbar-center uk-visible@m">
+      <ul class="uk-navbar-nav">
         {%- for link in linklists['main-menu'].links -%}
           <li{% if link.active %} class="uk-active"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
         {%- endfor -%}
         <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();window.crmDocsModal.open(0);}">Docs</a></li>
       </ul>
+    </div>
+    <div class="uk-navbar-right">
       <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search" role="search" data-crm-role="search"><span uk-icon="icon: search"></span></a>
       <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart" data-crm-role="cart">
         <span uk-icon="icon: cart"></span>
