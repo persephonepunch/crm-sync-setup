@@ -78,7 +78,7 @@ Collection field slugs (what the sync reads): `title`, `url`, `active`, `locale`
 | `/nav?shop=&menu=&locale=` | GET | public | named menu (`main`/`footer`), localized ✅ |
 | `/nav?shop=&menu=&locale=` | POST | admin/tenant | write a menu (Webflow sync / config app) ✅ |
 | `/flow/campaign` | POST | admin/tenant | Shopify Flow action → GA4 Smart Bidding (consent-gated, revenue-weighted) ✅ |
-| `/categories?shop=&locale=` | GET/POST | public / admin | Tags as Category Collection ⏳ |
+| `/categories?shop=&locale=&kind=` | GET/POST | public / admin | Tags as Category Collection ✅ (kind filter; mirrors /nav) |
 
 `menu` resolution: `nav_menus[menu].i18n[locale]` → `[lang]` → `.items`. Each
 locale is a separately-editable instance (English + globalized variants).
