@@ -100,3 +100,75 @@
     </div>
   </div>
 </div>
+
+{%- comment -%} ============================================================================
+  PART 2b · ALT MENU SOURCE — Webflow → Shopify Nav Collection (embed code)
+
+  Use this INSTEAD of the linklists markup above when the menu is authored in a
+  Webflow CMS "Nav" collection and synced Webflow → Shopify. The items are
+  fetched as JSON from the worker and bound reactively with petite-vue (Tier B
+  of the Higher-Order Stack) into the SAME UIkit navbar — so the look/behavior
+  is identical; only the data source changes. UIkit auto-inits the rendered
+  markup; the Docs modal / Log in / CTA are unchanged.
+
+  Worker feed shape (GET, per-shop):
+    { "items": [ { "title": "Difference", "url": "/pages/difference", "active": false }, … ] }
+============================================================================ {%- endcomment -%}
+{%- comment -%}  --- uncomment to switch to the Webflow-collection source ---
+<div class="dsx-nav" v-scope="Nav()" @mounted="load">
+  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
+    <div class="uk-navbar-left">
+      <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}"><span class="mark">CRM</span> {{ shop.name }}</a>
+    </div>
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav uk-visible@m">
+        <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
+        <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
+      </ul>
+      <a class="dsx-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a class="uk-button dsx-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
+      <a class="uk-navbar-toggle uk-hidden@m" href="#dsx-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
+    </div>
+  </nav>
+  <div id="dsx-offcanvas" uk-offcanvas="overlay: true; flip: true">
+    <div class="uk-offcanvas-bar">
+      <button class="uk-offcanvas-close" type="button" uk-close></button>
+      <ul class="uk-nav uk-nav-default">
+        <li class="uk-nav-header">Menu</li>
+        <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
+        <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
+        <li><a href="{{ routes.account_login_url }}">Log in</a></li>
+        <li><a class="uk-button dsx-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  // bind the Webflow→Shopify nav collection with petite-vue from the Higher-Order Stack
+  CRMStack.use('petite-vue').then(function (PetiteVue) {
+    PetiteVue.createApp({
+      Nav: function () {
+        return {
+          items: [],
+          load: function () {
+            // locale-aware: each language's nav is a separate, remotely-editable
+            // instance of the Webflow→Shopify Nav Collection (English + globalized
+            // variants), keyed by the storefront locale. Pairs with UIkit i18n for
+            // the toggle/aria strings (UIkit.mixin({i18n:{…}}, 'navbar')).
+            var loc = '{{ request.locale.iso_code | default: localization.language.iso_code }}';
+            var url = 'https://cf-worker-crm-sync.yoonsunlee150.workers.dev/nav'
+                    + '?shop={{ shop.permanent_domain }}&locale=' + encodeURIComponent(loc);
+            var self = this;
+            fetch(url).then(function (r) { return r.json(); })
+              .then(function (d) { self.items = (d && d.items) || []; })
+              .catch(function () {});
+          },
+          openDocs: function () {
+            if (window.crmDocsModal) { try { UIkit.offcanvas('#dsx-offcanvas').hide(); } catch (e) {} window.crmDocsModal.open(0); }
+          }
+        };
+      }
+    }).mount('.dsx-nav');
+  });
+</script>
+--- end Webflow-collection source --- {%- endcomment -%}
