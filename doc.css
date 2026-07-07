@@ -8,7 +8,7 @@
 :root{
   --ink:#0a0a0a; --paper:#ffffff;
   --g1:#f4f4f4; --g2:#e6e6e6; --g3:#cfcfcf; --g4:#9a9a9a; --g5:#5c5c5c; --g6:#3a3a3a;
-  --grid:#ececec; --rule:#111; --link:#0a0a0a;
+  --grid:#eeeeee; --rule:#111; --link:#0a0a0a;
   --sans:"Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:"Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
 }
@@ -19,7 +19,7 @@ body{
   background-image:
     linear-gradient(to right, var(--grid) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-  background-size:40px 40px;
+  background-size:28px 28px;
   font:400 15px/1.6 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
 }
 
