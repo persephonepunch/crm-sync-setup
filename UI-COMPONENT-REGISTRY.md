@@ -16,10 +16,17 @@ the storefront never re-pastes code. (Layer 4 of the Higher-Order Stack.)
 
 | Bundle | Loads | Endpoint (worker) | Placement |
 |---|---|---|---|
-| **Stack** (Layer 1) | GA4 (Consent-Mode-v2) + UIkit/GSAP/petite-vue per-need | `/embed/stack-loader.js` ⏳ (interim: Pages) | **helmet** (`<head>`) |
-| **CRM** | `<crm-login>`, `<crm-cart>`, `<crm-search>`, docs modal | `/embed/crm-elements.js` ⏳ | footer, `defer` |
-| **PIM** | product/catalog components | `/embed/pim-elements.js` ⏳ | per-page, `defer` |
+| **Stack** (Layer 1) | GA4 (Consent-Mode-v2, id from `/stack/config`) + UIkit/GSAP/petite-vue per-need | `/embed/stack-loader.js` ✅ | **helmet** (`<head>`) |
+| **CRM** | `<crm-brand-studio>`, `<crm-brand>`, `<crm-sync>` (event bus) | `/embed/crm-elements.js` ✅ | `defer` |
+| **PIM** | `<pim-*>` + `crmPim.resolve()` GID⇄Webflow⇄Xano | `/embed/pim-elements.js` ✅ | `defer` |
 | **Design** | brand theme / tokens (Layer 2 look) | `/brand/<slug>/theme.css` ✅ | helmet |
+| **Docs modal** | `window.crmDocsModal` (docs utility) | Pages `docs-nav.js` (data-modal-only) | `defer` |
+
+Bundles are **served from the worker**, so an update ships with `wrangler deploy`
+— the storefront never re-pastes code. The Stack loader is `window.crmStack`
+(`data-stack="uikit"`, `data-worker`, `data-shop`; GA4 pulled from `/stack/config`
+per-shop, MP secret server-side). The Brand Designer loads the SAME loader with
+`data-stack="uikit,petite-vue,gsap"`.
 
 **Placement rule:** the **Nav loads in the helmet** (head — no FOUC, paints first).
 The **Footer loads deferred** (`defer`) at end of body and carries the Shopify /

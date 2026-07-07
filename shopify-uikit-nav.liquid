@@ -33,11 +33,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.6/dist/css/uikit.min.css">
-<script
-  src="https://persephonepunch.github.io/crm-sync-setup/stack-loader.js"
-  data-use="uikit"
-  data-config="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/stack/config?shop={{ shop.permanent_domain }}"></script>
-<!-- Docs modal only (this nav owns the menu; docs-nav just provides window.crmDocsModal) -->
+<!-- Higher-Order Stack loader — served FROM THE WORKER (updates ship with a deploy).
+     window.crmStack: Consent-Mode-v2 (GA4 id pulled from /stack/config per-shop),
+     event bus, UIkit JS via data-stack. Same loader the Brand Designer uses. -->
+<script defer
+  src="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/embed/stack-loader.js"
+  data-stack="uikit"
+  data-worker="https://cf-worker-crm-sync.yoonsunlee150.workers.dev"
+  data-shop="{{ shop.permanent_domain }}"></script>
+<!-- CRM + PIM component bundles (worker-served, per-need). CRM registers <crm-*>;
+     PIM registers <pim-*> + GID⇄Webflow⇄Xano resolve. -->
+<script defer src="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/embed/crm-elements.js"></script>
+<script defer src="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/embed/pim-elements.js"></script>
+<!-- Docs modal (window.crmDocsModal) — docs utility hosted with the docs content. -->
 <script defer
   src="https://persephonepunch.github.io/crm-sync-setup/docs-nav.js"
   data-modal-only
@@ -174,31 +182,25 @@
   </div>
 </div>
 <script>
-  // bind the Webflow→Shopify nav collection with petite-vue from the Higher-Order Stack
-  CRMStack.use('petite-vue').then(function (PetiteVue) {
-    PetiteVue.createApp({
-      Nav: function () {
-        return {
-          items: [],
-          load: function () {
-            // locale-aware: each language's nav is a separate, remotely-editable
-            // instance of the Webflow→Shopify Nav Collection (English + globalized
-            // variants), keyed by the storefront locale. Pairs with UIkit i18n for
-            // the toggle/aria strings (UIkit.mixin({i18n:{…}}, 'navbar')).
-            var loc = '{{ request.locale.iso_code | default: localization.language.iso_code }}';
-            var url = 'https://cf-worker-crm-sync.yoonsunlee150.workers.dev/nav'
-                    + '?shop={{ shop.permanent_domain }}&locale=' + encodeURIComponent(loc);
-            var self = this;
-            fetch(url).then(function (r) { return r.json(); })
-              .then(function (d) { self.items = (d && d.items) || []; })
-              .catch(function () {});
-          },
-          openDocs: function () {
-            if (window.crmDocsModal) { try { UIkit.offcanvas('#crm-nav-offcanvas').hide(); } catch (e) {} window.crmDocsModal.open(0); }
-          }
-        };
+  // The worker stack-loader auto-loads petite-vue (it detects [v-scope]) and mounts it.
+  // Expose Nav() globally so v-scope="Nav()" resolves. Locale-aware: each language's
+  // nav is a separate, remotely-editable instance of the Webflow→Shopify Nav Collection
+  // (menu=main), keyed by the storefront locale. Pairs with UIkit i18n for aria strings.
+  window.Nav = function () {
+    return {
+      items: [],
+      load: function () {
+        var loc = '{{ request.locale.iso_code | default: localization.language.iso_code }}';
+        var self = this;
+        fetch('https://cf-worker-crm-sync.yoonsunlee150.workers.dev/nav?shop={{ shop.permanent_domain }}&menu=main&locale=' + encodeURIComponent(loc))
+          .then(function (r) { return r.json(); })
+          .then(function (d) { self.items = (d && d.items) || []; })
+          .catch(function () {});
+      },
+      openDocs: function () {
+        if (window.crmDocsModal) { try { UIkit.offcanvas('#crm-nav-offcanvas').hide(); } catch (e) {} window.crmDocsModal.open(0); }
       }
-    }).mount('.crm-nav');
-  });
+    };
+  };
 </script>
 --- end Webflow-collection source --- {%- endcomment -%}
