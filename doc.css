@@ -49,7 +49,7 @@ body{
   margin:22px 0 0; max-width:19ch; color:var(--ink);
 }
 .hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the thin headline */
-.hero .sub{color:var(--g5); font-size:17px; line-height:1.6; margin:22px 0 0; max-width:72ch}
+.hero .sub{color:var(--ink); font-size:17px; line-height:1.6; margin:22px 0 0; max-width:72ch}
 .hero .sub strong,.hero .sub b{color:var(--ink); font-weight:700}
 .hero .meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:22px;
   font:600 11px/1 var(--mono); letter-spacing:.08em; color:var(--g5)}
@@ -72,7 +72,7 @@ body{
 .doc li::marker{color:var(--g4)}
 .doc hr{border:none; border-top:1px solid var(--g2); margin:36px 0}
 .doc blockquote{margin:16px 0; padding:14px 20px; border-left:3px solid var(--ink);
-  background:var(--g1); color:var(--g6); font-size:15px}
+  background:var(--g1); color:var(--ink); font-size:15px}
 .doc blockquote p{margin:5px 0; max-width:none}
 
 /* code */
