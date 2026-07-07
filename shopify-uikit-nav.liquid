@@ -38,34 +38,34 @@
   data-use="uikit"
   data-config="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/stack/config?shop={{ shop.permanent_domain }}"></script>
 <style>
-  /* theme override — scoped to .dsx-nav / #dsx-offcanvas so it can't clobber the theme */
-  .dsx-nav{--cyan:#06b6d4}
-  .dsx-nav .uk-navbar-container{background:#fff;border-bottom:1px solid #e6e6e6;font-family:"Roboto",-apple-system,system-ui,sans-serif}
-  .dsx-nav .uk-logo{display:flex;align-items:center;gap:10px;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;
+  /* theme override — scoped to .crm-nav / #crm-nav-offcanvas so it can't clobber the theme */
+  .crm-nav{--cyan:#06b6d4}
+  .crm-nav .uk-navbar-container{background:#fff;border-bottom:1px solid #e6e6e6;font-family:"Roboto",-apple-system,system-ui,sans-serif}
+  .crm-nav .uk-logo{display:flex;align-items:center;gap:10px;font-family:"Roboto Mono",ui-monospace,Menlo,monospace;
     font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#0a0a0a;font-size:16px}
-  .dsx-nav .uk-logo .mark{width:26px;height:26px;border:1.5px solid #0a0a0a;background:#cfe9f4;
+  .crm-nav .uk-logo .mark{width:26px;height:26px;border:1.5px solid #0a0a0a;background:#cfe9f4;
     display:inline-flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.02em}
-  .dsx-nav .uk-navbar-nav>li>a{font-family:"Roboto",sans-serif;font-size:15px;letter-spacing:0;
+  .crm-nav .uk-navbar-nav>li>a{font-family:"Roboto",sans-serif;font-size:15px;letter-spacing:0;
     text-transform:none;color:#5c5c5c;min-height:64px;padding:0 14px;border-bottom:2px solid transparent}
-  .dsx-nav .uk-navbar-nav>li>a:hover,.dsx-nav .uk-navbar-nav>li.uk-active>a{color:#0a0a0a;border-bottom-color:var(--cyan)}
-  .dsx-nav .dsx-login{color:#5c5c5c;font-size:15px;padding:0 12px}
-  .dsx-nav .dsx-login:hover{color:#0a0a0a}
-  .dsx-cta{background:#0a0a0a;color:#fff;border:1.5px solid #0a0a0a;border-radius:2px;font-family:"Roboto",sans-serif;
+  .crm-nav .uk-navbar-nav>li>a:hover,.crm-nav .uk-navbar-nav>li.uk-active>a{color:#0a0a0a;border-bottom-color:var(--cyan)}
+  .crm-nav .crm-nav-login{color:#5c5c5c;font-size:15px;padding:0 12px}
+  .crm-nav .crm-nav-login:hover{color:#0a0a0a}
+  .crm-nav-cta{background:#0a0a0a;color:#fff;border:1.5px solid #0a0a0a;border-radius:2px;font-family:"Roboto",sans-serif;
     font-weight:600;text-transform:none;font-size:14px;line-height:34px;padding:0 16px}
-  .dsx-cta:hover{background:#fff;color:#0a0a0a}
-  .dsx-nav .uk-navbar-toggle{color:#0a0a0a;padding:0 4px}
+  .crm-nav-cta:hover{background:#fff;color:#0a0a0a}
+  .crm-nav .uk-navbar-toggle{color:#0a0a0a;padding:0 4px}
   /* offcanvas drawer — light theme to match the site */
-  #dsx-offcanvas .uk-offcanvas-bar{background:#fff;color:#0a0a0a;border-left:1.5px solid #0a0a0a;font-family:"Roboto",sans-serif}
-  #dsx-offcanvas .uk-nav-header{color:#5c5c5c;font-family:"Roboto Mono",monospace;letter-spacing:.2em;font-size:11px}
-  #dsx-offcanvas .uk-nav-default>li>a{color:#0a0a0a;font-size:16px;padding:14px 0;border-bottom:1px solid #e6e6e6}
-  #dsx-offcanvas .uk-nav-default>li>a:hover{color:var(--cyan)}
-  #dsx-offcanvas .uk-nav-default>li.uk-active>a{color:#0a0a0a}
-  #dsx-offcanvas .uk-offcanvas-close{color:#0a0a0a}
-  #dsx-offcanvas .dsx-cta{display:block;text-align:center;margin-top:16px;line-height:44px}
+  #crm-nav-offcanvas .uk-offcanvas-bar{background:#fff;color:#0a0a0a;border-left:1.5px solid #0a0a0a;font-family:"Roboto",sans-serif}
+  #crm-nav-offcanvas .uk-nav-header{color:#5c5c5c;font-family:"Roboto Mono",monospace;letter-spacing:.2em;font-size:11px}
+  #crm-nav-offcanvas .uk-nav-default>li>a{color:#0a0a0a;font-size:16px;padding:14px 0;border-bottom:1px solid #e6e6e6}
+  #crm-nav-offcanvas .uk-nav-default>li>a:hover{color:var(--cyan)}
+  #crm-nav-offcanvas .uk-nav-default>li.uk-active>a{color:#0a0a0a}
+  #crm-nav-offcanvas .uk-offcanvas-close{color:#0a0a0a}
+  #crm-nav-offcanvas .crm-nav-cta{display:block;text-align:center;margin-top:16px;line-height:44px}
 </style>
 
 {%- comment -%} ==================== PART 2 · BODY (markup) ==================== {%- endcomment -%}
-<div class="dsx-nav">
+<div class="crm-nav">
   <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}">
@@ -79,13 +79,13 @@
         {%- endfor -%}
         <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();window.crmDocsModal.open(0);}">Docs</a></li>
       </ul>
-      <a class="dsx-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
-      <a class="uk-button dsx-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
-      <a class="uk-navbar-toggle uk-hidden@m" href="#dsx-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
+      <a class="crm-nav-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
+      <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>
   </nav>
 
-  <div id="dsx-offcanvas" uk-offcanvas="overlay: true; flip: true">
+  <div id="crm-nav-offcanvas" uk-offcanvas="overlay: true; flip: true">
     <div class="uk-offcanvas-bar">
       <button class="uk-offcanvas-close" type="button" uk-close aria-label="Close menu"></button>
       <ul class="uk-nav uk-nav-default">
@@ -93,9 +93,9 @@
         {%- for link in linklists['main-menu'].links -%}
           <li{% if link.active %} class="uk-active"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
         {%- endfor -%}
-        <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();UIkit.offcanvas('#dsx-offcanvas').hide();window.crmDocsModal.open(0);}">Docs</a></li>
+        <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();UIkit.offcanvas('#crm-nav-offcanvas').hide();window.crmDocsModal.open(0);}">Docs</a></li>
         <li><a href="{{ routes.account_login_url }}">Log in</a></li>
-        <li><a class="uk-button dsx-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
+        <li><a class="uk-button crm-nav-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
       </ul>
     </div>
   </div>
@@ -115,7 +115,7 @@
     { "items": [ { "title": "Difference", "url": "/pages/difference", "active": false }, … ] }
 ============================================================================ {%- endcomment -%}
 {%- comment -%}  --- uncomment to switch to the Webflow-collection source ---
-<div class="dsx-nav" v-scope="Nav()" @mounted="load">
+<div class="crm-nav" v-scope="Nav()" @mounted="load">
   <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}"><span class="mark">CRM</span> {{ shop.name }}</a>
@@ -125,12 +125,12 @@
         <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
         <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
       </ul>
-      <a class="dsx-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
-      <a class="uk-button dsx-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
-      <a class="uk-navbar-toggle uk-hidden@m" href="#dsx-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
+      <a class="crm-nav-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
+      <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>
   </nav>
-  <div id="dsx-offcanvas" uk-offcanvas="overlay: true; flip: true">
+  <div id="crm-nav-offcanvas" uk-offcanvas="overlay: true; flip: true">
     <div class="uk-offcanvas-bar">
       <button class="uk-offcanvas-close" type="button" uk-close></button>
       <ul class="uk-nav uk-nav-default">
@@ -138,7 +138,7 @@
         <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
         <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
         <li><a href="{{ routes.account_login_url }}">Log in</a></li>
-        <li><a class="uk-button dsx-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
+        <li><a class="uk-button crm-nav-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
       </ul>
     </div>
   </div>
@@ -164,11 +164,11 @@
               .catch(function () {});
           },
           openDocs: function () {
-            if (window.crmDocsModal) { try { UIkit.offcanvas('#dsx-offcanvas').hide(); } catch (e) {} window.crmDocsModal.open(0); }
+            if (window.crmDocsModal) { try { UIkit.offcanvas('#crm-nav-offcanvas').hide(); } catch (e) {} window.crmDocsModal.open(0); }
           }
         };
       }
-    }).mount('.dsx-nav');
+    }).mount('.crm-nav');
   });
 </script>
 --- end Webflow-collection source --- {%- endcomment -%}
