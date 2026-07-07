@@ -80,7 +80,8 @@
 
 {%- comment -%} ==================== PART 2 · BODY (markup) ==================== {%- endcomment -%}
 <div class="crm-nav">
-  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
+  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left"
+       role="navigation" aria-label="Primary" data-crm-region="primary-nav">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}">
         <span class="mark">CRM</span> {{ shop.name | default: 'CRM Sync' }}
@@ -93,12 +94,12 @@
         {%- endfor -%}
         <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();window.crmDocsModal.open(0);}">Docs</a></li>
       </ul>
-      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search"><span uk-icon="icon: search"></span></a>
-      <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart">
+      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search" role="search" data-crm-role="search"><span uk-icon="icon: search"></span></a>
+      <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart" data-crm-role="cart">
         <span uk-icon="icon: cart"></span>
         <span class="crm-nav-cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
       </a>
-      <a id="crm-nav-login" class="crm-nav-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a id="crm-nav-login" class="crm-nav-login uk-visible@m" data-crm-role="login" href="{{ routes.account_login_url }}">Log in</a>
       <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
       <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>
@@ -137,7 +138,8 @@
 ============================================================================ {%- endcomment -%}
 {%- comment -%}  --- uncomment to switch to the Webflow-collection source ---
 <div class="crm-nav" v-scope="Nav()" @mounted="load">
-  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left">
+  <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar="align: left"
+       role="navigation" aria-label="Primary" data-crm-region="primary-nav">
     <div class="uk-navbar-left">
       <a class="uk-navbar-item uk-logo" href="{{ routes.root_url }}"><span class="mark">CRM</span> {{ shop.name }}</a>
     </div>
@@ -146,12 +148,12 @@
         <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
         <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
       </ul>
-      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search"><span uk-icon="icon: search"></span></a>
-      <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart">
+      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search" role="search" data-crm-role="search"><span uk-icon="icon: search"></span></a>
+      <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart" data-crm-role="cart">
         <span uk-icon="icon: cart"></span>
         <span class="crm-nav-cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
       </a>
-      <a id="crm-nav-login" class="crm-nav-login uk-visible@m" href="{{ routes.account_login_url }}">Log in</a>
+      <a id="crm-nav-login" class="crm-nav-login uk-visible@m" data-crm-role="login" href="{{ routes.account_login_url }}">Log in</a>
       <a class="uk-button crm-nav-cta uk-visible@m uk-margin-small-left" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a>
       <a class="uk-navbar-toggle uk-hidden@m" href="#crm-nav-offcanvas" uk-toggle uk-navbar-toggle-icon aria-label="Open menu"></a>
     </div>

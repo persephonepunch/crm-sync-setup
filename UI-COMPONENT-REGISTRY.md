@@ -154,3 +154,31 @@ Rules (from the ORM discipline in `PROCESS-MANAGEMENT-DATA-LAYER.md`):
 This makes every entity **agent-addressable and consent-qualified** end to end:
 an AI agent resolves a Shopify GID → Xano row → Webflow item (and back) through
 one worker socket, under caps + consent, per loop.
+
+---
+
+## 8. Semantic wrapper — machine legibility (AEO + a11y)
+
+The **UIkit / semantic wrapper** is what makes every `#crm-` id machine-legible.
+Because `uk-*` is BEM-namespaced (conflict-free by construction) it supplies the
+semantic skeleton that utility CSS can't; on top of it we attach a **role +
+attribute pattern keyed to the id** so screen readers *and* answer engines parse
+the same structure.
+
+Pattern per addressable element:
+
+| Layer | Carries | Example (`#crm-nav-cart`) |
+|---|---|---|
+| **id** | the address | `id="crm-nav-cart"` |
+| **ARIA role / label** | a11y semantics (WCAG) | `aria-label="Cart"` |
+| **`data-crm-role`** | machine role for AEO / agents | `data-crm-role="cart"` |
+| **`data-crm-region`** | landmark on the wrapper | `<nav … data-crm-region="primary-nav">` |
+| **UIkit BEM class** | component structure | `.uk-navbar-item` |
+
+Applied on the nav today: `data-crm-region="primary-nav"` on the `<nav>` landmark;
+`data-crm-role="search|cart|login"` on the controls (+ native `role`/`aria-label`).
+Same pattern extends to footer, category chips, and every `<crm-*>` component —
+one wrapper, three readers (browser, screen reader, answer engine / agent).
+
+Scores against the a11y (WCAG) + machine-index (AEO) harness — the wrapper is how
+we keep both high without hand-tuning each surface.
