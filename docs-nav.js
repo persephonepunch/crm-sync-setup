@@ -17,6 +17,10 @@
      data-docs-base  base URL the modal iframes load from
                      (default: the folder this script is served from)
      data-breakpoint px width at/below which the nav collapses     (default 720)
+     data-modal-only present ⇒ ONLY provide the docs modal; inject no nav items,
+                     no hamburger, no drawer, and never touch the theme nav. Use
+                     this when the UIkit nav embed already owns the nav and just
+                     needs window.crmDocsModal for its "Docs" link.
 
    Exposes window.crmDocsModal.open(fileOrIndex) / .close().
    ========================================================================== */
@@ -30,6 +34,9 @@
   var CTA_SEL   = D.cta || '.cta';
   var LOGIN_URL = D.loginUrl || '/account/login';
   var BP        = parseInt(D.breakpoint || '720', 10);
+  // modal-only: provide window.crmDocsModal but DON'T inject nav items / hamburger.
+  // Use this when the UIkit nav embed already owns the nav (Docs link calls the modal).
+  var MODAL_ONLY = D.modalOnly !== undefined && D.modalOnly !== 'false';
 
   var TABS = [
     { label: 'Setup',       file: 'setup-guide.html' },
@@ -68,11 +75,15 @@
   'border:1px solid #0a0a0a;background:#fff;color:#0a0a0a;cursor:pointer;border-radius:2px}' +
   '.crm-docs-x:hover{background:#0a0a0a;color:#fff}' +
   '.crm-docs-frame{flex:1 1 auto;width:100%;border:0;background:#fff}' +
-  /* nav items injected inline */
+  /* modal goes fullscreen on small screens (applies in modal-only mode too) */
+  '@media (max-width:' + BP + 'px){.crm-docs-ov{padding:0}.crm-docs-panel{width:100vw;height:100vh;border:0}}';
+
+  // nav CSS (burger + drawer + the theme-nav-hiding media query) — only when this
+  // script owns the nav. In modal-only mode we never touch the theme's nav.
+  var navCss = '' +
   '.crm-docs-burger{display:none;align-items:center;justify-content:center;width:42px;height:38px;' +
   'border:1.5px solid #0a0a0a;background:#fff;color:#0a0a0a;cursor:pointer;border-radius:2px;margin-left:8px}' +
   '.crm-docs-burger:hover{background:#0a0a0a;color:#fff}' +
-  /* mobile drawer */
   '.crm-docs-drawer{position:fixed;top:0;right:0;bottom:0;z-index:2147482000;width:min(320px,86vw);' +
   'background:#fff;color:#0a0a0a;border-left:1.5px solid #0a0a0a;transform:translateX(100%);' +
   'transition:transform .22s ease;display:flex;flex-direction:column;padding:18px 20px;gap:2px;' +
@@ -96,9 +107,8 @@
   '  ' + CTA_SEL + '{display:none!important}' +
   '  .crm-docs-burger{display:inline-flex}' +
   '  .crm-docs-navitem-inline{display:none!important}' +
-  '  .crm-docs-ov{padding:0}' +
-  '  .crm-docs-panel{width:100vw;height:100vh;border:0}' +
   '}';
+  if (!MODAL_ONLY) css += navCss;
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* ---------- modal ----------------------------------------------------- */
@@ -152,6 +162,7 @@
     if (document.readyState !== 'loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);
   }
+  if (MODAL_ONLY) return;   // modal is built + exposed; skip all nav injection
   ready(function () {
     var nav = document.querySelector(NAV_SEL);
     var cta = document.querySelector(CTA_SEL);

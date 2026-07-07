@@ -37,6 +37,11 @@
   src="https://persephonepunch.github.io/crm-sync-setup/stack-loader.js"
   data-use="uikit"
   data-config="https://cf-worker-crm-sync.yoonsunlee150.workers.dev/stack/config?shop={{ shop.permanent_domain }}"></script>
+<!-- Docs modal only (this nav owns the menu; docs-nav just provides window.crmDocsModal) -->
+<script defer
+  src="https://persephonepunch.github.io/crm-sync-setup/docs-nav.js"
+  data-modal-only
+  data-docs-base="https://persephonepunch.github.io/crm-sync-setup/"></script>
 <style>
   /* theme override — scoped to .crm-nav / #crm-nav-offcanvas so it can't clobber the theme */
   .crm-nav{--cyan:#06b6d4}
