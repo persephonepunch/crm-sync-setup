@@ -55,6 +55,8 @@
   .crm-nav .uk-navbar-nav>li>a:hover,.crm-nav .uk-navbar-nav>li.uk-active>a{color:#0a0a0a;border-bottom-color:var(--cyan)}
   .crm-nav .crm-nav-login{color:#5c5c5c;font-size:15px;padding:0 12px}
   .crm-nav .crm-nav-login:hover{color:#0a0a0a}
+  .crm-nav .crm-nav-search{color:#0a0a0a;padding:0 10px}
+  .crm-nav .crm-nav-search:hover{color:var(--cyan)}
   .crm-nav .crm-nav-cart{position:relative;color:#0a0a0a;padding:0 10px}
   .crm-nav .crm-nav-cart:hover{color:var(--cyan)}
   .crm-nav .crm-nav-cart-count{position:absolute;top:12px;right:0;min-width:16px;height:16px;
@@ -91,6 +93,7 @@
         {%- endfor -%}
         <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();window.crmDocsModal.open(0);}">Docs</a></li>
       </ul>
+      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search"><span uk-icon="icon: search"></span></a>
       <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart">
         <span uk-icon="icon: cart"></span>
         <span class="crm-nav-cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
@@ -110,6 +113,7 @@
           <li{% if link.active %} class="uk-active"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
         {%- endfor -%}
         <li><a href="#docs" onclick="if(window.crmDocsModal){event.preventDefault();UIkit.offcanvas('#crm-nav-offcanvas').hide();window.crmDocsModal.open(0);}">Docs</a></li>
+        <li><a id="crm-nav-search-m" class="crm-nav-search" href="{{ routes.search_url }}"><span uk-icon="icon: search"></span> Search</a></li>
         <li><a id="crm-nav-cart-m" class="crm-nav-cart" href="{{ routes.cart_url }}"><span uk-icon="icon: cart"></span> Cart (<span data-cart-count>{{ cart.item_count }}</span>)</a></li>
         <li><a id="crm-nav-login-m" class="crm-nav-login" href="{{ routes.account_login_url }}">Log in</a></li>
         <li><a class="uk-button crm-nav-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
@@ -142,6 +146,7 @@
         <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
         <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
       </ul>
+      <a id="crm-nav-search" class="crm-nav-search uk-navbar-item uk-visible@m" href="{{ routes.search_url }}" aria-label="Search"><span uk-icon="icon: search"></span></a>
       <a id="crm-nav-cart" class="crm-nav-cart uk-navbar-item uk-visible@m" href="{{ routes.cart_url }}" aria-label="Cart">
         <span uk-icon="icon: cart"></span>
         <span class="crm-nav-cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
@@ -158,6 +163,7 @@
         <li class="uk-nav-header">Menu</li>
         <li v-for="i in items" :class="{ 'uk-active': i.active }"><a :href="i.url" v-text="i.title"></a></li>
         <li><a href="#docs" @click.prevent="openDocs">Docs</a></li>
+        <li><a id="crm-nav-search-m" class="crm-nav-search" href="{{ routes.search_url }}"><span uk-icon="icon: search"></span> Search</a></li>
         <li><a id="crm-nav-cart-m" class="crm-nav-cart" href="{{ routes.cart_url }}"><span uk-icon="icon: cart"></span> Cart (<span data-cart-count>{{ cart.item_count }}</span>)</a></li>
         <li><a id="crm-nav-login-m" class="crm-nav-login" href="{{ routes.account_login_url }}">Log in</a></li>
         <li><a class="uk-button crm-nav-cta" href="{{ routes.root_url }}pages/connect-a-segment">Connect a segment</a></li>
