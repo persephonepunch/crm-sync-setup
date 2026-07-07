@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM Sync — Home, sectioned for GSAP construction</title>
+<meta name="description" content="CRM Sync home page, decomposed into individual self-contained sections with GSAP ScrollTrigger reveals — copy any section block and reuse the init.">
+<style>
+  :root{
+    --ink:#0a0a0a; --paper:#ffffff;
+    --g1:#f6f6f6; --g2:#e6e6e6; --g3:#cfcfcf; --g4:#6b6b6b; --g5:#5c5c5c;
+    --grid:rgba(17,17,17,0.045);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"Roboto Mono",ui-monospace,Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;
+    background-image:
+      repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 44px),
+      repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 44px);}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.86);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--g2)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px;font:600 15px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;text-decoration:none}
+  .brand img{width:30px;height:30px;object-fit:contain;border:1.5px solid var(--ink)}
+  .navlinks{display:flex;gap:22px;font-size:14px}
+  .navlinks a{text-decoration:none;color:var(--g5)}
+  .navlinks a:hover{color:var(--ink)}
+  .cta{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--ink);padding:9px 15px;font:600 13px/1 var(--font);text-decoration:none;background:var(--ink);color:var(--paper)}
+  .cta:hover{background:var(--paper);color:var(--ink)}
+  .cta.ghost{background:var(--paper);color:var(--ink)}
+  .cta.ghost:hover{background:var(--ink);color:var(--paper)}
+
+  .hero{padding:60px 0 40px}
+  .eyebrow{font:600 12px/1.4 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--g4);margin-bottom:22px}
+  h1{font-size:clamp(38px,5.4vw,66px);font-weight:100;letter-spacing:-0.5px;line-height:1.03;margin-bottom:22px;max-width:16ch}
+  h1 b{font-weight:600}
+  .lede{font-size:19px;color:var(--g5);max-width:40rem;margin-bottom:22px}
+  .lede b{color:var(--ink);font-weight:600}
+  .answer{border-left:3px solid var(--ink);background:var(--g1);padding:16px 20px;max-width:44rem;font-size:15.5px;color:var(--ink);margin-bottom:26px}
+  .answer .k{display:block;font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--g4);margin-bottom:8px}
+  .herobtns{display:flex;gap:12px;flex-wrap:wrap}
+
+  .compare{border-top:1px solid var(--g2);border-bottom:1px solid var(--g2);background:var(--paper)}
+  .comparegrid{display:grid;grid-template-columns:repeat(3,1fr)}
+  .comparegrid > div{padding:22px 24px;border-right:1px solid var(--g2)}
+  .comparegrid > div:last-child{border-right:none}
+  .comparegrid .vs{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:8px}
+  .comparegrid p{font-size:15px;color:var(--ink)}
+  .comparegrid p b{font-weight:600}
+
+  section.band{padding:56px 0;border-top:1px solid var(--g2)}
+  .kicker{font:700 12px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--g5);margin-bottom:18px}
+  h2{font-size:clamp(24px,3vw,34px);font-weight:200;letter-spacing:-.3px;line-height:1.15;max-width:22ch;margin-bottom:14px}
+  h2 b{font-weight:600}
+  .band .body{font-size:16px;color:var(--g5);max-width:46rem}
+  .band .body b{color:var(--ink);font-weight:600}
+
+  .mission-q{font-size:clamp(22px,2.8vw,30px);font-weight:200;line-height:1.3;letter-spacing:-.2px;max-width:26ch;border-left:3px solid var(--ink);padding-left:22px;margin-bottom:22px}
+  .mission-q b{font-weight:600}
+
+  .pod{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--g2);border:1px solid var(--g2);margin-top:8px}
+  .pod .cell{background:var(--paper);padding:24px}
+  .pod .n{font:700 12px/1 var(--mono);color:var(--g4);margin-bottom:12px}
+  .pod h3{font-size:16px;font-weight:600;margin-bottom:8px;letter-spacing:-.2px}
+  .pod p{font-size:14px;color:var(--g5)}
+  .pod p b{color:var(--ink);font-weight:600}
+
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;border:2px solid var(--ink);margin-top:22px}
+  .flow .node{flex:1 1 180px;padding:20px 22px;border-right:1px solid var(--g2)}
+  .flow .node:last-child{border-right:none}
+  .flow .node.src{background:var(--ink);color:var(--paper)}
+  .flow .node .t{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;opacity:.85}
+  .flow .node .d{font-size:14px;line-height:1.45}
+  .flow .split{display:flex;flex:1.6 1 320px;flex-direction:column}
+  .flow .split .node{flex:1;border-right:none;border-bottom:1px solid var(--g2)}
+  .flow .split .node:last-child{border-bottom:none}
+
+  .buildwrap{border:2px solid var(--ink);padding:28px 30px;background:var(--paper);margin-top:8px}
+  .buildwrap h2{margin-bottom:12px}
+  .taillist{list-style:none;margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+  .taillist li{font-size:14px;color:var(--g5);padding-left:18px;position:relative}
+  .taillist li::before{content:"—";position:absolute;left:0;color:var(--ink)}
+
+  .cmp-wrap{overflow-x:auto;margin-top:20px;border:1px solid var(--g2)}
+  .cmp{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+  .cmp th,.cmp td{border:1px solid var(--g2);padding:13px 15px;text-align:left;vertical-align:middle}
+  .cmp thead th{font:600 11px/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--g5);text-align:center;background:var(--g1)}
+  .cmp thead th.rowhead{text-align:left;background:var(--paper)}
+  .cmp thead th.us{background:var(--ink);color:var(--paper)}
+  .cmp thead th.us span{display:block;font:400 10px/1.3 var(--font);letter-spacing:0;text-transform:none;color:var(--g3);margin-top:3px}
+  .cmp tbody th{font-weight:600;color:var(--ink)}
+  .cmp tbody td{text-align:center;color:var(--g4)}
+  .cmp tbody td.us{background:var(--g1);color:var(--ink)}
+  .cmp .yes{color:var(--ink);font-weight:700;font-size:15px}
+  .cmp .no{color:var(--g3)}
+
+  .final{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border:2px solid var(--ink);padding:28px 32px;margin:8px 0}
+  .final .t{font-size:22px;font-weight:200;letter-spacing:-.2px;max-width:24ch}
+  .final .t b{font-weight:600}
+
+  footer{border-top:1px solid var(--g2);padding:30px 0;color:var(--g4);font-size:13px}
+  footer a{color:var(--g5);text-decoration:none;margin-right:18px}
+  footer a:hover{color:var(--ink)}
+  .foot-note{font-size:11px;color:var(--g4);margin-top:10px;max-width:52rem}
+
+  @media (max-width:820px){
+    .comparegrid{grid-template-columns:1fr}
+    .comparegrid > div{border-right:none;border-bottom:1px solid var(--g2)}
+    .comparegrid > div:last-child{border-bottom:none}
+  }
+  @media (max-width:640px){
+    .cmp-wrap{overflow-x:visible;border:none;margin-top:16px}
+    .cmp{min-width:0;border-collapse:separate;border-spacing:0}
+    .cmp thead{display:none}
+    .cmp tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g2);border:1px solid var(--g2);margin-bottom:12px}
+    .cmp tbody th{grid-column:1 / -1;background:var(--paper);border:none;text-align:left;padding:13px 13px 9px;font-size:14px;line-height:1.35}
+    .cmp tbody td{background:var(--paper);border:none;text-align:left;display:flex;align-items:center;gap:9px;padding:11px 13px;font-size:13px;color:var(--ink)}
+    .cmp tbody td.us{background:var(--g1)}
+    .cmp tbody td::before{font:600 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--g4);min-width:62px}
+    .cmp tbody td:nth-of-type(1)::before{content:"CRM Sync";color:var(--ink)}
+    .cmp tbody td:nth-of-type(2)::before{content:"HubSpot"}
+    .cmp tbody td:nth-of-type(3)::before{content:"Attio"}
+    .cmp tbody td:nth-of-type(4)::before{content:"Klaviyo"}
+    .cmp .no{color:var(--g4)}
+  }
+
+  /* ── GSAP reveal scaffold ─────────────────────────────────────────────────
+     Each section is an independent [data-section]; children marked .reveal
+     animate in on scroll. Initial hidden state is gated behind body.anim so the
+     content still shows if GSAP fails to load (progressive enhancement). */
+  body.anim [data-section] .reveal{opacity:0;transform:translateY(20px)}
+  @media (prefers-reduced-motion: reduce){
+    body.anim [data-section] .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CRM Sync home — decomposed into INDIVIDUAL SECTIONS for GSAP construction.
+     Each block below is self-contained: copy one <section data-section="…">
+     into Webflow (Embed / Code) and the GSAP init at the bottom reveals every
+     .reveal child on scroll (stagger per section). Rebuild the init per section
+     if you split them across separate embeds.
+     ═════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ░░ SECTION: header/nav ░░ -->
+<header data-section="nav">
+  <div class="wrap nav">
+    <a class="brand" href="/"><img src="https://crm-sync.dev/brand/crm-sync/logos/crm-mark-1600.png" alt="">CRM&nbsp;Sync</a>
+    <nav class="navlinks">
+      <a href="#difference">Difference</a>
+      <a href="#segment">How it works</a>
+      <a href="#mission">Mission</a>
+      <a href="#build">Build vs buy</a>
+    </nav>
+    <a class="cta" href="#segment">Connect a segment</a>
+  </div>
+</header>
+
+<!-- ░░ SECTION 1: hero ░░ -->
+<section class="hero" data-section="hero">
+  <div class="wrap">
+    <div class="eyebrow reveal">The CRM your ads and AI agents can use — not just your team</div>
+    <h1 class="reveal">Turn your Shopify Customer Segments into <b>Google Smart Bidding</b> audiences — consented and real-time.</h1>
+    <p class="lede reveal">Your Shopify Email and Customer Segments are already free and GA4-linked. CRM Sync turns that <b>same segment</b> into a <b>tagged, consented, immediately-flagged conversion</b> for Google Smart Bidding — the part Klaviyo was never built for. One segment, two activations: email <b>and</b> ads.</p>
+    <div class="answer reveal">
+      <span class="k">In one line</span>
+      CRM Sync is a Shopify-native, consent-first alternative to Klaviyo that turns your existing Shopify Customer Segments into Google Smart Bidding audiences — tagged with consented identity, valued with real revenue, and flagged the moment a conversion happens.
+    </div>
+    <div class="herobtns reveal">
+      <a class="cta" href="#segment">Connect a segment → Smart Bidding</a>
+      <a class="cta ghost" href="#difference">See how it beats Klaviyo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SECTION 2: compare strip ░░ -->
+<div class="compare" id="difference" data-section="compare">
+  <div class="wrap" style="padding:0">
+    <div class="comparegrid">
+      <div class="reveal">
+        <div class="vs">vs HubSpot</div>
+        <p>HubSpot bolts AI onto the CRM you log into. <b>CRM Sync is the CRM an AI logs into.</b></p>
+      </div>
+      <div class="reveal">
+        <div class="vs">vs Attio</div>
+        <p>Attio is data-driven for your team. <b>CRM Sync is data-addressable for your agents.</b></p>
+      </div>
+      <div class="reveal">
+        <div class="vs">vs Klaviyo</div>
+        <p>Klaviyo emails the segment. <b>CRM Sync bids on it.</b></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ SECTION 3: the shift ░░ -->
+<section class="band" data-section="shift">
+  <div class="wrap">
+    <div class="kicker reveal">The funnel got repriced</div>
+    <h2 class="reveal">Marketing was built on the page view. The funnel now pays for the <b>consented login</b>.</h2>
+    <p class="body reveal">Consent Mode v2, the decay of third-party cookies, first-party identity — the last two years quietly moved the funnel's unit of value from the anonymous page view to the consented, logged-in identity. A page view <b>depreciates</b>: cookie-fragile, anonymous, disposable. A consented login <b>appreciates</b>: durable, addressable, worth money — and the only thing an AI agent or an AI answer engine can act on. Most marketing apps still pivot on the page view. We build on the login.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 4: one segment, two activations + flow ░░ -->
+<section class="band" id="segment" data-section="segment">
+  <div class="wrap">
+    <div class="kicker reveal">One segment, two activations</div>
+    <h2 class="reveal">The <b>same</b> Shopify segment drives your email and your Google Smart Bidding.</h2>
+    <p class="body reveal">Shopify Customer Segments are native, free, and GA4-linked. CRM Sync reads the <b>same segment live</b> (<code>customerSegmentMembers</code>), consent-gates it against Consent Mode v2, weights it by real revenue, and hands Google a <b>tagged, immediately-flagged conversion</b>. Klaviyo's segments are trapped in Klaviyo and never touch your Google bidding.</p>
+    <div class="flow">
+      <div class="node src reveal">
+        <div class="t">Source · Shopify</div>
+        <div class="d">Customer Segment<br>(native, free, GA4-linked)</div>
+      </div>
+      <div class="split">
+        <div class="node reveal">
+          <div class="t">Activation 1 · Shopify Email</div>
+          <div class="d">Sends to the segment — free, built in.</div>
+        </div>
+        <div class="node reveal">
+          <div class="t">Activation 2 · CRM Sync</div>
+          <div class="d">Consent gate → revenue value → Google Smart Bidding (Customer Match + conversion value).</div>
+        </div>
+      </div>
+      <div class="node reveal">
+        <div class="t">Result</div>
+        <div class="d">Smart Bidding on the <b>tagged, consented, immediately-flagged conversion</b> — the bid optimizes on truth, not a latent anonymous page view.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SECTION 5: mission ░░ -->
+<section class="band" id="mission" data-section="mission">
+  <div class="wrap">
+    <div class="kicker reveal">Mission</div>
+    <div class="mission-q reveal">Make the <b>consented login</b> the unit of value across commerce — measured, biddable, and agent-addressable — on the infrastructure a store already owns.</div>
+    <p class="body reveal">A consented login is a real person who said yes, signed in, and can be acted on — by your team, and by their agent. CRM Sync makes that consented identity fresh, portable, and usable at the moment of decision, so a store's own data drives its ads, its AI-answer visibility, and its agentic checkout — without a million-dollar CDP or a lock-in CRM.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 6: use what you already have ░░ -->
+<section class="band" data-section="use-what-you-have">
+  <div class="wrap">
+    <div class="kicker reveal">Use what you already have</div>
+    <h2 class="reveal">Shopify already ships a built-in <b>Email tool and a CRM</b> — Customer Segments, connected to Google.</h2>
+    <p class="body reveal">You're paying Klaviyo for what Shopify hands you for free. <b>Take advantage of the connection.</b> CRM Sync activates your native Shopify Email and Customer Segments for Google Smart Bidding — so one consented segment drives <b>both</b> your email and your ads, GA4-linked, with nothing new to build.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 7: governance ░░ -->
+<section class="band" data-section="governance">
+  <div class="wrap">
+    <div class="kicker reveal">Governance, built in</div>
+    <h2 class="reveal">Consent and data rights aren't a bolt-on — they're wired into the <b>activation plane</b>.</h2>
+    <p class="body reveal"><b>Customer data redaction.</b> Delete and redact requests — GDPR/CCPA right-to-be-forgotten — are honored at the data plane, so a redaction instantly removes that customer from every audience and Smart-Bidding activation. Not chased across a dozen tools.</p>
+    <p class="body reveal" style="margin-top:12px"><b>Consent updates live in the preference history — and tag the Google Signal.</b> Every change a customer makes is written to their user preference history, and that consent state tags the <b>Google Signal</b> (Consent Mode v2) that gates Smart Bidding. A CRM will store the history; it won't propagate it to Google. Here, activation only ever runs on <b>current</b> consent.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 8: agentic commerce ░░ -->
+<section class="band" data-section="agentic-commerce">
+  <div class="wrap">
+    <div class="kicker reveal">Agentic commerce, enabled</div>
+    <h2 class="reveal">The login is connected to <b>agentic carts</b> and Google-powered search checkouts.</h2>
+    <p class="body reveal">When an AI agent shops for a customer, the <b>consented login carries into the cart</b> — with <b>A2A</b> and <b>AP2 grants and permissions</b> enabled. A scoped mandate governs every agent action: what it may buy, the spend cap, the expiry — and settlement runs on real payment rails. Google-powered search checkouts transact on the <b>same consented identity under the same mandate</b>, not a cookie or an anonymous session. Your CRM has no verb for this; CRM Sync was built for it.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 9: point of difference (5-cell grid) ░░ -->
+<section class="band" data-section="point-of-difference">
+  <div class="wrap">
+    <div class="kicker reveal">Point of difference</div>
+    <div class="pod">
+      <div class="cell reveal">
+        <div class="n">01</div>
+        <h3>Consent-first, not page-view-first</h3>
+        <p>We optimize the appreciating asset — the <b>consented login</b> — while marketing apps still pivot on the depreciating page view. It's the shift the funnel already made; most tools haven't.</p>
+      </div>
+      <div class="cell reveal">
+        <div class="n">02</div>
+        <h3>One segment, two activations — GA4-linked</h3>
+        <p>Your Shopify segment drives Shopify Email (free) <b>and</b> Google Smart Bidding (CRM Sync) from a single, consistent definition. Klaviyo's segments never touch your Google bidding.</p>
+      </div>
+      <div class="cell reveal">
+        <div class="n">03</div>
+        <h3>Smart Bidding on the tagged, immediately-flagged conversion</h3>
+        <p>Consented identity + real revenue + real-time flag → the algorithm <b>bids on truth</b>. Everyone else feeds it a latent, anonymous, page-view-inferred conversion.</p>
+      </div>
+      <div class="cell reveal">
+        <div class="n">04</div>
+        <h3>Agent-addressable and AEO-ready by construction</h3>
+        <p>The same consented data an <b>AI answer engine cites</b> and an <b>agent transacts on</b> under a scoped mandate. Page view → consented login → agent-transactable is one continuous line.</p>
+      </div>
+      <div class="cell reveal">
+        <div class="n">05</div>
+        <h3>Productized, not DIY</h3>
+        <p>The "$300 Salesforce you built yourself" — done and maintained, including the consent, compliance, integration, and agent tail those viral posts quietly skip.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SECTION 10: the future CRM (compare matrix) ░░ -->
+<section class="band" data-section="future-crm">
+  <div class="wrap">
+    <div class="kicker reveal">The future CRM</div>
+    <h2 class="reveal">Today's CRMs <b>organize</b> customers. The future CRM <b>activates</b> them.</h2>
+    <p class="body reveal">HubSpot and Attio store your customers; Klaviyo emails them. None turn a consented segment into a Smart-Bidding conversion, an agent action, or an AI-answer citation — and none ride the free Shopify data you already have.</p>
+    <div class="cmp-wrap reveal">
+      <table class="cmp">
+        <thead><tr>
+          <th class="rowhead">Capability</th>
+          <th class="us">CRM Sync<span>the future CRM</span></th>
+          <th>HubSpot</th><th>Attio</th><th>Klaviyo</th>
+        </tr></thead>
+        <tbody>
+          <tr><th>Consent as a runtime primitive (not a suppression checkbox)</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>One segment &rarr; email <em>and</em> Google Smart Bidding</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>Smart Bidding on a tagged, consented, real-time conversion</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>Agent-addressable under scoped mandates</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>AEO / answer-engine grounding</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>Nothing to build &mdash; activates your existing Shopify segments</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>Consent history that tags the Google Signal (Consent Mode v2)</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+          <tr><th>Agentic carts + Google search checkout (A2A / AP2 grants &amp; permissions)</th><td class="us"><span class="yes">&#10003;</span></td><td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot-note reveal" style="margin-top:14px">The flexibility that makes Attio powerful is the flexibility that makes it hard to set up. CRM Sync has <b style="color:var(--ink)">no data model to configure</b> &mdash; it rides the Shopify Customer Segments you already have, so time-to-value is measured in minutes, not a rollout.</p>
+  </div>
+</section>
+
+<!-- ░░ SECTION 11: build vs buy ░░ -->
+<section class="band" id="build" data-section="build-vs-buy">
+  <div class="wrap">
+    <div class="buildwrap reveal">
+      <div class="kicker">Can I just build this myself?</div>
+      <h2>Everyone's building the <b>$300 Salesforce</b>. Here's the 90% the posts skip.</h2>
+      <p class="body">A weekend build gets you a table and a webhook. It does not get you the tail that actually carries the risk — and that tail is the moat:</p>
+      <ul class="taillist">
+        <li>Consent evaluated at the moment of action, not wired once</li>
+        <li>Mandate-scoped authority for AI agents (spend, scope, expiry)</li>
+        <li>Customer Match / Smart Bidding on a tagged, flagged conversion</li>
+        <li>AEO-grounded structured data an answer engine can cite</li>
+        <li>Integrations kept current as Shopify &amp; Google ship changes</li>
+        <li>Audit trail, revocation, and someone on call</li>
+      </ul>
+      <p class="body" style="margin-top:16px">We already built it — including all of the above. You get the outcome without becoming the maintenance team.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SECTION 12: final CTA ░░ -->
+<section class="band" data-section="final-cta">
+  <div class="wrap">
+    <div class="final reveal">
+      <div class="t">Build the funnel on the <b>consented login</b> — not the page view.</div>
+      <div class="herobtns">
+        <a class="cta" href="#segment">Connect a segment</a>
+        <a class="cta ghost" href="https://crm-sync.dev/get">Get the app</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ SECTION: footer ░░ -->
+<footer data-section="footer">
+  <div class="wrap">
+    <a href="#difference">Difference</a>
+    <a href="#segment">How it works</a>
+    <a href="#mission">Mission</a>
+    <a href="https://persephonepunch.github.io/crm-sync-setup/">Docs</a>
+    <div class="foot-note">Shopify-native, consent-first. Works with Shopify Email &amp; Customer Segments (free), GA4, and Google Smart Bidding. Not affiliated with Klaviyo, HubSpot, or Attio; names are used for comparison only. Klaviyo leads on advanced lifecycle email, SMS, and deliverability — CRM Sync is for stores whose email is served by Shopify and whose growth is paid, AI-answer, and agent-led.</div>
+  </div>
+</footer>
+
+<!-- ═══ GSAP + ScrollTrigger — per-section reveal ═══
+     Reusable init: every [data-section] reveals its .reveal children on scroll
+     with a stagger. Lift this block alongside any single section you copy out.
+     (External CDN — fine on GitHub Pages / Webflow; NOT for CSP-locked embeds.) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  (function () {
+    if (!window.gsap || !window.ScrollTrigger) return;      // no GSAP → content stays visible
+    document.body.classList.add('anim');                    // arm the hidden initial state
+    gsap.registerPlugin(ScrollTrigger);
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('[data-section]').forEach(function (section) {
+      var items = section.querySelectorAll('.reveal');
+      if (!items.length) return;
+      if (reduce) { gsap.set(items, { opacity: 1, y: 0 }); return; }
+      gsap.to(items, {
+        opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.08,
+        scrollTrigger: { trigger: section, start: 'top 82%', once: true }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
