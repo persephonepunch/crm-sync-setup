@@ -2,7 +2,7 @@
 
 **Version:** 1.1 — Cloudflare-Native Architecture
 **Date:** 2026-05-27
-**Classification:** Internal — Confidential
+**Classification:** Public · Spec
 **Compliance:** GDPR Art. 6/9, CCPA §1798.140, CPRA, UK DPA 2018
 **Infrastructure:** Cloudflare D1 + R2 + Durable Objects (same network as Hydrogen/Worker)
 
