@@ -177,12 +177,13 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
     <tr><td>Xano</td><td>User profiles, consent records, tags, extras</td><td>Database (source of truth)</td><td>US</td></tr>
     <tr><td>Webflow</td><td>Customer CMS items (name, email, tags, consent)</td><td>CMS publishing</td><td>US</td></tr>
     <tr><td>Google Analytics (GA4)</td><td>Tag categories, consent state, events (no raw PII)</td><td>Analytics</td><td>US</td></tr>
+    <tr><td>Google Ads (Customer Match / Smart Bidding)</td><td>SHA-256 hashed email, conversion value, consent state</td><td>Consent-gated advertising audiences &mdash; only with your marketing consent; excluded entirely by a Do-Not-Sell/Share opt-out</td><td>US</td></tr>
     <tr><td>Adobe Experience Platform</td><td>SHA-256 hashed PII, consent state, commerce events</td><td>CDP (if enabled)</td><td>Per tenant AEP region</td></tr>
     <tr><td>Resend</td><td>Email address, name</td><td>Transactional email</td><td>US</td></tr>
     <tr><td>Cloudflare</td><td>KV config, request metadata</td><td>Worker hosting, KV storage</td><td>Global (edge)</td></tr>
   </table>
 
-  <p>We do not share data with advertising networks, data brokers, or any party not listed above.</p>
+  <p>We never share data with data brokers or any party not listed above. Advertising audience sharing (Google Ads, above) happens <strong>only</strong> under your explicit marketing consent, is suppressed the moment that consent is revoked, and is blocked outright &mdash; regardless of consent &mdash; when you enable <strong>Do Not Sell or Share My Personal Information</strong> (Privacy &amp; Permissions &rarr; Privacy). Every inclusion or exclusion is recorded as an audited consent event.</p>
 
   <!-- 6 -->
   <h2 id="storage">6. Data Storage &amp; Security</h2>
@@ -226,6 +227,10 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
 
   <!-- 8 -->
   <h2 id="rights">8. Your Rights</h2>
+  <p><strong>In-product access:</strong> your consent and interaction history is visible at any time in
+  <em>Privacy &amp; Permissions &rarr; Me &rarr; Activity log</em> (every grant, revocation, preference save, and form
+  interaction, timestamped and attributed to its channel), and <em>Privacy &rarr; Export my data</em> downloads the same
+  records with your profile and tags &mdash; no support request required.</p>
 
   <h3>8.1 For End Users (Customers)</h3>
   <p>Under GDPR, CCPA, and other applicable privacy laws, you have the following rights:</p>
@@ -253,6 +258,10 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
 
   <!-- 9 -->
   <h2 id="cookies">9. Cookies &amp; Tracking</h2>
+  <p><strong>Consent fires first.</strong> Measurement on our sites is denied by default and loads only after your stored
+  consent decision is applied &mdash; on every visit, before any analytics script runs. Your choice is changeable at any time
+  via the footer <em>Cookie Preferences</em> control, and fully resettable via <em>Reset Consent</em>. See the
+  <a href="./consent-cookies-preferences.html">Consent, Cookies &amp; Preferences guide</a> for the full behavior.</p>
 
   <h3>9.1 Cookies We Set</h3>
   <table>
@@ -275,6 +284,12 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
 
   <!-- 10 -->
   <h2 id="ccpa">10. California Privacy Rights (CCPA)</h2>
+  <p><strong>Do Not Sell or Share My Personal Information.</strong> Signed-in users can enable this opt-out at
+  <em>Privacy &amp; Permissions &rarr; Privacy</em> (avatar menu &rarr; My Account &amp; Privacy). It is enforced as an
+  independent plane from cookie consent: when on, cross-context behavioral-advertising sharing &mdash; advertising audiences
+  (Google Customer Match / Smart Bidding), partner identifier projections, and peer or AI-agent cross-context sharing &mdash;
+  is blocked fail-closed <strong>even while your marketing consent remains granted</strong>. First-party services you consented
+  to continue to work. The opt-out and any later change are kept as audited, timestamped consent events.</p>
   <p>If you are a California resident, you have additional rights under the California Consumer Privacy Act:</p>
   <table>
     <tr><th>Right</th><th>Implementation</th></tr>
@@ -314,7 +329,7 @@ footer .links{display:flex;gap:1rem;justify-content:center;margin-bottom:0.5rem}
       <a href="terms.html">Terms of Service</a>
       <a href="mailto:ysl@story-story.ai">Support</a>
     </div>
-    <p>CRM Sync &mdash; Story Story AI &middot; Last updated May 2026</p>
+    <p>CRM Sync &mdash; Story Story AI &middot; Last updated July 2026</p>
   </footer>
 
   <script>
