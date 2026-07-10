@@ -1,7 +1,7 @@
 # Marketing was built on the page view. The funnel now pays for the **consented login**.
 
 **For:** Marketing ops, performance media, and analytics engineering
-**Status:** Built (GA4 push + audiences) · Direct Google Ads push pending Ads API credentials
+**Status:** Built (GA4 push + audiences) · Direct Google push routes via the Data Manager API — plan: [`SEGMENTS-GOOGLE-CONNECT.md`](segments-google-connect.html)
 **Date:** 2026-07-07
 **Depends on:** [`FEATURE-SPEC-UA-MIGRATION.md`](FEATURE-SPEC-UA-MIGRATION.md) · [`ARCHITECTURE.md`](ARCHITECTURE.md)
 
@@ -117,9 +117,9 @@ JIT keeps the bidding signal fresh to the event, while the cron sweep guarantees
 | GA4 audiences → Google Ads sharing | **Live** (native GA4 → Ads link) |
 | Revenue-weighted band (`crm_revenue_band`) | **Live** |
 | JIT membership via Shopify Customer Events | **Live** |
-| **Direct** push to Google Ads Customer Match / offline conversions | **Pending** — requires Google Ads API credentials |
+| **Direct** push to Google Ads Customer Match / offline conversions | **Planned** — via the Data Manager API ([plan](segments-google-connect.html)) |
 
-The direct Ads API path (Customer Match audiences + value-based offline conversion import, hashed first-party identifiers under consent) is the next increment. Until those credentials are provisioned, GA4's native audience share carries the signal.
+The direct path (Customer Match audiences + value-based conversion ingestion, hashed first-party identifiers under consent) is the next increment — and it no longer runs through the Google Ads API. Google disabled Ads API Customer Match uploads on April 1, 2026; the successor channel is the **Data Manager API**, planned in [`SEGMENTS-GOOGLE-CONNECT.md`](segments-google-connect.html). Until that ships, GA4's native audience share carries the signal.
 
 ---
 
