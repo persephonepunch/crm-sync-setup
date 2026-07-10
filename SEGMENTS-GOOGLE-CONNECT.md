@@ -161,7 +161,13 @@ agent-addressable — and the estate consumes from a plane that is admissible
 under the new rules.
 
 **Your stack isn't wrong — it's deaf to the new signals. We don't replace it;
-we give it ears that are legal to use.**
+we give it ears that are legal to use — and ears an average user in the
+organization can operate.** The substrate ships with its own plain-language
+surfaces: a question box that answers in English (the Answers plane above), a
+searchable documentation archive written for operators — this article is part
+of it — and a campaign wizard with approval gates. The people who own segments
+day-to-day run this in-house. Conformance here is not a statement of work, and
+nothing waits on a consulting team ten time zones away.
 
 ---
 
