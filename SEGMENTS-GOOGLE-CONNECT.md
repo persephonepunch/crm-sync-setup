@@ -194,6 +194,28 @@ nothing waits on a consulting team ten time zones away.
 
 ---
 
+### The measurement stack, side by side
+
+| Model | Built to measure | Primitive | Agent-commerce impact | Consent posture | Fee model |
+|---|---|---|---|---|---|
+| **Semrush-class** (visibility) | Public presence: rankings, now AI-answer citations | The keyword position | SERP → AI answers; rank ≠ cited. **Adapts** — stays useful as the scoreboard for "are we cited?" | None needed — public data only | Per-seat intel |
+| **Segment-class** (CDP) | Client-side behavioral events, routed to N destinations | `page()`/`track()` on a cookie `anonymousId` | Agents never load the script; the audience-sync patterns it fed were retired April 2026. **Bypassed** | Filter at the destination, bolted on after the pipes | Per-MTU — billed per anonymous cookie |
+| **Optimizely-class** (A/B) | On-page conversion lift | The DOM variant shown to a browser | Agents render no DOM — nothing to variant-test. **Replaced** by edge/server-side flags | Adds its own script + cookie consent surface | Per-MAU / per-impression |
+| **The standard page-based funnel** (ad → landing page → pixel → retarget) | Clicks and page views, stitched into modeled attribution | The click | The agent funnel has no click, page, or pixel — the entire chain simply never fires. **Blind** | Degrades at every hop; modeled numbers paper over the gaps | Media percentage + the tool stack above |
+| **Server-side, agent-ready, consent-tracked** (this plan) | Authenticated requests: tool calls, mandates, transactions — plus human-web events server-side | The consented event | **Native** — the protocol endpoint is the measurement point; the same plane covers browsers and agents | Gates at the source; stamped per event and per member | Infrastructure-priced; $0 per contact |
+
+The value-add of the last row, stated plainly: **deterministic** (a ledger,
+not a model — every conversion carries its transaction and mandate);
+**channel-complete** (one plane sees the browser funnel *and* the agent
+funnel the others cannot); **admissible** (Consent Mode v2 and Data Manager
+requirements are satisfied by construction, not by retrofit);
+**auditable** (every number traceable through the audit chain); and
+**operable in-house** (the surfaces are built for the segment owner, not a
+retained integration team). The four incumbent rows are not made worthless —
+the scoreboard keeps score and page-based testing still serves the human
+web — but every row above the last one is measuring a shrinking share of
+the funnel, on rented collection, at a per-contact price.
+
 ### Measurement without a browser
 
 The forward question decides tooling strategy: what happens when measurement
