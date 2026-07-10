@@ -153,6 +153,29 @@ architecture those stacks were built on:
   seven-figure measurement estate is not underperforming on this channel —
   it is structurally blind to it.
 
+### The CDP that syndicated the page view
+
+The clearest instance is the Segment-class CDP. Its founding primitives are
+the Universal Analytics worldview promoted to infrastructure: `page()` as a
+first-class API call, identity rooted in a cookie-scoped `anonymousId`,
+collection defaulting to a client-side library injected into the DOM. Instead
+of sending the page view to one destination, it sold sending it to a hundred —
+so it did not escape the page view's obsolescence, it **syndicated** it: when
+the cookie/client-script architecture broke, the value proposition broke in
+every destination simultaneously. Server-side sources and audience products
+moved the transport, not the worldview — the same page/track/identify schema,
+the same cookie-rooted identity spine, audiences computed inside the toll
+booth and synced to ad platforms through exactly the upload patterns retired
+in April 2026. The pricing makes the toll explicit: metering by monthly
+tracked users bills the merchant per anonymous cookie, including the
+overwhelming share who never consent, never sign in, and never buy.
+
+This substrate inverts every term of that model. Consent gates the signal at
+the source instead of filtering it at the destination; identity is the
+consented login, not a stitched cookie; audiences are computed in the
+merchant's own data layer and projected outward; and nobody is billed per
+ghost.
+
 The pivot is not rip-and-replace. The incumbent stack stays as the system of
 engagement, and keeps receiving its feeds. What changes is the signal path:
 identity, consent, mandates, and conversions run through the consent-gated
