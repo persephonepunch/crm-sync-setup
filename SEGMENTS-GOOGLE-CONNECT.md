@@ -134,7 +134,38 @@ Phase 0 is a supervised human sitting. Phases 1 and 2 are independent and parall
 
 ---
 
-## 8. Related documents
+## 8. The enterprise pivot — when the incumbent stack can't conform
+
+Enterprise organizations holding seven-figure Salesforce/Adobe commitments are
+waiting for those platforms to conform to the new advertising regime. They
+won't — not because the vendors are slow, but because the regime broke the
+architecture those stacks were built on:
+
+- **Consent Mode v2** demands per-event, per-signal consent stamped at the
+  data layer. Incumbent CDPs store consent as a field on a record — the wrong
+  place architecturally, and no release cycle relocates it.
+- **The Customer Match retirement** (April 1, 2026) deleted the upload pattern
+  every enterprise Google connector was built around. The successor channel
+  expects consent fields on every member, on the wire — which presumes the
+  gate above already exists.
+- **Agentic buyers never fire the instrumentation.** An agent completes
+  search → cart → checkout with no click, no page view, no pixel. A
+  seven-figure measurement estate is not underperforming on this channel —
+  it is structurally blind to it.
+
+The pivot is not rip-and-replace. The incumbent stack stays as the system of
+engagement, and keeps receiving its feeds. What changes is the signal path:
+identity, consent, mandates, and conversions run through the consent-gated
+substrate this plan describes — stamped at the source, encrypted in transit,
+agent-addressable — and the estate consumes from a plane that is admissible
+under the new rules.
+
+**Your stack isn't wrong — it's deaf to the new signals. We don't replace it;
+we give it ears that are legal to use.**
+
+---
+
+## 9. Related documents
 
 - [`SEGMENTS-GA4-BIDDING.md`](segments-ga4-bidding.html) — the built GA4 pipe: consent gate, revenue weights, user properties, audiences. This plan's Reach plane is its direct-channel sibling.
 - [`ARCHITECTURE.md`](architecture.html) — where the worker, data layer, and consent plane sit.
