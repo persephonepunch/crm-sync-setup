@@ -194,6 +194,18 @@ nothing waits on a consulting team ten time zones away.
 
 ---
 
+### What AEO means here
+
+**AEO — answer-engine optimization — is the discipline of being *cited and
+transacted with* by AI answer engines and their shopping agents, rather than
+ranked on a results page.** It is the successor to keyword SEO: the inputs are
+machine-readable content, catalog schema, and structured data; the scoreboard
+is citations (not positions); and the conversion side — an agent completing a
+cart from an answer — is only measurable server-side, where this substrate
+lives. (AEO is unrelated to the accessibility/machine-index score used for
+CRM Sync UI components — that is an a11y engineering metric, not a marketing
+discipline.)
+
 ### The measurement stack, side by side
 
 | Model | Built to measure | Primitive | Agent-commerce impact | Consent posture | Fee model |
