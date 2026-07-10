@@ -194,6 +194,51 @@ nothing waits on a consulting team ten time zones away.
 
 ---
 
+### Measurement without a browser
+
+The forward question decides tooling strategy: what happens when measurement
+must include agents and machines that never open a browser?
+
+Every load-bearing assumption of the current toolchain — a browser implies a
+person, a session implies attention, a cookie implies continuity — fails at
+once. A browser emits *behavior* that tools sample, model, and stitch into
+inferred identity. An agent emits *authenticated requests*: tool calls
+carrying tokens, mandates, and consent claims. There is nothing left to
+infer — the call announces who it is, on whose behalf it acts, what it is
+permitted to do, and what it did. Measurement collapses from probabilistic
+reconstruction into a **deterministic ledger**. The statistical apparatus of
+the tag era — sampling, modeled attribution, view-through windows — existed
+to compensate for not knowing. On this channel, you know.
+
+The observation point moves to the only place the merchant controls: the
+protocol surface where `discover`, `search`, cart, and checkout calls land.
+No agent will ever execute your JavaScript. Structurally this is a return to
+server-log analytics — except the requests are signed, structured, and
+intent-rich, and the event that *authorizes* an action is the *record* of it:
+the permissions bus and the measurement bus become the same bus.
+
+The questions change shape with it. Not "which page converted," but: which
+agent (attestation replaces user-agent strings — bot management inverts from
+blocking machines to admitting the right ones); on whose behalf (the mandate
+chain); with what permission at call time; and which *answer* converted —
+the funnel now runs indexed → cited → discovered → completed.
+
+Measurement vendors face three doors: adapt what they watch (the visibility
+scoreboards), insert themselves into the server path (a new toll booth that
+substrate-owning merchants have no reason to admit), or read from the
+merchant's ledger — becoming reporting layers over a warehouse they no longer
+collect for. Collection was the moat; on this channel the merchant owns
+collection by default, because the protocol endpoint is theirs. Google
+already conceded the direction — Measurement Protocol and the Data Manager
+API are server-side ingestion of merchant-owned truth, not tags.
+
+**The browser era measured what strangers did on your pages. The agent era
+notarizes what authenticated parties did with your permission.** Agent
+analytics is not a product to buy; it is a report over data this substrate
+already keeps.
+
+---
+
 ## 9. Related documents
 
 - [`SEGMENTS-GA4-BIDDING.md`](segments-ga4-bidding.html) — the built GA4 pipe: consent gate, revenue weights, user properties, audiences. This plan's Reach plane is its direct-channel sibling.
