@@ -69,7 +69,9 @@
       '<span class="spacer"></span>'];
     if (cfg.pdf)    parts.push('<a class="dl" href="' + cfg.pdf + '" download>' + ICON.pdf + 'PDF</a>');
     if (cfg.md)     parts.push('<a class="dl" href="' + cfg.md + '" download>' + ICON.md + 'Markdown</a>');
-    if (cfg.source) parts.push('<a href="' + cfg.source + '">' + ICON.git + 'Source</a>');
+    // GitHub sends X-Frame-Options: deny — when this page is shown inside the
+    // store/site modal iframe the Source link must escape the frame.
+    if (cfg.source) parts.push('<a href="' + cfg.source + '" target="_blank" rel="noopener">' + ICON.git + 'Source</a>');
     parts.push('</div>');
     b.innerHTML = parts.join('');
     document.body.insertBefore(b, document.body.firstChild);
@@ -113,6 +115,6 @@
       document.getElementById('doc').innerHTML =
         '<p class="doc-status">Load error (' + e.message + '). Read the ' +
         '<a href="' + cfg.md + '">raw markdown</a>' +
-        (cfg.source ? ' or <a href="' + cfg.source + '">source on GitHub</a>' : '') + '.</p>';
+        (cfg.source ? ' or <a href="' + cfg.source + '" target="_blank" rel="noopener">source on GitHub</a>' : '') + '.</p>';
     });
 })();
