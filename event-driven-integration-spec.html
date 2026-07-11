@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event-Driven Integration Spec — CRM Sync</title>
+<meta name="description" content="Replace cron-only polling with an event-driven integration substrate: webhooks and queues move data when something happens, with ordering, replay, and observability defined per channel — cron remains only as the reconcile backstop.">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/event-driven-integration-spec.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="Data moves when something happens, not when a clock ticks. — Event-Driven Integration Spec">
+<meta property="og:description" content="Cron is the wrong primitive for data integration: most polls find nothing and the rest arrive stale. The spec defines the event-driven substrate — sources, ordering, replay, and observability — with cron demoted to a reconcile backstop.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/event-driven-integration-spec.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./doc.css">
+</head>
+<body
+  data-md="./docs/EVENT-DRIVEN-INTEGRATION-SPEC.md"
+  data-title="Event-Driven Integration Spec — CRM Sync"
+  data-kicker="Replaces cron-only polling"
+  data-sub="Version 1.0 · 2026-05-27 · Specification. Cron is the wrong primitive for data integration — most polls find nothing and the hits arrive up to fifteen minutes stale. This spec moves the external integrations to an event-driven substrate: **data moves when something happens, not when a clock ticks**, with ordering, replay, and observability defined per channel, and cron demoted to the reconcile backstop."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/EVENT-DRIVEN-INTEGRATION-SPEC.md"
+  data-pdf="./event-driven-integration-spec.pdf">
+  <div class="wrap">
+    <header id="hero" class="hero"><span class="doc-status">Loading…</span></header>
+    <article id="doc" class="doc"></article>
+  </div>
+  <footer class="docfoot">
+    <span>CRM Sync · Consent-gated · Revenue-weighted · Agent-addressable</span>
+    <span>Monochrome · print / PDF ready</span>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="./doc.js"></script>
+</body>
+</html>
