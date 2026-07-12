@@ -1,10 +1,12 @@
-# CRM Sync — Functional Specification & UAT Release Plan
+# Omen — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001
 **Version:** 1.19
 **Date:** 2026-06-17
 **Status:** Draft — Pending DPO & PMO Review
 **Classification:** Public
+
+> **Superseded for CRM Sync (2026-07-12):** This document is the engineering record of the **Omen** build (the `omenphase1-1.webflow.io` era) and is preserved as-is, including its original pricing model. The canonical specification for the **CRM Sync** product is [CRM Sync — Functional Specification](https://persephonepunch.github.io/crm-sync-setup/crm-sync-functional-spec.html).
 
 ---
 
