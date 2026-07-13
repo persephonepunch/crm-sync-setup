@@ -71,3 +71,5 @@ Because what you're buying this cycle isn't a layer. It's **forward-deployed inf
 - Rithum/ChannelAdvisor API docs: https://developer.channeladvisor.com/
 - Rithum Flex Feeds: https://www.rithum.com/terms/flex-feeds/
 - Terminology (REST, SOAP, GraphQL, Merchant AI): https://crm-sync.dev/app/faq
+
+The store-the-graph inversion, productized: **PIM Sync for UCP Data** — the GraphQL, AI-shaped PIM. Tailored for GraphQL-era Shopify, built for Google feed managers, BigQuery-ready: https://apps.shopify.com/pim-sync
