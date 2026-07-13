@@ -1,3 +1,10 @@
+---
+title: "CRM Sync — Home Page Section Spec (design-sync.myshopify.com)"
+canonical: https://persephonepunch.github.io/crm-sync-setup/home-sections.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/home-sections.md
+---
 # CRM Sync — Home Page Section Spec (design-sync.myshopify.com)
 
 Build spec for the CRM Sync marketing home, section by section, for rebuilding in

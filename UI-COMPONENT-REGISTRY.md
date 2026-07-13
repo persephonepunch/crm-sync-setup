@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — UI Component & ID Registry"
+description: "Canonical naming + delivery model for the storefront UI system (nav, footer, cart, login, search) across design-sync.myshopify.com → crm-sync.dev. One addressable crm- namespace…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/ui-component-registry.html
+category: "Specs"
+date: 2026-07-07
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/UI-COMPONENT-REGISTRY.md
+---
 # CRM Sync — UI Component & ID Registry
 
 Canonical naming + delivery model for the storefront UI system (nav, footer,

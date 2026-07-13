@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Security Audit & Paired Data Requirements"
+description: "Date: 2026-05-18 Version: 1.1 Worker Version: dac8f178-f6ed-4a11-96be-f640a67c64ae"
+canonical: https://persephonepunch.github.io/crm-sync-setup/security-audit.html
+category: "Security"
+date: 2026-05-26
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SECURITY-AUDIT.md
+---
 # CRM Sync — Security Audit & Paired Data Requirements
 
 **Date:** 2026-05-18

@@ -1,3 +1,11 @@
+---
+title: "Shopify App Requirements Checklist (2026)"
+description: "A comprehensive, downloadable checklist for building, submitting, and maintaining a Shopify App Store app. Based on Shopify's official App Store requirements and the latest plat…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-app-checklist.html
+category: "Shopify"
+date: 2026-05-29
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-APP-CHECKLIST.md
+---
 # Shopify App Requirements Checklist (2026)
 
 A comprehensive, downloadable checklist for building, submitting, and maintaining a Shopify App Store app. Based on [Shopify's official App Store requirements](https://shopify.dev/docs/apps/launch/shopify-app-store/app-store-requirements) and the latest platform changes through May 2026.

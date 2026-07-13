@@ -1,3 +1,11 @@
+---
+title: "Global Payouts — Dependency Map"
+description: "Status: Living reference · Globalized Commerce settlement layer Scope: How an agentic purchase gets from authorized to money-in-a-bank, per market, and what each market depends on."
+canonical: https://persephonepunch.github.io/crm-sync-setup/global-payouts.html
+category: "Global"
+date: 2026-06-21
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBAL-PAYOUTS.md
+---
 # Global Payouts — Dependency Map
 
 **Status:** Living reference · Globalized Commerce settlement layer

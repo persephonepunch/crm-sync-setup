@@ -1,3 +1,11 @@
+---
+title: "Forward-Deploy Guideline — Server-Side GraphQL + Agentic Workflows + Tool Runner"
+description: "Audience: merchants, app developers, and platform teams planning their Shopify roadmap. Thesis: Shopify's 2025–2026 deprecation cliff retires the client-side / REST / Script-Edi…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/forward-deploy-agentic-graphql.html
+category: "Specs"
+date: 2026-06-21
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FORWARD-DEPLOY-AGENTIC-GRAPHQL.md
+---
 # Forward-Deploy Guideline — Server-Side GraphQL + Agentic Workflows + Tool Runner
 
 **Audience:** merchants, app developers, and platform teams planning their Shopify roadmap.

@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Clean Room Utility & Security Rules"
+description: "Version: 1.1 — Cloudflare-Native Architecture Date: 2026-05-27 Classification: Internal — Confidential Compliance: GDPR Art. 6/9, CCPA §1798.140, CPRA, UK DPA 2018 Infrastructur…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/clean-room.html
+category: "Specs"
+date: 2026-05-27
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/CLEAN-ROOM-SPEC.md
+---
 # CRM Sync — Clean Room Utility & Security Rules
 
 **Version:** 1.1 — Cloudflare-Native Architecture

@@ -1,3 +1,11 @@
+---
+title: "Key Ceremony — Loop Review Checklist (Automation)"
+description: "Version: 1.0 Date: 2026-06-22 Companion to: KEY-MANAGEMENT-LIFECYCLE.md (§8 rotation, §9 ceremony, §10 glossary, §12 ownership) Run mode: recurring automated review (e.g. Claude…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/key-ceremony-loop-review.html
+category: "Security"
+date: 2026-06-22
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/KEY-CEREMONY-LOOP-REVIEW.md
+---
 # Key Ceremony — Loop Review Checklist (Automation)
 
 **Version:** 1.0

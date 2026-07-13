@@ -1,3 +1,10 @@
+---
+title: "CRM Sync — Feature Specification Addendum"
+canonical: https://persephonepunch.github.io/crm-sync-setup/docs/FEATURE-SPEC-UA-MIGRATION.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/FEATURE-SPEC-UA-MIGRATION.md
+---
 # CRM Sync — Feature Specification Addendum
 
 ## UA → GA4 Migration, Connected Data Streams & Trust Network DevOps

@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Functional Specification"
+description: "Document ID: CRM-SYNC-FUNC-SPEC-001 Version: 1.0 Date: 2026-07-12 Status: Active Classification: Public"
+canonical: https://persephonepunch.github.io/crm-sync-setup/crm-sync-functional-spec.html
+category: "Specs"
+date: 2026-07-12
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CRM-SYNC-FUNCTIONAL-SPEC.md
+---
 # CRM Sync — Functional Specification
 
 **Document ID:** CRM-SYNC-FUNC-SPEC-001

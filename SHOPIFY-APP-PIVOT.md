@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Shopify App Platform Changes"
+description: "For: Product managers, operations teams, and business stakeholders tracking Shopify app compliance Date: 2026-05-18"
+canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-app-pivot.html
+category: "Shopify"
+date: 2026-05-26
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-APP-PIVOT.md
+---
 # CRM Sync — Shopify App Platform Changes
 
 **For:** Product managers, operations teams, and business stakeholders tracking Shopify app compliance

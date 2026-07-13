@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Feature Specification"
+description: "Document ID: CRM-FEAT-003 Version: 1.0 Date: 2026-07-06 Status: Published Classification: Public Parent: CRM-FUNC-SPEC-001"
+canonical: https://persephonepunch.github.io/crm-sync-setup/feature-spec-accessibility-index.html
+category: "Specs"
+date: 2026-07-06
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FEATURE-SPEC-ACCESSIBILITY-INDEX.md
+---
 # CRM Sync — Feature Specification
 
 ## Accessibility & Machine-Index Score — the measurable foundation of the accessibility offer

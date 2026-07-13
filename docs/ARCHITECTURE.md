@@ -1,3 +1,10 @@
+---
+title: "CRM Sync — Why This Architecture Is Safer"
+canonical: https://persephonepunch.github.io/crm-sync-setup/docs/ARCHITECTURE.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/ARCHITECTURE.md
+---
 # CRM Sync — Why This Architecture Is Safer
 
 **For:** Business leaders, compliance officers, and operations teams evaluating CRM Sync

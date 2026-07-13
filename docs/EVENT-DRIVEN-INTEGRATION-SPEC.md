@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Event-Driven Integration Spec"
+description: "Version: 1.0 Date: 2026-05-27 Status: Specification Replaces: Cron-only polling for external integrations"
+canonical: https://persephonepunch.github.io/crm-sync-setup/event-driven-integration-spec.html
+category: "Specs"
+date: 2026-05-27
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/EVENT-DRIVEN-INTEGRATION-SPEC.md
+---
 # CRM Sync — Event-Driven Integration Spec
 
 **Version:** 1.0

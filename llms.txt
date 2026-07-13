@@ -2,7 +2,9 @@
 
 > Consent-first customer-data and agent-entitlement layer for commerce (Shopify + Webflow + Xano + Cloudflare). These are the public specs, runbooks, and analyses. Canonical product site: https://crm-sync.dev — terminology lookup (Merchant AI, GPC, GraphQL, REST, SOAP, UCP): https://crm-sync.dev/app/faq
 
-Source markdown for every doc lives in this repository (github.com/persephonepunch/crm-sync-setup); the .html links below are human renders of the same files. Raw markdown is the canonical machine-readable form.
+Source markdown for every doc lives in this repository (github.com/persephonepunch/crm-sync-setup); the .html links below are human renders of the same files. Raw markdown is the canonical machine-readable form, and every markdown file carries YAML front matter (title, description, canonical, category, date).
+
+This file is a committed snapshot. The LIVE machine index regenerates automatically from the Docs CMS at: https://crm-sync.dev/llms.txt
 
 ## Global
 

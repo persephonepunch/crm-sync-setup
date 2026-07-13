@@ -1,3 +1,11 @@
+---
+title: "Shopify Token Management"
+description: "App Automation Tokens are for CI/CD only. They authenticate shopify app deploy in pipelines. They cannot be used for Admin API calls and are rejected by the CRM worker."
+canonical: https://persephonepunch.github.io/crm-sync-setup/docs/SHOPIFY-TOKEN-MANAGEMENT.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/SHOPIFY-TOKEN-MANAGEMENT.md
+---
 # Shopify Token Management
 
 ## Shopify Dev Dashboard Token Model

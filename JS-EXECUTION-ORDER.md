@@ -1,3 +1,11 @@
+---
+title: "JS Execution Order — Challenge & Solution"
+description: "Consent fires first: the client-JS execution-order contract and the tests that enforce it."
+canonical: https://persephonepunch.github.io/crm-sync-setup/js-execution-order.html
+category: "Specs"
+date: 2026-07-09
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/JS-EXECUTION-ORDER.md
+---
 # JS Execution Order — Challenge & Solution
 
 **Status:** Live · **Class:** Engineering challenge record · **Surface:** every page that loads the CRM Sync embeds

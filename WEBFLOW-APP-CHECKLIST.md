@@ -1,3 +1,11 @@
+---
+title: "Webflow App Requirements Checklist (2026)"
+description: "A comprehensive, downloadable checklist for building, submitting, and maintaining a Webflow Marketplace app. Based on Webflow's official Marketplace guidelines and the latest pl…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/webflow-app-checklist.html
+category: "Webflow"
+date: 2026-05-29
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WEBFLOW-APP-CHECKLIST.md
+---
 # Webflow App Requirements Checklist (2026)
 
 A comprehensive, downloadable checklist for building, submitting, and maintaining a Webflow Marketplace app. Based on [Webflow's official Marketplace guidelines](https://developers.webflow.com/data/v2.0.0-beta/apps/docs/marketplace-guidelines) and the latest platform changes through May 2026.

@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Key Management Lifecycle"
+description: "Version: 1.5 Date: 2026-07-03 (v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26) Scope: Dev → Stage → Prod key management, consulting team workflow, stakeh…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html
+category: "Security"
+date: 2026-07-03
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/KEY-MANAGEMENT-LIFECYCLE.md
+---
 # CRM Sync — Key Management Lifecycle
 
 **Version:** 1.5

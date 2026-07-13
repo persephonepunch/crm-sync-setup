@@ -1,3 +1,11 @@
+---
+title: "Risk & Liability Brief — The 2026 Client-Side Cliff"
+description: "Audience: owners, finance, legal, and engineering leads who carry the downside. As of: 2026-06-21 · Companion to: FORWARD-DEPLOY-AGENTIC-GRAPHQL.md (the fix)."
+canonical: https://persephonepunch.github.io/crm-sync-setup/SHOPIFY-2026-RISK-BRIEF.pdf
+category: "Shopify"
+date: 2026-06-21
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-2026-RISK-BRIEF.md
+---
 # Risk & Liability Brief — The 2026 Client-Side Cliff
 
 **Audience:** owners, finance, legal, and engineering leads who carry the downside.

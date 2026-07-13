@@ -1,3 +1,11 @@
+---
+title: "CRM Sync Setup Guide"
+description: "Everything you need to get your CRM system running. Complete each section in order — each one builds on the last."
+canonical: https://persephonepunch.github.io/crm-sync-setup/setup-guide.html
+category: "Setup"
+date: 2026-07-07
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SETUP-GUIDE.md
+---
 # CRM Sync Setup Guide
 
 > **Getting started?** Use the interactive [Setup Wizard](https://crm.story-story.ai/setup) — it walks you through each step with direct links and live status checks.

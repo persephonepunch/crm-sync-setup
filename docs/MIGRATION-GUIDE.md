@@ -1,3 +1,10 @@
+---
+title: "CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams"
+canonical: https://persephonepunch.github.io/crm-sync-setup/docs/MIGRATION-GUIDE.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/MIGRATION-GUIDE.md
+---
 # CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams
 
 **For:** Marketing ops, analytics teams, and CRM administrators planning the transition

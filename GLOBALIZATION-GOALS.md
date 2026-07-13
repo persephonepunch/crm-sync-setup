@@ -1,3 +1,11 @@
+---
+title: "Globalization — Goal Checklist (Pending / Review State)"
+description: "Status board for the globalization parameters of the chat-commerce platform (chatbot, Knowledge Base, market storefronts). Each entry is a goal with its current state. States:"
+canonical: https://persephonepunch.github.io/crm-sync-setup/globalization-goals.html
+category: "Global"
+date: 2026-06-12
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBALIZATION-GOALS.md
+---
 # Globalization — Goal Checklist (Pending / Review State)
 
 Status board for the globalization parameters of the chat-commerce platform

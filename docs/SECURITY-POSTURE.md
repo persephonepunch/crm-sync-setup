@@ -1,3 +1,10 @@
+---
+title: "CRM Sync — Security & Compliance Posture"
+canonical: https://persephonepunch.github.io/crm-sync-setup/docs/SECURITY-POSTURE.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/SECURITY-POSTURE.md
+---
 # CRM Sync — Security & Compliance Posture
 
 **For:** Compliance officers, security auditors, and risk assessment teams

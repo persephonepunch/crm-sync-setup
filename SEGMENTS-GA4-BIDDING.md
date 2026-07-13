@@ -1,3 +1,11 @@
+---
+title: "Marketing was built on the page view. The funnel now pays for the consented login."
+description: "For: Marketing ops, performance media, and analytics engineering Status: Built (GA4 push + audiences) · Direct Google Ads push pending Ads API credentials Date: 2026-07-07 Depen…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/segments-ga4-bidding.html
+category: "Shopify"
+date: 2026-07-07
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GA4-BIDDING.md
+---
 # Marketing was built on the page view. The funnel now pays for the **consented login**.
 
 **For:** Marketing ops, performance media, and analytics engineering

@@ -1,3 +1,11 @@
+---
+title: "Agency → Client Deploy Handoff"
+description: "Checklist + Interactive Key Rotation ceremony. This document is the normative handoff procedure for transferring a deployed CRM Sync / headless commerce stack from the implement…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/agency-handoff.html
+category: "Setup"
+date: 2026-06-12
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENCY-HANDOFF.md
+---
 # Agency → Client Deploy Handoff
 
 **Checklist + Interactive Key Rotation ceremony.** This document is the

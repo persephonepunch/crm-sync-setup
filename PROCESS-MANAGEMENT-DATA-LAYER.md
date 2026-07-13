@@ -1,3 +1,11 @@
+---
+title: "Process Management Guide — Webflow · Xano · Cloudflare · Shopify"
+description: "Audience: Operations, platform engineering, and business stakeholders running a multi-system commerce stack Scope: Public guide. No secrets, credentials, or source code. Process…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/process-management.html
+category: "Specs"
+date: 2026-06-08
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md
+---
 # Process Management Guide — Webflow · Xano · Cloudflare · Shopify
 
 **Audience:** Operations, platform engineering, and business stakeholders running a multi-system commerce stack

@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — What Traditional CRMs Miss"
+description: "For: Business leaders, investors, and operations teams evaluating CRM Sync against Salesforce, HubSpot, and Klaviyo Date: 2026-05-19"
+canonical: https://persephonepunch.github.io/crm-sync-setup/ai-native-crm-comparison.html
+category: "Specs"
+date: 2026-05-29
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/AI-NATIVE-CRM-COMPARISON.md
+---
 # CRM Sync — What Traditional CRMs Miss
 
 **For:** Business leaders, investors, and operations teams evaluating CRM Sync against Salesforce, HubSpot, and Klaviyo

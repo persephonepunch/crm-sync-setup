@@ -1,3 +1,11 @@
+---
+title: "Shopify Expiring Token Management"
+description: "As of April 2026, Shopify mandates that all OAuth apps use expiring offline access tokens with rotation. Non-expiring tokens return 403: Non-expiring access tokens are no longer…"
+canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-token-management.html
+category: "Security"
+date: 2026-05-26
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-TOKEN-MANAGEMENT.md
+---
 # Shopify Expiring Token Management
 
 ## Requirement

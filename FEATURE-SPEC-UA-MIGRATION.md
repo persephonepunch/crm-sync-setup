@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Feature Specification Addendum"
+description: "Document ID: CRM-FEAT-002 Version: 1.0 Date: 2026-05-17 Status: Draft — Architecture Review Parent: CRM-FUNC-SPEC-001 v1.2"
+canonical: https://persephonepunch.github.io/crm-sync-setup/feature-spec-ua-migration.html
+category: "Specs"
+date: 2026-06-25
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FEATURE-SPEC-UA-MIGRATION.md
+---
 # CRM Sync — Feature Specification Addendum
 
 ## UA → GA4 Migration, Connected Data Streams & Trust Network DevOps

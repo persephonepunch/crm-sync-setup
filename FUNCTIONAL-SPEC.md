@@ -1,3 +1,11 @@
+---
+title: "Omen — Functional Specification & UAT Release Plan"
+description: "Engineering record of the Omen build — superseded for CRM Sync by the CRM Sync Functional Specification. Document ID: CRM-FUNC-SPEC-001 Version: 1.19"
+canonical: https://persephonepunch.github.io/crm-sync-setup/functional-spec.html
+category: "Specs"
+date: 2026-06-21
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md
+---
 # Omen — Functional Specification & UAT Release Plan
 
 **Document ID:** CRM-FUNC-SPEC-001

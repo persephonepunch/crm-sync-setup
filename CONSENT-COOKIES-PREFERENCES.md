@@ -1,3 +1,11 @@
+---
+title: "Consent, Cookies & Preferences — User Guide"
+description: "The consent banner, cookie preferences, reset, Do Not Sell vs consent, and the audit trail."
+canonical: https://persephonepunch.github.io/crm-sync-setup/consent-cookies-preferences.html
+category: "Setup"
+date: 2026-07-09
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CONSENT-COOKIES-PREFERENCES.md
+---
 # Consent, Cookies & Preferences — User Guide
 
 **Status:** Live · **Class:** User guide · **Surface:** every CRM Sync–connected page

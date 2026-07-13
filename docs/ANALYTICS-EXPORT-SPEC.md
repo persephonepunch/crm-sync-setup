@@ -1,3 +1,11 @@
+---
+title: "Analytics Export via Xano Polling + Worker Cron"
+description: "Version: 1.0 Date: 2026-05-27 Status: Specification"
+canonical: https://persephonepunch.github.io/crm-sync-setup/analytics-export-spec.html
+category: "Specs"
+date: 2026-05-27
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/ANALYTICS-EXPORT-SPEC.md
+---
 # Analytics Export via Xano Polling + Worker Cron
 
 **Version:** 1.0

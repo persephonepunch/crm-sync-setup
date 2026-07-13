@@ -1,3 +1,11 @@
+---
+title: "Google turned off the list upload. We were never uploading lists."
+description: "For: Marketing ops, analytics engineering, and the business analyst who owns segments Status: Plan of record · GA4 pipe built · Live Google push routes via the Data Manager API"
+canonical: https://persephonepunch.github.io/crm-sync-setup/segments-google-connect.html
+category: "Shopify"
+date: 2026-07-10
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GOOGLE-CONNECT.md
+---
 # Google turned off the list upload. We were never uploading lists.
 
 **For:** Marketing ops, analytics engineering, and the business analyst who owns segments

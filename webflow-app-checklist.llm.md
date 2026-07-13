@@ -1,3 +1,11 @@
+---
+title: "Webflow App Requirements — LLM Audit Prompt"
+description: "Feed this file to any LLM (Claude, GPT, Gemini) along with your codebase to get an automated compliance audit against current Webflow Marketplace requirements (May 2026)."
+canonical: https://persephonepunch.github.io/crm-sync-setup/webflow-app-checklist.llm.md
+category: "General"
+date: 2026-07-13
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/webflow-app-checklist.llm.md
+---
 # Webflow App Requirements — LLM Audit Prompt
 
 > Feed this file to any LLM (Claude, GPT, Gemini) along with your codebase to get an automated compliance audit against current Webflow Marketplace requirements (May 2026).

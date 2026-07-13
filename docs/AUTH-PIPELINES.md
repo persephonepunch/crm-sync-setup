@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — Auth Pipelines"
+description: "For: Engineering, security auditors, and compliance teams reviewing authentication architecture Date: 2026-05-19"
+canonical: https://persephonepunch.github.io/crm-sync-setup/auth-pipelines.html
+category: "Security"
+date: 2026-05-29
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/AUTH-PIPELINES.md
+---
 # CRM Sync — Auth Pipelines
 
 **For:** Engineering, security auditors, and compliance teams reviewing authentication architecture
