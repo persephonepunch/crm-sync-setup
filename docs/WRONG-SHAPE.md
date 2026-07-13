@@ -38,6 +38,10 @@ Shopify forced the question: the REST Admin API is frozen; the full variant mode
 
 The same test applies to the identity side of the estate. Salesforce's clouds — and even AI-native CRMs like Attio — govern the relationship record: service, sales, the account. None of them sit on the commerce protocol surface where catalogs are read and agent orders transact. However modern your CRM, the catalog side of the stack has to produce the shape itself.
 
+## Rent the AI-shaped tool, or own the shape
+
+Attio's rise makes the point from the other direction: the market clearly wants AI-native, graph-flexible tooling — that's why teams leave rigid CRMs for it. But there is a strategic option nobody prices in that comparison: **build your own.** Once your substrate stores the graph — products, identities, consent, and entitlements as real relations, with REST and GraphQL surfaces — an Attio-class experience becomes a composition over data you already own: bespoke views, AI answers, agent access, no per-seat meter, no migration hostage. The choice this cycle isn't which vendor's shape to move into. It's whether the shape lives in a vendor's database or in yours.
+
 ## The inversion: store the graph, render the projections
 
 Real parent-child relations in the database, Shopify GraphQL consumed natively, nested JSON emitted — **the CSV becomes a render target, never the database.** Your spreadsheet still works: it enters once, gets AI-ified, and the Google feed, BigQuery, and the AI-queryable catalog are all projections of the same living structure.
