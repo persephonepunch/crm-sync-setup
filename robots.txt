@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://persephonepunch.github.io/crm-sync-setup/sitemap.xml

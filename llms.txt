@@ -1,0 +1,56 @@
+# CRM Sync — Public Docs & Specs
+
+> Consent-first customer-data and agent-entitlement layer for commerce (Shopify + Webflow + Xano + Cloudflare). These are the public specs, runbooks, and analyses. Canonical product site: https://crm-sync.dev — terminology lookup (Merchant AI, GPC, GraphQL, REST, SOAP, UCP): https://crm-sync.dev/app/faq
+
+Source markdown for every doc lives in this repository (github.com/persephonepunch/crm-sync-setup); the .html links below are human renders of the same files. Raw markdown is the canonical machine-readable form.
+
+## Global
+
+- [Global Payouts — Dependency Map](https://persephonepunch.github.io/crm-sync-setup/global-payouts.html): Status: Living reference · Globalized Commerce settlement layer Scope: How an agentic purchase gets from authorized to money-in-a-bank, per market, and what each market depends on.
+- [Globalization — Goal Checklist (Pending / Review State)](https://persephonepunch.github.io/crm-sync-setup/globalization-goals.html): Status board for the globalization parameters of the chat-commerce platform (chatbot, Knowledge Base, market storefronts). Each entry is a goal with its current state. States:
+- [The Wrong-Shape Thesis](https://persephonepunch.github.io/crm-sync-setup/wrong-shape.html): Why feed middleware can't align you with UCP — tech debt as shape debt, with receipts from the vendors' own docs
+
+## Security
+
+- [CRM Sync — Security & Compliance Posture](https://persephonepunch.github.io/crm-sync-setup/security-posture.html): For: Compliance officers, security auditors, and risk assessment teams Date: 2026-06-15
+- [CRM Sync — Security Audit & Paired Data Requirements](https://persephonepunch.github.io/crm-sync-setup/security-audit.html): Date: 2026-05-18 Version: 1.1 Worker Version: dac8f178-f6ed-4a11-96be-f640a67c64ae
+- [Shopify Expiring Token Management](https://persephonepunch.github.io/crm-sync-setup/shopify-token-management.html): As of April 2026, Shopify mandates that all OAuth apps use expiring offline access tokens with rotation. Non-expiring tokens return 403: Non-expiring access tokens are no longer…
+- [Key Ceremony — Loop Review Checklist (Automation)](https://persephonepunch.github.io/crm-sync-setup/key-ceremony-loop-review.html): Version: 1.0 Date: 2026-06-22 Companion to: KEY-MANAGEMENT-LIFECYCLE.md (§8 rotation, §9 ceremony, §10 glossary, §12 ownership) Run mode: recurring automated review (e.g. Claude…
+- [CRM Sync — Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html): Version: 1.5 Date: 2026-07-03 (v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26) Scope: Dev → Stage → Prod key management, consulting team workflow, stakeh…
+- [CRM Sync — Auth Pipelines](https://persephonepunch.github.io/crm-sync-setup/auth-pipelines.html): For: Engineering, security auditors, and compliance teams reviewing authentication architecture Date: 2026-05-19
+
+## Setup
+
+- [Consent, Cookies & Preferences — User Guide](https://persephonepunch.github.io/crm-sync-setup/consent-cookies-preferences.html): The consent banner, cookie preferences, reset, Do Not Sell vs consent, and the audit trail.
+- [CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams](https://persephonepunch.github.io/crm-sync-setup/migration-guide.html): For: Marketing ops, analytics teams, and CRM administrators planning the transition Date: 2026-05-18
+- [Agency → Client Deploy Handoff](https://persephonepunch.github.io/crm-sync-setup/agency-handoff.html): Checklist + Interactive Key Rotation ceremony. This document is the normative handoff procedure for transferring a deployed CRM Sync / headless commerce stack from the implement…
+- [CRM Sync — PWA & Native App Commerce Setup Guide](https://persephonepunch.github.io/crm-sync-setup/readme.html): Ship your CRM as an installable PWA and native app (iOS · Android · desktop) on Shopify + Webflow + Xano — with auth, real-time consent, GA4, and agent permissions. Everything y…
+- [CRM Sync Setup Guide](https://persephonepunch.github.io/crm-sync-setup/setup-guide.html): Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
+
+## Shopify
+
+- [Marketing was built on the page view. The funnel now pays for the consented login.](https://persephonepunch.github.io/crm-sync-setup/segments-ga4-bidding.html): For: Marketing ops, performance media, and analytics engineering Status: Built (GA4 push + audiences) · Direct Google Ads push pending Ads API credentials Date: 2026-07-07 Depen…
+- [Google turned off the list upload. We were never uploading lists.](https://persephonepunch.github.io/crm-sync-setup/segments-google-connect.html): For: Marketing ops, analytics engineering, and the business analyst who owns segments Status: Plan of record · GA4 pipe built · Live Google push routes via the Data Manager API
+- [Shopify App Requirements Checklist (2026)](https://persephonepunch.github.io/crm-sync-setup/shopify-app-checklist.html): A comprehensive, downloadable checklist for building, submitting, and maintaining a Shopify App Store app. Based on Shopify's official App Store requirements and the latest plat…
+- [CRM Sync — Shopify App Platform Changes](https://persephonepunch.github.io/crm-sync-setup/shopify-app-pivot.html): For: Product managers, operations teams, and business stakeholders tracking Shopify app compliance Date: 2026-05-18
+- [Risk & Liability Brief — The 2026 Client-Side Cliff](https://persephonepunch.github.io/crm-sync-setup/SHOPIFY-2026-RISK-BRIEF.pdf): Audience: owners, finance, legal, and engineering leads who carry the downside. As of: 2026-06-21 · Companion to: FORWARD-DEPLOY-AGENTIC-GRAPHQL.md (the fix).
+
+## Specs
+
+- [JS Execution Order — Challenge & Solution](https://persephonepunch.github.io/crm-sync-setup/js-execution-order.html): Consent fires first: the client-JS execution-order contract and the tests that enforce it.
+- [CRM Sync — Why This Architecture Is Safer](https://persephonepunch.github.io/crm-sync-setup/architecture.html): For: Business leaders, compliance officers, and operations teams evaluating CRM Sync Date: 2026-05-18
+- [Process Management Guide — Webflow · Xano · Cloudflare · Shopify](https://persephonepunch.github.io/crm-sync-setup/process-management.html): Audience: Operations, platform engineering, and business stakeholders running a multi-system commerce stack Scope: Public guide. No secrets, credentials, or source code. Process…
+- [CRM Sync — UI Component & ID Registry](https://persephonepunch.github.io/crm-sync-setup/ui-component-registry.html): Canonical naming + delivery model for the storefront UI system (nav, footer, cart, login, search) across design-sync.myshopify.com → crm-sync.dev. One addressable crm- namespace…
+- [CRM Sync — Feature Specification](https://persephonepunch.github.io/crm-sync-setup/feature-spec-accessibility-index.html): Document ID: CRM-FEAT-003 Version: 1.0 Date: 2026-07-06 Status: Published Classification: Public Parent: CRM-FUNC-SPEC-001
+- [Forward-Deploy Guideline — Server-Side GraphQL + Agentic Workflows + Tool Runner](https://persephonepunch.github.io/crm-sync-setup/forward-deploy-agentic-graphql.html): Audience: merchants, app developers, and platform teams planning their Shopify roadmap. Thesis: Shopify's 2025–2026 deprecation cliff retires the client-side / REST / Script-Edi…
+- [CRM Sync — What Traditional CRMs Miss](https://persephonepunch.github.io/crm-sync-setup/ai-native-crm-comparison.html): For: Business leaders, investors, and operations teams evaluating CRM Sync against Salesforce, HubSpot, and Klaviyo Date: 2026-05-19
+- [Analytics Export via Xano Polling + Worker Cron](https://persephonepunch.github.io/crm-sync-setup/analytics-export-spec.html): Version: 1.0 Date: 2026-05-27 Status: Specification
+- [CRM Sync — Functional Specification](https://persephonepunch.github.io/crm-sync-setup/crm-sync-functional-spec.html): Document ID: CRM-SYNC-FUNC-SPEC-001 Version: 1.0 Date: 2026-07-12 Status: Active Classification: Public
+- [Omen — Functional Specification & UAT Release Plan](https://persephonepunch.github.io/crm-sync-setup/functional-spec.html): Engineering record of the Omen build — superseded for CRM Sync by the CRM Sync Functional Specification. Document ID: CRM-FUNC-SPEC-001 Version: 1.19
+- [CRM Sync — Feature Specification Addendum](https://persephonepunch.github.io/crm-sync-setup/feature-spec-ua-migration.html): Document ID: CRM-FEAT-002 Version: 1.0 Date: 2026-05-17 Status: Draft — Architecture Review Parent: CRM-FUNC-SPEC-001 v1.2
+- [CRM Sync — Clean Room Utility & Security Rules](https://persephonepunch.github.io/crm-sync-setup/clean-room.html): Version: 1.1 — Cloudflare-Native Architecture Date: 2026-05-27 Classification: Internal — Confidential Compliance: GDPR Art. 6/9, CCPA §1798.140, CPRA, UK DPA 2018 Infrastructur…
+- [CRM Sync — Event-Driven Integration Spec](https://persephonepunch.github.io/crm-sync-setup/event-driven-integration-spec.html): Version: 1.0 Date: 2026-05-27 Status: Specification Replaces: Cron-only polling for external integrations
+
+## Webflow
+
+- [Webflow App Requirements Checklist (2026)](https://persephonepunch.github.io/crm-sync-setup/webflow-app-checklist.html): A comprehensive, downloadable checklist for building, submitting, and maintaining a Webflow Marketplace app. Based on Webflow's official Marketplace guidelines and the latest pl…

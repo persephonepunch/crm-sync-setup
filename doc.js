@@ -108,6 +108,8 @@
   bar();
   fetch(cfg.md, { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+    // YAML front matter is machine metadata (AI/Jekyll readers) — human render skips it.
+    .then(function (t) { return t.replace(/^---[ \t]*\n[\s\S]*?\n---[ \t]*\n/, ''); })
     .then(render)
     .catch(function (e) {
       document.getElementById('hero').innerHTML =
