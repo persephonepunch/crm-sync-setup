@@ -1,206 +1,198 @@
 ---
 title: "CRM Sync — Security & Compliance Posture"
-description: "For: Compliance officers, security auditors, and risk assessment teams Date: 2026-06-15"
+description: "Encrypted per-tenant credentials, scoped revocable tokens, fail-closed consent, offline-verifiable agent mandates, and a public, dated list of open findings."
 canonical: https://persephonepunch.github.io/crm-sync-setup/security-posture.html
 category: "Security"
-date: 2026-07-03
+date: 2026-07-14
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SECURITY-POSTURE.md
 ---
 # CRM Sync — Security & Compliance Posture
 
-**For:** Compliance officers, security auditors, and risk assessment teams
-**Date:** 2026-06-15
+**For:** compliance officers, security auditors, DPOs, and risk-assessment teams.
+**Last updated:** 2026-07-14 · This document is versioned and public.
+**Companion:** the [CISO / DPO FAQ](CISO-DPO-FAQ.md) answers the same ground in question form. If you
+only read one section here, read **Known Limitations** at the bottom — it is dated and honest.
 
 ---
 
-## The Problem
+## The problem
 
-E-commerce businesses connect to 5-15 external platforms (Shopify, Google Analytics, Adobe, email providers, CRMs, CDPs). Each connection stores credentials, transfers customer data, and creates compliance obligations. The typical approach — storing API keys in environment variables, transferring data via CSV, managing consent in browser cookies — creates three compounding risks:
-
-1. **Credential sprawl.** API keys and tokens scattered across config files, CI pipelines, environment variables, and team spreadsheets. Nobody knows where all the keys are stored, so nobody can confirm they're all rotated after an incident.
-
-2. **Consent without enforcement.** A consent banner sets a cookie. But the server that sends customer data to Salesforce, Klaviyo, or Google Analytics never checks that cookie. Consent is collected but not enforced.
-
-3. **No audit trail for data movement.** Customer data is exported as CSV, emailed between teams, uploaded to platforms. When a customer asks "where is my data?" or "delete my data," there is no log of which systems received it.
+E-commerce businesses connect to 5–15 external platforms (Shopify, Google, Adobe, email, CRMs,
+CDPs). The typical approach — API keys in env vars, data over CSV, consent in browser cookies —
+creates three compounding risks: **credential sprawl** (keys nobody can fully enumerate to rotate
+after an incident), **consent without enforcement** (a banner sets a cookie the send-side server
+never checks), and **no audit trail for data movement** (CSV exports with no record of which system
+received what). CRM Sync is built to remove each one — and to let you verify that it did, rather
+than take our word for it.
 
 ---
 
-## How CRM Sync Addresses Each Risk
+## 1 · Credential management
 
-### 1. Credential Management
-
-| Risk | How CRM Sync Handles It |
+| Risk | How CRM Sync handles it |
 |------|------------------------|
-| Credentials scattered across systems | All credentials stored in one encrypted location per tenant (Cloudflare KV) |
-| Credentials visible in API responses | All secrets are automatically masked — only first 4 and last 4 characters shown |
-| Credentials in code repositories | Credentials stored via encrypted secrets manager, never in source code |
-| One compromised credential affects all clients | Each client (tenant) has its own isolated credentials — one breach cannot access another tenant's data |
-| Credential rotation requires code changes | Updating a credential is a config change — same authenticated, logged process as any other update |
+| Credentials scattered across systems | Stored in one place per tenant — Cloudflare KV + Worker secrets |
+| Credentials visible in API responses | Masked automatically — only first-4/last-4 shown |
+| Credentials in source | Never in source; in the encrypted secret store |
+| One credential compromises all clients | Per-tenant isolation — one breach cannot reach another tenant |
+| Rotation requires a deploy | Rotation is a config change, run through an Interactive Key Ceremony (below) |
 
-### 2. Consent Enforcement
+**What Cloudflare can read.** We state this plainly rather than blur it: KV data is protected by
+**Cloudflare-managed encryption at rest** — encrypted, per-tenant-isolated, masked in every API
+response, and Cloudflare is inside your trust boundary. That is *trust SOC 2 infrastructure*, not
+*trust no one*. Customers needing dedicated infrastructure and full data isolation are directed to
+the Private Worker tier. The independently-verifiable layer in this system is the signed-mandate
+plane (§4), not the storage layer — and we do not conflate the two.
 
-| Risk | How CRM Sync Handles It |
+**Key ceremony.** Every privileged rotation runs as an Interactive Key Ceremony: a human operator
+executes while the tooling prepares and verifies. Secrets never enter logs, transcripts, or an
+operator's screen. Rotations are recorded to an audit log by fingerprint — never the key value.
+
+---
+
+## 2 · Consent enforcement
+
+**Consent is enforced server-side, at the point of transmission** — not modelled and left unchecked.
+Every outbound push to every connected platform checks the subject's consent state before sending.
+
+| Risk | How CRM Sync handles it |
 |------|------------------------|
-| Consent collected but not enforced | Every data push to every platform checks the customer's consent state before sending |
-| Consent stored only in browser cookies | Consent is persisted server-side in the database — survives cookie clearing, works for server-side operations |
-| Consent changes don't propagate | When consent changes, all connected platforms are notified in the same request |
-| No record of consent history | Every consent change is logged with timestamp, source, action, and which systems were notified |
-| AI agents can't verify consent | Consent state is available via authenticated API — machine-readable, not browser-cookie-dependent |
+| Consent collected but not enforced | Every push checks consent before sending |
+| Consent only in a browser cookie | Persisted server-side; survives cookie clearing; works server-side |
+| Consent state unknown | **Fail-closed — we don't send.** Records lacking a consent basis are stored but not projected |
+| Consent changes don't propagate | On withdrawal, connected platforms are notified in the same request — not a nightly reconcile |
+| No consent history | Every change is recorded: subject, type, action, method, policy version, user agent, session id, client + server timestamps |
 
-### 3. Audit Trail
+**Recording consent is not enforcing it.** Most platforms model consent well and have no runtime
+that stops a send. The distinguishing property here is the runtime gate, and it is server-side.
 
-| Risk | How CRM Sync Handles It |
+---
+
+## 3 · Audit trail
+
+| Risk | How CRM Sync handles it |
 |------|------------------------|
-| No log of what data was sent where | Every outbound data push is logged per platform with status (success/failure) and timestamp |
-| Customer asks "where is my data?" | UCP Dashboard shows which platforms have their data and when it was last synced |
-| Customer requests deletion | GDPR handler anonymizes data across all connected systems and logs confirmation |
-| Auditor asks for processing records | Consent log (append-only) + per-platform sync log = complete GDPR Art. 30 record |
-| Config change with no record of who or when | Every configuration change requires authentication and can be logged with before/after comparison |
+| No log of what went where | Every outbound push is logged per platform with status + timestamp |
+| "Where is my data?" | The subject's own dashboard shows which platforms hold their data and when |
+| Deletion request | GDPR handler anonymizes across connected systems and logs confirmation |
+| Records of processing (Art. 30) | Append-only consent records + per-platform sync logs |
+| Config change with no record | Every change is authenticated and logged with before/after |
 
-### 4. Agent-Safe Credential Operations (Interactive Key Ceremony)
-
-CRM Sync is built and operated with AI agents in the loop. That raises a question
-most stacks never answer: **what stops an automated agent from minting, reading, or
-leaking a production secret?** Our answer is structural, not a policy reminder —
-every privileged credential operation (mint, rotate, revoke, set) runs as a
-**two-role ceremony**.
-
-| Risk | How CRM Sync Handles It |
-|------|------------------------|
-| An automation/AI agent could mint or read a production credential | Privileged credential commands are **blocked for the agent** by a permission classifier; only a named **Security Human** executes them interactively. The agent prepares the runbook and verifies the result — it never runs the mint |
-| A secret ends up in a log, transcript, or model context | The new key's value is written **straight to a `chmod 600` file or piped into the secrets manager** — never printed. Read-back surfaces return a masked preview (`564bbe…9298`) or a `(set)` flag only |
-| A botched rotation orphans the root key | Rotation is **additive**: a rotatable key lives alongside the root key, which never moves. A failed ceremony cannot lock anyone out; the root is the always-valid fallback |
-| "Who rotated what, when?" with no provable trail | Each ceremony files an **append-only audit record** carrying SHA-256 fingerprints (never the secret): date, credential, action, executed-by, verified-by, old→new fingerprint, reason, consumers updated. The trail is itself safe to publish |
-| Agent access outlives the engagement | The post-handoff access matrix covers **humans *and* agents**; tier-boundary re-isolation re-mints every credential when crossing shared → private → enterprise |
-
-The full ceremony — flow diagram, trust-boundary model, and audit-record schema —
-is documented in **`docs/KEY-MANAGEMENT-LIFECYCLE.md` §9** and specified normatively
-in **`FUNCTIONAL-SPEC.md` §13 (FR-HANDOFF-02)**.
+The consent log is **append-only by design** — the application exposes no update or delete path on a
+written record; corrections are new records. It is **not yet cryptographically hash-chained**
+(Sprint 2 — see Known Limitations), so we do **not** use the word "tamper-evident" for the consent
+log. Tamper-evidence in this system belongs to the signed-mandate plane below, which is a different
+artifact and genuinely verifiable.
 
 ---
 
-## Authentication Layers
+## 4 · Cryptographic mandate verification — *what you can check without trusting us*
 
-CRM Sync uses four independent authentication mechanisms. Compromising one does not compromise the others:
+Agent authority to transact does not rest on trusting our API. Every agent purchase requires a
+**signed mandate** (Ed25519 / EdDSA) that names the subject, scope, payment rail, and spend cap.
 
-| Layer | What It Protects | How It Works |
-|-------|-----------------|-------------|
-| **Bearer Token** | All admin and sync endpoints | API requests must include a secret key in the request header; per-tenant admin keys checked first, platform key as fallback |
-| **JWT Session** | Customer-facing features (profile, consent, tags) | Signed token issued after login — expires automatically **and is revoked server-side on logout** (denylist with token-lifetime TTL), so a cached copy cannot outlive the session |
-| **HMAC Signature** | All Shopify webhooks and GDPR handlers | Shopify signs each request — the Worker verifies the signature matches |
-| **Cloudflare Access** | Browser access to admin pages | Email-based one-time password verification before any admin page loads |
-
-### Route Coverage
-
-All 67 API endpoints have been audited. Every endpoint that writes data or accesses admin functions requires authentication. 12 endpoints that were previously unprotected were fixed in the May 2026 security hardening. Per-tenant admin keys add granular access control — each tenant can have its own admin key, with the platform key as fallback.
-
-Public endpoints (no auth required): health check, OAuth initiation pages, public embeds, read-only config (secrets masked).
-
-### Session Revocation & Self-Service Owner Keys (July 2026)
-
-Two hardening rounds extended the authentication model beyond expiry-based sessions:
-
-- **Server-side logout revocation.** Logout now denylists the session token at the server
-  (hashed, TTL matched to the token's remaining lifetime). Previously a logged-out session
-  remained technically valid until natural expiry; a token cached in browser storage or
-  history could re-authenticate on a shared machine. Authenticated team surfaces also
-  receive the session token at click time, hold it in memory only, and scrub it from URLs.
-- **Self-service owner keys.** Each app owner holds a dedicated per-store credential they
-  mint, rotate, and revoke themselves through an entitlement-gated wizard — ownership is
-  granted by purchase, never self-assigned. The key value is shown exactly once at mint;
-  rotation writes the replacement before revoking predecessors (no keyless failure mode);
-  every event lands in a per-store, fingerprint-only, append-only audit ledger. The
-  platform operates the key system but never holds the key value. Full treatment:
-  `docs/KEY-MANAGEMENT-LIFECYCLE.md` §13.
+- **Verify it yourself, offline.** Paste any mandate into **`crm-sync.dev/verify`** — the signature,
+  expiry, and not-before check run **in your browser**, against our published public key. The only
+  network call is for the public key. No account, no API round-trip.
+- **Public keys** are served as a standard JWKS at **`crm-sync.dev/.well-known/jwks.json`**.
+- **Tamper shows.** Alter a mandate's cap, scope, or subject and verification fails — demonstrable
+  in the same tool.
+- **Spend caps are enforced fail-closed** at the data plane before any checkout executes; an
+  over-cap attempt is refused (covered by an automated end-to-end test).
+- **The refusal is in the tool boundary, not a prompt.** Agents call the same server-side gate as any
+  client; the gate holds when you swap the model. A prompt is guidance; this is a control.
 
 ---
 
-## Supply Chain Risk
+## Authentication layers
 
-### The Partner Trust Problem
+Four independent mechanisms; compromising one does not compromise the others.
 
-Every platform CRM Sync connects to is a trust boundary. A compromised credential or partner API could be used to access customer data. Here's how each partner's risk is contained:
+| Layer | Protects | How |
+|-------|----------|-----|
+| **Bearer token** | Admin + sync endpoints | Secret key per request; per-tenant admin keys checked first, platform key as fallback (see Known Limitations on disabling the platform key) |
+| **JWT session** | Customer features (profile, consent, tags) | A **signed (HMAC-SHA256) cookie** — tamper-evident, auto-expiring. *Signed, not encrypted*: it carries no secret payload, it proves the session wasn't forged |
+| **HMAC signature** | Shopify webhooks + GDPR handlers | Shopify signs each request; the Worker verifies |
+| **Cloudflare Access** | Browser admin pages | Email OTP before any admin page loads |
 
-| Partner | What Could Go Wrong | How CRM Sync Contains It |
-|---------|--------------------|-----------------------|
-| **Shopify** | Compromised admin token exposes customer data | Token stored per-tenant (not shared); auto-refreshed; scoped to minimum permissions |
-| **Webflow** | Compromised CMS token allows data injection | Token scoped per site; data validated before writing |
-| **Google Analytics** | API secret stolen allows fake event injection | Only category data sent (no personal information); synthetic user IDs prevent enumeration |
-| **Adobe AEP** | OAuth compromise allows profile manipulation | Short-lived tokens; all personal data hashed before transmission |
-| **Email provider** | API key compromise allows sending email as your brand | Only two email templates exist (welcome and password reset); tokens are single-use |
-| **Third-party code packages** | Malicious code in dependency tree | Zero third-party packages in production — this entire risk category is eliminated |
-
-### Disabling a Compromised Partner
-
-If any partner is compromised, the response is:
-
-1. Set that partner's toggle to "disabled" in config (one API call)
-2. The credential is never read again
-3. No code change, no deployment, no downtime
-4. Takes less than 30 seconds
+**Route coverage.** Every route is classified in the published [route matrix](SECURITY-AUDIT.md);
+each route that writes data or reaches admin functions requires authentication. Twelve
+previously-open routes were closed on 2026-05-17 (listed in the audit). Public routes: health,
+OAuth initiation, public embeds, the public JWKS, the offline verifier, and read-only config with
+secrets masked.
 
 ---
 
-## GDPR / Privacy Compliance
+## Supply-chain risk
 
-### Data Subject Rights
+| Partner | What could go wrong | How it's contained |
+|---------|--------------------|--------------------|
+| **Shopify** | Compromised admin token | Per-tenant token; auto-refreshed; min scopes |
+| **Webflow** | Compromised CMS token | Scoped per site; data validated before write |
+| **Google** | API secret stolen | Analytics receives category + consent state, **no PII**; audience uploads use **SHA-256-hashed** identifiers only |
+| **Adobe AEP** | OAuth compromise | Short-lived tokens; **all personal data SHA-256-hashed before transmission** |
+| **Email** | API key compromise | Two templates only (welcome, reset); scoped token |
+| **Third-party packages** | Malicious dependency | **Zero third-party packages in production** — the runtime uses only built-in platform capabilities; this risk category is eliminated |
 
-| Right | How CRM Sync Supports It |
-|-------|-------------------------|
-| **Right of access** (Art. 15) | UCP Dashboard shows customers their consent history, sync status, and which platforms have their data |
-| **Right to erasure** (Art. 17) | Deletion handler anonymizes customer data across all connected systems and logs confirmation |
-| **Right to withdraw consent** (Art. 7) | Consent toggle in dashboard → immediate propagation to all platforms |
-| **Records of processing** (Art. 30) | Consent records (append-only) + per-platform sync logs = complete processing record |
-| **Data minimization** (Art. 5) | Only consented data categories are pushed; personal information is hashed for analytics platforms |
-
-### GDPR Webhooks
-
-Three mandatory Shopify GDPR endpoints are implemented:
-
-1. **Customer data request** — returns all stored data for a customer
-2. **Customer deletion** — anonymizes all customer personal data
-3. **Shop deletion** — deletes all data 48 hours after app uninstall
-
-All three verify request authenticity via cryptographic signature before processing.
+**Disabling a compromised partner:** set that partner's toggle to disabled in config (one
+authenticated API call). The credential is never read again. No code change, no deploy — the
+disconnect is a config change, not a release.
 
 ---
 
-## Privacy Guarantees
+## GDPR / privacy
 
-| Guarantee | How It's Enforced |
-|-----------|------------------|
-| **Consent before collection** | Consent signals fire before any tracking; system defaults to "denied" if consent is unknown |
-| **Consent before sharing** | Each platform has its own consent requirement; checked before every data push |
-| **Personal data never sent to analytics** | Email, phone, and name are hashed (one-way) before sending to Google Analytics or Adobe |
-| **Tenant isolation** | Each store's data and credentials are completely separate — one store cannot access another's data |
-| **Append-only audit logs** | Consent changes and sync events cannot be modified or deleted — only new records are added |
+| Right | Support |
+|-------|---------|
+| Access (Art. 15) | The subject's own dashboard shows consent history, sync status, and which platforms hold their data — self-service, no ticket |
+| Erasure (Art. 17) | Deletion handler anonymizes across connected systems and logs confirmation |
+| Withdraw consent (Art. 7) | Dashboard toggle → propagation to platforms in the same request |
+| Records of processing (Art. 30) | Append-only consent records + per-platform sync logs |
+| Data minimization (Art. 5) | Only consented categories are pushed; PII is hashed for analytics |
 
----
+**Shopify GDPR webhooks** (customer data request, customer redact, shop redact) are implemented and
+verify a cryptographic signature before processing.
 
-## Remaining Hardening Items
-
-| Item | Priority | Status |
-|------|----------|--------|
-| Rate limiting on login and signup endpoints | Medium | Planned |
-| Rate limiting on consent endpoint | Medium | Planned |
-| Content Security Policy headers on embedded pages | Low | Planned |
-| Security response headers on all API responses | Low | Planned |
+**What PII leaves the system.** Raw PII never leaves the Worker. Adobe and Google audience uploads
+receive **SHA-256 hashes**; GA4 receives **no PII** — only tag categories and consent state.
 
 ---
 
-## For Auditors: Quick Reference
+## Known limitations and remediation dates
 
-**Where are credentials?** → Cloudflare KV, encrypted at rest, one key per tenant, masked in all API responses.
+*Nobody who is bluffing publishes this section. It is why the sections above are believable.*
 
-**Where does customer data flow?** → Only to platforms where (1) the platform is enabled in config AND (2) the customer has granted the required consent. Every transfer is logged.
+| Finding | Severity | Status |
+|---------|----------|--------|
+| Consent ledger is append-only by application design, **not** hash-chained | High | Sprint 2 |
+| Consent writes are best-effort idempotent, **not** exactly-once (duplicate records possible under retry) | High | Sprint 2 |
+| Sync conflict resolution is most-recent-write-wins — wrong for consent, where a later sync could overwrite an earlier withdrawal (correcting to last-intent-wins) | High | Sprint 2 |
+| Consent Mode v2: `ad_storage` / `ad_user_data` / `ad_personalization` are driven by one marketing flag, not separately electable | Medium | Planned |
+| Platform admin key authenticates tenant routes and cannot yet be disabled per tenant | Medium | Sprint 2 |
+| Ed25519 signing private key resides in Cloudflare KV, not a dedicated secrets vault | Medium | Sprint 2 |
+| No revocation of a signed mandate faster than its expiry (mandates are short-lived + scoped) | Medium | Planned |
+| CSP headers on embedded pages | Low | Open |
+| `X-Content-Type-Options: nosniff` on JSON responses | Low | Open |
 
-**How is consent tracked?** → Server-side in Xano database, append-only log, timestamped, with source and affected systems recorded.
+**Recently closed (2026-07-14):** `/auth/consent-sync` requires an authenticated session and binds
+the subject id to the login token (unauthenticated writes → 401); per-IP rate limiting added to
+`/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/auth/consent-sync`.
 
-**What happens during a breach?** → Disable the affected platform (30 seconds). Credential is never read again. Per-tenant isolation means other tenants are unaffected.
-
-**What's the software supply chain risk?** → Zero third-party packages in production. The processing engine uses only built-in platform capabilities.
+**Already closed:** twelve routes moved from open to authenticated on 2026-05-17 —
+`/admin/init-tag-system`, `/admin/xano-schema`, `/admin/xano-reseed`, `/admin/register-webhooks`,
+`/admin/webflow-ensure-fields`, `/admin/webflow-sync-test`, `/admin/webflow-test`,
+`/admin/shopify-customers`, `/admin/shopify-test`, `/sync/customers`, `/sync/webflow`,
+`/tags/create`.
 
 ---
 
-*Technical reference: [SECURITY-AUDIT.md](SECURITY-AUDIT.md) (route matrix, data pair contracts)*
-*Technical reference: [FEATURE-SPEC-UA-MIGRATION.md](FEATURE-SPEC-UA-MIGRATION.md) (canonical specification)*
+## The standard we hold ourselves to
+
+We will not state a control we haven't shipped. Where an honest answer would embarrass us, the
+response is to fix it — not to word it carefully. One carefully-worded answer poisons the other
+forty, and a reviewer would find it anyway. The section above is how we keep that promise in public.
+
+---
+
+*Technical references: [SECURITY-AUDIT.md](SECURITY-AUDIT.md) (route matrix, data-pair contracts) ·
+[CISO-DPO-FAQ.md](CISO-DPO-FAQ.md) (the same posture in question form).*
