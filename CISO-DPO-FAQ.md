@@ -25,8 +25,10 @@ the subject id is bound to that token server-side, so a forged or client-supplie
 consent for anyone else (a mismatch is rejected). Consent given *before* login — at the cookie
 banner, before a subject has a session — is applied immediately client-side via Consent Mode v2 and
 written to the ledger only when the subject authenticates. The pre-session banner never makes an
-unauthenticated server write. (This is verifiable: an unauthenticated `POST /auth/consent-sync`
-returns 401.)
+unauthenticated server write.
+
+**Verify it yourself:** an unauthenticated `POST https://crm-sync.dev/auth/consent-sync` returns
+**401**. The thing you can run beats the thing you have to believe.
 
 **Can a record be modified or deleted after the fact?**
 The ledger is append-only. There is no update or delete path on a written record — corrections are
@@ -155,7 +157,7 @@ Disable any partner integration with one authenticated config call. No code chan
 |---------|----------|--------|
 | Consent ledger is append-only but not hash-chained | High | Sprint 2 |
 | Consent writes are best-effort idempotent, not exactly-once (duplicate records possible) | High | Sprint 2 |
-| Conflict resolution is most-recent-write-wins; wrong for consent | High | Sprint 2 |
+| Conflict resolution is most-recent-write-wins — a later sync can overwrite an earlier consent withdrawal; correcting to last-intent-wins (this is the §2 "limitation we'll name" finding) | High | Sprint 2 |
 | Consent Mode v2: `ad_storage`, `ad_user_data`, `ad_personalization` all driven by one marketing flag — not separately electable | Medium | Planned |
 | Platform admin key authenticates tenant routes and cannot yet be disabled per tenant | Medium | Sprint 2 |
 | Ed25519 signing private key resides in Cloudflare KV, not a dedicated secrets vault | Medium | Sprint 2 |
