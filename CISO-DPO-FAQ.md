@@ -139,6 +139,15 @@ that's the Private Worker tier.
 Raw PII never leaves the Worker. Adobe receives SHA-256 hashes. GA4 receives no PII at all — only tag
 categories and consent state.
 
+**What about card data — the PAN, the CVV?**
+Neither ever reaches us. Payments are tokenized by the wallet (Apple / Google / Samsung Pay) or by
+Stripe in the browser before anything touches our servers; we settle against a gateway token, never a
+card number. We checked this by construction, not by policy: no field named for a card number or CVV
+exists anywhere in the code; **no table in our data store has a column that could hold one** (we read
+the schema of all 70); nothing logs one; and the reconciliation ledger is id/ref-only by design.
+Cardholder data is therefore out of scope of this system by construction (an SAQ A shape) — you
+confirm your own SAQ level with your acquirer.
+
 **Bus factor. Handover. What happens if you disappear?**
 A documented key-rotation ceremony, a RACI, and a normative agency-to-client handoff procedure — all
 public. The enforcement plane is deliberately small so that it can be handed over.
