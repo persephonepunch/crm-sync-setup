@@ -145,6 +145,36 @@ Webflow (Gateway) ←→ Worker ←→ Shopify (Commerce)
 
 Each pair defines: what data crosses the boundary, which direction, what trigger, and what security contract.
 
+**Thesis — keep the castle and the moat; distribute the gold.** The incumbent's mistake is not having walls — it is **hoarding all the gold in one vault behind them.** That vault is the blast radius: one breach takes everything, and the hoarding also locks the value away from the people who need it. This architecture keeps the castle and the moat — **Cloudflare's WAF, DDoS, and edge governance still stand** — but **spreads the gold across many pockets**: PCI in Shopify, PII/consent in Xano, a draft mirror in Webflow, grants that verify with a public key. The result is **security *and* accessibility in the same move** — nothing concentrated to steal, everything reachable to those authorized:
+
+- **The walls stand, but they hoard nothing.** Being *inside* the perimeter grants nothing — every request is re-verified per-action (403 without the right consent/mandate). The castle governs access; it does not store the treasure.
+- **No single vault.** The gold sits in many pockets — Shopify (PCI), Xano (PII/consent), a draft Webflow mirror. Breach one and you get a *fragment*, never the hoard.
+- **No secret to steal.** Entitlement grants are offline-verifiable with a **public** key — the proof of trust is not a secret an attacker can exfiltrate.
+- **No single point to take down.** Three legs, self-healing — the loss of any one leg is a Tuesday, not a breach.
+- **Distributed = usable.** Because the gold is spread out **for people and agents to use** (consent-gated), distribution *is* the accessibility model — not a vault to petition, a network to reach.
+
+"Zero Trust" is simply the admission that a hoarded, *trusted* vault is how you get breached.
+
+**Substrate ≠ Security.** Webflow and Xano are *where this runs* — not *what makes it safe.* The controls live in the architecture below: HMAC-SHA256 mandates, PKCE + OIDC auth, JWT sessions, per-action authorization, offline-verifiable Ed25519 grants, real-time consent. These are the same cryptographic primitives enterprise systems use — and the agentic model (A2A *read* vs AP2 *spend*, per-action gating, revocable consent) is one most enterprise CRMs do not have at all. No-code substrate; enterprise-grade boundary logic. **Judge the boundary logic, not the vendor logos.**
+
+**Closed-boundary software and AI governance.** A closed, monolithic, single-vendor boundary governs by *containment* — a fixed perimeter, a fixed release cadence, a policy engine you cannot reach into. For human-speed CRM that is tolerable. For governing an autonomous, real-time AI actor it is a liability, because AI incidents move faster than a closed system can respond. A closed boundary denies the three capabilities AI governance requires:
+
+- **It cannot heal.** When state drifts or a record corrupts, a closed system waits for the vendor's next sync, patch, or support ticket — while an agent compounds the error on stale data. Self-healing (idempotent reconcile; the mirror that rebuilds itself from the system of record) is the only thing that keeps an autonomous actor off bad data.
+- **It cannot fall back.** A monolith degrades to *off*: if its one plane is down, governance stops — and the agents either halt (lost commerce) or, worse, proceed **ungoverned** (a control gap is an incident). Graceful degradation (authorize offline, capture online, buffer-and-replay across three legs) keeps the guardrails *on* even when a leg is down. Governance must fail closed **and keep working**.
+- **It cannot forward-deploy.** When an incident needs a rule changed *now* — revoke a mandate, tighten a scope, block a rail — a closed boundary makes you file a change request and wait for a release window. An edge-deployed, code-owned governance layer pushes the new rule to every request in seconds. AI incident remediation is measured in seconds, not sprints.
+
+**Implication:** you cannot govern an autonomous, real-time actor with a system that changes only on the vendor's schedule, recovers only on the vendor's timeline, and works only when every component is up. AI governance requires a layer you can **heal, fall back, and forward-deploy at the speed the AI operates** — which a closed boundary, by definition, forbids. This is the "Risk Management for AI Incident Remediation" framework the architecture names.
+
+**Layer model** (canonical: the published architecture at <https://crm-sync.webflow.io>). Five layers, each with a distinct job; no single one is a hard dependency — the three-leg design degrades gracefully if any is unavailable:
+
+1. **Cloudflare — edge governance (the "God layer").** Edge OTP + admin-only gating, WAF, DDoS protection, bot mitigation, secrets, rate limits. Governs security for every request — but is **not a single point of failure**: entitlement grants are offline-verifiable (Ed25519 public key), writes buffer and replay, and the PWA serves cached reads.
+2. **Authentication Layer.** Google (OAuth + PKCE), Shopify (OIDC + PKCE), Email/Password (Xano direct).
+3. **Verification Layer — Xano.** Find-or-create users; the **system of record** for identity, PII, and consent state.
+4. **Token.** Worker-issued JWT (7-day TTL) — the scoped session / mandate credential.
+5. **Data Layer.** Webflow (Collection Sync + Entitlement — the draft-only CRM mirror, Pair 2), Shopify (metaobjects, tags, A2A/AP2 JSON — the **PCI plane**: cardholder data stays in Shopify's PCI scope), GA4 + Adobe/BAU (user props, UCP conversions).
+
+**Plane separation:** payment/cardholder data stays in **Shopify's PCI scope**; identity / PII / consent are the **Xano** system of record; **Webflow** holds a draft-only CRM read-model mirror (no PCI, no Webflow commerce); **Cloudflare** governs but is not depended upon.
+
 #### Pair 1: Shopify ↔ Xano (Customer Identity)
 
 | Field | Shopify Source | Xano Table | Direction | Trigger |
@@ -161,7 +191,14 @@ Each pair defines: what data crosses the boundary, which direction, what trigger
 
 **Security:** HMAC-SHA256 on webhooks. Admin token (OAuth access token) for GraphQL. Token auto-refreshed before 60-min expiry.
 
-#### Pair 2: Xano ↔ Webflow CMS (Customer Profiles)
+#### Pair 2: Xano → Webflow (Customers CRM mirror — resilience leg)
+
+The Webflow "Customers" collection is a **read-model CRM mirror / backup** of Shopify customer profiles — the same role Salesforce or HubSpot play (contact PII, consent *state*, and commerce *aggregates* for CRM use). It is one leg of the **three-leg resilience design** (Shopify ↔ Xano ↔ Webflow): if one leg is unavailable, the customer read-model still exists in the others. Mirror items are written as **drafts** — a back-office copy, not published to the live public site.
+
+**Plane separation (why this is a CRM mirror, not a PCI / commerce exposure):**
+- **Shopify = PCI plane** — cardholder / payment data never leaves Shopify's PCI-compliant scope. We never store, mirror, or transmit card data.
+- **Xano = PII / identity / consent** — the system of record.
+- **Webflow = CRM mirror + presentation** — the profile read-model only, draft-only. **Webflow's native E-commerce is NOT used** (no products, checkout, orders, or payment data).
 
 | Field | Xano Source | Webflow CMS Field | Direction | Trigger |
 |-------|------------|-------------------|-----------|---------|
@@ -170,15 +207,13 @@ Each pair defines: what data crosses the boundary, which direction, what trigger
 | First/Last Name | `storefront_users.first_name/last_name` | `first-name`, `last-name` | Xano → Webflow | Sync |
 | Provider | `storefront_users.provider` | `provider` | Xano → Webflow | Sync |
 | Status | Derived from tags | `status` | Xano → Webflow | Sync |
-| Tags (flat) | `storefront_users.tags` | `tags` | Xano → Webflow | Sync |
-| Tag Refs | `user_tag_map` | `tag-refs` (ItemRefSet) | Xano → Webflow | Sync |
-| Consent fields | `user_claims.*` | `consent-tos/privacy/cookie/marketing` | Xano → Webflow | Sync |
-| Commerce | `storefront_users.*` | `number-of-orders`, `amount-spent`, `country` | Xano → Webflow | Sync |
+| Tags | `storefront_users.tags` / `user_tag_map` | `tags`, `tag-refs` | Xano → Webflow | Sync |
+| Consent state | `user_claims.*` | `consent-tos/privacy/cookie/marketing` | Xano → Webflow | Sync |
+| Commerce aggregates | `storefront_users.*` | `number-of-orders`, `amount-spent`, `country` | Xano → Webflow | Sync |
 | Shopify ID | `storefront_users.shopify_gid` | `shopify-customer-id` | Xano → Webflow | Sync |
 | Adobe fields | `user_extras.*` | `adobe-ecid/email-hash/sync-status/last-synced/identity-graph-id` | Xano → Webflow | Sync |
-| CMS edits | Webflow CMS item | `storefront_users.*` | Webflow → Xano | Webhook |
 
-**Security:** Webflow CMS token via OAuth. Webflow webhook verified via state nonce.
+**Security:** Webflow CMS token (write-scoped, worker-held). Mirror items are **drafts** (off the live site). **No PCI / cardholder data** is ever mirrored — payment data stays in Shopify's PCI plane. The mirror performs **no transactional or commerce function**; it is a CRM read-model backup, comparable to a Salesforce/HubSpot contact sync.
 
 #### Pair 3: Xano ↔ GA4 (Analytics Events)
 
