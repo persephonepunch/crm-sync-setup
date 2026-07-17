@@ -431,6 +431,12 @@ This lets your customers log in using their existing Shopify account — no sepa
 
 #### Step 3 — Add Redirect URL
 
+> **If the "Application setup" card is greyed out / read-only** (the pencil does
+> nothing): open the **Partner dashboard → your store's custom app → API access
+> requests** and enable **"Allow network access in checkout and account UI
+> extensions."** That toggle releases the card for editing. Do not waste time on
+> reinstalling the app or the Dev Dashboard — neither unlocks it.
+
 On the same Customer Account API page, add your Worker's callback URL:
 
 ```
