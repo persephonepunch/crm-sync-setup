@@ -1,14 +1,14 @@
 ---
-title: "CRM Sync Setup Guide"
-description: "Everything you need to get your CRM system running. Complete each section in order — each one builds on the last."
+title: "CRM Sync Setup Reference"
+description: "The full technical reference for the CRM Sync stack. New users: start with the short numbered guide at crm-sync.dev/start — this page is for depth."
 canonical: https://persephonepunch.github.io/crm-sync-setup/setup-guide.html
 category: "Setup"
 date: 2026-07-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SETUP-GUIDE.md
 ---
-# CRM Sync Setup Guide
+# CRM Sync Setup Reference
 
-> **Getting started?** Use the interactive [Setup Wizard](https://crm.story-story.ai/setup) — it walks you through each step with direct links and live status checks.
+> **Getting started?** Follow the [step-by-step setup at crm-sync.dev/start](https://crm-sync.dev/start) — a short numbered list that tells you exactly where each key comes from and which screen it goes into. This page is the full reference, for when you want every detail behind those steps.
 
 Everything you need to get your CRM system running. Complete each section in order — each one builds on the last.
 
@@ -705,132 +705,27 @@ For consent event reporting in GA4:
 </details>
 
 <details>
-<summary><strong>Alternative: GTM Setup (Google Tag Manager)</strong></summary>
+<summary><strong>Google Tag Manager — not required</strong></summary>
 
-If you prefer managing tags through Google Tag Manager instead of hardcoding gtag.js, use this approach. GTM gives you a visual interface to manage all your tags, triggers, and consent settings.
+**You do not need a GTM container to measure anything.** GA4 is delivered via `gtag` in the CRM Sync
+stack loader (`/embed/stack-loader.js`), with Consent Mode v2 defaults applied before any tag fires.
 
-#### Step 1 — Create a GTM Container
+GTM is **optional and additive**: if you already maintain your own marketing tags in a container, paste
+its `GTM-` ID into **Connect Google → Tag Manager container** and CRM Sync loads that container behind
+the same consent gate as everything else. Point the container at your own tags — not at the GA4
+property you connected above, or that property will count every hit twice.
 
-1. Go to [tagmanager.google.com](https://tagmanager.google.com/)
-2. Click **Create Account**
-3. Name it (e.g., "OMEN Site")
-4. Container name: your domain (e.g., `omenphase1-1.webflow.io`)
-5. Target platform: **Web**
-6. Copy your **Container ID** (looks like `GTM-XXXXXXX`)
+This section previously walked through creating a container and pasting the snippet into Webflow. That
+was written for the OMEN/Webflow-era build and did not describe how the app actually ships tags, so it
+has been removed rather than left to contradict the product.
 
-#### Step 2 — Install GTM on Your Webflow Site
+If you run your own GTM container for reasons of your own, it can coexist — just don't expect CRM Sync
+to populate it.
 
-**Head Code** (Webflow Site Settings > Custom Code > Head Code):
-
-```html
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
-<!-- End Google Tag Manager -->
-
-<!-- Consent defaults (MUST be before GTM loads GA4) -->
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('consent', 'default', {
-  'analytics_storage': 'denied',
-  'ad_storage': 'denied',
-  'ad_user_data': 'denied',
-  'ad_personalization': 'denied',
-  'functionality_storage': 'granted',
-  'security_storage': 'granted',
-  'wait_for_update': 500
-});
-</script>
-```
-
-**Body Code** (immediately after `<body>` — Webflow doesn't have a body slot, so add this to Head Code as well):
-
-```html
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-```
-
-Replace `GTM-XXXXXXX` with your Container ID.
-
-#### Step 3 — Create GTM Tags
-
-In GTM, create these tags:
-
-##### Tag 1: GA4 Configuration
-
-| Setting | Value |
-|---|---|
-| Tag Type | Google Tag |
-| Tag ID | `G-XXXXXXXXXX` (your GA4 Measurement ID) |
-| Trigger | Consent Initialization - All Pages |
-
-> Use **Consent Initialization** trigger (not All Pages) so consent defaults are set before GA4 loads.
-
-##### Tag 2: GA4 — Consent Update Event
-
-| Setting | Value |
-|---|---|
-| Tag Type | GA4 Event |
-| Event Name | `consent_update` |
-| Configuration Tag | (your GA4 tag from above) |
-| Event Parameters | `consent_tos`, `consent_privacy`, `consent_cookie`, `consent_marketing`, `consent_method` |
-| Trigger | Custom Event: `consent_update` |
-
-##### Tag 3: GA4 — Newsletter Signup Event
-
-| Setting | Value |
-|---|---|
-| Tag Type | GA4 Event |
-| Event Name | `newsletter_signup` |
-| Configuration Tag | (your GA4 tag from above) |
-| Event Parameters | `email` → `{{DLV - email}}`, `session_id` → `{{DLV - session_id}}`, `signup_timestamp` → `{{DLV - signup_timestamp}}`, `consent_marketing` → `{{DLV - consent_marketing}}`, `crm_user_id` → `{{DLV - crm_user_id}}`, `source_page` → `{{Page Path}}` |
-| Trigger | Custom Event: `newsletter_signup` |
-
-##### Tag 4: GA4 — CRM Tags Updated Event
-
-| Setting | Value |
-|---|---|
-| Tag Type | GA4 Event |
-| Event Name | `crm_tags_updated` |
-| Configuration Tag | (your GA4 tag from above) |
-| Event Parameters | `tags_added` → `{{DLV - tags_added}}`, `tags_removed` → `{{DLV - tags_removed}}`, `campaign_tags` → `{{DLV - campaign_tags}}` |
-| Trigger | Custom Event: `crm_tags_updated` |
-
-#### Step 4 — Create Data Layer Variables
-
-In GTM > Variables > User-Defined Variables, create these **Data Layer Variables**:
-
-| Variable Name | Data Layer Variable Name |
-|---|---|
-| DLV - email | `email` |
-| DLV - session_id | `session_id` |
-| DLV - signup_timestamp | `signup_timestamp` |
-| DLV - consent_marketing | `consent_marketing` |
-| DLV - crm_user_id | `crm_user_id` |
-| DLV - tags_added | `tags_added` |
-| DLV - tags_removed | `tags_removed` |
-| DLV - campaign_tags | `campaign_tags` |
-| DLV - consent_tos | `consent_tos` |
-| DLV - consent_privacy | `consent_privacy` |
-| DLV - consent_cookie | `consent_cookie` |
-| DLV - consent_method | `consent_method` |
-
-#### Step 5 — Create Triggers
-
-| Trigger Name | Type | Event Name |
-|---|---|---|
-| Consent Update | Custom Event | `consent_update` |
-| Newsletter Signup | Custom Event | `newsletter_signup` |
-| CRM Tags Updated | Custom Event | `crm_tags_updated` |
-
-#### Step 6 — Publish
-
-Click **Submit** in GTM to publish your container.
+**Setting up for the first time?** The canonical, step-by-step new-user guide — including where every
+key comes from — is **[crm-sync.dev/start](https://crm-sync.dev/start)**, with the key reference at
+**[crm-sync.dev/start#keys](https://crm-sync.dev/start#keys)**. It is maintained against the running
+worker, so it stays correct as the app changes.
 
 </details>
 
