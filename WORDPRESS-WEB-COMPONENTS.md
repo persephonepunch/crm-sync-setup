@@ -17,7 +17,7 @@ A Webflow export is vanilla HTML/CSS. Vanilla HTML plus two sets of platform-neu
 
 ## The Web Components block (production pattern)
 
-This is the pattern running in production on the OMEN build — a Webflow-designed page where product data, pricing, variants, and cart actions are handled entirely by Shopify's custom elements. It is the block you carry into every delivery target in this guide:
+This is the pattern running in production on the [OMEN build](https://omenphase1-1.webflow.io/) — a Webflow-designed page where product data, pricing, variants, and cart actions are handled entirely by Shopify's custom elements. It is the block you carry into every delivery target in this guide:
 
 ```html
 <!-- 1 · The loader: one script, no build step -->
