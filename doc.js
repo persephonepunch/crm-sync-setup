@@ -103,6 +103,14 @@
       var w = document.createElement('div'); w.style.overflowX = 'auto';
       t.parentNode.insertBefore(w, t); w.appendChild(t);
     });
+    // Docs render inside the store's KB modal iframe, and the store refuses to be
+    // framed — an absolute link (crm-sync.dev deep links, external citations) that
+    // navigates the IFRAME dies with "refused to connect". Absolute links escape to
+    // the top window instead; relative/same-doc links keep working in-frame.
+    art.querySelectorAll('a[href^="http"]').forEach(function (a) {
+      a.target = '_top';
+      if (!a.rel) a.rel = 'noopener';
+    });
   }
 
   bar();
