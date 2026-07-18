@@ -27,7 +27,7 @@ body{
 /* ---- top command bar (nav + downloads) --------------------------------- */
 .docbar{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92);
   backdrop-filter:saturate(1.6) blur(8px); border-bottom:1px solid var(--g2)}
-.docbar .inner{max-width:940px; margin:0 auto; padding:11px 40px;
+.docbar .inner{max-width:1180px; margin:0 auto; padding:11px 40px;
   display:flex; align-items:center; gap:18px; flex-wrap:wrap;
   font:600 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase}
 .docbar a{color:var(--g5); text-decoration:none; display:inline-flex; align-items:center; gap:6px}
@@ -40,7 +40,7 @@ body{
   stroke-linecap:round; stroke-linejoin:round}
 
 /* ---- shell ------------------------------------------------------------- */
-.wrap{max-width:940px; margin:0 auto; padding:56px 40px 104px}
+.wrap{max-width:1180px; margin:0 auto; padding:56px 40px 104px}
 
 /* ---- hero -------------------------------------------------------------- */
 .hero{padding-bottom:30px; margin-bottom:14px; border-bottom:2px solid var(--cyan)}
@@ -97,7 +97,7 @@ body{
 .doc ul:has(input[type=checkbox]){list-style:none; padding-left:2px}
 
 /* ---- footer ------------------------------------------------------------ */
-.docfoot{max-width:940px; margin:0 auto; padding:24px 40px 60px;
+.docfoot{max-width:1180px; margin:0 auto; padding:24px 40px 60px;
   border-top:1px solid var(--g3); color:var(--g4); font:12px/1.6 var(--mono);
   letter-spacing:.04em; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap}
 .docfoot a{color:var(--g5); text-decoration:none}
