@@ -1,4 +1,4 @@
-# Data Layer — WordPress, Astro, Headless
+# File System Agnostic Publishing
 
 **Status:** Living guide · **Scope:** One Webflow design, delivered as a custom WordPress theme or an EmDash/Astro site, with the storefront behavior riding along unchanged — Shopify Storefront Web Components for commerce, CRM Sync embeds for consent, identity, and the connected data plane.
 
