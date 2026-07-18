@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM Sync on a Custom WordPress Theme — Shopify Web Components from Your Webflow Design</title>
+<meta name="description" content="One Webflow design, delivered as a custom WordPress theme (Udesly or Pinegrow) or an EmDash/Astro site — with Shopify Storefront Web Components and the CRM Sync behavior layer riding along unchanged.">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="CRM Sync on a Custom WordPress Theme — Shopify Web Components from Your Webflow Design">
+<meta property="og:description" content="The migration is theme packaging, not a rebuild: Udesly or Pinegrow for WordPress, EmDash for Astro — the Web Components block and CRM Sync embeds carry across verbatim.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./doc.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html#article","headline":"CRM Sync on a Custom WordPress Theme — Shopify Web Components from Your Webflow Design","alternativeHeadline":"The migration is theme packaging, not a rebuild","description":"One Webflow design, delivered as a custom WordPress theme (Udesly or Pinegrow) or an EmDash/Astro site — with Shopify Storefront Web Components and the CRM Sync behavior layer riding along unchanged.","datePublished":"2026-07-18","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/WORDPRESS-WEB-COMPONENTS.md","citation":[{"@type":"WebPage","name":"Shopify Storefront Web Components","url":"https://shopify.dev/docs/api/storefront-web-components"},{"@type":"WebPage","name":"Udesly — Webflow to WordPress converter","url":"https://www.udesly.com/"},{"@type":"WebPage","name":"Pinegrow — native WordPress theme builder from HTML","url":"https://pinegrow.com/"},{"@type":"WebPage","name":"EmDash — full-stack TypeScript CMS on Astro","url":"https://github.com/emdash-cms/emdash"},{"@type":"WebPage","name":"Introducing EmDash (Cloudflare)","url":"https://blog.cloudflare.com/emdash-wordpress/"},{"@type":"WebPage","name":"CRM Sync Setup Reference","url":"https://www.crm-sync.dev/pages/knowledge-base#setup-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HowTo","@id":"https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html#howto-wordpress","name":"Ship a Webflow design as a custom WordPress theme with Shopify Web Components and CRM Sync","description":"Convert the Webflow export with Udesly (fast loop, Webflow stays canonical) or Pinegrow (native theme output), then carry the Shopify Storefront Web Components block and the CRM Sync embeds across verbatim.","totalTime":"P1D","tool":[{"@type":"HowToTool","name":"Udesly","url":"https://www.udesly.com/"},{"@type":"HowToTool","name":"Pinegrow","url":"https://pinegrow.com/"}],"supply":[{"@type":"HowToSupply","name":"Webflow site export (vanilla HTML/CSS)"},{"@type":"HowToSupply","name":"Shopify store domain (Storefront API enabled)"},{"@type":"HowToSupply","name":"CRM Sync tenant keys"}],"step":[{"@type":"HowToStep","position":1,"name":"Export the Webflow design","text":"Export the site from Webflow. The export is vanilla HTML/CSS — the design source of truth stays in Webflow if you choose the Udesly loop."},{"@type":"HowToStep","position":2,"name":"Convert to a WordPress theme","text":"Udesly: run the extension on the export and convert with a largely no-code workflow — fastest when Webflow remains canonical. Pinegrow: build a native WordPress theme or blocks from the HTML — exported PHP/JS runs without Pinegrow or runtime plugins, better for long-term maintainability."},{"@type":"HowToStep","position":3,"name":"Enqueue the behavior layer","text":"In functions.php, enqueue the Shopify Web Components module (https://cdn.shopify.com/storefront/web-components.js) and the CRM Sync embed loaders (https://crm-sync.dev/embed/…) via wp_enqueue_scripts."},{"@type":"HowToStep","position":4,"name":"Place components in theme templates","text":"Put shopify-store, shopify-context, shopify-data, shopify-money, shopify-variant-selector, and shopify-cart in template parts — not in post content, where KSES sanitization can strip custom elements and shopify-attr--* attributes."},{"@type":"HowToStep","position":5,"name":"Connect the store and keys","text":"Set store-domain on shopify-store and complete the CRM Sync tenant configuration per the Setup Reference.","url":"https://www.crm-sync.dev/pages/knowledge-base#setup-guide"},{"@type":"HowToStep","position":6,"name":"Verify commerce and consent","text":"Confirm product contexts hydrate, add-to-cart and buy-now act on live variants, and the CRM Sync consent surfaces fire before measurement."}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HowTo","@id":"https://persephonepunch.github.io/crm-sync-setup/wordpress-web-components.html#howto-emdash-astro","name":"Ship a Webflow design on EmDash/Astro with Shopify Web Components and CRM Sync","description":"Re-home the Webflow export in EmDash — the Astro-based full-stack TypeScript CMS — keeping pages static while Shopify Storefront Web Components hydrate live commerce in the browser.","totalTime":"P1D","tool":[{"@type":"HowToTool","name":"EmDash","url":"https://github.com/emdash-cms/emdash"},{"@type":"HowToTool","name":"Astro","url":"https://astro.build/"}],"supply":[{"@type":"HowToSupply","name":"Webflow site export (vanilla HTML/CSS)"},{"@type":"HowToSupply","name":"Shopify store domain (Storefront API enabled)"},{"@type":"HowToSupply","name":"CRM Sync tenant keys"}],"step":[{"@type":"HowToStep","position":1,"name":"Export the Webflow design","text":"Export the site from Webflow. The vanilla HTML/CSS ports into Astro layouts and components largely as-is."},{"@type":"HowToStep","position":2,"name":"Scaffold EmDash on Astro","text":"Stand up EmDash — the full-stack TypeScript CMS built on Astro, with plugins in sandboxed Worker isolates — and port the exported structure into src/layouts and src/pages."},{"@type":"HowToStep","position":3,"name":"Inline the behavior layer","text":"Add the Shopify Web Components module and the CRM Sync embed loaders as is:inline scripts in the storefront layout so Astro ships them untouched instead of bundling them."},{"@type":"HowToStep","position":4,"name":"Place components in .astro templates","text":"Astro passes unknown elements through as plain HTML: shopify-store, shopify-context, shopify-data, shopify-money, shopify-variant-selector, and shopify-cart need no client directives — they hydrate themselves from the Storefront API."},{"@type":"HowToStep","position":5,"name":"Connect the store and keys","text":"Set store-domain on shopify-store and complete the CRM Sync tenant configuration per the Setup Reference.","url":"https://www.crm-sync.dev/pages/knowledge-base#setup-guide"},{"@type":"HowToStep","position":6,"name":"Verify static output with live commerce","text":"Build statically and confirm the pages stay static while product data, pricing, variants, cart, and CRM Sync consent surfaces hydrate live in the visitor's browser."}]}
+</script>
+</head>
+<body
+  data-md="./WORDPRESS-WEB-COMPONENTS.md"
+  data-title="CRM Sync on a Custom WordPress Theme — Shopify Web Components from Your Webflow Design"
+  data-kicker="Delivery · Webflow → WordPress · EmDash/Astro"
+  data-sub="The migration is theme packaging, not a rebuild: Udesly or Pinegrow for WordPress, EmDash for Astro — the Shopify Web Components block and the CRM Sync embeds carry across verbatim."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/WORDPRESS-WEB-COMPONENTS.md">
+  <div class="wrap">
+    <header id="hero" class="hero"><span class="doc-status">Loading…</span></header>
+    <article id="doc" class="doc"></article>
+  </div>
+  <footer class="docfoot">
+    <span>CRM Sync · Webflow · Xano · Cloudflare · Shopify</span>
+    <span>Monochrome · print / PDF ready</span>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="./doc.js"></script>
+</body>
+</html>
