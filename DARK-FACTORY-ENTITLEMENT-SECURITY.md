@@ -58,6 +58,12 @@ A "mandate for AI agents" is not a new security category. It is permissions for 
 
 **7 · Mini slingshots, not fortresses.** The monolith is the fortress, and the fortress is the breach: one perimeter, one blast radius, too big for anyone to audit. Build many small, grant-scoped, individually auditable services — each too small to breach interestingly, each cheap to lose and redeploy. The only monolith worth keeping is the append-only ledger, and the ledger never ships to a client.
 
+## The leaders still lead — the bridge is the gap
+
+None of this displaces the undisputed leaders. Siemens and Rockwell run the world's factories; their platforms are the system of record for physical operations, and that is not changing — nor should it. What has changed around them is speed and shape: **AI now moves against operational data in real time, and the leaders' functional data shape was designed for a different era** — historians, asset graphs, and proprietary interchange formats built for batch reporting and human-paced workflows, exchanged as exactly the opaque-blob documents this article opened with. Making that data addressable by fast-moving AI *without* making it the next deserialization surface is the bridge problem, and it is extra work the platforms were never designed to do themselves.
+
+That bridge is what the entitlement substrate is for, and it is a coexistence layer by construction: the envelope gives the leaders' functional data a searchable, inert, warehouse-joinable head without touching the system of record; healing per-row encryption lets that data move to AI consumers at real-time speed while possession stays separated from access; the grant engine scopes every AI tool-call to an entitlement boundary; and the ledger hands Insights Hub, FactoryTalk, and the auditors behind them the evidence trail regulation now demands. The leaders keep the factory. The substrate keeps the gate and the receipts — and feeds everything back into the platforms the operation already trusts.
+
 ## The asymmetry, stated once
 
 A flaw in a bundled runtime costs the ecosystem a global rebuild. A flaw in a silo monolith costs its deepest customers an active breach. A flaw in a grant-scoped service costs one revoked entitlement and one redeployment — and the ledger answers, with evidence, the only question that matters in the incident: *who accessed what while it was vulnerable?* That is the question neither the bundle model nor the silo model can answer today, and the one every auditor, regulator, and dark factory will be asking from here on.
