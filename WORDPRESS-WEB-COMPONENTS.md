@@ -138,6 +138,22 @@ The two protocol families answer the same question — "how do peers share data 
 
 For a storefront, IPFS's model is the better fit twice over. The pin-it-for-me industry only exists on the IPFS side — there is no Pinata-of-Hypercore, so a "DAT endpoint" resolves to IPFS in practice. And immutable CIDs are a release-engineering feature, not a limitation: every publish is a cryptographically named artifact, promotion is pointing the gateway at the new CID, and rollback is pointing it back. Hypercore's stable-address, live-updating feed is the right shape for chat and collaborative data (which is exactly where Holepunch took it) — but a storefront wants named releases, and that is what content addressing gives you for free.
 
+## The publishing-cost ledger — Firebase vs the PWA rails
+
+The same portability argument has a price tag. The conventional way to ship an app around a Shopify store is a Firebase-backed build distributed through the app stores; the CRM Sync model is a PWA served from the edge. Two very different meters:
+
+| Cost driver | Firebase (Blaze) | PWA on Cloudflare + Xano |
+| --- | --- | --- |
+| Hosting / egress | 10GB/mo free, then [$0.15/GB transferred](https://firebase.google.com/docs/hosting/usage-quotas-pricing) | Workers ~$5/mo flat, 10M requests included, zero egress fees |
+| Auth | Free to 50K MAU, then ~$0.0055/MAU | PKCE + JWT at the worker — no per-MAU meter |
+| Data operations | Firestore ~$0.60/M reads, ~$1.80/M writes | Xano flat plan, unlimited API requests |
+| Push | FCM free | Web Push (VAPID) from the worker — free |
+| Shipping an update | Deploy free; every client re-downloads on the egress meter | Service-worker version bump on deploy; no review gate |
+
+At hobby scale Firebase is effectively free — its allowances cover a small app entirely. The difference is the shape, not the starting price: every Firebase meter (egress, operations, MAU) is wired to user growth, the exact variable a successful app maximizes. The edge stack's marginal cost per additional install is approximately zero until the request cap, and the bill is a constant either way.
+
+**Distribution is where the real money moves.** A store-distributed app pays the platform 15–30% of every sale — on a $90 one-time purchase, that is $13.50–$27 per copy, plus the developer-program fees and a review cycle on every update. The browser-installed PWA pays card processing (~3%) and nothing else, and the same build feeds native wrappers when a store presence is a choice rather than a requirement. At even 100 sales a month, the avoided store cut is one to two orders of magnitude larger than the entire infrastructure delta — the publishing-cost argument is a distribution argument wearing an infrastructure costume.
+
 ## The migration in one sentence
 
 Export the Webflow design; convert it with [Udesly](https://www.udesly.com/) (fast loop, Webflow stays canonical) or [Pinegrow](https://pinegrow.com/) (native theme, WordPress becomes canonical) — or re-home it in [EmDash](https://github.com/emdash-cms/emdash) on Astro; carry the Shopify Web Components block and the CRM Sync script tags across verbatim; connect keys per the [Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide). Or skip servers entirely and [pin the export to IPFS with Pinata](https://pinata.cloud/). The design moved. The behavior layer never noticed.
