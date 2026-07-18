@@ -111,9 +111,22 @@ The Web Components block needs exactly one adaptation in Astro: mark the loader 
 
 Astro's compiler passes unknown elements through as plain HTML — `<shopify-context>`, `<shopify-data>`, and friends need no client directives because they are not framework components; they hydrate themselves. Static output (`astro build`) works: the elements fetch live Storefront API data from the visitor's browser, so the pages stay static while the commerce stays current. EmDash adds the editorial layer (content collections, admin, auth) on top without touching any of it.
 
+## The decentralized path — pinning the export to IPFS with Pinata
+
+The furthest extension of the same argument: if the export is vanilla HTML and the behavior layer is client-side, the "server" can be a content-addressed network instead of a server at all. [Pinata](https://pinata.cloud/) pins the Webflow export to IPFS and serves it through a [dedicated gateway](https://docs.pinata.cloud/gateways/dedicated-ipfs-gateways) with a [custom domain](https://knowledge.pinata.cloud/en/articles/5455526-set-up-a-custom-domain-for-your-gateway) — restricted gateways serve only the CIDs pinned to your account, so the domain serves your site and nothing else. (If you've seen this called a "DAT endpoint": Dat/Hypercore is a sibling peer-to-peer protocol — Pinata is IPFS, and this guide's pattern applies to any content-addressed host.)
+
+Why the stack survives the move intact:
+
+- **Commerce is browser-side.** `<shopify-store>` and friends fetch the Storefront API from the visitor's browser — there is no origin server involved, so an immutable, content-addressed page serves live prices, variants, and cart exactly as a WordPress page would.
+- **The CRM Sync layer is CORS-open.** The embeds and worker endpoints answer any origin; sessions are origin-bound as usual, so register the gateway's custom domain as the tenant's callback origin (same per-tenant OAuth configuration as any other domain move).
+- **Forms already bypass the host.** Webflow-native form handling never survives an export anywhere — on CRM Sync builds, forms post to the worker's form socket, which works identically from an IPFS gateway.
+- **Publishing is versioning.** Every re-pin produces a new CID: content-addressed hosting gives you immutable, cryptographically-named releases of the storefront for free — point the gateway (or DNSLink) at the new CID to release, at the old one to roll back.
+
+The one discipline it demands: keep internal links relative in the export and lean on Webflow's CDN-absolute asset URLs (which the export already does), so the site renders identically whether the root is a domain or a CID.
+
 ## The migration in one sentence
 
-Export the Webflow design; convert it with [Udesly](https://www.udesly.com/) (fast loop, Webflow stays canonical) or [Pinegrow](https://pinegrow.com/) (native theme, WordPress becomes canonical) — or re-home it in [EmDash](https://github.com/emdash-cms/emdash) on Astro; carry the Shopify Web Components block and the CRM Sync script tags across verbatim; connect keys per the [Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide). The design moved. The behavior layer never noticed.
+Export the Webflow design; convert it with [Udesly](https://www.udesly.com/) (fast loop, Webflow stays canonical) or [Pinegrow](https://pinegrow.com/) (native theme, WordPress becomes canonical) — or re-home it in [EmDash](https://github.com/emdash-cms/emdash) on Astro; carry the Shopify Web Components block and the CRM Sync script tags across verbatim; connect keys per the [Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide). Or skip servers entirely and [pin the export to IPFS with Pinata](https://pinata.cloud/). The design moved. The behavior layer never noticed.
 
 ---
 
