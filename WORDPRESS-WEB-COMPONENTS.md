@@ -124,6 +124,20 @@ Why the stack survives the move intact:
 
 The one discipline it demands: keep internal links relative in the export and lean on Webflow's CDN-absolute asset URLs (which the export already does), so the site renders identically whether the root is a domain or a CID.
 
+### DAT/Hypercore vs IPFS — the two decentralized models
+
+The two protocol families answer the same question — "how do peers share data without a server?" — from opposite directions. **IPFS addresses content**: every file hashes to a CID, the address *is* the hash, and a given CID is immutable forever. **Dat/Hypercore addresses authors**: the address is a public key, and it points to a signed append-only log that the keyholder keeps writing to — the address stays stable while the content updates underneath it. (Naming note: Dat was the folder-syncing product of the mid-2010s; [Hypercore](https://hypercore-protocol.org/) is the log primitive that was always inside it, renamed to top billing in 2020 and carried forward today by [Holepunch](https://holepunch.to/).)
+
+| | IPFS | Dat/Hypercore |
+| --- | --- | --- |
+| Address | Hash of content (CID) | Public key of the writer |
+| Updates | New CID per change; repoint the gateway or DNSLink | Same address, append to the log |
+| History | Snapshots you choose to keep pinned | Built into the append-only log |
+| Discovery | Global public DHT — anyone with the CID can fetch | Key required to find or replicate a feed |
+| Commercial hosting | Mature ([Pinata](https://pinata.cloud/), web3.storage, Filecoin) | Essentially none |
+
+For a storefront, IPFS's model is the better fit twice over. The pin-it-for-me industry only exists on the IPFS side — there is no Pinata-of-Hypercore, so a "DAT endpoint" resolves to IPFS in practice. And immutable CIDs are a release-engineering feature, not a limitation: every publish is a cryptographically named artifact, promotion is pointing the gateway at the new CID, and rollback is pointing it back. Hypercore's stable-address, live-updating feed is the right shape for chat and collaborative data (which is exactly where Holepunch took it) — but a storefront wants named releases, and that is what content addressing gives you for free.
+
 ## The migration in one sentence
 
 Export the Webflow design; convert it with [Udesly](https://www.udesly.com/) (fast loop, Webflow stays canonical) or [Pinegrow](https://pinegrow.com/) (native theme, WordPress becomes canonical) — or re-home it in [EmDash](https://github.com/emdash-cms/emdash) on Astro; carry the Shopify Web Components block and the CRM Sync script tags across verbatim; connect keys per the [Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide). Or skip servers entirely and [pin the export to IPFS with Pinata](https://pinata.cloud/). The design moved. The behavior layer never noticed.
