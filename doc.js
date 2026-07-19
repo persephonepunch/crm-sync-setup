@@ -103,13 +103,19 @@
       var w = document.createElement('div'); w.style.overflowX = 'auto';
       t.parentNode.insertBefore(w, t); w.appendChild(t);
     });
-    // Docs render inside the store's KB modal iframe, and the store refuses to be
-    // framed — an absolute link (crm-sync.dev deep links, external citations) that
-    // navigates the IFRAME dies with "refused to connect". Absolute links escape to
-    // the top window instead; relative/same-doc links keep working in-frame.
-    art.querySelectorAll('a[href^="http"]').forEach(function (a) {
-      a.target = '_top';
-      if (!a.rel) a.rel = 'noopener';
+    // Docs render inside the store's KB modal iframe. THIRD-PARTY links (eur-lex,
+    // digital-strategy, vendor advisories) open a NEW WINDOW — navigating the frame
+    // to a framing-refusing host blanks the modal, and _top would eject the visitor
+    // from the store. Site-family links (crm-sync.dev deep links, sibling docs) keep
+    // the whole-page _top swap so KB deep links work without a recursive modal-in-
+    // modal. Covers the HERO too — the Tags meta row previously escaped rewriting,
+    // and its in-frame EU-site navigation was the field-reported blank.
+    var FAMILY = /^https?:\/\/((www\.)?crm-sync\.dev|persephonepunch\.github\.io)\//i;
+    [document.getElementById('hero'), art].forEach(function (root) {
+      root.querySelectorAll('a[href^="http"]').forEach(function (a) {
+        a.target = FAMILY.test(a.href) ? '_top' : '_blank';
+        if (!a.rel) a.rel = 'noopener';
+      });
     });
   }
 
