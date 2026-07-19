@@ -3,13 +3,13 @@ title: "CRM Sync — What Traditional CRMs Miss"
 description: "For: Business leaders, investors, and operations teams evaluating CRM Sync against Salesforce, HubSpot, and Klaviyo Date: 2026-05-19"
 canonical: https://persephonepunch.github.io/crm-sync-setup/ai-native-crm-comparison.html
 category: "Specs"
-date: 2026-05-29
+date: 2026-07-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/AI-NATIVE-CRM-COMPARISON.md
 ---
 # CRM Sync — What Traditional CRMs Miss
 
 **For:** Business leaders, investors, and operations teams evaluating CRM Sync against Salesforce, HubSpot, and Klaviyo
-**Date:** 2026-05-19
+**Date:** 2026-05-19 · **Updated:** 2026-07-19
 
 ---
 
@@ -65,6 +65,16 @@ Klaviyo and HubSpot depend on client-side JavaScript for tracking, which ad bloc
 
 HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Klaviyo charges per profile. Salesforce charges per user seat plus per-feature add-ons. CRM Sync charges per infrastructure tier ($69 shared, $325 private) — no per-contact penalty for growing your customer base.
 
+## 11. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
+
+Salesforce sells warehouse-grade identity as Data Cloud — consumption credits on top of platform licensing. HubSpot gates warehouse sync behind Operations Hub. Klaviyo offers CSV exports. CRM Sync takes the commodity path: a consent-gated `user_id` flows through GA4's free BigQuery export into a Google Cloud project you own.
+
+**The cost side is commodity infrastructure.** The GA4 daily export to BigQuery is free. BigQuery's free tier (10 GiB storage, 1 TiB of queries per month) covers a typical store end-to-end; past that you pay published on-demand rates (about $6.25 per TiB queried, about $0.02 per GiB-month stored) — pennies per month at DTC volumes, in your own project under your own IAM. There is no per-contact or per-profile multiplier on identity.
+
+**The benefit side only exists with consent.** The `user_id` is attached only when the consent gate has passed (Consent Mode v2). A non-consented session still produces aggregate analytics, but never an identity-bearing row. Everything downstream inherits that property: retargeting audiences built from newsletter signups, revenue-weighted Smart Bidding signals pushed through Data Manager, predicted-LTV models trained in BQML. Each is compliant by construction, because a non-consented ID was never emitted in the first place.
+
+The asymmetry is the point: carrying the ID costs almost nothing, while the consented benefit is a first-party audience and bidding asset that survives ad blockers, cookie deprecation, and ad-platform policy churn. Traditional CRMs invert this — you pay platform rates for identity whether or not you can lawfully activate it.
+
 ---
 
 ## Comparison Table
@@ -80,4 +90,5 @@ HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Kla
 | Architecture | Monolithic platform | Monolithic platform | Email-focused platform | Composable orchestration |
 | GDPR compliance | Privacy Center add-on | Basic tools | Limited | Built into data model |
 | Analytics tracking | Client-side JS | Client-side JS | Client-side JS | Server-side (ad-block proof) |
+| Warehouse identity | Data Cloud add-on (credits) | Operations Hub add-on | CSV export | Consent-gated `user_id` in your BigQuery (free GA4 export) |
 | Pricing model | Per seat + add-ons | Per contact tier | Per profile | Per infrastructure tier |
