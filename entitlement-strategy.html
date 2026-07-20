@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How RBAC, ABAC, and RuBAC relate; why WordPress roles, AWS IAM, and Azure RBAC stop at the door; and how an entitlement plane with purchase-granted capability caps, envelope encryption, and AP2 mandates gates AI agents.">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/entitlement-strategy.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Entitlement Strategy — RBAC, ABAC, RuBAC & Permissions for AI Agents","datePublished":"2026-07-20","author":{"@type":"Organization","name":"CRM Sync"},"about":["RBAC","ABAC","RuBAC","AI agent permissions","entitlements","access control"],"url":"https://persephonepunch.github.io/crm-sync-setup/entitlement-strategy.html"}</script>
+<title>Entitlement Strategy — RBAC, ABAC, RuBAC &amp; Permissions for AI Agents</title>
+<style>
+  @page { margin: 22mm 20mm; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #0a0a0a; max-width: 720px; margin: 0 auto; line-height: 1.55; font-size: 11.5px; }
+  h1 { font-size: 26px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .kicker { font-family: "Courier New", monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #767676; margin-bottom: 18px; }
+  .lead { font-size: 13.5px; margin: 10px 0 22px; }
+  h2 { font-size: 15px; margin: 26px 0 8px; border-bottom: 1px solid #0a0a0a; padding-bottom: 4px; }
+  h3 { font-size: 12px; margin: 16px 0 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 10.5px; }
+  th, td { border: 1px solid #0a0a0a; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { font-family: "Courier New", monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: #f2f2f2; }
+  code { font-family: "Courier New", monospace; font-size: 10px; background: #f2f2f2; padding: 0 3px; }
+  .rule { border-left: 3px solid #0a0a0a; padding: 6px 12px; margin: 12px 0; font-size: 12px; }
+  ul { margin: 6px 0 12px; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  .refs { font-size: 10px; color: #333; }
+  .refs li { margin-bottom: 6px; }
+  .foot { margin-top: 28px; padding-top: 8px; border-top: 1px solid #ccc; font-family: "Courier New", monospace; font-size: 9px; color: #767676; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<div class="kicker">Strategy &middot; Access Control &middot; CRM Sync Platform &middot; 2026-07-20</div>
+<h1>Entitlement Strategy — RBAC, ABAC, RuBAC &amp; Permissions for AI Agents</h1>
+<p class="lead"><strong>From role gates to policy bound to data.</strong> How RBAC (role-based), ABAC (attribute-based), and RuBAC (rule-based) access control actually relate; why role-based perimeters — WordPress roles, AWS IAM, Azure RBAC — stop at the door; and how the entitlement plane extends the same discipline to a subject the incumbents were never designed for: the AI agent.</p>
+
+<h2>1 &middot; Thesis</h2>
+<p>Every mainstream permission system answers one question: <em>who may open the door?</em> The questions that decide real-world outcomes are different: <em>what does this specific subject hold, right now, on this specific object, under which terms — and how do we take it back?</em> The entitlement plane answers those. Policy is <strong>data</strong> (purchase-granted roles carrying scoped capability caps), enforcement is at the <strong>data plane</strong> (per-asset envelope encryption; possession of bytes is worthless without a grant), revocation is an <strong>operation</strong> (rotate one key, every outstanding copy dies), and every decision leaves <strong>evidence</strong> (a hash-chained ledger, verifiable against a published key at <code>/.well-known/jwks.json</code> by anyone, with no account and no trust in the platform).</p>
+
+<h2>2 &middot; The door-check pattern: three incumbents, one failure joint</h2>
+<table>
+  <tr><th></th><th>WordPress roles</th><th>AWS IAM</th><th>Azure RBAC / Entra</th></tr>
+  <tr><td><strong>Model</strong></td><td>Roles = flat bundles of global capabilities (<code>edit_posts</code> = all posts)</td><td>Identity policies over control-plane APIs; ABAC via tags exists but governs <em>resources</em>, not app users</td><td>Role assignments at scopes (subscription → resource); ABAC conditions narrow (e.g. blob storage)</td></tr>
+  <tr><td><strong>Granularity stops at</strong></td><td>Site / post-type; per-object requires plugins enforcing in PHP at render time</td><td>The AWS resource boundary; your application's users and objects are "your problem" — hence Cedar</td><td>The Azure resource boundary; app roles are coarse claims stamped into a token</td></tr>
+  <tr><td><strong>The naked file</strong></td><td><code>wp-content/uploads</code> = public URL, zero policy</td><td>S3 presigned URL = bearer access, irrevocable until expiry</td><td>SAS tokens = same bearer pattern</td></tr>
+  <tr><td><strong>Revocation semantics</strong></td><td>Role change ≠ recall of anything already served</td><td>Policy change ≠ recall of presigned URLs</td><td>Assignment change ≠ recall of issued SAS/tokens mid-lifetime</td></tr>
+</table>
+<p>The common structure: all three are <strong>perimeter authorization over containers</strong>. None bind policy to the data itself; all three have weak revocation. The industry has already conceded the gap — AWS shipped <strong>Cedar / Verified Permissions</strong>, Google published <strong>Zanzibar</strong> (now OpenFGA), and <strong>OPA</strong> exists, all because role gates do not compose into application-level authorization. Each of those is a policy-as-data engine. The entitlement plane is the same conclusion, plus the step none of them take: cryptographic enforcement at the asset.</p>
+
+<h2>3 &middot; The layered model is the standard, not a workaround</h2>
+<p>A role gate at the door with attribute rules underneath is the architecture the standards bodies recommend:</p>
+<ul>
+  <li><strong>NIST SP 800-162</strong> (Guide to Attribute Based Access Control) frames RBAC as a <em>special case</em> of ABAC in which the evaluated attribute is "role." The role check is the first layer of the general model — not an alternative to it.</li>
+  <li><strong>Kuhn, Coyne &amp; Weil, "Adding Attributes to Role-Based Access Control"</strong> (IEEE Computer, June 2010) — by authors of the RBAC standard itself — endorses the <em>role-centric hybrid</em>: roles set the ceiling of what a subject may ever do; attributes constrain what they can do right now, on this object, in this context.</li>
+</ul>
+<p><strong>Where RuBAC fits.</strong> Rule-based access control (RuBAC) evaluates condition rules — time windows, network, object state — against a request. In NIST’s framing it is not a rival model but the policy half of ABAC: attributes describe the subject, object, and context; rules decide. A mature stack therefore layers all three: an RBAC gate at the door, RuBAC condition rules in the policy engine, and attributes carrying the per-subject, per-object facts those rules consume.</p>
+<div class="rule">Purchase-granted roles carrying scoped capability caps are the Kuhn role-centric hybrid, implemented: the purchase grants the ceiling (RBAC); the caps, entitlement state, and consent snapshot are the attributes (ABAC); the evaluation of them per object and per request is the rule layer (RuBAC).</div>
+
+<h2>4 &middot; The entitlement plane, concretely</h2>
+<ul>
+  <li><strong>Grant, not file.</strong> Assets are sealed in per-asset envelopes (AES-256-GCM). Delivery is server-side decryption against the caller's entitlement, per request. There is no public URL to leak, cache, or scrape.</li>
+  <li><strong>Policy as data.</strong> Entitlements are records — purchase-granted, scoped, per-subject, revocable — evaluated at request time. Changing policy is a state change, not a redeploy.</li>
+  <li><strong>Revocation heals.</strong> Rotating an asset key kills every outstanding envelope copy at once. Refund-driven or abuse-driven revocation is one recorded operation.</li>
+  <li><strong>Decisions leave evidence.</strong> Every mint, grant, denial, download, and revocation lands in a hash-chained ledger; certificates are Ed25519-signed and third-party-verifiable against the published JWKS. This is the accountability record GDPR expects and the evidence artifact CRA Article&nbsp;14 reporting presumes.</li>
+  <li><strong>Coexistence, not replacement.</strong> The plane sits beside WordPress, AWS, and Azure estates and feeds them: those systems keep governing their containers; the entitlement plane governs the objects and subjects they cannot see.</li>
+</ul>
+
+<h2>5 &middot; Agent &amp; AI gating: the subject the incumbents never modeled</h2>
+<p>Role systems assume a human who logs in occasionally and holds standing permissions. An AI agent is the opposite subject: it acts continuously, delegates, and cannot safely hold a role-wide grant — an agent with "Editor everywhere, forever" is an incident report with a timestamp. Agent authorization requires exactly the properties the entitlement plane already has:</p>
+<ul>
+  <li><strong>Agents are first-class subjects</strong> in the same engine — no parallel permission vocabulary. Agent capability is gated by an explicit cap (<code>caps.a2a</code>), granted and revoked like any entitlement.</li>
+  <li><strong>Mandates, not sessions.</strong> Autonomous purchase runs under an AP2-style mandate: a scoped, time-boxed, consent-anchored authorization for a <em>specific</em> action envelope (<code>create_mandate</code> → <code>agentic_checkout</code>). The mandate is the ceiling; caps constrain within it — the Kuhn hybrid applied to machines.</li>
+  <li><strong>Identity travels encrypted.</strong> The acting party is resolved server-side from a decrypted JWE token — never from a claim the agent asserts about itself. An agent cannot name its own principal.</li>
+  <li><strong>Consent is an input, not a footnote.</strong> Agent actions evaluate the subject's consent snapshot at decision time, and the snapshot is signed into the resulting certificate.</li>
+  <li><strong>Every agent action is ledgered.</strong> Agent-initiated grants, purchases, and denials land in the same hash-chained record as human actions — one audit surface, machine and human alike.</li>
+  <li><strong>Tool surfaces are gated.</strong> Agent-facing interfaces (MCP tools) expose only operations the caller's entitlements permit; the tool list is a projection of the grant, not a menu plus a prayer.</li>
+</ul>
+<div class="rule">Principle: <strong>agents get entitlements, never roles.</strong> A role is standing power; an entitlement is a scoped, revocable, evidenced grant. Standing power plus autonomy is how AI incidents happen.</div>
+
+<h2>6 &middot; Strategy summary</h2>
+<table>
+  <tr><th>Layer</th><th>Question it answers</th><th>Mechanism</th></tr>
+  <tr><td>RBAC gate (door)</td><td>Who may enter at all?</td><td>Roles — including the incumbents' (WP/IAM/Azure), which coexist</td></tr>
+  <tr><td>Capability caps (ABAC)</td><td>What can this subject do here, now?</td><td>Purchase-granted, scoped caps evaluated per request (NIST 800-162 / Kuhn hybrid)</td></tr>
+  <tr><td>Agent mandates</td><td>What may this <em>machine</em> do, for whom, until when?</td><td>AP2 mandates + <code>caps.a2a</code> + JWE-resolved principal + consent snapshot</td></tr>
+  <tr><td>Data-plane crypto</td><td>What happens if every layer above fails?</td><td>Envelope encryption; leak yields ciphertext; rotation = revocation</td></tr>
+  <tr><td>Evidence</td><td>Can anyone prove what happened?</td><td>Hash-chained ledger; Ed25519 certificates; public JWKS verification</td></tr>
+</table>
+
+<h2>7 &middot; References</h2>
+<ul class="refs">
+  <li>NIST SP 800-162, <em>Guide to Attribute Based Access Control (ABAC) Definition and Considerations</em> — https://csrc.nist.gov/pubs/sp/800/162/upd2/final (PDF: https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-162.pdf)</li>
+  <li>D.R. Kuhn, E.J. Coyne, T.R. Weil, "Adding Attributes to Role-Based Access Control," <em>IEEE Computer</em> 43(6), June 2010 — https://csrc.nist.gov/files/pubs/journal/2010/06/adding-attributes-to-rolebased-access-control/final/docs/kuhn-coyne-weil-10.pdf (DOI 10.1109/MC.2010.155)</li>
+  <li>NIST ABAC project overview — https://csrc.nist.rip/projects/abac/</li>
+  <li>NIST SP 800-207, <em>Zero Trust Architecture</em> (policy enforcement point model) — https://csrc.nist.gov/pubs/sp/800/207/final</li>
+  <li>Amazon Cedar / Verified Permissions; Google Zanzibar (USENIX ATC 2019) / OpenFGA; Open Policy Agent — the industry's policy-as-data concessions.</li>
+</ul>
+
+<div class="foot"><span>CRM Sync &middot; Entitlement Strategy &middot; v1.0 &middot; 2026-07-20</span><span>Monochrome &middot; print / PDF ready</span></div>
+
+</body>
+</html>
