@@ -2,10 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="How RBAC, ABAC, and RuBAC relate; why WordPress roles, AWS IAM, and Azure RBAC stop at the door; and how an entitlement plane with purchase-granted capability caps, envelope encryption, and AP2 mandates gates AI agents.">
-<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/entitlement-strategy.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Entitlement Strategy — RBAC, ABAC, RuBAC & Permissions for AI Agents","datePublished":"2026-07-20","author":{"@type":"Organization","name":"CRM Sync"},"about":["RBAC","ABAC","RuBAC","AI agent permissions","entitlements","access control"],"url":"https://persephonepunch.github.io/crm-sync-setup/entitlement-strategy.html"}</script>
 <title>Entitlement Strategy — RBAC, ABAC, RuBAC &amp; Permissions for AI Agents</title>
 <style>
   @page { margin: 22mm 20mm; }
@@ -76,7 +72,29 @@
 </ul>
 <div class="rule">Principle: <strong>agents get entitlements, never roles.</strong> A role is standing power; an entitlement is a scoped, revocable, evidenced grant. Standing power plus autonomy is how AI incidents happen.</div>
 
-<h2>6 &middot; Strategy summary</h2>
+<h2>6 &middot; Terminology precision</h2>
+<ul>
+  <li><strong>MAC — claim the property, not the label.</strong> Classical MAC (Bell-LaPadula lineage; SELinux, classification lattices) means centrally assigned labels no subject can alter. This plane is not label-lattice MAC — creators set sharing states on their own objects. What it <em>does</em> have is MAC's defining property: <strong>mandatory, non-discretionary enforcement</strong> — no subject, human or agent, can extend access they hold; possession of bytes confers nothing; revocation executes without the holder's cooperation. NIST SP 800-162 notes ABAC policy can be enforced in exactly this non-discretionary manner.</li>
+  <li><strong>RABAC, not "RBDAC."</strong> Roles whose effective permissions vary dynamically with context is a named, citable model: <em>RABAC — Role-Centric Attribute-Based Access Control</em> (Jin, Sandhu &amp; Krishnan, 2012). Purchase-granted roles with runtime-evaluated caps are RABAC with dynamic entitlements. Invented acronyms next to real ones weaken the citable stack.</li>
+  <li><strong>Three control types in the runners — named correctly.</strong> File delivery is <em>rule-based access control</em> over entitlement attributes (per-request rules deciding on live grants). Task runners are <em>least-privilege service principals</em> under scoped credentials (blast radius bounded by what the credential can reach). Deploy guards, dry-run gates, and publish locks are <em>workflow gating</em> — operational governance, not access control. Delegated runs inherit the subject's entitlements, never the platform's.</li>
+</ul>
+
+<h2>7 &middot; The application-scope boundary: RBAC-only stacks vs out-of-scope modules</h2>
+<p>The deeper split is not which acronym a stack implements but <em>where its enforcement lives</em>. WordPress, the cloud IAMs, and the modern Next.js stack (Sanity for content, Better Auth or Clerk for identity) all enforce inside the file system or application scope — the app is the guard. The entitlement plane's modules live outside both: policy as data at the edge, enforcement cryptographic at the asset. When the application is compromised, only one of these designs still holds.</p>
+<table>
+  <tr><th></th><th>WordPress</th><th>AWS IAM / Azure RBAC</th><th>Next.js + Sanity + Better Auth / Clerk</th><th>Entitlement modules — outside file-system &amp; application scope</th></tr>
+  <tr><td><strong>Where policy lives</strong></td><td>App code + DB, inside the install</td><td>Cloud control plane (infra scope)</td><td>App middleware + role claims in the vendor's token</td><td>Policy-as-data at the edge, independent of any app deployment</td></tr>
+  <tr><td><strong>Enforcement point</strong></td><td>Template/render code</td><td>Cloud API perimeter</td><td>Route guards &amp; server components — whatever code remembers to check</td><td>Every request at the edge, plus cryptographically at the asset</td></tr>
+  <tr><td><strong>Object granularity</strong></td><td>Role → site-wide capabilities</td><td>Resource / container</td><td>Org &amp; role claims; per-object = custom app code</td><td>Per-subject &times; per-object &times; per-request entitlement</td></tr>
+  <tr><td><strong>Re-delegation</strong></td><td>Files &amp; links forwardable</td><td>Presigned URL / SAS = bearer access</td><td>Token holder asserts role; sessions replayable in scope</td><td>Non-discretionary: no holder can extend access</td></tr>
+  <tr><td><strong>Revocation</strong></td><td>Role edit &ne; recall of anything served</td><td>Policy edit &ne; recall of issued URLs</td><td>Session revoke stops future logins; served data is gone</td><td>Key rotation kills every outstanding copy at once</td></tr>
+  <tr><td><strong>App compromised — then what?</strong></td><td>Game over: the app was the guard</td><td>Infra intact; data within granted scope exposed</td><td>Game over: enforcement was compiled into the app</td><td>Modules unaffected; the attacker holds ciphertext</td></tr>
+  <tr><td><strong>AI agents</strong></td><td>No model</td><td>Service principals with standing power</td><td>API keys with standing power</td><td>Mandates + <code>caps.a2a</code>: time-boxed, consent-anchored, ledgered</td></tr>
+  <tr><td><strong>Evidence</strong></td><td>Logs, if configured</td><td>Control-plane trails only</td><td>Vendor dashboards</td><td>Hash-chained ledger; public JWKS verification</td></tr>
+</table>
+<p>To be fair to the incumbents: Sanity, Better Auth, and Clerk solve <em>authentication</em> and role assertion well. The gap is that everything after the door — object authorization, delegation, revocation, evidence — remains application code, in application scope, sharing the application's fate.</p>
+
+<h2>8 &middot; Strategy summary</h2>
 <table>
   <tr><th>Layer</th><th>Question it answers</th><th>Mechanism</th></tr>
   <tr><td>RBAC gate (door)</td><td>Who may enter at all?</td><td>Roles — including the incumbents' (WP/IAM/Azure), which coexist</td></tr>
@@ -86,16 +104,17 @@
   <tr><td>Evidence</td><td>Can anyone prove what happened?</td><td>Hash-chained ledger; Ed25519 certificates; public JWKS verification</td></tr>
 </table>
 
-<h2>7 &middot; References</h2>
+<h2>9 &middot; References</h2>
 <ul class="refs">
   <li>NIST SP 800-162, <em>Guide to Attribute Based Access Control (ABAC) Definition and Considerations</em> — https://csrc.nist.gov/pubs/sp/800/162/upd2/final (PDF: https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-162.pdf)</li>
   <li>D.R. Kuhn, E.J. Coyne, T.R. Weil, "Adding Attributes to Role-Based Access Control," <em>IEEE Computer</em> 43(6), June 2010 — https://csrc.nist.gov/files/pubs/journal/2010/06/adding-attributes-to-rolebased-access-control/final/docs/kuhn-coyne-weil-10.pdf (DOI 10.1109/MC.2010.155)</li>
   <li>NIST ABAC project overview — https://csrc.nist.rip/projects/abac/</li>
   <li>NIST SP 800-207, <em>Zero Trust Architecture</em> (policy enforcement point model) — https://csrc.nist.gov/pubs/sp/800/207/final</li>
+  <li>X. Jin, R. Sandhu, R. Krishnan, "RABAC: Role-Centric Attribute-Based Access Control," MMM-ACNS 2012 — https://link.springer.com/chapter/10.1007/978-3-642-33704-8_8</li>
   <li>Amazon Cedar / Verified Permissions; Google Zanzibar (USENIX ATC 2019) / OpenFGA; Open Policy Agent — the industry's policy-as-data concessions.</li>
 </ul>
 
-<div class="foot"><span>CRM Sync &middot; Entitlement Strategy &middot; v1.0 &middot; 2026-07-20</span><span>Monochrome &middot; print / PDF ready</span></div>
+<div class="foot"><span>CRM Sync &middot; Entitlement Strategy &middot; v1.1 &middot; 2026-07-20</span><span>Monochrome &middot; print / PDF ready</span></div>
 
 </body>
 </html>

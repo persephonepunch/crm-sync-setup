@@ -58,7 +58,30 @@ Role systems assume a human who logs in occasionally and holds standing permissi
 
 > Principle: **agents get entitlements, never roles.** A role is standing power; an entitlement is a scoped, revocable, evidenced grant. Standing power plus autonomy is how AI incidents happen.
 
-## 6 · Strategy summary
+## 6 · Terminology precision
+
+- **MAC — claim the property, not the label.** Classical MAC (Bell-LaPadula lineage; SELinux, classification lattices) means centrally assigned labels no subject can alter. This plane is not label-lattice MAC — creators set sharing states on their own objects. What it *does* have is MAC's defining property: **mandatory, non-discretionary enforcement** — no subject, human or agent, can extend access they hold; possession of bytes confers nothing; revocation executes without the holder's cooperation. NIST SP 800-162 notes ABAC policy can be enforced in exactly this non-discretionary manner.
+- **RABAC, not "RBDAC."** Roles whose effective permissions vary dynamically with context is a named, citable model: *RABAC — Role-Centric Attribute-Based Access Control* (Jin, Sandhu & Krishnan, 2012). Purchase-granted roles with runtime-evaluated caps are RABAC with dynamic entitlements.
+- **Three control types in the runners — named correctly.** File delivery is *rule-based access control* over entitlement attributes. Task runners are *least-privilege service principals* under scoped credentials. Deploy guards, dry-run gates, and publish locks are *workflow gating* — governance, not access control. Delegated runs inherit the subject's entitlements, never the platform's.
+
+## 7 · The application-scope boundary: RBAC-only stacks vs out-of-scope modules
+
+The deeper split is not which acronym a stack implements but *where its enforcement lives*. WordPress, the cloud IAMs, and the modern Next.js stack (Sanity for content, Better Auth or Clerk for identity) all enforce inside the file system or application scope — the app is the guard. The entitlement plane's modules live outside both: policy as data at the edge, enforcement cryptographic at the asset.
+
+| | WordPress | AWS IAM / Azure RBAC | Next.js + Sanity + Better Auth / Clerk | Entitlement modules — outside file-system & application scope |
+|---|---|---|---|---|
+| **Where policy lives** | App code + DB, inside the install | Cloud control plane | App middleware + role claims in the vendor's token | Policy-as-data at the edge, independent of any app deployment |
+| **Enforcement point** | Template/render code | Cloud API perimeter | Route guards — whatever code remembers to check | Every request at the edge, plus cryptographically at the asset |
+| **Object granularity** | Role → site-wide capabilities | Resource / container | Org & role claims; per-object = custom app code | Per-subject × per-object × per-request entitlement |
+| **Re-delegation** | Files & links forwardable | Presigned URL / SAS = bearer access | Token holder asserts role | Non-discretionary: no holder can extend access |
+| **Revocation** | Role edit ≠ recall | Policy edit ≠ recall of issued URLs | Session revoke stops future logins only | Key rotation kills every outstanding copy |
+| **App compromised** | Game over: the app was the guard | Infra intact; granted scope exposed | Game over: enforcement compiled into the app | Modules unaffected; attacker holds ciphertext |
+| **AI agents** | No model | Service principals, standing power | API keys, standing power | Mandates + `caps.a2a`: time-boxed, consent-anchored, ledgered |
+| **Evidence** | Logs, if configured | Control-plane trails only | Vendor dashboards | Hash-chained ledger; public JWKS verification |
+
+To be fair to the incumbents: Sanity, Better Auth, and Clerk solve *authentication* and role assertion well. The gap is that everything after the door — object authorization, delegation, revocation, evidence — remains application code, in application scope, sharing the application's fate.
+
+## 8 · Strategy summary
 
 | Layer | Question it answers | Mechanism |
 |---|---|---|
@@ -69,10 +92,11 @@ Role systems assume a human who logs in occasionally and holds standing permissi
 | Data-plane crypto | What if every layer above fails? | Envelope encryption; leak yields ciphertext; rotation = revocation |
 | Evidence | Can anyone prove what happened? | Hash-chained ledger; Ed25519 certificates; public JWKS verification |
 
-## 7 · References
+## 9 · References
 
 - NIST SP 800-162, *Guide to Attribute Based Access Control* — <https://csrc.nist.gov/pubs/sp/800/162/upd2/final> ([PDF](https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-162.pdf))
 - Kuhn, Coyne, Weil, "Adding Attributes to Role-Based Access Control," *IEEE Computer* 43(6), 2010 — <https://csrc.nist.gov/files/pubs/journal/2010/06/adding-attributes-to-rolebased-access-control/final/docs/kuhn-coyne-weil-10.pdf> (DOI 10.1109/MC.2010.155)
 - NIST ABAC project overview — <https://csrc.nist.rip/projects/abac/>
 - NIST SP 800-207, *Zero Trust Architecture* — <https://csrc.nist.gov/pubs/sp/800/207/final>
+- Jin, Sandhu, Krishnan, "RABAC: Role-Centric Attribute-Based Access Control," MMM-ACNS 2012 — <https://link.springer.com/chapter/10.1007/978-3-642-33704-8_8>
 - Amazon Cedar / Verified Permissions; Google Zanzibar (USENIX ATC 2019) / OpenFGA; Open Policy Agent — the industry's policy-as-data concessions.
