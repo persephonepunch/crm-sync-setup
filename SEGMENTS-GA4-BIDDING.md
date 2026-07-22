@@ -3,7 +3,7 @@ title: "Marketing was built on the page view. The funnel now pays for the consen
 description: "For: Marketing ops, performance media, and analytics engineering Status: Built (GA4 push + audiences) · Direct Google Ads push pending Ads API credentials Date: 2026-07-07 Depen…"
 canonical: https://persephonepunch.github.io/crm-sync-setup/segments-ga4-bidding.html
 category: "Shopify"
-date: 2026-07-07
+date: 2026-07-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GA4-BIDDING.md
 ---
 # Marketing was built on the page view. The funnel now pays for the **consented login**.
@@ -135,9 +135,9 @@ The direct path (Customer Match audiences + value-based conversion ingestion, ha
 
 Every surface a bid lands on — the storefront, the login, the account, the dashboard — is themed from one place. Open the store this stack is built on:
 
-**→ [design-sync.myshopify.com](https://design-sync.myshopify.com)**  *(migrating to **[crm-sync.dev](https://crm-sync.dev)**)*
+**→ [www.crm-sync.dev](https://www.crm-sync.dev)** — the live store this stack is built on.
 
-One primary color and token set key Shopify, Webflow, and every embed, so the consented login you bid on looks like one brand across the whole funnel.
+One primary color and token set key Shopify, Webflow, and every embed, so the consented login you bid on looks like one brand across the whole funnel. The design system behind those surfaces is documented in [`UI-COMPONENT-REGISTRY.md`](ui-component-registry.html).
 
 ---
 
