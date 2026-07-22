@@ -1,3 +1,11 @@
+---
+title: "File System Agnostic Publishing"
+description: "Ship the Webflow design as a WordPress theme (Udesly or Pinegrow) or on EmDash/Astro — the Shopify Web Components block and CRM Sync embeds carry across verbatim."
+canonical: https://persephonepunch.github.io/crm-sync-setup/universal.html
+category: "Setup"
+date: 2026-07-18
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WORDPRESS-WEB-COMPONENTS.md
+---
 # File System Agnostic Publishing
 
 **Status:** Living guide · **Scope:** One Webflow design, delivered as a custom WordPress theme or an EmDash/Astro site, with the storefront behavior riding along unchanged — Shopify Storefront Web Components for commerce, CRM Sync embeds for consent, identity, and the connected data plane.

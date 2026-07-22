@@ -1,3 +1,11 @@
+---
+title: "Dark Factory Entitlement Security"
+description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity and Trimble Cityworks receipts and the entitlement architecture that survives AI-speed extraction."
+canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html
+category: "Security"
+date: 2026-07-19
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
+---
 # Dark Factory Entitlement Security
 
 **Status:** Living reference · **Scope:** Where the vulnerability actually lives in modern business operations — IoT firmware, game platforms, 3D/BIM assets — and the entitlement architecture that survives it. Written from production experience shipping commerce on Roblox/Shopify rails and 3D asset pipelines against PIM/BIM systems.

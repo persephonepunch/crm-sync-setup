@@ -1,3 +1,11 @@
+---
+title: "CRM Sync — PWA & Native App Commerce Setup Reference"
+description: "Ship your CRM as an installable PWA and native app (iOS · Android · desktop) on Shopify + Webflow + Xano — with auth, real-time consent, GA4, and agent permissions. Everything you need to get it running, in order."
+canonical: https://persephonepunch.github.io/crm-sync-setup/readme.html
+category: "Setup"
+date: 2026-07-06
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/README.md
+---
 # CRM Sync — PWA & Native App Commerce Setup Guide
 
 

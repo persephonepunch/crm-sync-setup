@@ -1,3 +1,11 @@
+---
+title: "BIM Fortress vs Event-Socket"
+description: "Two diagrams: the fortress wound map and the event-socket heal — envelope encryption, healing encryption, evidence ledger, AI robots on mandates. A+-respectful for Trimble estates: you need more, not different."
+canonical: https://persephonepunch.github.io/crm-sync-setup/bim-fortress-event-socket.html
+category: "Security"
+date: 2026-07-18
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BIM-FORTRESS-EVENT-SOCKET.md
+---
 # BIM Fortress Exposure vs the Event-Socket Heal
 
 **Status:** Companion diagram to [Dark Factory Entitlement Security](https://crm-sync.dev/share/dark-factory-entitlement-security) · **Scope:** One picture of where the fortress *model* bleeds — an era's architecture, not any vendor's failing — and one picture of the event-socket layer that heals each wound, feeding AI consumers in real time under entitlement boundaries.
