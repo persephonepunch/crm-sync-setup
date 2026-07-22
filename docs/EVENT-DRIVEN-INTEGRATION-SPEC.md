@@ -711,9 +711,12 @@ The WMS never holds firmware, keys, or certificates; the bus never accepts WMS P
   "location_code": "US-EAST-1/A-14-3",
   "movement": "inbound",
   "order_ref": "SHOP-1042",
+  "rma_ref": "RMA-2026-0187",
   "carrier_ref": "1Z999AA10123456784"
 }
 ```
+
+`rma_ref` is REQUIRED on `unit.returned` (it joins the custody receipt to the return case) and omitted on all other event types.
 
 No names, no addresses, no contact fields — the WMS keeps those; the bus records custody, not people (the `reconciliation_log` posture). Because the payload is non-personal operational data, WMS events are not consent-gated — they bypass the Consent Mode v2 gate and never fan out to marketing destinations.
 
@@ -723,6 +726,7 @@ Join keys are `(mpn, serial)`:
 
 - `mpn` → the PIM record (MarketOfSale registry) that owns GTIN/SKU and both catalog projections (channel feed + nested JSON-LD).
 - On `unit.shipped` for a firmware-bearing MPN, the bus stamps a ledger row binding `serial → firmware version + sha256` from the vault registry (`firmware_artifacts`) — the CRA Article-14 evidence join: which image was current when this unit left custody.
+- `rma_ref` on `unit.returned` -> the return case at `/commerce/returns/{rma}` — customer-service channels answer "the warehouse received your return" from the custody event itself, not from carrier scans; for digital goods the same refund closes the loop by revoking the grant instead.
 - A unit's full story = the WMS custody stream ⋈ the firmware unwrap ledger, joined on `(mpn, serial)`.
 
 ### 13.5 Destinations & evidence
