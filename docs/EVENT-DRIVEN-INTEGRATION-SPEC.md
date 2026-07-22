@@ -3,7 +3,7 @@ title: "CRM Sync — Event-Driven Integration Spec"
 description: "Version: 1.0 Date: 2026-05-27 Status: Specification Replaces: Cron-only polling for external integrations"
 canonical: https://persephonepunch.github.io/crm-sync-setup/event-driven-integration-spec.html
 category: "Specs"
-date: 2026-05-27
+date: 2026-07-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/EVENT-DRIVEN-INTEGRATION-SPEC.md
 ---
 # CRM Sync — Event-Driven Integration Spec
@@ -123,7 +123,7 @@ interface EventEnvelope {
   idempotency_key: string;       // SHA-256(source + entity_id + event_type + timestamp)
   
   // Routing
-  source: EventSource;           // "shopify" | "webflow" | "xano" | "sap" | "erp" | "manual"
+  source: EventSource;           // "shopify" | "webflow" | "xano" | "sap" | "erp" | "wms" | "manual"
   event_type: string;            // "customer.updated" | "order.created" | "inventory.changed"
   entity_type: EntityType;       // "customer" | "order" | "product" | "inventory" | "invoice"
   entity_id: string;             // Source-system ID
@@ -675,3 +675,60 @@ Returns recent delivery attempts with status, latency, and error details.
 | Configure destinations | ✅ Platform config | ❌ | ✅ Own config |
 | SAP / ERP credentials | ✅ Secrets | ❌ | ✅ Own secrets |
 | Dead letter alerts | ✅ Email | ❌ | ✅ Own alerts |
+
+---
+
+## 13. WMS Socket (v1.1 — 2026-07-22)
+
+The tenant config has carried the socket since the config-connect release — `wms_system` (default `none`) and `wms_base_url` — with no adapter behind it. This section wires the socket into the bus as a contract, so the first WMS tenant is a config change plus credentials, not a design exercise.
+
+### 13.1 Transport
+
+WMS platforms deliver into the standard ingest path — `POST /events/ingest` (§4), authenticated per §4 (per-source shared secret or the rotatable key), with `source: "wms"`. No WMS-specific endpoint: the socket IS the envelope.
+
+### 13.2 Event types
+
+| event_type | Fires when | entity_id |
+|---|---|---|
+| `unit.received` | Serialized unit checked into a location | serial |
+| `unit.picked` | Unit picked against an order | serial |
+| `unit.packed` | Unit sealed to a shipment | serial |
+| `unit.shipped` | Carrier handoff | serial |
+| `unit.returned` | RMA receipt back into custody | serial |
+
+`entity_type: "inventory"` · `priority: 2` — custody events outrank analytics and follow payments.
+
+### 13.3 Payload contract — references only (the custody rule)
+
+The WMS never holds firmware, keys, or certificates; the bus never accepts WMS PII. A `wms` payload is id/ref-only:
+
+```json
+{
+  "mpn": "HX-DEV-0042",
+  "gtin": "00812345678905",
+  "sku": "DEV-0042-BLK",
+  "serial": "SN-2026-000731",
+  "location_code": "US-EAST-1/A-14-3",
+  "movement": "inbound",
+  "order_ref": "SHOP-1042",
+  "carrier_ref": "1Z999AA10123456784"
+}
+```
+
+No names, no addresses, no contact fields — the WMS keeps those; the bus records custody, not people (the `reconciliation_log` posture). Because the payload is non-personal operational data, WMS events are not consent-gated — they bypass the Consent Mode v2 gate and never fan out to marketing destinations.
+
+### 13.4 Joins — physical custody ⋈ digital custody
+
+Join keys are `(mpn, serial)`:
+
+- `mpn` → the PIM record (MarketOfSale registry) that owns GTIN/SKU and both catalog projections (channel feed + nested JSON-LD).
+- On `unit.shipped` for a firmware-bearing MPN, the bus stamps a ledger row binding `serial → firmware version + sha256` from the vault registry (`firmware_artifacts`) — the CRA Article-14 evidence join: which image was current when this unit left custody.
+- A unit's full story = the WMS custody stream ⋈ the firmware unwrap ledger, joined on `(mpn, serial)`.
+
+### 13.5 Destinations & evidence
+
+`destinations: ["xano"]`, plus BigQuery via the Xano→BQ path. WMS events land in the GENERAL event ledger — append-only by policy until the Sprint-2 hash-chaining (SECURITY-REMEDIATION-PLAN Q2) ships. Until then, custody claims cite the firmware ledger (chained) as primary evidence and present WMS rows as supporting records, not tamper-evident ones.
+
+### 13.6 Status
+
+SOCKET — config fields live, adapter unwired, no WMS tenant connected. This section is the contract an integrator implements; nothing here ships code.
