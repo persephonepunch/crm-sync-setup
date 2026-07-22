@@ -710,6 +710,9 @@ The WMS never holds firmware, keys, or certificates; the bus never accepts WMS P
   "serial": "SN-2026-000731",
   "location_code": "US-EAST-1/A-14-3",
   "movement": "inbound",
+  "hs_code": "8471.30",
+  "country_of_origin": "KR",
+  "customs_ref": "MRN-26DE520123456789A1",
   "order_ref": "SHOP-1042",
   "rma_ref": "RMA-2026-0187",
   "carrier_ref": "1Z999AA10123456784"
@@ -717,6 +720,10 @@ The WMS never holds firmware, keys, or certificates; the bus never accepts WMS P
 ```
 
 `rma_ref` is REQUIRED on `unit.returned` (it joins the custody receipt to the return case) and omitted on all other event types.
+
+`movement` values: `inbound` | `outbound` | `transfer` | `export-cleared` | `import-cleared` | `return` — customs clearance is a movement state on the same five events, not a new event type; a border never reshapes the envelope.
+
+Cross-border ownership boundary: `hs_code` and `country_of_origin` are PIM-owned attributes (one classification per MPN, canonical in the MarketOfSale record) carried on custody events by reference; `customs_ref` (e.g. an MRN) is the declaration pointer. The WMS layer fully owns the movement/custody slice of cross-border data — per-market commercial attributes (price, currency, `eligibleRegion`) stay on the PIM plane, and jurisdiction evidence selection (SBOM + DoC bundles per destination market) stays on the compliance projection; both join the custody stream on `(mpn, serial)`.
 
 No names, no addresses, no contact fields — the WMS keeps those; the bus records custody, not people (the `reconciliation_log` posture). Because the payload is non-personal operational data, WMS events are not consent-gated — they bypass the Consent Mode v2 gate and never fan out to marketing destinations.
 
