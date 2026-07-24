@@ -91,6 +91,12 @@ Name the parts precisely and the failure mode becomes obvious.
 
 That last property is the one that cannot be built in-house, at any budget: **evidence you issue about yourself is testimony; evidence a neutral plane issues is an exhibit.** A ledger inside your own tenancy proves only that your logs agree with you. The station's neutrality is not a feature — it is the product, and it is structurally unavailable from any vendor who also owns a destination, which is to say, from everyone the consulting firm resells.
 
+## When the door itself falls
+
+If the doors-versus-station model needs a current-events proof, 2026 is supplying one. An active voice-phishing campaign — attributed in public reporting to the ShinyHunters group — has been defeating the best perimeter identity products on the market (Okta, Microsoft Entra, and Google SSO estates; 100+ organizations targeted) **without touching the vendors' infrastructure at all**. A live caller walks an employee through sign-in while a real-time phishing kit intercepts the credentials and talks the victim past their own MFA. The observed pattern per incident: take the account, persist by changing MFA factors, enumerate everything behind the SSO, pivot, exfiltrate. The vendors' platforms held; the *doors' customers* fell — because a door, however excellent, authenticates a human, and humans answer phones.
+
+What determines the damage after that phone call is everything this article has been describing: whether the stolen session meets capability caps, per-purpose consent gates, spend-capped mandates, content locks, and an append-only ledger that records the anomaly — or meets a flat estate where SSO was the only wall and "enumerate everything behind the SSO" is a complete attack plan. And the earlier identity incident of record — the 2023 support-system breach, where harvested session tokens and a leaked service account let attackers ride *copies* of authority into customer tenants — is the rung-2 mechanism wearing identity clothing: **a copy of authority outliving the record of it**. Same disease, different organ. The door vendors are not the failure here; the assumption that doors are sufficient is. That assumption has a name on the org chart, and it is the same perimeter worldview this article opened with.
+
 ## High-order functions arch both ends
 
 The rule that keeps the station honest — and keeps it from becoming one more silo — is this: **every high-order function must arch both the station and the destination.** Like a bridge, it bears on both foundations or it carries nothing.
