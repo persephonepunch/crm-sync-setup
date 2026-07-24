@@ -5,6 +5,12 @@
    One canonical source, shared by every styled reference page.
    ========================================================================== */
 
+/* Self-hosted variable fonts — same-origin, no third-party request pre- or
+   post-consent (fonts/: Apache-2.0 Roboto). Weight ranges cover the whole
+   100-weight-hero → 700-bold scale from two files. */
+@font-face{font-family:"Roboto";src:url("./fonts/roboto-vf.woff2") format("woff2");font-weight:100 900;font-stretch:75% 100%;font-style:normal;font-display:swap}
+@font-face{font-family:"Roboto Mono";src:url("./fonts/roboto-mono-vf.woff2") format("woff2");font-weight:100 700;font-style:normal;font-display:swap}
+
 :root{
   --ink:#0a0a0a; --paper:#ffffff;
   --g1:#f4f4f4; --g2:#e6e6e6; --g3:#cfcfcf; --g4:#9a9a9a; --g5:#5c5c5c; --g6:#3a3a3a;
