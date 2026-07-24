@@ -27,7 +27,7 @@ body{
     linear-gradient(to right, var(--grid) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
   background-size:20px 20px;
-  font:400 15px/1.6 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
+  font:300 15px/1.6 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
 }
 
 /* ---- top command bar (nav + downloads) --------------------------------- */
@@ -57,7 +57,7 @@ body{
 }
 .hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the thin headline */
 .hero .sub{color:var(--ink); font-size:17px; line-height:1.6; margin:22px 0 0; max-width:72ch}
-.hero .sub strong,.hero .sub b{color:var(--ink); font-weight:700}
+.hero .sub strong,.hero .sub b{color:var(--ink); font-weight:600}
 .hero .meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:22px;
   font:600 11px/1 var(--mono); letter-spacing:.08em; color:var(--g5)}
 .hero .meta b{color:var(--ink)}
@@ -72,7 +72,7 @@ body{
 .doc p{margin:11px 0; max-width:74ch}
 .doc a{color:var(--link); text-decoration:none; border-bottom:1px solid var(--g3)}
 .doc a:hover{border-bottom-color:var(--ink)}
-.doc strong{font-weight:700}
+.doc strong{font-weight:600}
 .doc em{font-style:italic}
 .doc ul,.doc ol{margin:11px 0; padding-left:22px; max-width:74ch}
 .doc li{margin:6px 0}
