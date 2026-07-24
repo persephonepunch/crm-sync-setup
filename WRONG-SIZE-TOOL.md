@@ -26,6 +26,23 @@ Compliance failures do not stay in the IT department. They climb, and each rung 
 
 The pattern below the famous case repeats quietly across consumer-goods estates: one inherited tag-manager container ruling seven domains, consent banners that decorate rather than gate, pixels firing before anyone answers them. Ask who owns the server that decides — not displays, decides — what may fire, and the room goes quiet. That server does not exist. This article is about why it never gets built.
 
+## The ladder, priced — US market, no names
+
+Every rung below has been climbed by US household names. None of it required AI, agents, or even GA4 — these ladders were climbed with 2010s tooling. The agent era does not add a rung; it adds readers to every rung.
+
+| Rung | Trigger | US mechanism | Impact | Who absorbs it |
+| --- | --- | --- | --- | --- |
+| **1 · Scoping drift** | Unowned tags, inherited containers, feeds nobody maps | None — silence | "Free" — until observed | Nobody. That is the trap |
+| **2 · Channel delisting** | Feed and data-quality violations, misrepresentation | Google Merchant Center suspension; marketplace removal | A revenue channel to zero, overnight; the e-commerce team and its leadership rarely survive the post-mortem | The e-commerce org |
+| **3 · Privacy enforcement** | Pre-consent firing, dark patterns, wiretap-adjacent trackers | FTC Act §5; state AGs (CPRA per-violation math scales with traffic); CIPA class actions | Settlements plus years of injunctive obligations that constrain the ad stack | Legal, the CMO |
+| **4 · Controls event** | The data failure touches order flow or revenue recognition | SOX 302/404 — disclosed material weakness | Delayed filings, audit escalation, restatement risk, stock drop | CFO, audit committee |
+| **5 · Securities litigation** | Disclosed weakness + stock drop | Rule 10b-5 class actions | Years of litigation, D&O exposure, settlements | Officers and directors, personally named |
+| **6 · Exchange delisting** | The spiral completes | NYSE/NASDAQ listing standards | Terminal | Everyone, including the shareholders who sued |
+
+The chart names no names; the top three rungs don't need any invented — they are, in documented order, the public arc of **Revlon**: material weakness disclosed with the FY2018 filings after the 2018 ERP cutover failure, shareholder class actions filed in 2019, Chapter 11 in June 2022, NYSE delisting that October. One data-plane failure at a North Carolina plant, walked all the way up.
+
+Two rungs deserve a second look. **Rung 2 is the one operators underestimate**: a channel delisting is not a fine you appeal — it is a distribution channel amputated while your competitors keep selling, and it arrives by policy enforcement, not due process. **Rung 4 is the one that changes whose problem it is**: the moment a data-plane failure touches the numbers the CFO attests, it stops being an IT incident and enters the securities-law bloodstream. The rungs are connected by one substance — records the organization cannot produce about what its servers did — and vigilance at rung 1 is the only rung that costs nothing.
+
 ## The org chart has no organ for it
 
 Enterprise IT was built for the perimeter, and it is genuinely good at the perimeter: identity, passwords, SSO, endpoints, phishing, uptime. That discipline answers one question — *who got in* — and answers it well.
