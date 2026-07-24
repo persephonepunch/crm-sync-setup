@@ -113,6 +113,14 @@ The rule that keeps the station honest — and keeps it from becoming one more s
 
 A function that exists only in a destination is a hostage. A function that exists only in the station is an island. The arch is the architecture.
 
+## Islands, not bridges: the doctrine applied to the build
+
+The same containment law governs the engineering organization, because the estate has two kinds of single point of failure and only one of them holds a credential. The other one holds the *knowledge*: the single developer who understands the bundle, who may or may not stay with the project. Bus-factor-one is not an HR inconvenience — it is a controls problem on the same ladder. An estate whose rendering, data wiring, and restriction logic live in one build that one person truly understands has fused its technical SPOF and its human SPOF into the same node.
+
+The fashionable build stack makes this worse while looking smaller. An SSR-to-CSR hydration pipeline — one framework, one bundler, one build graph — *seems* like a tidy small package. For a marketing site, it is. For **e-commerce data distributed to many funnels under restrictions** — per-market pricing, per-purpose consent, per-grant entitlements — it is the bridge again: every funnel's data wired through one hydration boundary, the whole application re-shipped to every browser, restrictions enforced in client code that any DevTools breakpoint can bypass, and one dependency compromise or one misrouted prop away from cross-funnel leakage. One build graph is one surface, and it is the *maximum* surface wearing a minimal package's clothes.
+
+The recommendation for enterprise estates is the inverse: **distributed DevOps islands with component publishing.** Each component is published independently against a stable contract — an ID, a registry row, a versioned snapshot — and owns nothing beyond its room: server-enforced data access scoped to what that island renders, restrictions applied before the payload leaves the server, no shared hydration boundary to leak across. The properties follow the doctrine exactly: an island can fail, be rotated, or be rebuilt without the estate noticing; a compromised island leaks its row, not the funnel; and a departing developer takes knowledge of a room, not the castle — because the registry, the inventory, and the published contracts *are* the institutional memory, held by the system instead of the person. Many small publishes by many stakeholders is not fragmentation. Like many keys to many doors, it is the policy — and it is the only build architecture whose blast radius, human or technical, an officer can put a number on.
+
 ## What the signing officers should ask
 
 Not the CTO — the people who sign. Five questions, before any program is approved:
