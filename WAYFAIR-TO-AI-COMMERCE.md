@@ -124,6 +124,8 @@ This is what makes **global context automation** tractable: across twenty locale
 
 Seen this way, JSON-LD and Shopify's catalogs are the same move on two planes: both are **machine-inference-optimized** structures. The catalog pre-computes "what is the lawful price and assortment in this market" so no one derives it; JSON-LD pre-computes "what does this page assert, in which language, at which price" so no one infers it. Every layer this article has covered — `lang`, hreflang, semantic components, consent events with locale, timestamped price history — is the same optimization applied somewhere else: **replace inference with declaration, because the reader is now a machine that will act on whichever it gets.**
 
+None of this is new, either. `robots.txt` (what machines may read), YAML front matter in markdown (what this document *is* — title, description, canonical, date — the contract every static-site pipeline builds on), and JSON-LD (what this page asserts) were the original "machine index score" of content, decades before anyone scored it. `llms.txt` is just robots' successor for the agent era, and a modern docs pipeline that diffs front matter against its CMS records is computing that score continuously. The agent era didn't invent the declaration layer — it raised the price of neglecting it.
+
 ## Design and content privacy in the AI era
 
 The same forces sharpen privacy from a banner problem into a design discipline — because agents don't just read your declared context, they *republish* it.
