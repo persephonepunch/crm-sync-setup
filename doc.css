@@ -70,11 +70,19 @@ body{
 .doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px}
 .doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6)}
 .doc p{margin:10px 0; max-width:none}
-/* Stand-out headline lines — UIkit's uk-text-lead, defined locally at the doc scale.
-   Use on the thesis sentence of a section: <p class="uk-text-lead">…</p> */
+/* Stand-out headline lines — UIkit heading scale + text modifiers, defined locally
+   (doc pages ship no uikit.css). Section thesis lines use:
+   <p class="uk-heading-small uk-text-secondary">…</p> */
 .doc .uk-text-lead{font-size:2.4rem; font-weight:300; line-height:1.18; letter-spacing:-.015em;
   margin:20px 0 14px; color:var(--ink); text-wrap:pretty}
 .doc .uk-text-lead strong,.doc .uk-text-lead b{font-weight:600}
+.doc .uk-heading-small{font-size:clamp(2.4rem,2rem + 1.2vw,3rem); font-weight:300; line-height:1.15;
+  letter-spacing:-.02em; margin:22px 0 16px; text-wrap:pretty}
+.doc .uk-heading-medium{font-size:clamp(2.9rem,2.3rem + 1.8vw,3.8rem); font-weight:300; line-height:1.1;
+  letter-spacing:-.02em; margin:24px 0 18px; text-wrap:pretty}
+.doc .uk-heading-small strong,.doc .uk-heading-small b,
+.doc .uk-heading-medium strong,.doc .uk-heading-medium b{font-weight:600}
+.doc .uk-text-secondary{color:var(--g5)}
 /* UIkit media-width discipline — uk-* utilities defined LOCALLY (doc pages ship no
    uikit.css; same scoped convention as uk-overflow-auto in the worker blocks).
    Images and video embeds share ONE measure (uk-container ≈ 1320px (wrap inner)) so media
