@@ -3,6 +3,8 @@ title: "Your Software Investment Is the Barrier to AI Enablement"
 description: "Tech debt, redefined: legacy tech that can't convert to the JSON shape AI, Google, and Shopify now run on — verified against Feedonomics, Rithum, and JDA/Blue Yonder documentation."
 canonical: https://crm-sync.dev/wrong-shape
 render: https://persephonepunch.github.io/crm-sync-setup/wrong-shape.html
+category: "Global"
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/WRONG-SHAPE.md
 image: https://crm-sync.dev/wrong-shape-visual.jpg
 date: 2026-07-13
 author: CRM Sync
