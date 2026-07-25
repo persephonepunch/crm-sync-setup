@@ -28,7 +28,7 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 ## ITGC 1 · Access controls
 
-*Managing who can access systems and data — provisioning, deprovisioning, periodic review.*
+<p class="uk-text-lead">Managing who can access systems and data — provisioning, deprovisioning, periodic review.</p>
 
 - ✓ Access by explicit invitation only; unique identity per human **and** per AI agent
 - ✓ Deprovisioning revokes live sessions immediately (token denylist), not just future logins; agent mandates expire on their own clock
@@ -38,7 +38,7 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 ## ITGC 2 · Change management
 
-*Changes tested, approved, and documented before deployment.*
+<p class="uk-text-lead">Changes tested, approved, and documented before deployment.</p>
 
 - ✓ Environment separation: Stage, Production, and a key-gated Deploy-Live realm
 - ✓ Author, approver, and deployer are different personas — enforced by role, not policy memo
@@ -47,7 +47,7 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 ## ITGC 3 · IT operations
 
-*Backup and recovery, job scheduling, incident management.*
+<p class="uk-text-lead">Backup and recovery, job scheduling, incident management.</p>
 
 - ✓ Scheduled jobs carry reconcile backstops; every job is idempotent and cursor-gated, so re-runs are safe by construction
 - ✓ The system of record is backed up independently of the enforcement cache — the cache can be rebuilt from truth at any time
@@ -56,7 +56,7 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 ## ITGC 4 · Program development / acquisition
 
-*How new systems or major changes are developed or acquired.*
+<p class="uk-text-lead">How new systems or major changes are developed or acquired.</p>
 
 - ✓ Security requirements live in the design: consent and entitlement are enforced in the data path
 - ✓ A pipeline security baseline governs dependencies and supply chain
@@ -92,7 +92,9 @@ Not a slide — the running product. Two of the review's controls, photographed 
 
 ## The cost of standing still — AI-speed data on batch-speed infrastructure
 
-AI asks in milliseconds. Batch infrastructure answers in days. An estate without real-time server functions has exactly two options when agents arrive, and both are expensive: **block the AI** (the revenue and productivity cost of sitting out the platform shift) or **let it act unverified** (the compliance cost of an actor moving faster than your controls can watch). The remediation ladder is public record — the [billion-dollar fine table](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), and the [ERP failure walked to delisting](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The alternative — consent, entitlement, and evidence enforced at the moment of the event — is not a program. It is middleware that is free to adopt.
+<p class="uk-text-lead">AI asks in milliseconds. Batch infrastructure answers in days.</p>
+
+An estate without real-time server functions has exactly two options when agents arrive, and both are expensive: **block the AI** (the revenue and productivity cost of sitting out the platform shift) or **let it act unverified** (the compliance cost of an actor moving faster than your controls can watch). The remediation ladder is public record — the [billion-dollar fine table](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), and the [ERP failure walked to delisting](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The alternative — consent, entitlement, and evidence enforced at the moment of the event — is not a program. It is middleware that is free to adopt.
 
 ### The trust network is already breached
 
@@ -100,7 +102,9 @@ The case for offline-verifiable, short-lived, fail-closed authority is not theor
 
 #### The enterprise trust frameworks were the exploit path — Entra and Okta
 
-Enterprises did not merely *use* Okta and Microsoft Entra; they made them the **trust framework** — the party every application defers to on the question *is this session real?* Both frameworks were then exploited, and in neither case did the attacker break the cryptography. They exploited the framework itself:
+<p class="uk-text-lead">Enterprises did not merely use Okta and Microsoft Entra; they made them the <strong>trust framework</strong>.</p>
+
+The framework is the party every application defers to on the question *is this session real?* Both frameworks were then exploited, and in neither case did the attacker break the cryptography. They exploited the framework itself:
 
 - **Okta, October 2023.** The identity provider's *own support system* was breached with stolen credentials. Customers had uploaded browser recordings (HAR files) for troubleshooting; those recordings contained **live session tokens**. Files for 134 customer organizations were exposed, and five — including security companies — were then **session-hijacked with no password and no MFA**, because inside the trust framework a session token *is* the identity. Detection came from the customers, not the vendor. ([Krebs on Security](https://krebsonsecurity.com/2023/10/hackers-stole-access-tokens-from-oktas-support-unit/) · [BleepingComputer](https://www.bleepingcomputer.com/news/security/okta-breach-134-customers-exposed-in-october-support-system-hack/))
 - **Microsoft Entra, 2023–24.** Storm-0558 obtained a Microsoft signing key and **minted valid authentication tokens** — trusted everywhere the framework was trusted — to read the cloud mailboxes of, among others, U.S. government agencies. The forgeries passed every check, because the check was "signed by the framework." Again the vendor did not detect it; a customer did. ([Cybersecurity Dive](https://www.cybersecuritydive.com/news/okta-customer-support-system-cyberattack/697407/))
@@ -124,7 +128,9 @@ What that lesson demands is exactly this checklist's spine: verify authority aga
 
 ### Inverting risk into success
 
-The same speed that makes AI a risk from the sidelines becomes the advantage the moment it belongs to the stakeholders who carry the consequences. The signing officer, the DPO, the analyst who must answer for what the servers did — [each holds an operational view of their own](https://www.crm-sync.dev/pages/how-it-works#permission-baseline), fed at the speed the question arrives: consent enforced at the moment of the event, authority verified per request against published keys, every refusal ledgered as it happens. The alternative is standing on the sidelines inside single-point-of-failure patterns that have already failed in public — [one maintainer's phished inbox](https://www.trendmicro.com/en_us/research/26/c/axios-npm-package-compromised.html), [one support system's session tokens](https://krebsonsecurity.com/2023/10/hackers-stole-access-tokens-from-oktas-support-unit/) — while a remediation program tries to boil an ocean of software that neither resolves the data nor solves the problem; [that ladder has a documented ending](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The inversion is the whole strategy: don't rebuild the estate to move at AI speed — [put AI beside it as middleware that already moves at that speed](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), free to adopt, so the people who manage the consequences see them coming instead of reading about them in next quarter's disclosure.
+<p class="uk-text-lead">The same speed that makes AI a risk from the sidelines becomes the advantage the moment it belongs to the stakeholders who carry the consequences.</p>
+
+The signing officer, the DPO, the analyst who must answer for what the servers did — [each holds an operational view of their own](https://www.crm-sync.dev/pages/how-it-works#permission-baseline), fed at the speed the question arrives: consent enforced at the moment of the event, authority verified per request against published keys, every refusal ledgered as it happens. The alternative is standing on the sidelines inside single-point-of-failure patterns that have already failed in public — [one maintainer's phished inbox](https://www.trendmicro.com/en_us/research/26/c/axios-npm-package-compromised.html), [one support system's session tokens](https://krebsonsecurity.com/2023/10/hackers-stole-access-tokens-from-oktas-support-unit/) — while a remediation program tries to boil an ocean of software that neither resolves the data nor solves the problem; [that ladder has a documented ending](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The inversion is the whole strategy: don't rebuild the estate to move at AI speed — [put AI beside it as middleware that already moves at that speed](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), free to adopt, so the people who manage the consequences see them coming instead of reading about them in next quarter's disclosure.
 
 ## The gaps this review finds in real estates
 

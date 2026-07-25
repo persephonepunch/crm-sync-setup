@@ -70,6 +70,11 @@ body{
 .doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px}
 .doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6)}
 .doc p{margin:10px 0; max-width:none}
+/* Stand-out headline lines — UIkit's uk-text-lead, defined locally at the doc scale.
+   Use on the thesis sentence of a section: <p class="uk-text-lead">…</p> */
+.doc .uk-text-lead{font-size:2.4rem; font-weight:300; line-height:1.18; letter-spacing:-.015em;
+  margin:20px 0 14px; color:var(--ink); text-wrap:pretty}
+.doc .uk-text-lead strong,.doc .uk-text-lead b{font-weight:600}
 /* UIkit media-width discipline — uk-* utilities defined LOCALLY (doc pages ship no
    uikit.css; same scoped convention as uk-overflow-auto in the worker blocks).
    Images and video embeds share ONE measure (uk-container ≈ 1320px (wrap inner)) so media
