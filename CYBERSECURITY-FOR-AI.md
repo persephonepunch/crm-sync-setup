@@ -38,6 +38,8 @@ These are the fines that forced it. All public record.
 
 The pattern in every case: **cookies and tracking deployed without a valid, recorded consent** — exactly the gap that Consent Mode v2 and server-side, consent-gated collection were built to close. That is the billion-dollar reason behind the three-year server-side migration.
 
+Fines are only the regulatory rung. [The Wrong-Size Tool](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool) follows the same ladder through the financial statements — one ERP migration failure, walked in public from material weakness to securities litigation to delisting.
+
 ## What the CRA is
 
 The **EU Cyber Resilience Act** (Regulation (EU) 2024/2847) sets baseline cybersecurity obligations for **products with digital elements** sold in the EU — including connected devices and their firmware. It is enforceable law, with a clock and a fine schedule.
