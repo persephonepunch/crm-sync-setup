@@ -119,6 +119,21 @@
     });
   }
 
+  // Links back into the store's KB page (…/pages/knowledge-base#<hash>) rely on a
+  // _top navigation — which the browser treats as a NO-OP when the top hash already
+  // matches (e.g. "see it live" → #console while the address bar is on #console).
+  // When framed, ALSO tell the host page directly; the store footer's crm-kb-link
+  // handler opens the surface whatever the current hash is. _top stays as the
+  // fallback for hosts without the handler, so no preventDefault.
+  document.addEventListener('click', function (ev) {
+    if (window.parent === window) return;
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href*="/pages/knowledge-base#"]') : null;
+    if (!a) return;
+    var hash = (a.href.split('#')[1] || '');
+    if (!hash) return;
+    try { window.parent.postMessage({ type: 'crm-kb-link', hash: hash, href: a.href }, '*'); } catch (e) {}
+  });
+
   bar();
   fetch(cfg.md, { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })

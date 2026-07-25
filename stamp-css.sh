@@ -6,13 +6,16 @@
 #
 # Run manually after editing doc.css, or let .git/hooks/pre-commit call it.
 cd "$(dirname "$0")" || exit 1
-V=$(git hash-object doc.css | cut -c1-10)
-CHANGED=0
-for f in *.html; do
-  grep -q "doc\.css" "$f" || continue
-  if ! grep -q "doc\.css?v=$V" "$f"; then
-    perl -pi -e "s/doc\\.css(\\?v=[^\"']*)?/doc.css?v=$V/g" "$f"
-    CHANGED=$((CHANGED+1))
-  fi
+for asset in doc.css doc.js; do
+  V=$(git hash-object "$asset" | cut -c1-10)
+  A=$(printf '%s' "$asset" | sed 's/\./\\./g')
+  CHANGED=0
+  for f in *.html; do
+    grep -q "$A" "$f" || continue
+    if ! grep -q "$asset?v=$V" "$f"; then
+      perl -pi -e "s/$A(\\?v=[^\"']*)?/$asset?v=$V/g" "$f"
+      CHANGED=$((CHANGED+1))
+    fi
+  done
+  echo "$asset?v=$V — stamped $CHANGED shell(s)"
 done
-echo "doc.css?v=$V — stamped $CHANGED shell(s)"
