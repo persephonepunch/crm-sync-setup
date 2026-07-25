@@ -3,7 +3,7 @@ title: "Cybersecurity for AI — CISO · CTO · DPO"
 description: "What the EU Cyber Resilience Act requires, what firmware and SBOMs are, why CISOs, CTOs, and DPOs are personally exposed when a system only looks like it works, the billion-dollar GDPR precedent behind the server-side migration, and two pathways to compliance: bundled-AI SaaS vs. AI-as-middleware."
 canonical: https://persephonepunch.github.io/crm-sync-setup/cybersecurity-for-ai.html
 category: "Security"
-date: 2026-07-21
+date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CYBERSECURITY-FOR-AI.md
 ---
 # Cybersecurity for AI
