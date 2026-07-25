@@ -144,7 +144,7 @@ Four gaps, one shape: **the record exists, the join doesn't.** The wrong-size an
 
 ERP implementations fail for operational reasons — all seven documented causes are variants of *the system only looked like it worked until operations asked it a question.* The engineering community has a name for this: **probably-working software.**
 
-<div style="position:relative;width:100%;max-width:74ch;padding-top:42%;background:#000;margin:16px 0"><iframe src="https://www.youtube-nocookie.com/embed/DZpR0GojoWQ" title="The dangers of probably-working software — Damian Brady, NDC London 2026" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" loading="lazy" allow="clipboard-write; encrypted-media; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="uk-cover-container"><iframe src="https://www.youtube-nocookie.com/embed/DZpR0GojoWQ" title="The dangers of probably-working software — Damian Brady, NDC London 2026" loading="lazy" allow="clipboard-write; encrypted-media; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
 
 *Damian Brady, NDC London 2026 — ["The dangers of probably-working software"](https://youtu.be/DZpR0GojoWQ) (privacy-enhanced player, no tracking cookies before you press play). The dogfood discipline below is the cure: software stops being "probably working" when the operator runs it on themselves and the evidence is public — this store's own consent, orders, and sessions feed the same ledger it sells. The NDC series also carries talks on permissions and identity — the same ground the [AI requirements](#ai-requirements--itgc-applied-to-non-human-actors) section walks.*
 
