@@ -82,7 +82,7 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 ## The controls, live
 
-Not a slide — the running product. Two of the review's controls, photographed on this store:
+Not a slide — the running product. Two of the review's controls, photographed on this store — or skip the photographs and open [the soul of the application](https://www.crm-sync.dev/pages/knowledge-base#console) yourself:
 
 ![Choose your view — the persona selector: CISO/DPO, Designer, Revenue BA, QA/Compliance, Release Manager, Audience Manager, Funnel Wizard, Session view, Agent permissions, Firmware & SBOM](./assets/soc-review-choose-view.png)
 *Separation of duties as a product surface (ITGC 1): access is granted by invitation, and each stakeholder — the DPO, the analyst, QA, the release manager — gets exactly their operational view, including Agent permissions and the Firmware & SBOM harness. Open it live from [the permission baseline on the How page](https://www.crm-sync.dev/pages/how-it-works#permission-baseline).*
