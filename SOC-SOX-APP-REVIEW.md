@@ -26,6 +26,24 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 
 *Alignment claim, stated precisely: aligned to the SOC 2 Trust Services Criteria — design-alignment, not an attestation. SOX ITGC domains are the frame external auditors test; the evidence plane here is what your signing officers draw on.*
 
+## Table stakes — at a glance
+
+<p class="uk-heading-small uk-text-secondary">The risk is an ERP-scale failure — scoping gap to material weakness to delisting. These stakes are what keep you off that ladder.</p>
+
+The minimum bar per domain, what enforces it, and where to watch it run — the full ladder is documented in [The Wrong-Size Tool](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). Everything below this table is the walkable detail.
+
+| Domain | Table stakes | Enforced by | See it live |
+| --- | --- | --- | --- |
+| **Access controls** | Invitation-only identity for humans *and* agents; revocation kills live sessions, not just future logins | Personas + separation of duties, token denylist, key ceremonies | [Choose your view](https://www.crm-sync.dev/pages/knowledge-base#console) |
+| **Change management** | Author ≠ approver ≠ deployer; staged realms between edit and live | `release:promote` capability, deploy guards, pre-ship harnesses | Release Manager view |
+| **IT operations** | Every job idempotent and re-runnable; writes buffer through outages; cache rebuildable from truth | Reconcile crons, cursor gates, outage replay | [Session view](https://www.crm-sync.dev/pages/knowledge-base#console) |
+| **Program development** | Security in the data path from design; supply chain governed | Pipeline security baseline; the ERP-failure acquisition lens | — |
+| **AI requirements** | Agents hold their own identity and a signed, capped, expiring mandate; consent parity; refusals audited | AP2 mandates (offline-verifiable), immutable agent audit log | [Agent permissions](https://www.crm-sync.dev/pages/knowledge-base#console) |
+| **Dependency & failover** | Fail closed when a trusted party goes dark; verification works offline; reconcile is exactly-once | Published keys, buffered replays, the anti-monolith legs | — |
+| **Data & evidence** | Consent enforced at the moment of the event; one session-keyed ledger joins order, tax, consent, engagement | Consent event bus + the universal revenue ledger | [Session view](https://www.crm-sync.dev/pages/knowledge-base#console) |
+
+*Every "see it live" link opens the running console on the store — access by invitation; uninvited visitors get the full preview catalog.*
+
 ## ITGC 1 · Access controls
 
 <p class="uk-heading-small uk-text-secondary">Managing who can access systems and data — provisioning, deprovisioning, periodic review.</p>
