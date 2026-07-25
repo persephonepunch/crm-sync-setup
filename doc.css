@@ -85,12 +85,12 @@ body{
 .doc .uk-text-secondary{color:var(--g5)}
 /* UIkit media-width discipline — uk-* utilities defined LOCALLY (doc pages ship no
    uikit.css; same scoped convention as uk-overflow-auto in the worker blocks).
-   Images and video embeds share ONE measure (uk-container ≈ 1320px (wrap inner)) so media
-   aligns with the text column instead of each element picking its own width. */
-.doc img{display:block; width:100%; max-width:1320px; height:auto; margin:14px 0; border:1px solid var(--g3)}
-.doc .uk-cover-container{position:relative; width:100%; max-width:1320px; aspect-ratio:16/9; background:#000; overflow:hidden; margin:16px 0}
+   Images and video embeds span the FULL content column (uk-width-1-1) so their right
+   edge lands exactly where the section heading rules end. */
+.doc img{display:block; width:100%; max-width:none; height:auto; margin:14px 0; border:1px solid var(--g3)}
+.doc .uk-cover-container{position:relative; width:100%; max-width:none; aspect-ratio:16/9; background:#000; overflow:hidden; margin:16px 0}
 .doc .uk-cover-container>iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
-.doc img+em, .doc .uk-cover-container+em{display:block; max-width:1320px; font-size:13px; color:var(--g5); margin:-6px 0 14px}
+.doc img+em, .doc .uk-cover-container+em{display:block; max-width:none; font-size:13px; color:var(--g5); margin:-6px 0 14px}
 .doc a{color:var(--link); text-decoration:none; border-bottom:1px solid var(--g3)}
 .doc a:hover{border-bottom-color:var(--ink)}
 .doc strong{font-weight:600}
