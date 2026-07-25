@@ -80,6 +80,27 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 - ✓ The anti-monolith doctrine is the standing design answer: no single vendor going dark takes the controls with it
 - Cadence: per-leg outage drills with retained evidence, and a subservice-organization map recording which controls are inherited from vendor SOC 2 reports versus owned here
 
+## The cost of standing still — AI-speed data on batch-speed infrastructure
+
+AI asks in milliseconds. Batch infrastructure answers in days. An estate without real-time server functions has exactly two options when agents arrive, and both are expensive: **block the AI** (the revenue and productivity cost of sitting out the platform shift) or **let it act unverified** (the compliance cost of an actor moving faster than your controls can watch). The remediation ladder is public record — the [billion-dollar fine table](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), and the [ERP failure walked to delisting](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The alternative — consent, entitlement, and evidence enforced at the moment of the event — is not a program. It is middleware that is free to adopt.
+
+### The trust network is already breached
+
+The case for offline-verifiable, short-lived, fail-closed authority is not theoretical. The things estates *trust by default* — package registries and identity providers — have each been compromised, recently and publicly:
+
+![All modern digital infrastructure — a teetering tower of blocks resting on a project some random person in Nebraska has been thanklessly maintaining since 2003](https://imgs.xkcd.com/comics/dependency.png)
+*xkcd #2347, "Dependency" — CC BY-NC 2.5, [xkcd.com/2347](https://xkcd.com/2347/)*
+
+- **npm, September 2025** — the maintainer of `debug`, `chalk`, and 16 other utilities (billions of weekly downloads) was phished through a fake 2FA-reset domain; malicious versions shipped to the whole ecosystem within hours. ([Upwind](https://www.upwind.io/feed/npm-supply-chain-attack-massive-compromise-of-debug-chalk-and-16-other-packages))
+- **npm, December 2025** — the self-replicating **Shai-Hulud 2.0** worm harvested roughly 400,000 developer secrets through infected packages' install scripts. ([Unit 42](https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/))
+- **npm, March 2026 — `axios`** — the HTTP client with 100M+ weekly downloads was published with a cross-platform remote-access trojan via its maintainer's compromised account, attributed to North Korean state activity. ([Trend Micro](https://www.trendmicro.com/en_us/research/26/c/axios-npm-package-compromised.html) · [Microsoft Security](https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/) · [Snyk](https://snyk.io/blog/axios-npm-package-compromised-supply-chain-attack-delivers-cross-platform/))
+- **Okta, October 2023** — the identity provider's own support system was breached; uploaded HAR files yielded live session tokens for 134 customers, five of whom were then session-hijacked — no password or MFA needed. ([Krebs](https://krebsonsecurity.com/2023/10/hackers-stole-access-tokens-from-oktas-support-unit/) · [BleepingComputer](https://www.bleepingcomputer.com/news/security/okta-breach-134-customers-exposed-in-october-support-system-hack/))
+- **Microsoft Entra, 2023–24** — Storm-0558 forged authentication tokens with a stolen signing key to read cloud mailboxes, detected not by the vendor but by a customer — the same customer-detects-vendor pattern as Okta. ([Cybersecurity Dive](https://www.cybersecuritydive.com/news/okta-customer-support-system-cyberattack/697407/))
+
+The pattern across all five: **the trust network itself is the attack surface.** Your dependencies ship to you; your identity provider's session is your session. A stolen token that lives for hours on batch-speed identity sync is a breach; the same token on real-time infrastructure dies at revocation — *now*, not at the next sync window.
+
+What that lesson demands is exactly this checklist's spine: verify authority against **your own published keys**, offline, per request (no inherited vendor trust); tokens that are **short-lived and single-use**; controls that **fail closed** when a trusted party goes dark or goes rogue; and an **SBOM discipline** that can answer "do we ship the compromised version?" in minutes — the question every axios consumer had to answer on March 31, 2026, at whatever speed their inventory allowed.
+
 ## The gaps this review finds in real estates
 
 Four gaps recur in otherwise well-run estates. Each one is a *join that doesn't exist* — two systems that are individually healthy and jointly blind. This is what the review above surfaces, and what middleware closes without replacing either side.
