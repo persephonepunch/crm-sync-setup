@@ -27,7 +27,7 @@ body{
     linear-gradient(to right, var(--grid) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
   background-size:20px 20px;
-  font:300 15px/1.6 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
+  font:400 15px/1.55 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
 }
 
 /* ---- top command bar (nav + downloads) --------------------------------- */
@@ -51,12 +51,12 @@ body{
 /* ---- hero -------------------------------------------------------------- */
 .hero{padding-bottom:30px; margin-bottom:14px; border-bottom:2px solid var(--cyan)}
 .hero .kicker{font:600 12px/1 var(--mono); letter-spacing:.30em; text-transform:uppercase; color:var(--g5)}
-.hero h1{                          /* 100-weight headline */
-  font-weight:100; font-size:clamp(36px,5.4vw,58px); line-height:1.08; letter-spacing:-1px;
-  margin:22px 0 0; max-width:19ch; color:var(--ink);
+.hero h1{                          /* light display headline (300 — 100 was too faint) */
+  font-weight:300; font-size:clamp(36px,5.4vw,58px); line-height:1.08; letter-spacing:-1px;
+  margin:22px 0 0; max-width:24ch; color:var(--ink);
 }
-.hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the thin headline */
-.hero .sub{color:var(--ink); font-size:17px; line-height:1.6; margin:22px 0 0; max-width:72ch}
+.hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the light headline */
+.hero .sub{color:var(--ink); font-size:17px; line-height:1.55; margin:22px 0 0; max-width:92ch}
 .hero .sub strong,.hero .sub b{color:var(--ink); font-weight:600}
 .hero .meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:22px;
   font:600 11px/1 var(--mono); letter-spacing:.08em; color:var(--g5)}
@@ -69,12 +69,12 @@ body{
   margin:54px 0 16px; padding-bottom:9px; border-bottom:1.5px solid var(--cyan)}
 .doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px}
 .doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6)}
-.doc p{margin:11px 0; max-width:74ch}
+.doc p{margin:10px 0; max-width:92ch}
 .doc a{color:var(--link); text-decoration:none; border-bottom:1px solid var(--g3)}
 .doc a:hover{border-bottom-color:var(--ink)}
 .doc strong{font-weight:600}
 .doc em{font-style:italic}
-.doc ul,.doc ol{margin:11px 0; padding-left:22px; max-width:74ch}
+.doc ul,.doc ol{margin:10px 0; padding-left:22px; max-width:92ch}
 .doc li{margin:6px 0}
 .doc li::marker{color:var(--g4)}
 .doc hr{border:none; border-top:1px solid var(--g2); margin:36px 0}
