@@ -102,10 +102,10 @@ The minimum bar per domain, what enforces it, and where to watch it run — the 
 
 Not a slide — the running product. Two of the review's controls, photographed on this store — or skip the photographs and open [the soul of the application](https://www.crm-sync.dev/pages/knowledge-base#console) yourself:
 
-![Choose your view — the persona selector: CISO/DPO, Designer, Revenue BA, QA/Compliance, Release Manager, Audience Manager, Funnel Wizard, Session view, Agent permissions, Firmware & SBOM](./assets/soc-review-choose-view.png)
+![Choose your view — the persona selector: CISO/DPO, Designer, Revenue BA, QA/Compliance, Release Manager, Audience Manager, Funnel Wizard, Session view, Agent permissions, Firmware & SBOM](./assets/soc-review-choose-view.png?v=1)
 *Separation of duties as a product surface (ITGC 1): access is granted by invitation, and each stakeholder — the DPO, the analyst, QA, the release manager — gets exactly their operational view, including Agent permissions and the Firmware & SBOM harness. Open it live from [the permission baseline on the How page](https://www.crm-sync.dev/pages/how-it-works#permission-baseline).*
 
-![Entitlement Service session view — one session showing 1P consent revoked, entitlement caps, revenue pane, and engagement suppressed with the note: consent revoked/reset for this identity, enforced from N+1, YouTube/social tracking withheld](./assets/soc-review-session-view.png)
+![Entitlement Service session view — one session showing 1P consent revoked, entitlement caps, revenue pane, and engagement suppressed with the note: consent revoked/reset for this identity, enforced from N+1, YouTube/social tracking withheld](./assets/soc-review-session-view.png?v=1)
 *Real-time enforcement, evidenced (AI requirements · consent parity): one session, four consent-scoped panes. The consent revoke is honored — engagement tracking is withheld and says so — and the refusal itself is the audit record. This is the server-side answer to "what did the servers do?"*
 
 ## The cost of standing still — AI-speed data on batch-speed infrastructure
