@@ -80,6 +80,16 @@ SOC-aligned controls and security are **built into the data path, not bolted on*
 - ✓ The anti-monolith doctrine is the standing design answer: no single vendor going dark takes the controls with it
 - Cadence: per-leg outage drills with retained evidence, and a subservice-organization map recording which controls are inherited from vendor SOC 2 reports versus owned here
 
+## The controls, live
+
+Not a slide — the running product. Two of the review's controls, photographed on this store:
+
+![Choose your view — the persona selector: CISO/DPO, Designer, Revenue BA, QA/Compliance, Release Manager, Audience Manager, Funnel Wizard, Session view, Agent permissions, Firmware & SBOM](./assets/soc-review-choose-view.png)
+*Separation of duties as a product surface (ITGC 1): access is granted by invitation, and each stakeholder — the DPO, the analyst, QA, the release manager — gets exactly their operational view, including Agent permissions and the Firmware & SBOM harness.*
+
+![Entitlement Service session view — one session showing 1P consent revoked, entitlement caps, revenue pane, and engagement suppressed with the note: consent revoked/reset for this identity, enforced from N+1, YouTube/social tracking withheld](./assets/soc-review-session-view.png)
+*Real-time enforcement, evidenced (AI requirements · consent parity): one session, four consent-scoped panes. The consent revoke is honored — engagement tracking is withheld and says so — and the refusal itself is the audit record. This is the server-side answer to "what did the servers do?"*
+
 ## The cost of standing still — AI-speed data on batch-speed infrastructure
 
 AI asks in milliseconds. Batch infrastructure answers in days. An estate without real-time server functions has exactly two options when agents arrive, and both are expensive: **block the AI** (the revenue and productivity cost of sitting out the platform shift) or **let it act unverified** (the compliance cost of an actor moving faster than your controls can watch). The remediation ladder is public record — the [billion-dollar fine table](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai), and the [ERP failure walked to delisting](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool). The alternative — consent, entitlement, and evidence enforced at the moment of the event — is not a program. It is middleware that is free to adopt.
