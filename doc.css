@@ -27,7 +27,7 @@ body{
     linear-gradient(to right, var(--grid) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
   background-size:20px 20px;
-  font:400 1.5rem/1.55 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
+  font:400 1.3rem/1.55 var(--sans); letter-spacing:.1px; -webkit-font-smoothing:antialiased;
 }
 
 /* ---- top command bar (nav + downloads) --------------------------------- */
@@ -56,14 +56,14 @@ body{
   margin:22px 0 0; max-width:24ch; color:var(--ink);
 }
 .hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the light headline */
-.hero .sub{color:var(--ink); font-size:1.5rem; line-height:1.55; margin:22px 0 0; max-width:none}
+.hero .sub{color:var(--ink); font-size:1.3rem; line-height:1.55; margin:22px 0 0; max-width:none}
 .hero .sub strong,.hero .sub b{color:var(--ink); font-weight:600}
 .hero .meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:22px;
   font:600 11px/1 var(--mono); letter-spacing:.08em; color:var(--g5)}
 .hero .meta b{color:var(--ink)}
 
 /* ---- rendered markdown body ------------------------------------------- */
-.doc{font-size:1.5rem}
+.doc{font-size:1.3rem}
 .doc > h1:first-child{display:none}   /* first h1 is lifted into the hero */
 .doc h2{font-size:12px; letter-spacing:.18em; text-transform:uppercase; font-weight:700;
   margin:54px 0 16px; padding-bottom:9px; border-bottom:1.5px solid var(--cyan)}
