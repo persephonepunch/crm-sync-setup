@@ -63,7 +63,30 @@ Klaviyo and HubSpot depend on client-side JavaScript for tracking, which ad bloc
 
 ## 10. Transparent Pricing Without Per-Contact Scaling
 
-HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Klaviyo charges per profile. Salesforce charges per user seat plus per-feature add-ons. CRM Sync charges per infrastructure tier ($69 shared, $325 private) — no per-contact penalty for growing your customer base.
+HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Klaviyo charges per profile. Salesforce charges per user seat plus per-feature add-ons. CRM Sync charges flat, published prices — no per-contact, per-profile, or per-seat penalty for growing your customer base.
+
+**What you're buying is a build, not a tenancy.** CRM Sync is a build with AI integration tooling: run it alongside the standard CRM you already have, or mirror that CRM's data through the sync layer and migrate off it entirely — the mirror becomes the system you own. Either path uses the same connectors and the same consent substrate; there is no fork-lift moment where the vendor decides your schema.
+
+**Single-fee services** (one-time, fixed price):
+
+| Service | Price |
+|---|---|
+| [Download App](https://www.crm-sync.dev/products/download-app) — the app build, yours to run | $90 |
+| [Verified Transaction Layer — License](https://www.crm-sync.dev/products/verified-transactions) | $90 |
+| [Firmware SBOM — Per-Image Analysis](https://www.crm-sync.dev/products/sbom-firmware-image) | $250 |
+| [Firmware Security — ceremony-signed distribution](https://www.crm-sync.dev/products/firmware-security) | $499 |
+| [CRA Readiness Assessment](https://www.crm-sync.dev/products/cra-readiness) — fixed-fee working session, all ten CRA documents in order | $900 |
+
+**CRA compliance line** (what an EU Cyber Resilience Act posture costs here, versus a platform's enterprise-compliance add-on tier):
+
+| CRA product | Price |
+|---|---|
+| [SBOM Registry — App Coverage](https://www.crm-sync.dev/products/sbom-registry) | $49/mo |
+| [Firmware SBOM — Per-Image Analysis](https://www.crm-sync.dev/products/sbom-firmware-image) | $250 one-time |
+| [Firmware Security — vault + certificates](https://www.crm-sync.dev/products/firmware-security) | $499 one-time |
+| [CRA Readiness Assessment](https://www.crm-sync.dev/products/cra-readiness) | $900 one-time |
+
+Distribution and creator rails ([Channel Publish](https://www.crm-sync.dev/products/channel-publish), [3D Publisher](https://www.crm-sync.dev/products/3d-publisher)) are $49 each. Every price above is the live store price — the catalog is the price list.
 
 ## 11. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
 
@@ -91,4 +114,4 @@ The asymmetry is the point: carrying the ID costs almost nothing, while the cons
 | GDPR compliance | Privacy Center add-on | Basic tools | Limited | Built into data model |
 | Analytics tracking | Client-side JS | Client-side JS | Client-side JS | Server-side (ad-block proof) |
 | Warehouse identity | Data Cloud add-on (credits) | Operations Hub add-on | CSV export | Consent-gated `user_id` in your BigQuery (free GA4 export) |
-| Pricing model | Per seat + add-ons | Per contact tier | Per profile | Per infrastructure tier |
+| Pricing model | Per seat + add-ons | Per contact tier | Per profile | Flat published prices — a build you own ($90 app; fixed-fee services) |
