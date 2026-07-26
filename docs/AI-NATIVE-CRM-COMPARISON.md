@@ -109,7 +109,7 @@ Standard CRMs sell these as enterprise editions of themselves. Here they're buil
 
 ## 11. The Migration Rail: CRM → Shopify → GA4 / UCP
 
-The same connectors that let you coexist with a CRM are a **data-harvesting rail for leaving it** — three stages, no big-bang:
+CRMs weren't built to include consent in real time. You will need to **update or migrate** — CRM Sync does both. The same connectors that let you coexist with a CRM are a **data-harvesting rail for leaving it** — three stages, no big-bang:
 
 1. **CRM → Shopify.** Point the sync layer at the CRM in mirror mode. Profiles, consent-relevant records, and transaction history harvest into Shopify customer objects and your own identity spine — the CRM keeps running while its monopoly on the record ends.
 2. **Shopify → GA4.** Events and identity flow server-side (Measurement Protocol, Consent Mode v2) into GA4 and the free BigQuery export — infrastructure you own, keyed by consent-gated `user_id`.
