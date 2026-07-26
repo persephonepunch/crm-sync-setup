@@ -67,6 +67,8 @@ HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Kla
 
 **What you're buying is a build, not a tenancy.** CRM Sync is a build with AI integration tooling: run it alongside the standard CRM you already have, or mirror that CRM's data through the sync layer and migrate off it entirely — the mirror becomes the system you own. Either path uses the same connectors and the same consent substrate; there is no fork-lift moment where the vendor decides your schema.
 
+**We generate a Worker — you use it where you need it.** The deliverable is an edge Worker: AI-secure by construction (scoped credentials, audited agent actions, masked secrets), with the Verified Trust network — published keys, signed certificates, offline-verifiable records — reinforcing the system you already have rather than replacing it. Built to enterprise standards with flexibility in mind: it meets your stack where it stands.
+
 **Single-fee services** (one-time, fixed price):
 
 | Service | Price |
