@@ -75,6 +75,8 @@ HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Kla
 
 This is also why AI-paired system development stays **front-end agnostic** here: none of the security lives in the page. Every read and write passes through surgical, row-based AI functions at the edge — each call scoped to the row it touches and the mandate it carries, consent checked at that row, the result ledgered. Swap the front end and nothing security-relevant moves.
 
+**The Worker that secures the configurator is shared infrastructure — included.** The $90 configurator runs against the shared edge Worker: the function/security brain — consent gates, entitlements, ledgers, the Verified Trust network — operated for every tenant at once. Want your own brain? A **dedicated Worker** on your own zone, with your own keys, your own ledgers, your own trust network, generated and customized for you — that is the Enterprise engagement, priced by scope with the private-customization menu below. The shape is familiar: WordPress on shared hosting versus your own private VM — identical software, different isolation, and you graduate when the stakes say so.
+
 **The key strategy works because there is no "store your data somewhere else" fee.** Identity and records live in your own Shopify, Xano, and BigQuery under your own keys — per-tenant isolation is key-level, not a licensing tier. The price buys the build, never a place to keep what was already yours.
 
 **Single-fee services** (one-time, fixed price):
