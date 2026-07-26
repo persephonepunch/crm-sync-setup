@@ -115,6 +115,8 @@ The same connectors that let you coexist with a CRM are a **data-harvesting rail
 2. **Shopify → GA4.** Events and identity flow server-side (Measurement Protocol, Consent Mode v2) into GA4 and the free BigQuery export — infrastructure you own, keyed by consent-gated `user_id`.
 3. **GA4 → UCP.** The same plane publishes agent-eligible offers over the Universal Commerce Protocol. Humans arrive through Google; agents arrive through UCP; one consent substrate governs both.
 
+**Logging on change is the difference.** Every change — price, consent, campaign, discount, A-B test — lands in a ledger the business stakeholder owns: their own business notebook, exportable as a CSV, visible only to them. That does two things at once: it adds **security** (a private, tamper-evident record nobody else can rewrite) and it adds **utility to AI-managed data** (the AI works against a ledger the human can always read, check, and keep).
+
 **The benefit of direct-to-user data with consent is real time.** A CRM's copy of the customer is always a replica — captured somewhere else, synced later, consent checked after the fact. Direct-to-user capture inverts that: the record is written at the moment of the event, from the user themselves, with consent evaluated in the same request. There is no sync lag to apologize for and no replica to reconcile — the first copy is already yours, already consented, already in the systems you keep.
 
 ## 12. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
