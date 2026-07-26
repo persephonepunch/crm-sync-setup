@@ -17,6 +17,8 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/AI-NA
 
 Traditional CRMs were built for a pre-AI, pre-privacy world: centralized databases, batch syncs, vendor-locked identity, and GDPR bolted on as an afterthought. CRM Sync is designed from the ground up for real-time, consent-first, AI-native customer data orchestration across composable services.
 
+The endgame is visible in two steps. The **GA4 pivot** moves events and identity into infrastructure you own (server-side Measurement Protocol, the free BigQuery export, your own project and IAM). The **UCP turn** makes commerce agent-addressable. At that threshold, organizations pivoting to GA4 discover the CRM was never the requirement — **consent-governed identity was**, and by then they already own it.
+
 ---
 
 ## 1. Consent-First Architecture
