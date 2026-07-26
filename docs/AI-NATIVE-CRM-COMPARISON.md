@@ -107,7 +107,11 @@ Distribution and creator rails ([Channel Publish](https://www.crm-sync.dev/produ
 
 Standard CRMs sell these as enterprise editions of themselves. Here they're builds on infrastructure you already own by the time you need them.
 
-## 11. The Migration Rail: CRM → Shopify → GA4 / UCP
+## 11. Attio and the AI-Native CRMs: the Hotel California Problem
+
+Newer, AI-native CRMs (Attio is the one evaluators search most) fix the UI and the data model — and change nothing about the shape that matters. The record still accumulates inside the vendor's workspace, per-seat billing still scales with the team, and consent is still a field you maintain rather than a timestamped object the infrastructure enforces. Even teams that go "headless CRM" hit the same wall: the painful part is realizing later that **you can never leave** — every workflow points at the vendor's IDs and the exit is a CSV plus a re-keying project. The bridge is going to be needed either way: an AI tool that mirrors the vendor's data into systems you own while everything keeps running. Install it on day one, not on the day you want out. Store page for evaluators: [Attio Alternative](https://www.crm-sync.dev/pages/attio-alternative).
+
+## 12. The Migration Rail: CRM → Shopify → GA4 / UCP
 
 CRMs weren't built to include consent in real time. You will need to **update or migrate** — CRM Sync does both. The same connectors that let you coexist with a CRM are a **data-harvesting rail for leaving it** — three stages, no big-bang:
 
@@ -119,7 +123,7 @@ CRMs weren't built to include consent in real time. You will need to **update or
 
 **The benefit of direct-to-user data with consent is real time.** A CRM's copy of the customer is always a replica — captured somewhere else, synced later, consent checked after the fact. Direct-to-user capture inverts that: the record is written at the moment of the event, from the user themselves, with consent evaluated in the same request. There is no sync lag to apologize for and no replica to reconcile — the first copy is already yours, already consented, already in the systems you keep.
 
-## 12. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
+## 13. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
 
 Salesforce sells warehouse-grade identity as Data Cloud — consumption credits on top of platform licensing. HubSpot gates warehouse sync behind Operations Hub. Klaviyo offers CSV exports. CRM Sync takes the commodity path: a consent-gated `user_id` flows through GA4's free BigQuery export into a Google Cloud project you own.
 
