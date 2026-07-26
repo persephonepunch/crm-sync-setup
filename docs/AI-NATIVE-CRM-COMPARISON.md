@@ -88,6 +88,17 @@ HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Kla
 
 Distribution and creator rails ([Channel Publish](https://www.crm-sync.dev/products/channel-publish), [3D Publisher](https://www.crm-sync.dev/products/3d-publisher)) are $49 each. Every price above is the live store price — the catalog is the price list.
 
+**Private customization** (scoped engagements on the same substrate — priced by scope, not by seat):
+
+- **ERP integration** — your ERP's records join the universal revenue ledger on the session key, so order, tax, consent, and ERP references reconcile in one place instead of four exports. This is the gap acquisitions keep rediscovering: an ERP that doesn't resolve to the transaction record.
+- **RMA / returns lifecycle** — returns as first-class records with verifiable state, joined to the same ledger; the "customer service system that doesn't link to the warehouse" failure mode, closed.
+- **Fraud linkage** — fraud signals bound to the CRM identity spine rather than a sidecar tool, so a flagged actor is flagged everywhere consent allows.
+- **Cross-border / market rails** — per-market pricing, tax, and payment rails (card, regional wallets) under one market-of-sale record per transaction, with EU price-reference (Omnibus) discipline built in.
+- **Add-ons** — anything the composable layer reaches: warehouse/WMS hooks, channel publishing, custom consent surfaces, agent-payment mandates. Because the substrate is the same consent-gated event bus, a custom add-on inherits the audit trail instead of escaping it.
+- **Bring your own interface** — the data plane doesn't care what renders it. Managed CMS: Webflow, Em Dash, WordPress, Drupal, AEM, Salesforce Experience Cloud. File-system frameworks: Astro, Next, Nuxt, Svelte. The connectors and embeds are interface-agnostic, so the presentation layer is your choice — and replaceable without touching the data.
+
+Standard CRMs sell these as enterprise editions of themselves. Here they're builds on infrastructure you already own by the time you need them.
+
 ## 11. Warehouse Identity: What a BigQuery ID Costs, and What Consent Unlocks
 
 Salesforce sells warehouse-grade identity as Data Cloud — consumption credits on top of platform licensing. HubSpot gates warehouse sync behind Operations Hub. Klaviyo offers CSV exports. CRM Sync takes the commodity path: a consent-gated `user_id` flows through GA4's free BigQuery export into a Google Cloud project you own.
