@@ -27,6 +27,8 @@ Salesforce and HubSpot store consent as a checkbox field. CRM Sync treats consen
 
 Traditional CRMs rely on the marketing team to check the box. CRM Sync enforces it at the infrastructure level.
 
+**The banner most enterprises run is still tuned for the page-view era.** UA-generation CMP deployments — the OneTrust banner wired up years ago — record a page-view consent and stop there, and household-name enterprises are still running them because nobody owns the update. But AI predictive audiences explicitly require **Consent Mode v2**: no v2 signals, no modeling, no predictive audiences — and no defensible record. Most orgs treat CMv2 as optional. Then they're surprised when they get sued. The ones that treat it as infrastructure never have that day.
+
 ## 2. Real-Time Multi-Channel Sync (Not Batch ETL)
 
 Klaviyo syncs customer segments on a schedule (hourly/daily). HubSpot workflows trigger sequentially. CRM Sync writes to all 7 services in the same request — database, website CMS, online store, analytics, customer data platform, email, and consent log — with zero delay.
