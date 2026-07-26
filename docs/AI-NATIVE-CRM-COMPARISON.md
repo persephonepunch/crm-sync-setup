@@ -81,7 +81,7 @@ This is also why AI-paired system development stays **front-end agnostic** here:
 
 | Service | Price |
 |---|---|
-| [Download App](https://www.crm-sync.dev/products/download-app) — the app build, yours to run | $90 |
+| [Download App](https://www.crm-sync.dev/products/download-app) — the configurator: use as you wish, on as many Webflow/Shopify instances as you run | $90 |
 | [Verified Transaction Layer — License](https://www.crm-sync.dev/products/verified-transactions) | $90 |
 | [Firmware SBOM — Per-Image Analysis](https://www.crm-sync.dev/products/sbom-firmware-image) | $250 |
 | [Firmware Security — ceremony-signed distribution](https://www.crm-sync.dev/products/firmware-security) | $499 |
