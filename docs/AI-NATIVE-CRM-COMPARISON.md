@@ -67,7 +67,11 @@ HubSpot charges by contact tier ($800/mo at 2,000 contacts on Professional). Kla
 
 **What you're buying is a build, not a tenancy.** CRM Sync is a build with AI integration tooling: run it alongside the standard CRM you already have, or mirror that CRM's data through the sync layer and migrate off it entirely — the mirror becomes the system you own. Either path uses the same connectors and the same consent substrate; there is no fork-lift moment where the vendor decides your schema.
 
-**We generate a Worker — you use it where you need it.** The deliverable is an edge Worker: AI-secure by construction (scoped credentials, audited agent actions, masked secrets), with the Verified Trust network — published keys, signed certificates, offline-verifiable records — reinforcing the system you already have rather than replacing it. Built to enterprise standards with flexibility in mind: it meets your stack where it stands.
+**We generate a Worker — you use it where you need it.** The deliverable is an edge Worker on [Cloudflare Workers](https://workers.cloudflare.com): AI-secure by construction (scoped credentials, audited agent actions, masked secrets), with the Verified Trust network — published keys, signed certificates, offline-verifiable records — reinforcing the system you already have rather than replacing it. Built to enterprise standards with flexibility in mind: it meets your stack where it stands.
+
+This is also why AI-paired system development stays **front-end agnostic** here: none of the security lives in the page. Every read and write passes through surgical, row-based AI functions at the edge — each call scoped to the row it touches and the mandate it carries, consent checked at that row, the result ledgered. Swap the front end and nothing security-relevant moves.
+
+**The key strategy works because there is no "store your data somewhere else" fee.** Identity and records live in your own Shopify, Xano, and BigQuery under your own keys — per-tenant isolation is key-level, not a licensing tier. The price buys the build, never a place to keep what was already yours.
 
 **Single-fee services** (one-time, fixed price):
 
