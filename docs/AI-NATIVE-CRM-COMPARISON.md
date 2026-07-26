@@ -152,4 +152,5 @@ The asymmetry is the point: carrying the ID costs almost nothing, while the cons
 | Analytics tracking | Client-side JS | Client-side JS | Client-side JS | Server-side (ad-block proof) |
 | Warehouse identity | Data Cloud add-on (credits) | Operations Hub add-on | CSV export | Consent-gated `user_id` in your BigQuery (free GA4 export) |
 | Evidence ledger (Omnibus pricing · firmware/SBOM · consent) | No | No | No | **One ledger — unique to CRM Sync**: price evidence, shipped-software records, and Consent Mode v2 logged together |
+| Geo-dimensioned evidence | No | No | Profile location filters only | **Every event carries ISO country, currency, language, location** — per-market evidence, not a segment filter |
 | Pricing model | Per seat + add-ons | Per contact tier | Per profile | Flat published prices — a build you own ($90 app; fixed-fee services) |
