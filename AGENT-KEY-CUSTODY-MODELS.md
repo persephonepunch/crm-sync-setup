@@ -142,7 +142,37 @@ Consider one field. A conventional platform records consent as a boolean: *accep
 
 A CRM is very good at being where the revenue team works. It is not designed to prove to a third party what an organization was permitted to do, and when. Different jobs — the provenance layer coexists with the CRM and feeds it, and if the relationship ends the evidence does not leave with the subscription.
 
-## 7. You do not have to build any of this
+## 7. The channel manager and PIM layer
+
+The same distinction applies one layer up, where product data is managed and syndicated. Category incumbents — Salsify, Feedonomics, Productsup, Rithum among them — solve a genuinely hard problem: take a catalogue, normalize it, transform it per destination, and push it to dozens of marketplaces, retailers, and ad platforms at scale. Anyone who has hand-maintained a Walmart feed knows what that work is worth.
+
+The architectural observation is not that these systems are deficient. It is that they are **syndication-first**, and syndication optimizes for a different question than compliance does.
+
+A syndication system is designed to answer: *what is the current value of this attribute, and has it reached every destination?* Its data model is therefore a current-state record. Attributes are mutable fields; a price change overwrites a price; a market rule updates in place; a feed re-runs and the previous version has served its purpose. Throughput outward is the design goal, and by that measure these platforms perform well.
+
+Regulation asks a retrospective question instead: *what was true, when, in which market, and on whose authority?*
+
+- **Price transparency** (EU Omnibus) asks what the lowest price was during the 30 days before a reduction — a question about a *series*, not a current value.
+- **Consent and data residency** ask whether a routing decision that placed data or an offer into a jurisdiction was covered by a consent state that existed *at the time of the routing*.
+- **Product security and conformity** (CRA and adjacent regimes) ask which exact version of a claim, document, or bill of materials accompanied a specific release.
+
+Nothing about a syndication platform prevents an organization from answering these. But the answer has to be reconstructed — from exports, feed logs, and whatever the destination retained — rather than read from a record that was designed to be evidence. Reconstruction is expensive, contestable, and gets weaker with time.
+
+Two structural consequences are worth naming plainly, because both are architectural rather than anybody's fault:
+
+**Attribute collision has no arbiter.** In a typical enterprise, product truth arrives from more than one upstream system — an ERP, a merchandising tool, a regional override, a spreadsheet an operator maintains. The syndication layer resolves conflicts by precedence rules and last-write-wins. That produces a working feed and destroys the audit question: when two systems asserted different values, which one was authoritative, at what moment, and who decided? Without a timestamped, signed record at the point of resolution, that question is unanswerable afterwards at any price.
+
+**Routing decisions are rarely bound to consent.** Geographic and channel routing is configuration: this catalogue goes to these markets under these rules. The configuration is current-state, so the record of *which rule was in force when a given offer reached a given market* usually exists only as a changelog entry, if at all — and the consent state that should have governed it lives in a completely different system, on a different clock.
+
+### Complementary, not competitive
+
+The conclusion is the same as with the CRM: **keep the PIM.** Syndication at scale is specialized work, and replacing it to gain provenance would be a poor trade.
+
+What the provenance layer adds is the record the syndication layer was never designed to keep: a timestamped, hash-chained, signed entry each time a claim is published, a price changes, a routing rule applies, or a consent state governs a decision — verifiable afterwards by someone who does not trust either system. The PIM keeps answering *what is the value now.* The provenance layer answers *what was true then, and who said so.*
+
+That division is why this integrates rather than displaces. Feeds continue to flow. The difference is that a year later, when a regulator, a retailer, or a claimant asks what your product asserted in a particular market on a particular date, the answer is a signed record rather than a reconstruction.
+
+## 8. You do not have to build any of this
 
 A fair objection to everything above: it reads like a cryptography project, and most teams do not have a cryptographer to spare. They don't need one. The primitives are already in the platforms, and the work is configuration rather than construction.
 
@@ -156,7 +186,7 @@ The skill required is **reading a claim and deciding what it permits** — ordin
 
 That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team, on a normal Tuesday.
 
-## 8. What this means operationally
+## 9. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
 - **Separation of duties enforced in the data plane.** Whoever authors a change cannot promote it; whoever signs off cannot deploy it. Governance is a gate, not a job title.
@@ -164,7 +194,7 @@ That is the difference between a research posture and a deployment posture. A pr
 - **Evidence an outsider can check.** Certificates verify against a published key with no account and no trust in the platform.
 - **Consent bound to the record.** The consent state at the moment of the grant is signed into the certificate.
 
-## 9. Glossary of terms
+## 10. Glossary of terms
 
 Written for readers who know cryptography but not this stack, and for readers who know neither. No term below is proprietary — where a name is ours, it is marked.
 
@@ -226,11 +256,11 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 10. Verify it yourself
+## 11. Verify it yourself
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
-## 11. Where this is implemented
+## 12. Where this is implemented
 
 Everything described above is running software, not a proposal. Each product below is one capability of the same plane — the same entitlements, the same signing keys, the same ledger.
 
