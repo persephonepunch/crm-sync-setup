@@ -15,6 +15,8 @@ Block shipped **Buzz** on 21 July 2026: an open-source workspace where humans an
 
 ![The Channel Wizard open on a product page, minting an attributed link bound to that product's MPN — preview the QR free, mint it with the Channel Publish add-on](https://crm-sync.dev/kb/media/docs/wizard-pdp.png)
 
+*The Channel Wizard, opened from a product page. The product is preselected and its MPN travels with the mint, so every scan keys to the identifier the product page already publishes. Previewing is free; minting unlocks with the add-on.*
+
 ## 1. The shared thesis
 
 Buzz is built on the Nostr protocol under Apache-2.0. Every participant — human or agent — holds a keypair that belongs to them rather than to the platform. Every message, workflow step, code event, and approval is stored as a cryptographically signed event, and the record is verifiable by anyone holding the public key.
@@ -95,6 +97,8 @@ Self-hosting a private relay is possible and is the right answer for a serious d
 The shape used here is the ordinary one those controls were written for: a browser talking to a named origin over HTTPS. One domain to allowlist, one tenancy holding the record, no persistent connections to unvetted servers. Public verification is a plain `GET` against a published key — an auditor checks a certificate without joining a network, installing anything, or being granted an account.
 
 ![One Progressive Web App installs to the desktop dock, the iOS home screen and Android from a single build — no app-store review, no per-platform binary, and nothing for endpoint management to package](https://crm-sync.dev/kb/media/docs/pwa-install.png)
+
+*One build, three surfaces. The same Progressive Web App runs in the browser, installs to the desktop dock, and adds to a phone home screen — which is why rollout is a URL rather than a fleet deployment, and why a compliance reviewer can open it on the device already in their hand.*
 
 The install surface follows from the same choice. One Progressive Web App becomes the browser tab, the desktop application, and the phone home screen from a single build — so "roll this out" means sharing a URL rather than scheduling a fleet deployment, and updates ship when they are deployed rather than when the fleet next accepts a package.
 
@@ -240,6 +244,24 @@ The fastest place to prove it is not an internal chat tool — it is the commerc
 **Channel → attributed event → BigQuery** runs the whole pattern end to end today: a link or QR minted under your own key, every scan counted in a ledger you own, channel provenance carried into analytics and the warehouse, and the resulting order landing as an ordinary commerce order. Same identity plane, same signing, same audit properties as everything described above — pointed at a problem a growth team already has budget and urgency for.
 
 Once that is running, the mechanism is proven inside your own organization, on your own infrastructure, with numbers a business owner recognizes. Extending it to agent mandates, firmware, or consent evidence is then a matter of scope rather than a new argument.
+
+### The permission wall this walks around
+
+There is a specific reason this starting point works inside a large organization, and it is organizational rather than technical.
+
+Building an audience the conventional way requires the advertising and analytics consoles: an audience builder, conversion configuration, a customer-match upload, a tag change. In most large enterprises **that console access is centrally held** — by a media team, a central marketing-operations function, or an agency of record — and it is not granted to the analyst or growth marketer who actually owns the campaign. This is a defensible control: those consoles hold spend authority and customer data, so access is restricted.
+
+The consequence is that the person with the question cannot answer it. Requests queue behind a central team's roadmap. And because the work still has to happen, people route around the wall — a spreadsheet of identifiers here, a shared login there, an agency granted access "temporarily," a parallel tag deployed to get one campaign measured. **That improvisation is where collision comes from**: several partial systems asserting overlapping truth, none of them timestamped, none authoritative, and no record of who decided what.
+
+Minting removes the dependency for the measurement half of the problem:
+
+- **The coupon and the tracking are created in the same act.** A mint carries its own unlock code, so the offer and its attribution are one object rather than two tickets to two teams. No merchandising request, no separate campaign parameter convention to agree on.
+- **The signal reaches the warehouse through infrastructure that already exists.** Scans stamp channel provenance into the visit, the existing analytics tag carries it, and the standard export lands it in BigQuery. No new console permission is required to *produce* this data, because it flows through the tag and export the organization already runs.
+- **The audience is built from the warehouse, not the console.** Once the events are in BigQuery, segmentation and predictive modelling happen in the data platform — where analysts typically *do* have access — rather than in an advertising UI where they typically do not.
+
+To be precise about the boundary: **activating** an audience into a paid channel still involves that channel's own permissions, and it should. What changes is that the analysis, the evidence, and the audience definition are built and owned before that conversation, in a system the analyst can reach — so the request that eventually goes to the media team is a specific, evidenced ask rather than a plea for access.
+
+That is the same pattern as everything else in this document: the person who has the problem can produce the record themselves, and hand over something verifiable rather than a request to be trusted.
 
 **[Open the Channel Wizard →](https://crm-sync.dev/r/ubd9b6a)** — mint an attributed link or QR against a product, preview it free, and watch the first scan appear in the ledger.
 
@@ -387,6 +409,8 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 ## 14. Verify it yourself
 
 ![The account Licenses panel: every granted capability listed with its date, terms, and proof — a durable receipt, a public verification link, and a scannable QR certificate an auditor can check without an account](https://crm-sync.dev/kb/media/docs/licenses-proof.png)
+
+*Licenses as the buyer sees them: each granted capability with the date it was granted, its terms, and three forms of proof — a durable receipt, a verification link checked against the public key, and a QR an auditor can scan from a printed page.*
 
 Every capability a buyer holds appears in their own account with its proof attached — a receipt, a verification link, and a QR an auditor can scan from a printed page. That is the difference between being told your access is recorded and being handed the record.
 
