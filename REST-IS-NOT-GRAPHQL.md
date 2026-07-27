@@ -96,6 +96,26 @@ An organization that owns its own edge integration schedules the migration itsel
 
 That recording is a design choice, not a byproduct — see [Two Ways to Give an Agent a Key](https://persephonepunch.github.io/crm-sync-setup/agent-key-custody-models.html) for how signed, timestamped records are produced and verified, and §7 of that document for why syndication-first systems (channel managers and PIMs) answer *what is true now* rather than *what was true then*. For the same principle applied to a regulated artefact, see [Firmware, SBOM & the Cyber Resilience Act](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html).
 
+## What the single-hop model costs you next
+
+There is a further reason this matters now, beyond migration hygiene.
+
+Most bought integration middleware encodes a **single-hop data model**: read from a source, transform through a mapping declared at design time, write to a destination. Order of execution is fixed by the pipeline definition. Field binding is static — this field maps to that field, always. Permissions are checked at the boundary, once, as credentials rather than as context. That model was correct for the problem it was built for, and it is why these products scale so well at throughput.
+
+It is also the wrong shape for what AI can now do in the path.
+
+An event-scoped intelligence layer can decide things the pipeline cannot express:
+
+- **Order of execution as a decision, not a diagram.** Which write goes first depends on what this event contains, what state the destination is in, and what has to be true before the next step is safe — determined at event time, not fixed months earlier.
+- **Conditional data binding.** Which field feeds which destination can depend on market, locale, consent state, contract terms, or the presence of a competing assertion from another upstream. A static mapping cannot represent "bind this only when consent covers this jurisdiction."
+- **Rules-based permissions resolved per event.** Not "does the connector hold a valid credential," but "is *this actor* — human or agent — entitled to cause *this specific effect*, at this scope, under the consent in force right now." That is a per-event question, and a per-event answer.
+
+Taken together, that is **real-time event scoping**: the middleware understands the event well enough to decide sequence, binding, and authority as the event happens, and records what it decided. It is the difference between a pipe and a participant.
+
+Bought software cannot easily be taught this, because the limitation is not intelligence — it is the data model. There is nowhere in a single-hop mapping to express a conditional binding, no representation of an actor whose authority varies by event, and no slot for a decision record. You cannot bolt event scoping onto a system whose schema assumes one hop with a fixed shape; you would be rebuilding it.
+
+Which returns to ownership. If your integration layer is yours, the intelligence has somewhere to live: it sits in the path, sees the whole event, decides with full context, and writes down what it decided and why. If the layer belongs to a vendor, the most capable middleware partner available to you is standing outside a system that has no interface for it — and the migration you are planning today determines which of those two positions you occupy for the next several years.
+
 ---
 
 *Vendor-neutral and platform-general: the specifics here are Shopify's Admin API, but the divergences — inverted error semantics, cost-based limits, identifier shape, cursor pagination, and unequal surface coverage — recur in most REST-to-GraphQL migrations.*
