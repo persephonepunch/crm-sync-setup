@@ -59,6 +59,22 @@ The corresponding obligation is that **keystore access is signing authority**. T
 | Verification | Signature against the pubkey | Certificate against published JWKS — no account |
 | Delivery | Desktop application, installed per platform | One PWA: browser, desktop dock, home screen |
 
+### Which key do you actually hold?
+
+A reasonable question after all this curve talk: *which one do I use?* The short answer is that **you never handle a signing key at all.** Curves are internal machinery. What a human or a system holds is one of the credentials below, and only the first is issued to a person.
+
+| Credential | Who holds it | What it is for | If it leaks |
+|---|---|---|---|
+| **Tenant admin key** (`crm_t_…`) | You — generated in the Keys wizard, displayed once | Authenticates your own surfaces and automation to the platform: the extension, the desktop app, your scripts | Rotate it in the wizard; the old key dies immediately and the event lands in the audit ledger |
+| **Session token** (JWT) | The browser, after you sign in | Proves who you are for the length of a session | Expires on its own; an explicit sign-out revokes it everywhere |
+| **CI key** | Your build pipeline | Pushes SBOMs and release artefacts from CI without a human in the loop | Scoped to that one job; reissue it, and a lapsed subscription refuses it anyway |
+| **Agent mandate** | The agent, on your behalf | Lets software act within a spend cap, a scope, and an expiry | Revoke it in one click; it was never your credential to begin with |
+| **Ed25519 signing key** | The platform keystore, at the edge | Signs the certificates the outside world verifies | You do nothing: the platform rotates it, and the public half is republished at the JWKS endpoint |
+
+**secp256k1 does not appear in this list**, and that is the point of naming it: it is Nostr's curve, relevant here only as the comparison. In a participant-held model that key *is* your identity and its safekeeping is your problem. Here the equivalent responsibility is a single admin key you can rotate at will — and rotating it costs you a paste into a config field, not an identity.
+
+So the practical answer to "what key do I use?" is: **the admin key you mint yourself, once.** Everything else is either issued automatically to a session, a job, or an agent, or handled inside infrastructure on your behalf.
+
 ## 4. Delivery under enterprise controls
 
 Buzz ships as a desktop application for macOS, Windows, and Linux. For an open-source project with a developer audience that is a reasonable first surface: native performance, local key storage, an install anyone can inspect.
