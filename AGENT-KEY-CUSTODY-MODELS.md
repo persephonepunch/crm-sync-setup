@@ -260,6 +260,18 @@ The specification then plays its proper role. Rather than being the primary evid
 
 This is also why the workspace question is a distraction. The agency will be on Slack and the enterprise on Teams; the boundary between them is real and will not be dissolved by adopting a third tool. What crosses the boundary intact is not conversation — it is the signed record of what was authorized, which is legible on both sides and belongs to neither.
 
+### The compounding cost: churn
+
+The expensive version of this problem is not a single messy handover. It is what happens when an inherited system has no record and then **people keep leaving.**
+
+Whoever inherits an undocumented implementation spends their first months on archaeology: reading configuration to infer intent, testing in production to discover behaviour, and interviewing colleagues about decisions made by people who have since moved on. That work produces no new capability. It is pure re-derivation of knowledge the organization already paid for once.
+
+Then it compounds. Every departure — an agency rotating staff, a contract ending, an internal reorganization — removes context that was never written down, so the next team re-derives it again, slightly differently. Configuration drifts from documentation, documentation drifts from intent, and eventually the safest-looking option is to rebuild rather than to understand. That is how a working system becomes a replacement project, and why the true cost of a bad handover is usually recognized two teams later, by people with no idea they are paying it.
+
+The most damaging losses are not technical details but **reasons**. Any competent engineer can read a value out of a configuration file. Nobody can read *why* it was set — which market rule required it, which review approved it, which consent terms were in force when it was decided. Absent that, decisions get remade in good faith and wrongly, because the constraint that produced the original is invisible.
+
+A record produced as work happens changes the economics on both sides of the relationship. Onboarding reads the ledger rather than interviewing people who have left. The receiving organization can see what was authorized and when, without trusting anyone's recollection. And the agency benefits at least as much: a demonstrable handover ends an engagement cleanly instead of leaving an obligation that resurfaces every time something breaks, and an inherited project that can explain itself is a project that can be quoted accurately rather than absorbed at a loss.
+
 ## 11. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
