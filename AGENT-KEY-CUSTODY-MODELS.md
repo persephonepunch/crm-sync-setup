@@ -412,7 +412,23 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 14. Verify it yourself
+## 14. This is the data trail regulators are asking for
+
+Everything described here — the signed grant, the timestamped access record, the hash-chained history, the verifiable certificate — can read as engineering preference. It is not. It is close to a description of what recent EU regulation expects an organization to be able to produce.
+
+Consider what each regime actually asks for, stripped of legal language:
+
+- **The Cyber Resilience Act** (Regulation (EU) 2024/2847) expects manufacturers of products with digital elements to maintain a **software bill of materials**, ship security updates over a defined support period, and report actively exploited vulnerabilities against a clock — an early warning, a fuller notification, and a final report. Reporting an exploitation means answering *who obtained this build, when, and in which versions* — which is an access record, not a document. Reporting obligations begin **11 September 2026**; the fuller obligations apply from **11 December 2027**.
+- **Price transparency** (the Omnibus Directive, 2019/2161) expects a seller to substantiate the prior lowest price over the preceding 30 days — a **series** of price states with timestamps, not a current value.
+- **Consent under GDPR, and Consent Mode signalling**, expect an organization to show not merely that consent exists but *when it was given, by what mechanism, under which version of terms, and for what purpose* — provenance, not a flag.
+
+Set side by side, these ask for the same three properties: **an identifier that resolves, a record with a timestamp and an author, and independent verifiability.** That is not a coincidence of drafting. It is what "prove it" means when the party asking was not present at the time and does not trust you by default.
+
+Which is why the firmware-and-SBOM case is the clearest illustration rather than a niche feature. A vaulted firmware image produces exactly this trail as a by-product of ordinary distribution: the image encrypted at rest, an Ed25519 certificate binding product, version, digest and SBOM at the moment of upload, a hash-chained ledger of every grant, denial and served byte-stream, and public verification against a published key. Nobody assembles that afterwards for an auditor — it exists because the distribution mechanism produced it.
+
+The general lesson holds beyond firmware: **if a regime can ask you to prove a past state, the only cheap answer is a system that was already recording.** Reconstruction from exports and memory is expensive, contestable, and gets weaker precisely as the question gets older. See [Firmware, SBOM & the Cyber Resilience Act](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html) for the mapping in detail, including the framework table — offered as engineering guidance, with jurisdictional sign-off a matter for counsel.
+
+## 15. Verify it yourself
 
 ![The account Licenses panel: every granted capability listed with its date, terms, and proof — a durable receipt, a public verification link, and a scannable QR certificate an auditor can check without an account](https://crm-sync.dev/kb/media/docs/licenses-proof.png)
 
@@ -422,7 +438,7 @@ Every capability a buyer holds appears in their own account with its proof attac
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
-## 15. Where this is implemented
+## 16. Where this is implemented
 
 Everything described above is running software, not a proposal. Each product below is one capability of the same plane — the same entitlements, the same signing keys, the same ledger.
 
