@@ -1,5 +1,5 @@
 ---
-title: "Two Ways to Give an Agent a Key — Participant-Held vs Edge-Held Custody"
+title: "Two Ways to Give an Agent a Key"
 description: "An architecture comparison of cryptographic identity for AI agents: the Nostr participant-held keypair model (as shipped in Block's Buzz) against edge-held Ed25519 custody on Xano + Cloudflare. Covers identity vs authority, rotation and revocation, decentralized egress under enterprise controls, three-leg resilience, and where a provenance layer sits relative to a CRM."
 canonical: https://persephonepunch.github.io/crm-sync-setup/agent-key-custody-models.html
 category: "Security"
@@ -126,7 +126,21 @@ Consider one field. A conventional platform records consent as a boolean: *accep
 
 A CRM is very good at being where the revenue team works. It is not designed to prove to a third party what an organization was permitted to do, and when. Different jobs — the provenance layer coexists with the CRM and feeds it, and if the relationship ends the evidence does not leave with the subscription.
 
-## 7. What this means operationally
+## 7. You do not have to build any of this
+
+A fair objection to everything above: it reads like a cryptography project, and most teams do not have a cryptographer to spare. They don't need one. The primitives are already in the platforms, and the work is configuration rather than construction.
+
+**The token layer ships with the backend.** Xano issues authentication tokens with **custom claims** as a standard feature — the `auth/me` pattern returns the caller's identity and whatever claims were bound at issue time. Those claims are the same place an entitlement, a scope, or a mandate reference lives. Encryption and signing are built-in functions, not libraries you vendor and maintain: you configure which claims a token carries and which endpoints require them. Nobody hand-rolls a cipher, and there is no key-handling code to get subtly wrong.
+
+**The edge layer is the runtime's own crypto.** Signing and verification use the platform's native WebCrypto — generate a key, sign a payload, publish the public half. This is a handful of calls against a documented standard interface, not a bespoke implementation.
+
+**It reaches agents through MCP, not custom plumbing.** Because authority already travels in the token's claims, exposing a capability to an AI agent over the Model Context Protocol is a matter of handing the agent a scoped token and letting the server resolve the claim on each call. The agent does not need to understand cryptography; it needs a token that is already bounded. The permission check happens server-side where it belongs — so an agent that misbehaves is refused rather than trusted to behave.
+
+The skill required is **reading a claim and deciding what it permits** — ordinary application logic that any competent backend developer or technically-minded operator can implement. The heavy machinery (curve arithmetic, envelope encryption, chain construction) is already inside the platforms, maintained by their vendors and audited on their compliance schedule.
+
+That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team, on a normal Tuesday.
+
+## 8. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
 - **Separation of duties enforced in the data plane.** Whoever authors a change cannot promote it; whoever signs off cannot deploy it. Governance is a gate, not a job title.
@@ -134,7 +148,7 @@ A CRM is very good at being where the revenue team works. It is not designed to 
 - **Evidence an outsider can check.** Certificates verify against a published key with no account and no trust in the platform.
 - **Consent bound to the record.** The consent state at the moment of the grant is signed into the certificate.
 
-## 8. Glossary of terms
+## 9. Glossary of terms
 
 Written for readers who know cryptography but not this stack, and for readers who know neither. No term below is proprietary — where a name is ours, it is marked.
 
@@ -185,7 +199,7 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 9. Verify it yourself
+## 10. Verify it yourself
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
