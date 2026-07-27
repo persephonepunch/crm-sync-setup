@@ -237,7 +237,30 @@ Once that is running, the mechanism is proven inside your own organization, on y
 
 **[Open the Channel Wizard →](https://crm-sync.dev/r/ubd9b6a)** — mint an attributed link or QR against a product, preview it free, and watch the first scan appear in the ledger.
 
-## 10. What this means operationally
+## 10. The agency-to-enterprise handoff
+
+Everything above meets its hardest practical test at a single moment: **when an agency hands a system to the enterprise that will own it.**
+
+This is where most implementations quietly lose their history. The agency builds inside its own working context — its own accounts, its own credentials, its own chat tool — and delivers a system plus documentation written afterwards, from memory. The enterprise receives configuration without provenance. The questions that surface six months later are the ones nobody can answer:
+
+- Who set this value, and on whose authority?
+- Was this data flow reviewed, and against which consent terms in force at the time?
+- Which decisions were the client's and which were the agency's?
+- What exactly was true on the day of handover, before we started changing things?
+
+The usual remedy is a document written at the end — a specification describing what the system *is*, produced separately from the system itself, accurate on the day it is signed and drifting from that moment on. Credentials get rotated, access is revoked, and the institutional memory leaves with the people.
+
+**A provenance layer changes the shape of the handoff, because the record is produced as work happens rather than reconstructed afterwards.** Three properties do the work:
+
+- **The agency operates under scoped, attenuated grants from day one.** It holds exactly the capabilities it needs, within its own scope, unable to grant itself more (see the delegation rules earlier). It is a collaborator by construction, not by policy — which also means it never holds the credentials that would have to be rotated in a panic later.
+- **Every consequential action is already attributed.** Configuration changes, key ceremonies, consent decisions, and publishing events land in the ledger under the identity that caused them, timestamped, as they happen. Nobody has to remember; the record already exists.
+- **Handover becomes revocation, not reconstruction.** Ending the engagement means revoking the agency's grants. The system continues, the history remains intact and verifiable, and the enterprise inherits a record it can audit rather than a document it has to trust.
+
+The specification then plays its proper role. Rather than being the primary evidence, it becomes the readable summary of a system that can prove its own state — data SOPs and a functional specification that describe a thing the organization can independently verify. That is the same movement described earlier for the individual analyst, one scale up: **build it in a scope you control, hand it over as documentation plus a verifiable record, and let the receiving organization confirm rather than believe.**
+
+This is also why the workspace question is a distraction. The agency will be on Slack and the enterprise on Teams; the boundary between them is real and will not be dissolved by adopting a third tool. What crosses the boundary intact is not conversation — it is the signed record of what was authorized, which is legible on both sides and belongs to neither.
+
+## 11. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
 - **Separation of duties enforced in the data plane.** Whoever authors a change cannot promote it; whoever signs off cannot deploy it. Governance is a gate, not a job title.
@@ -245,7 +268,7 @@ Once that is running, the mechanism is proven inside your own organization, on y
 - **Evidence an outsider can check.** Certificates verify against a published key with no account and no trust in the platform.
 - **Consent bound to the record.** The consent state at the moment of the grant is signed into the certificate.
 
-## 11. Glossary of terms
+## 12. Glossary of terms
 
 Written for readers who know cryptography but not this stack, and for readers who know neither. No term below is proprietary — where a name is ours, it is marked.
 
@@ -307,11 +330,11 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 12. Verify it yourself
+## 13. Verify it yourself
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
-## 13. Where this is implemented
+## 14. Where this is implemented
 
 Everything described above is running software, not a proposal. Each product below is one capability of the same plane — the same entitlements, the same signing keys, the same ledger.
 
