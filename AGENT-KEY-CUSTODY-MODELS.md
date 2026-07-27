@@ -184,7 +184,24 @@ A fair objection to everything above: it reads like a cryptography project, and 
 
 The skill required is **reading a claim and deciding what it permits** — ordinary application logic that any competent backend developer or technically-minded operator can implement. The heavy machinery (curve arithmetic, envelope encryption, chain construction) is already inside the platforms, maintained by their vendors and audited on their compliance schedule.
 
-That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team, on a normal Tuesday.
+### And you do not need a procurement cycle to start
+
+It is worth being precise about the entry cost, because most enterprise architecture documents assume a platform commitment before the first line of work. That assumption does not hold here.
+
+The function-orchestration stack is available on **sign-up, free, in about five minutes** — no organizational service level, no contract, no infrastructure request. What an individual gets is not a sandbox toy: it is the real orchestration runtime, with the same authentication, custom-claim, and function-stack primitives the paid tiers use. The service level buys support, scale, and organizational governance. It does not gate the capability.
+
+The practical consequence is that **an individual business analyst can build the whole thing** — a working application and its trust framework — inside their own scope, on their own account, without asking anyone. Identity, claims, entitlements, the ledger, the endpoints an agent calls: all of it can exist and be demonstrated by one person before a single procurement conversation happens.
+
+That inverts the usual adoption sequence. Instead of *convince the organization → get budget → get infrastructure → build → discover what it actually needed to be*, the order becomes:
+
+1. **Build it in individual scope** — real, running, with real data flowing.
+2. **Prove the questions it answers** — hand a reviewer a certificate they can verify against a public key, on their phone, without an account.
+3. **Hand off as documentation** — the working system is transcribed into the organization's own artefacts: data SOPs, a functional specification in markdown, the schema and endpoint contracts that already exist because the thing was built rather than described.
+4. **Then buy the service level** — for support, scale, and governance, against a system whose value has already been demonstrated rather than forecast.
+
+This matters more than it sounds for the enterprise argument earlier in this document. The hardest part of introducing a provenance layer into a large organization is not technical and it is not cost — it is that the people who feel the compliance pain (a BA, an analyst, a compliance officer) are rarely the people who can commission infrastructure. A model where the person with the problem can build the answer themselves, and hand it over as a specification rather than a request, routes around the blockage entirely.
+
+That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team — or, to begin with, by one determined analyst on a Tuesday afternoon.
 
 ## 9. What this means operationally
 
