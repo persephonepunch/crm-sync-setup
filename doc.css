@@ -153,3 +153,14 @@ body{
   .doc h2,.doc h3{break-after:avoid}
   a{color:var(--ink) !important}
 }
+
+/* ---- jumbo section headline (hero-scale, inside the body) --------------- */
+.doc .jumbo{
+  font-weight:300; font-size:clamp(30px,4.4vw,48px); line-height:1.1; letter-spacing:-1px;
+  margin:64px 0 6px; max-width:22ch; color:var(--ink); border:0; padding:0;
+}
+.doc .jumbo strong,.doc .jumbo b{font-weight:700}
+.doc .jumbo + .jumbo-sub{
+  font-size:1.15rem; line-height:1.5; color:var(--g5); margin:0 0 26px; max-width:52ch;
+}
+@media(max-width:640px){ .doc .jumbo{font-size:28px; margin-top:44px} }

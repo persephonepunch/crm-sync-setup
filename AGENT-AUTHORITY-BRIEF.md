@@ -22,6 +22,9 @@ Most agent stacks reach production with these unresolved, not through carelessne
 
 **3. Unrecorded decisions.** The agent acted, the effect landed, and nothing recorded what it was permitted to do at that moment. When someone asks later — an auditor, a customer, your own incident review — the reconstruction is inference, and it gets weaker with time.
 
+<h2 class="jumbo">Verification for AI, and the <strong>data-shape revisions</strong> it forces</h2>
+<p class="jumbo-sub">You are almost certainly running agents on service credentials today, because that is what every framework hands you. The alternative is a mandate.</p>
+
 ## The model
 
 Three objects, all resolved server-side.
@@ -49,6 +52,9 @@ All authenticated calls take `Authorization: Bearer <token>`. Unauthenticated re
 | `/.well-known/jwks.json` | GET | Public key set. No auth. This is the verification anchor |
 | `/license/verify` | GET | Check any certificate this platform issued, no account required |
 
+<h2 class="jumbo">You don't need procurement or expensive apps. <strong>Set this up yourself.</strong></h2>
+<p class="jumbo-sub">The verification endpoints are public. Check a certificate against a published key in about ninety seconds, with no account and no call to us.</p>
+
 ## Verify before you read further
 
 This takes about ninety seconds and needs no account.
@@ -67,6 +73,9 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 
 The point of publishing the key rather than an API for verification: an auditor, a customer or a counterparty checks a certificate **offline**, without an account, without calling us, and without trusting that we answered honestly.
 
+<h2 class="jumbo">Use a server to extend <strong>mature, easy-to-use MCP tools</strong></h2>
+<p class="jumbo-sub">The agent does not need to understand your permission model. It needs a token that is already bounded, and a server that resolves the claim on every call.</p>
+
 ## MCP: how an agent reaches capability
 
 The MCP server exposes tools over Streamable HTTP. The relevant design decision is not the transport — it is that **the agent carries a bounded token and the server resolves the claim on every tool call.**
@@ -77,6 +86,9 @@ The MCP server exposes tools over Streamable HTTP. The relevant design decision 
 - The refusal is recorded, as is the grant. Denials are evidence too.
 
 Practically this means an agent needs no understanding of your permission model. It needs a token that is already bounded. That is what makes a misbehaving agent a non-event rather than an incident: the boundary is enforced where the effect happens, not where the agent was configured.
+
+<h2 class="jumbo">When documentation is what <strong>avoids the penalty</strong>, build it from data you can actually reach</h2>
+<p class="jumbo-sub">Authority resolved at event time, per call — not inferred later from a nightly sync. If you are building agent workflows on batch data, you already know it does not hold.</p>
 
 ## Where the record lives
 
