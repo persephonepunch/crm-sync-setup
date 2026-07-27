@@ -291,6 +291,23 @@ The discipline that holds is not a preference for any particular framework. It i
 
 The through-line with everything above is not an analogy. It is the same principle: **write the constraint somewhere that enforces itself, so the knowledge outlives the people who hold it.** A hash-chained ledger does that for authority. A failing test does it for design. Precision is not fussiness in either case — it is the property that makes a system inheritable.
 
+### Why this now matters at inference scale
+
+There is a newer reason to hold this line, and it is not aesthetic.
+
+Content is increasingly rendered, translated, localized, summarized, and answered by language models rather than read only by people. That changes the economics of imprecision. A single canonical piece of source text now scales globally through inference: one product description becomes market variants, answer-engine responses, agent-facing summaries, and localized surfaces — automatically, at volume, without a human in each path.
+
+Which means **the discipline of the source text is the discipline of every derived output.** Ambiguity does not stay put; it propagates and amplifies. A vague claim becomes a differently-vague claim in nine languages. A value stated without its unit, market, or effective date becomes an assertion no downstream reader — human or model — can qualify. The cost of sloppiness used to be one confusing paragraph; now it is a fan-out.
+
+The same properties that make a system inheritable make content safely inferable:
+
+- **One canonical source, not many copies.** Derived surfaces reference it rather than duplicating it, so a correction propagates instead of leaving stale variants behind — the content equivalent of a single system of record.
+- **Structure that carries meaning**, not just formatting. Identifiers, effective dates, market scope, and units expressed as data rather than implied by prose. A model can qualify a claim it can see the qualifiers for; it will guess at one it cannot.
+- **Auditable edit history with attribution.** When both humans and AI co-author, the useful question is not "who typed this" but "what changed, when, on whose authority, and against which source." That is the ledger property applied to text — and it is what makes AI-assisted authorship reviewable rather than merely fast.
+- **Constraints that hold at the boundary.** The same reason a contrast floor belongs in the test suite: a generated surface should fail a check rather than ship a claim nobody licensed it to make.
+
+Co-authorship between people and models works when the source is precise enough to be trusted and instrumented enough to be reviewed. Both authors then operate on the same artefact, with the same constraints, and every edit leaves a trace either can inspect. That is not a workflow preference — at inference scale it is the difference between content that can be corrected once and content that has to be chased across every surface it reached.
+
 ## 12. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
