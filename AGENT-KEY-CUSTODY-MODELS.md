@@ -201,6 +201,19 @@ That inverts the usual adoption sequence. Instead of *convince the organization 
 
 This matters more than it sounds for the enterprise argument earlier in this document. The hardest part of introducing a provenance layer into a large organization is not technical and it is not cost — it is that the people who feel the compliance pain (a BA, an analyst, a compliance officer) are rarely the people who can commission infrastructure. A model where the person with the problem can build the answer themselves, and hand it over as a specification rather than a request, routes around the blockage entirely.
 
+### The infrastructure is not the differentiator
+
+It is worth dispensing with a distraction. Modern platforms — self-hosted and managed alike — converge on the same commodity components: PostgreSQL for durable state, Redis for hot state and queues, containers for packaging, Kubernetes for orchestration. A self-hosted open-source workspace and a managed backend platform are, at the substrate, running the same well-understood pieces. Nobody wins this argument on infrastructure, and any vendor claiming a moat there is selling something else.
+
+The difference is **who operates and certifies it**. Self-hosting means the organization runs that stack: patching, backup verification, key handling, access review, and the evidence that all of it happened — before an auditor will accept anything built on top. That is a real programme of work, and it is the part that quietly consumes the first two quarters of a self-hosted deployment.
+
+A managed platform delivers the same primitives with that programme already done and independently attested. **Xano's compliance posture includes SOC 2 certification**, which changes the character of the conversation in two specific ways:
+
+- **The individual's build is already on certified infrastructure.** What the analyst assembles in personal scope is not a prototype that must be rebuilt "properly" later — it is already sitting on the substrate the organization's own auditors will accept.
+- **The handoff is commercial, not architectural.** Folding an individual account into an enterprise service level changes support, scale, governance, and contractual terms. It does not require re-platforming, re-implementing, or re-certifying what was built. The path from one analyst's afternoon to an organizational system is a contract, not a rewrite.
+
+That is the practical reason this route survives contact with an enterprise. The usual failure of bottom-up adoption is that the thing which proved the point was built somewhere the organization cannot accept, so the reward for a successful demonstration is being told to start again. Here the demonstration and the production system are the same system.
+
 That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team — or, to begin with, by one determined analyst on a Tuesday afternoon.
 
 ## 9. What this means operationally
