@@ -39,6 +39,18 @@ So the keys here sign a different object:
 
 A verifier can therefore answer not just "did this actor sign it," but "was this actor entitled to it, and under what terms."
 
+### A familiar version of the same mistake — and why it persists
+
+Consumer streaming built its access model on one shared password per household, then spent years trying to claw governance back with device fingerprints, address heuristics and verification prompts. Every one of those is a proxy inferring a fact the system never recorded: which person is acting. Profiles were never authentication; they are preferences. And the model was ultimately not corrected but **monetised** — additional paid "member" slots sell more access to the same ambiguity.
+
+That is the durable lesson. A shared credential is not an identity, no downstream inference reconstructs one, and once the ambiguity earns money it stops being a defect anyone is funded to remove.
+
+The regulatory consequence has already landed, and notably not for the sharing itself. In December 2024 the Dutch data protection authority fined the company €4.75 million — for inadequate information about how personal data was used, and for failing to answer subject access requests properly. The finding was, in effect, that the organisation could not adequately explain its own data practices when asked. That is the same root cause as the access model: a system that never recorded what it was doing cannot describe it afterwards.
+
+This is also the exposure that widens as AI adoption increases. When published claims, privacy statements and actual system behaviour can be interrogated at scale — by regulators, by researchers, by any competent model reading your surfaces — the gap between what an organisation says it does and what it can prove it did stops being obscure. It becomes searchable.
+
+The same applies directly to agents. An agent acting with a person's credentials rather than under its own bounded, revocable mandate is the household-password model rebuilt for software — and it will be equally irreversible, for the same commercial reasons.
+
 ## 3. The custody trade
 
 Both directions are defensible; they optimize against different failures.
@@ -101,6 +113,8 @@ The shape used here is the ordinary one those controls were written for: a brows
 *One build, three surfaces. The same Progressive Web App runs in the browser, installs to the desktop dock, and adds to a phone home screen — which is why rollout is a URL rather than a fleet deployment, and why a compliance reviewer can open it on the device already in their hand.*
 
 The install surface follows from the same choice. One Progressive Web App becomes the browser tab, the desktop application, and the phone home screen from a single build — so "roll this out" means sharing a URL rather than scheduling a fleet deployment, and updates ship when they are deployed rather than when the fleet next accepts a package.
+
+**A download also decides which devices exist.** A desktop build reaches laptops; it does not reach the phone in a reviewer's hand, and adding that surface means a second build, a second store, and a second review cycle. This is not a hypothetical constraint — it is the exact problem early streaming products hit when a downloadable media player ran on PCs and could not reach iOS at all, and it was solved then the same way it is solved now: by moving to the browser and carrying entitlements, permissions, analytics and rights enforcement across intact. One Progressive Web App reaches laptop, desktop and phone from a single deployment, which is why "can a compliance officer open this on their phone during the meeting" has a different answer for each model.
 
 > A signed record nobody outside the engineering team can open is a record with an audience of one department.
 
