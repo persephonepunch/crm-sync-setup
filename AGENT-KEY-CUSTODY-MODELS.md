@@ -216,7 +216,28 @@ That is the practical reason this route survives contact with an enterprise. The
 
 That is the difference between a research posture and a deployment posture. A protocol that demands every participant manage their own keypair correctly places a cryptographic burden on people who did not sign up for one; a platform that binds authority into a token the backend already issues places it where it can be operated by a normal team — or, to begin with, by one determined analyst on a Tuesday afternoon.
 
-## 9. What this means operationally
+## 9. Build your own
+
+The choice on offer is usually presented as: adopt a workspace product, or adopt a decentralized one. For most enterprises both fail, for opposite reasons.
+
+- **A hosted team workspace.** In practice this splits by organization type: agencies and smaller teams standardize on Slack, while most large enterprises mandate Microsoft Teams — it arrives inside an existing licence agreement, under identity and retention controls the organization already governs. Either way the outcome is the same for our purposes: the tool is approvable but it is another silo. Your record of who decided what lives in a vendor's tenancy, on their retention policy, exportable as messages. It answers *where the conversation happened*, never *what was authorized*. And notably, an enterprise that has already mandated Teams is not going to approve a second workspace product regardless of its cryptographic merits — the seat is taken.
+- **A decentralized client** is architecturally interesting but rarely clears review: an executable on managed endpoints, persistent connections to relays nobody vetted, and key custody handed to individuals with no rotation path.
+
+The third option is the one nobody pitches, because there is nothing to sell you: **you already have the parts.** A certified managed backend for identity, claims, and durable state. Edge compute for signing and verification. An interface layer you already publish. A warehouse you already load. That is the same substrate — Postgres, Redis, containers, orchestration — that the alternatives are built from, and in your case it is already through procurement.
+
+What you assemble from those parts is the capability, not the product: participants and agents with real identity, actions that produce signed and timestamped records, an append-only history, and verification that needs no account. The workspace was never the point; the **provable record of authority** was.
+
+### Start where the value is already measurable
+
+The fastest place to prove it is not an internal chat tool — it is the commercial edge, because the result shows up in revenue reporting rather than in an architecture review.
+
+**Channel → attributed event → BigQuery** runs the whole pattern end to end today: a link or QR minted under your own key, every scan counted in a ledger you own, channel provenance carried into analytics and the warehouse, and the resulting order landing as an ordinary commerce order. Same identity plane, same signing, same audit properties as everything described above — pointed at a problem a growth team already has budget and urgency for.
+
+Once that is running, the mechanism is proven inside your own organization, on your own infrastructure, with numbers a business owner recognizes. Extending it to agent mandates, firmware, or consent evidence is then a matter of scope rather than a new argument.
+
+**[Open the Channel Wizard →](https://crm-sync.dev/r/ubd9b6a)** — mint an attributed link or QR against a product, preview it free, and watch the first scan appear in the ledger.
+
+## 10. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
 - **Separation of duties enforced in the data plane.** Whoever authors a change cannot promote it; whoever signs off cannot deploy it. Governance is a gate, not a job title.
@@ -224,7 +245,7 @@ That is the difference between a research posture and a deployment posture. A pr
 - **Evidence an outsider can check.** Certificates verify against a published key with no account and no trust in the platform.
 - **Consent bound to the record.** The consent state at the moment of the grant is signed into the certificate.
 
-## 10. Glossary of terms
+## 11. Glossary of terms
 
 Written for readers who know cryptography but not this stack, and for readers who know neither. No term below is proprietary — where a name is ours, it is marked.
 
@@ -286,11 +307,11 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 11. Verify it yourself
+## 12. Verify it yourself
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
-## 12. Where this is implemented
+## 13. Where this is implemented
 
 Everything described above is running software, not a proposal. Each product below is one capability of the same plane — the same entitlements, the same signing keys, the same ledger.
 
