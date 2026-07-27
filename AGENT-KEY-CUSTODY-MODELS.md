@@ -328,6 +328,16 @@ The most damaging losses are not technical details but **reasons**. Any competen
 
 A record produced as work happens changes the economics on both sides of the relationship. Onboarding reads the ledger rather than interviewing people who have left. The receiving organization can see what was authorized and when, without trusting anyone's recollection. And the agency benefits at least as much: a demonstrable handover ends an engagement cleanly instead of leaving an obligation that resurfaces every time something breaks, and an inherited project that can explain itself is a project that can be quoted accurately rather than absorbed at a loss.
 
+### Who actually pays for a missing record
+
+It is worth being explicit about something the cost analysis above leaves out, because it is the part that matters most to the people doing the work.
+
+When a system built on undocumented decisions eventually fails, it fails **architecturally** — a constraint nobody wrote down, a permission model that could not answer the question, an integration whose migration was somebody else's schedule. But the person standing closest to the failure is almost never the person who designed it. It is whoever inherited it: the analyst, the operator, the internal owner who arrived after the decisions were made and was expected to keep it running.
+
+Without a record, there is nothing to distinguish a failure that was inherited from one that was caused. No evidence that the constraint predated the person, that the risk was raised and the remediation declined, that the change which would have prevented it was outside their authority to make. The absence of the record does not merely make the organization slower to recover. It transfers the blame to the individual least able to have prevented it, and does so silently — because the thing that would have exonerated them was never written.
+
+So a provenance layer is not only an institutional control. It protects the operator. A signed, timestamped account of what was authorized, by whom, under which constraints, and what was flagged and by whom, is the same artifact that answers a regulator and the one that answers "was this reasonable, given what they were handed." Systems that record their own history are fairer to the people who inherit them — and the people who inherit them are, disproportionately, the ones carrying institutional knowledge that no document captured.
+
 ## 11. The same discipline, applied to the interface
 
 It would be inconsistent to argue for provable records in the data plane and then build the interface on conventions nobody can verify. The presentation layer decays the same way an undocumented integration does, and for the same reason: it encodes decisions without preserving the reasoning behind them.
