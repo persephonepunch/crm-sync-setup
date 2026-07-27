@@ -11,7 +11,9 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-KEY-
 **For:** security architects, CISOs and DPOs, platform engineers, and anyone evaluating cryptographic identity for AI agents.
 **Companion surfaces:** the [key-management lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) spec, [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) on why the integration layer belongs to you, [Firmware, SBOM & the CRA](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html) for the evidence chain in practice, and the public verification endpoint at `/.well-known/jwks.json`.
 
-Block shipped **Buzz** on 21 July 2026: an open-source workspace where humans and AI agents hold cryptographic identities and every action is signed. It is a serious piece of work built on a serious thesis. This document compares its key-custody model with the one used here, because the difference is not cosmetic — it decides what can be proven, what happens after a compromise, and whether an enterprise security review can approve the thing at all.
+Block shipped **Buzz** on 21 July 2026: an open-source workspace where humans and AI agents hold cryptographic identities and every action is signed. It is a serious piece of work built on a serious thesis. This document compares its key-custody model with the one used here, because the difference is not cosmetic — it decides what can be proven, what happens after a compromise, and whether an enterprise security review can approve the thing at all. If you would rather try the mechanism than read about it, **[open the Channel Wizard](https://crm-sync.dev/r/ubd9b6a)** — mint an attributed link or QR against a real product, free to preview, and watch the first scan land in a ledger you own.
+
+![The Channel Wizard open on a product page, minting an attributed link bound to that product's MPN — preview the QR free, mint it with the Channel Publish add-on](https://crm-sync.dev/kb/media/docs/wizard-pdp.png)
 
 ## 1. The shared thesis
 
@@ -91,6 +93,10 @@ The harder blocker is the **network shape**. A Nostr client holds open connectio
 Self-hosting a private relay is possible and is the right answer for a serious deployment — but it converts an install into an infrastructure project, and until it is complete the default posture is workplace records replicating to third-party servers. Signed and tamper-evident: yes. Confined to approved infrastructure: no. Any organization with an egress policy, a data-residency clause, or a DLP mandate stops there, correctly.
 
 The shape used here is the ordinary one those controls were written for: a browser talking to a named origin over HTTPS. One domain to allowlist, one tenancy holding the record, no persistent connections to unvetted servers. Public verification is a plain `GET` against a published key — an auditor checks a certificate without joining a network, installing anything, or being granted an account.
+
+![One Progressive Web App installs to the desktop dock, the iOS home screen and Android from a single build — no app-store review, no per-platform binary, and nothing for endpoint management to package](https://crm-sync.dev/kb/media/docs/pwa-install.png)
+
+The install surface follows from the same choice. One Progressive Web App becomes the browser tab, the desktop application, and the phone home screen from a single build — so "roll this out" means sharing a URL rather than scheduling a fleet deployment, and updates ship when they are deployed rather than when the fleet next accepts a package.
 
 > A signed record nobody outside the engineering team can open is a record with an audience of one department.
 
@@ -379,6 +385,10 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
 ## 14. Verify it yourself
+
+![The account Licenses panel: every granted capability listed with its date, terms, and proof — a durable receipt, a public verification link, and a scannable QR certificate an auditor can check without an account](https://crm-sync.dev/kb/media/docs/licenses-proof.png)
+
+Every capability a buyer holds appears in their own account with its proof attached — a receipt, a verification link, and a QR an auditor can scan from a printed page. That is the difference between being told your access is recorded and being handed the record.
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
