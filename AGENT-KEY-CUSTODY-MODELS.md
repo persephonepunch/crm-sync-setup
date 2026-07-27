@@ -272,7 +272,26 @@ The most damaging losses are not technical details but **reasons**. Any competen
 
 A record produced as work happens changes the economics on both sides of the relationship. Onboarding reads the ledger rather than interviewing people who have left. The receiving organization can see what was authorized and when, without trusting anyone's recollection. And the agency benefits at least as much: a demonstrable handover ends an engagement cleanly instead of leaving an obligation that resurfaces every time something breaks, and an inherited project that can explain itself is a project that can be quoted accurately rather than absorbed at a loss.
 
-## 11. What this means operationally
+## 11. The same discipline, applied to the interface
+
+It would be inconsistent to argue for provable records in the data plane and then build the interface on conventions nobody can verify. The presentation layer decays the same way an undocumented integration does, and for the same reason: it encodes decisions without preserving the reasoning behind them.
+
+The common failure is a utility-class system applied without a system behind it. Markup accumulates strings like `text-sm text-gray-500 mt-2` at every call site, and six months later nobody can distinguish a deliberate hierarchy decision from a guess someone made on a Tuesday. The next person cannot safely reuse the intent — because the intent was never expressed — so they add a variant. Then another. The result is drift with a build step: a codebase where every surface is slightly different and no one can say which version is correct.
+
+That is the same knowledge-loss pattern as the handover problem, one layer up. The values survive; the reasons do not.
+
+The discipline that holds is not a preference for any particular framework. It is four commitments:
+
+- **One compiled first-party stylesheet, namespaced.** A single source shared across every surface — marketing site, storefront, embedded components — with namespacing that makes collision structurally impossible rather than merely unlikely. Surfaces cannot fight each other over specificity if they cannot address each other's rules.
+- **An existing component vocabulary rather than a private dialect.** Adopting a documented system (BEM-namespaced components, for instance) means the contract is written down by someone else and does not evaporate when the person who invented it moves on. A private class taxonomy is institutional knowledge with no custodian.
+- **Semantic tokens with literal fallbacks.** Values referenced as `var(--token, literal)` degrade to something correct when a token is missing, instead of degrading to nothing. This is the same fail-safe posture the data plane takes: a missing input produces a defined state, not an undefined one.
+- **Constraints stated as rules, not taste.** "The lightest permissible grey for text is a specific value meeting AA contrast." "No grid may leave a widowed item." "Emphasis is carried by weight, not hue." Each is checkable, which is what separates a standard from an aesthetic.
+
+**The last commitment is the one that actually holds: enforce the rules in the test suite.** A rule in a style guide is a preference someone will forget under deadline. A rule in the harness is a property of the system. Contrast floors, load order, and token usage can all be asserted statically — and when they are, the constraint survives every future contributor without anyone needing to remember it. In this codebase, adding exactly such a check found real violations on its first run, which is the ordinary outcome: the rules you believe you are following are not the rules you are following until something verifies it.
+
+The through-line with everything above is not an analogy. It is the same principle: **write the constraint somewhere that enforces itself, so the knowledge outlives the people who hold it.** A hash-chained ledger does that for authority. A failing test does it for design. Precision is not fussiness in either case — it is the property that makes a system inheritable.
+
+## 12. What this means operationally
 
 - **Identity you can retire.** Personnel change, agents are deprecated, contractors roll off. Rotation and revocation are routine operations, not identity funerals.
 - **Separation of duties enforced in the data plane.** Whoever authors a change cannot promote it; whoever signs off cannot deploy it. Governance is a gate, not a job title.
@@ -280,7 +299,7 @@ A record produced as work happens changes the economics on both sides of the rel
 - **Evidence an outsider can check.** Certificates verify against a published key with no account and no trust in the platform.
 - **Consent bound to the record.** The consent state at the moment of the grant is signed into the certificate.
 
-## 12. Glossary of terms
+## 13. Glossary of terms
 
 Written for readers who know cryptography but not this stack, and for readers who know neither. No term below is proprietary — where a name is ours, it is marked.
 
@@ -342,11 +361,11 @@ The division of labour matters: **sign what must be provable, encrypt what must 
 
 **Attestation** — a signed statement that some fact was true at a point in time (this image was vaulted, this license was granted, this deletion completed). Its value is that it can be checked long afterward by someone who does not trust, and need not contact, the issuer.
 
-## 13. Verify it yourself
+## 14. Verify it yourself
 
 Nothing above is self-attested. The public key set is served at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json); any certificate issued by this platform — a license grant, a firmware upload attestation, a data-deletion completion record — can be checked against it at [`/license/verify`](https://crm-sync.dev/license/verify) with no account and no trust in us.
 
-## 14. Where this is implemented
+## 15. Where this is implemented
 
 Everything described above is running software, not a proposal. Each product below is one capability of the same plane — the same entitlements, the same signing keys, the same ledger.
 
