@@ -9,7 +9,7 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-KEY-
 # Two Ways to Give an Agent a Key
 
 **For:** security architects, CISOs and DPOs, platform engineers, and anyone evaluating cryptographic identity for AI agents.
-**Companion surfaces:** the [key-management lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) spec and the public verification endpoint at `/.well-known/jwks.json`.
+**Companion surfaces:** the [key-management lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) spec, [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) on why the integration layer belongs to you, [Firmware, SBOM & the CRA](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html) for the evidence chain in practice, and the public verification endpoint at `/.well-known/jwks.json`.
 
 Block shipped **Buzz** on 21 July 2026: an open-source workspace where humans and AI agents hold cryptographic identities and every action is signed. It is a serious piece of work built on a serious thesis. This document compares its key-custody model with the one used here, because the difference is not cosmetic — it decides what can be proven, what happens after a compromise, and whether an enterprise security review can approve the thing at all.
 
