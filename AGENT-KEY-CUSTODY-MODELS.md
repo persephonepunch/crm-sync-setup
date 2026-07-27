@@ -253,6 +253,12 @@ Building an audience the conventional way requires the advertising and analytics
 
 The consequence is that the person with the question cannot answer it. Requests queue behind a central team's roadmap. And because the work still has to happen, people route around the wall — a spreadsheet of identifiers here, a shared login there, an agency granted access "temporarily," a parallel tag deployed to get one campaign measured. **That improvisation is where collision comes from**: several partial systems asserting overlapping truth, none of them timestamped, none authoritative, and no record of who decided what.
 
+**This is also the most common bad assumption in an agency statement of work.** Agencies work daily with clients where a marketer can open the analytics console and edit the event bus, so a delivery plan gets written on the premise that the client's BA or content team can do the same — configure a conversion, add a tag, adjust the data layer, upload an audience. In a large enterprise those are precisely the permissions that will not be granted, to anyone, on that timeline. The plan then stalls not on capability but on access, and the discovery usually happens after the contract is signed and the schedule is committed.
+
+The same assumption produces the same stall on the workspace side: a plan that depends on the client installing a new desktop client — or joining a network outside the sanctioned one — will not survive review either, however good the software is. In both cases the mistake is identical: assuming that because a capability exists and the team is competent, the organization will permit it.
+
+Planning against what an enterprise will actually approve is therefore not a limitation to work around; it is the design constraint. What survives is work that runs on infrastructure already procured, through permissions the team already holds, producing records the organization can verify without granting anyone new access.
+
 Minting removes the dependency for the measurement half of the problem:
 
 - **The coupon and the tracking are created in the same act.** A mint carries its own unlock code, so the offer and its attribution are one object rather than two tickets to two teams. No merchandising request, no separate campaign parameter convention to agree on.
