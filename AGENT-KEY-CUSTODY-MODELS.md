@@ -90,6 +90,20 @@ Holding keys at the edge does not create a single point of failure, because the 
 
 Independence is the point. When the record-keeping plane is slow, the edge still serves and buffers writes to replay. When the interface is being rebuilt, identity and entitlements are unaffected. When the edge deploys, nothing downstream is republished. A monolith converts any one of those events into an outage; three legs convert it into degraded capability in one plane while the others keep their footing.
 
+### Why these two vendors, specifically
+
+The pairing is not incidental. Xano and Cloudflare formalised an integration partnership precisely because the split is a natural one: a managed backend that owns durable state and a global edge network that owns proximity and compute. Each is a category leader with an enterprise track record, published compliance posture, and a support contract someone can be held to — which matters more than elegance when a security review asks who is accountable at 3am.
+
+The practical consequence is **general availability through tools an organization already runs**:
+
+- **No new protocol to approve.** Everything speaks HTTPS and JSON over a named origin — the shape every existing gateway, proxy, SIEM, and DLP rule was written for.
+- **No new client to install.** The interface is a URL. Endpoint management has nothing to package, and the auditor needs nothing but a browser.
+- **Standards, not inventions.** RFC-defined signatures (EdDSA/JWS), RFC-defined key publication (JWKS), ordinary OAuth for provider identity. A reviewer can check our claims against specifications rather than against our documentation.
+- **Egress that resolves to two named vendors**, both of which are almost certainly already on the organization's approved list and in its vendor register — rather than to a client-chosen set of relays that must each be assessed.
+- **Exportability.** Because the system of record is a managed database rather than a proprietary format, "give us everything" is a query, not a support ticket.
+
+Resilience follows from the same choice. The edge absorbs load and survives regional failure by design; the record plane is backed up, versioned, and restorable independently; the interface can be rebuilt without touching either. Three vendors' failure domains rarely coincide — and none of the three can unilaterally deny access to the evidence, because the verification key is public and the record is exportable.
+
 ### Logging is passive to the locked data
 
 The ledger records **that** something happened, to which record, under whose authority — without ever opening what is encrypted. Events are logged by reference and by hash: an entry names the subject, the capability, the timestamp, and the chain position, while the payload it refers to stays encrypted at rest. The log never needs the key to do its job.
@@ -147,6 +161,15 @@ Written for readers who know cryptography but not this stack, and for readers wh
 **Separation of duties (SoD)** — an integrity control in which no single actor completes a sensitive operation alone: whoever authors a change cannot promote it, and whoever signs it off cannot deploy it. Enforced here as distinct capabilities in the data plane, not as job titles in a policy document.
 
 **Hash-chained ledger** — an append-only log in which each row's hash includes the hash of the row before it. History cannot be quietly edited, only visibly broken — a tamper-*evident* structure, not a tamper-proof one.
+
+**Chain of custody** — the documented, unbroken sequence of who held or acted on a record, when, and under what authority, from creation to the present. The term comes from evidence handling: a fact is only admissible if every transfer between hands is accounted for. Applied to data, it is the difference between *having* a record and being able to *prove where it has been*. Here it is assembled from three parts working together — the hash-chained ledger (order cannot be altered), the signed certificate at each grant (authority at that moment is attested), and consent binding (the terms in force are captured, not reconstructed later). A CSV export has no chain of custody; a signed chain does, and it survives the vendor relationship that produced it.
+
+**JWT / JWS / JWE** — three layers of the JSON Web Token family, routinely conflated:
+- **JWS (Signed)** — a payload plus a signature. Anyone can *read* it; nobody can *alter* it undetected. Our licence, attestation, and mandate certificates are JWS with EdDSA — deliberately readable, because the point is public verifiability.
+- **JWE (Encrypted)** — a payload sealed so only a holder of the decryption key can read it. Used where the *contents* are sensitive rather than merely authentic: the identity plane's PII and payment-adjacent claims travel as JWE, so an intercepted token yields ciphertext rather than a person.
+- **JWT** — the umbrella term, and the source of the confusion: a "JWT" may be signed, encrypted, or nested (a JWS wrapped inside a JWE, giving both authenticity and confidentiality). "We use JWTs" says almost nothing on its own; which of the three you mean is the security-relevant fact.
+
+The division of labour matters: **sign what must be provable, encrypt what must be private, and never rely on one to do the other's job.** A signed-only token protecting personal data leaks it to anyone who intercepts it; an encrypted-only token proves nothing to a third party who cannot decrypt it.
 
 **Consent binding** — signing the state of a subject's consent (version, purposes, timestamp) into the certificate issued at the moment of a grant, so a later dispute reads the terms exactly as they stood rather than as they were subsequently edited.
 
