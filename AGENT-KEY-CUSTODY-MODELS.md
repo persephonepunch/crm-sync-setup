@@ -91,6 +91,14 @@ A reasonable question after all this curve talk: *which one do I use?* The short
 
 So the practical answer to "what key do I use?" is: **the admin key you mint yourself, once.** Everything else is either issued automatically to a session, a job, or an agent, or handled inside infrastructure on your behalf.
 
+### Why the peer model was chosen, and where it ends
+
+Buzz's key model is not arbitrary — it is the same primitive as peer-to-peer payment: self-custodied keys, direct settlement, no intermediary holding authority. Seen that way the choice is coherent, because a payment rail and an agent permission answer the same question: *who may move what, under whose authority, settled how.*
+
+The divergence is the relationship being modelled. Self-custody is correct for a person acting on their own behalf, where the absence of an intervening party is precisely the point. An organisation delegating to an agent needs the opposite: authority that can be capped, scoped, expired and withdrawn by someone accountable for it. That is a principal-agent relationship, not a peer one — and a mandate is only meaningful if there is a party who can revoke it.
+
+The same difference appears in payments the moment a rail crosses a border. Domestic card infrastructure, real-name requirements, settlement rules and merchant-of-record obligations are jurisdictional facts. A peer model is designed to make jurisdiction irrelevant, which is liberating for an individual and disqualifying for regulated commerce — the constraint does not disappear because the protocol declines to represent it.
+
 ## 4. Delivery under enterprise controls
 
 Buzz ships as a desktop application for macOS, Windows, and Linux. For an open-source project with a developer audience that is a reasonable first surface: native performance, local key storage, an install anyone can inspect.
