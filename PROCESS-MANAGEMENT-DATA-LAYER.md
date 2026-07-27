@@ -1,9 +1,9 @@
 ---
 title: "Process Management Guide — Webflow · Xano · Cloudflare · Shopify"
-description: "Audience: Operations, platform engineering, and business stakeholders running a multi-system commerce stack Scope: Public guide. No secrets, credentials, or source code. Process…"
+description: "Running a four-platform commerce stack: layer split, event-driven automation, outage runbook, and RACI - now extended with verification evidence, SBOM/CRA obligations, and AEO surfaces, plus a ten-point evidence checklist."
 canonical: https://persephonepunch.github.io/crm-sync-setup/process-management.html
 category: "Specs"
-date: 2026-06-08
+date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md
 ---
 # Process Management Guide — Webflow · Xano · Cloudflare · Shopify
@@ -246,4 +246,79 @@ Change-management rules:
 
 ---
 
+## 9. Verification — the process has to leave evidence
+
+Everything above keeps the stack *running*. This section is about being able to **prove afterwards what it did** — which is now a separate requirement, and one an outage runbook alone does not satisfy.
+
+The distinction that matters: a log records that something happened; **evidence lets a third party confirm it without trusting you.** Only the second survives an auditor, a regulator, or a counterparty in dispute.
+
+**What this stack publishes, all public and unauthenticated:**
+
+| Surface | Purpose |
+|---|---|
+| [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json) | The Ed25519 public key set. The anchor for every signature below. |
+| [`/license/verify`](https://crm-sync.dev/license/verify) | Check any certificate this platform issued — no account, no call to us. |
+| `/v/<record-hash>` | Short verification link; resolves the full signed certificate. |
+| `/license/qr/<hash>.svg` | Print-ready QR to the verification page — for packaging, labels, documents. |
+
+**Process rules that make the evidence hold:**
+
+- **Append-only.** Corrections add a row; they never edit one. A history an administrator can silently amend proves nothing, including the parts that are correct.
+- **Record denials too.** A refused action is evidence the controls were operating. A log containing only successes cannot demonstrate a control at all.
+- **One writer per field, idempotent upserts** — already the rule in §3.3. It is also what makes the ledger reconstructible after an outage rather than merely plausible.
+- **Rotate keys forward.** Mint a new pair, repoint the active identifier; certificates issued earlier stay verifiable against the published retired key. A suspected compromise becomes a pointer change, not an identity loss.
+
+Deeper treatment: [Agent Authority — Technical Brief](https://persephonepunch.github.io/crm-sync-setup/agent-authority-brief.html) · [AI Trust Framework Requirements](https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-requirements.html) · [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) (non-technical).
+
+## 10. SBOM and firmware — the same discipline, applied to what you ship
+
+If the stack ships anything with digital elements, the EU Cyber Resilience Act turns this from good practice into market access.
+
+**The dates that drive planning:** CRA entered into force 10 December 2024. **Article 14 reporting obligations apply from 11 September 2026** — actively exploited vulnerabilities and severe incidents, reported to ENISA and national CSIRTs, *including for products already on the market*. Full obligations — secure update mechanisms, conformity assessment, CE marking — apply 11 December 2027.
+
+Read the September 2026 date carefully, because it is the one that changes engineering priorities: **you cannot report exploitation you cannot see.** A reporting deadline is, in practice, an evidence-ledger deadline.
+
+**Process shape:**
+
+- **Firmware is a grant, not a URL.** A signed installer behind a storage link is, once shared, shared forever, with no record of who fetched it or when. Vault the image; release it through an authorization gate.
+- **Three records outlive every transaction** — a registry row (product, version, size, full SHA-256, linked SBOM), an upload certificate (signed proof of what was vaulted, by whom, when), and a hash-chained access ledger where every grant, every denial, and every served byte-stream seals the row before it.
+- **The SBOM is the dependency inventory** you will be asked for during an incident. Generate it at build time and store it with the artifact — reconstructing it later is exactly the archaeology §9 exists to prevent.
+
+Detail: [Firmware, SBOM & the Cyber Resilience Act](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html).
+
+## 11. AEO — make the process machine-readable
+
+The same content that documents your stack for people now has a second audience: retrieval systems, agents and answer engines. This is not marketing. It determines whether an operator asking a question at 2 a.m. — or an agent acting on their behalf — finds the correct answer or an inference.
+
+**Surfaces this stack publishes:**
+
+- [`/docs-index.json`](https://crm-sync.dev/docs-index.json) — the machine index of every published document, with canonical render URLs.
+- `llms.txt` — the corpus map for language models.
+- **JSON-LD on every doc and product** — `DefinedTermSet` for [terminology](https://crm-sync.dev/terminology), structured product data carrying the same GTIN/MPN the catalog publishes.
+- **RAG-backed search** at [`/pages/knowledge-base`](https://www.crm-sync.dev/pages/knowledge-base) — answers cite their sources, so a claim can be traced back to a document rather than trusted.
+
+**Process rules:**
+
+- **One canonical page per topic.** Duplicates split retrieval and produce confidently wrong answers.
+- **Publish to every surface or none.** A document in the index but missing from the CMS produces a citation that deep-links to nothing — a silent failure, and one this project has shipped before.
+- **Identifiers must agree across planes.** The MPN in the ledger, the MPN in the product page's structured data, and the MPN in the feed are the same string or the join is fiction.
+- **Terminology is infrastructure.** Define the terms your team will be tested on — [idempotent](https://crm-sync.dev/terminology#idempotent) and [monotonic](https://crm-sync.dev/terminology#monotonic) are the two a QA function cannot operate without.
+
+## 12. Extended checklist — evidence, artifacts, retrieval
+
+- [ ] **A third party can verify a record** without your cooperation and without an account.
+- [ ] **Records are append-only**; corrections add rather than edit.
+- [ ] **Denials are recorded**, not just successes.
+- [ ] **Keys are rotatable** without invalidating certificates already issued.
+- [ ] **SBOM is generated at build time** and stored with the artifact.
+- [ ] **Firmware releases through an authorization gate**, never a durable link.
+- [ ] **An incident report can be produced from the ledger**, not reconstructed from exports.
+- [ ] **Every published doc exists on all surfaces** — repo, index, CMS, KB page, RAG corpus.
+- [ ] **Product identifiers agree** across ledger, structured data, and channel feed.
+- [ ] **Retries are idempotent and sequences monotonic** — duplicates blocked, ordering provable.
+
+---
+
 *If you can check every box, a global Shopify outage is a degraded hour, not an existential one. That is the entire point of running four platforms instead of one.*
+
+*And if you can check the boxes in §12, the hour is also **documented** — which is the difference between an incident you explain and one you merely survive.*
