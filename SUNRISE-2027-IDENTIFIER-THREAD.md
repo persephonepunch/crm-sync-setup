@@ -1,12 +1,13 @@
 ---
-title: "Sunrise 2027 — One Identifier Thread, From Factory to Return"
-description: "What the QR on the box actually has to be, why GTIN is a registry question rather than a format one, and how the same identifier carries the factory, the warehouse, the sale and the cross-border return - instead of being reshaped at every border."
+title: "Product Taxonomy, GraphQL and the GID Rename — CPG Planning for Sunrise 2027"
+description: "Shopify moved product identity into a typed graph with GID-form identifiers and server-side events. For CPG planning toward Sunrise 2027, that changes the item master, the parent/child model, and every downstream join - here is what actually breaks and what to hold yourself."
 canonical: https://persephonepunch.github.io/crm-sync-setup/sunrise-2027-identifier-thread.html
 category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SUNRISE-2027-IDENTIFIER-THREAD.md
 ---
-# Sunrise 2027 — One Identifier Thread, From Factory to Return
+# Product Taxonomy, GraphQL and the GID Rename
+## CPG planning toward Sunrise 2027
 
 **For:** anyone who owns product data, fulfilment, or returns across more than one market.
 **Not:** a packaging story. The barcode is where the thread becomes visible, not where it starts.
@@ -173,6 +174,42 @@ When the WMS, the ERP and customer service all receive the flattened view, they 
 This is why the shape question is not academic. **Nesting is not a formatting preference — it is the difference between a relationship the system enforces and one everybody assumes.** The moment the commerce plane started resolving that graph at event time, every downstream system still receiving a flattened export began holding a slightly different product than the one being sold.
 
 The remedy is the same as everywhere else in this document, and it is deliberately unglamorous: keep the flat file as a *transport*, and hold the relationship in a mapping you own that can represent it — parent, child, variant, unit, market. The file delivers. The mapping decides.
+
+### The GID rename, which breaks more than people expect
+
+There is a smaller change inside the GraphQL move that causes more integration damage than the big ones, because it looks cosmetic.
+
+REST returned a bare numeric identifier. GraphQL returns a **GID** — a namespaced string:
+
+```
+REST      1234567890
+GraphQL   gid://shopify/Product/1234567890
+          gid://shopify/ProductVariant/9876543210
+```
+
+Three consequences, in ascending order of how late you find them:
+
+**1. Type changes.** Any column, spreadsheet or interface field typed as an integer now receives a string. Some systems coerce, some truncate, some silently drop it. A planning system with a numeric item key does not accept a URI.
+
+**2. Joins break quietly.** The dangerous state is partial migration — one system stores `1234567890`, another stores `gid://shopify/Product/1234567890`, and the join simply returns nothing. Not an error. An empty result, which reads as "no matching orders" rather than "your key format diverged."
+
+**3. Stripping the prefix loses the type, and the type was carrying meaning.** The obvious fix is to parse the number back out. But `Product/1234567890` and `ProductVariant/1234567890` occupy separate namespaces — the bare number is ambiguous, and the GID was telling you *which kind of thing* it identified. Discarding it to fit an integer column throws away the one piece of information that made parent and child distinguishable.
+
+That third point is why the GID rename matters for CPG specifically: it lands precisely on the parent/child question. When a combined listing has a parent record and child records, the difference between them is carried in the GID's type segment. Flatten it and the item master can no longer tell you whether a row is the thing you sell or the thing you ship.
+
+**Store the full GID.** It costs a varchar and it is the difference between a key that means something and a number that used to.
+
+And note the shape of the item master this implies for anyone planning toward 2027 — five identifiers, coexisting, none of them replacing the others:
+
+| Field | Owner | Purpose |
+|---|---|---|
+| `gid` | Shopify | Commerce identity, typed, parent/child aware |
+| `gtin` | GS1 registry | Global identity, scannable, Digital Link |
+| `mpn` | You | Manufacturing and firmware binding |
+| `planning_item` | ERP / planning estate | Supply chain and pick-pack |
+| `market` | You | Which obligations apply |
+
+That table is the whole project. Everything else is deciding where it lives and who may change it.
 
 ## Every retail road still runs through Google — AI or no AI
 
