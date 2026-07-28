@@ -72,6 +72,32 @@ So the first step is commercial, not technical: a GS1 company prefix, from which
 
 Budget the lead time. It is the longest pole in the project and it has nothing to do with engineering.
 
+### If you sell through retail, you already have them
+
+The section above is written for a brand starting from nothing. Most enterprises are not, and their problem is more awkward.
+
+**Walmart, Target and Amazon all require a GTIN for item setup.** So any brand with big-box distribution already holds GS1 licences and real, correct, in-use GTINs. The identifier is not missing.
+
+It is just not *yours to answer with*. It was mapped during onboarding inside a channel management platform — one mapping per retailer, alongside each retailer's own item spec — and it never came back into the brand's own systems as authoritative. The number exists, is correct, is in daily use, and the brand cannot produce it without asking a vendor.
+
+> **You already have the identifier. You are renting the only place it is joined.**
+
+That is a different failure from not having one, and a more consequential one: when the platform rebrands, when a contract ends, or when a retailer changes spec, the mapping does not travel with you.
+
+### The reason it ended up there, which is not stupidity
+
+Worth stating plainly, because the usual telling is unfair and the accurate version is more useful.
+
+Brands with big-box distribution did not build direct-to-consumer capability, and that was a defensible commercial position for years — selling direct competes with the retailer carrying the volume. Under-investing in DTC was a rational answer to channel conflict, not an oversight.
+
+The consequence was structural rather than technical. No DTC team meant nobody internal owning customer data, consent, catalog truth, or the operating knowledge that only comes from running a storefront. All of it was rented: the channel manager for syndication, an agency for the site, a consultancy for the integration. And each outsourced function removed the people who would have understood the next one, so the gap compounded instead of holding steady.
+
+**The requirements have now moved to precisely the layer that was never staffed.** Event-time consent, per-market obligations, identifier authority, agent mandates — none of it is outsourceable, because it is continuous judgment about your own business. A retailer relationship can be managed by a partner. A consent decision at 14:32 cannot.
+
+So the enterprise position today is: the identifiers exist, the volume exists, the brand exists, and there is no one inside who operates the layer that now matters. That is not a technology gap. It is a staffing decision made fifteen years ago, arriving on a deadline.
+
+Which also explains why buying a fifth vendor does not close it. A capability gap created by purchasing cannot be purchased shut.
+
 ## The thread these numbers already carry
 
 Here is the part that makes this operational rather than cosmetic. The same identifiers are already load-bearing across the physical estate, and nobody thinks of them as one thing:
@@ -184,7 +210,8 @@ But a queue was never actually a control. **Whoever picks up a ticket holds full
 
 You are not blocked. In order:
 
-1. **Start the GS1 licence.** It is the long pole and it is commercial.
+0. **First, check whether you already have them.** If you sell through any big-box retailer, you do — inside the channel management platform. Recovering that mapping into a system you control is faster than licensing afresh, and it is the step most enterprises skip because they assume the identifier is missing rather than merely rented.
+1. **If you genuinely have none, start the GS1 licence.** It is the long pole and it is commercial.
 2. **Make market a first-class record** — not a display preference. This is the work that pays off regardless of Sunrise.
 3. **Bind every identifier you already have** — MPN, SKU, planning item — to a single product entity now, so the join is correct on the day GTINs arrive rather than being retrofitted.
 4. **Stand up the resolver** at `/01/…`, even returning a stub. The route existing is what lets everything else be tested.
