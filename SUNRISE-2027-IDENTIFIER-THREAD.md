@@ -146,6 +146,34 @@ Then the obligations land on exactly that seam:
 - **The EU Omnibus price rules** require a 30-day prior-lowest reference, which must attach to the same entity the ads bid on, or your evidence is about a different product than your promotion.
 - **Returns and warranty** arrive as a physical code and must resolve to terms, batch and firmware.
 
+## The shape changed underneath: parent/child as a graph, not a column
+
+The reconciliation window did not just get shorter. **The thing being reconciled changed shape.**
+
+Shopify's Summer '25 Edition (Horizon, May 2025) shipped a product model that is a graph rather than a table. **Combined Listings** links separate products so they present as variants of one — a genuine parent/child relationship between distinct product records. Add the Standard Product Taxonomy category, options, variant-level identifiers, and metafields, and a "product" is now a nested object with typed relationships, queried through GraphQL and paired with server-side customer events carrying item-level data at event time.
+
+**A flat file cannot represent that.** It has never been able to. The workaround the channel world settled on is `item_group_id` — every variant gets its own row and a shared string tells the consumer which rows belong together. That is a convention, not a data model: nothing enforces it, nothing validates it, and the relationship exists only in the mind of whatever parses the file.
+
+So the collision is not about latency. It is about **disagreement over what a product is**:
+
+| | Commerce plane | Flat-file plane |
+|---|---|---|
+| Product | Nested object with typed children | Rows sharing a string |
+| Identity | Parent and variant both addressable | One row per sellable unit |
+| Relationship | Enforced by the platform | A naming convention |
+| Timing | Resolved at the event | Resolved at the next load |
+
+When the WMS, the ERP and customer service all receive the flattened view, they each hold a *keyless approximation* of a structure the commerce plane holds precisely. Then the questions that matter arrive and resolve differently in each system:
+
+- **A return comes back.** Is it the parent or the child? The customer bought a combined listing; the warehouse holds a discrete SKU; the ERP holds a third record.
+- **Inventory is committed** against the row, but sold against the graph.
+- **A recall must be scoped.** Which children of which parent, in which markets, on which firmware — a question the flat file cannot express and therefore cannot answer.
+- **Price evidence** attaches to whichever record the auditor is shown, and the three do not agree.
+
+This is why the shape question is not academic. **Nesting is not a formatting preference — it is the difference between a relationship the system enforces and one everybody assumes.** The moment the commerce plane started resolving that graph at event time, every downstream system still receiving a flattened export began holding a slightly different product than the one being sold.
+
+The remedy is the same as everywhere else in this document, and it is deliberately unglamorous: keep the flat file as a *transport*, and hold the relationship in a mapping you own that can represent it — parent, child, variant, unit, market. The file delivers. The mapping decides.
+
 ## Every retail road still runs through Google — AI or no AI
 
 It is worth separating this from the AI conversation, because it was true before and stays true regardless.
