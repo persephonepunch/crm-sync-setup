@@ -191,6 +191,25 @@ At the time of writing, the catalog behind this document carries `mpn` and `sku`
 
 That is the ordinary starting position, and it is stated here because a readiness article written by someone pretending to be finished is not worth reading.
 
+## The encouraging part, which is easy to miss
+
+None of this requires the legacy estate to change, and that is worth ending on.
+
+**Commerce was always server-side.** Catalogs, orders, inventory, pricing — all of it resolved on a server long before anyone said "server-side" as a strategy. The past decade of client-side tags and browser-resident tracking was the aberration, not the baseline. What has happened recently is a return: Google moved its consent and measurement boundary back to the server, and **Shopify joined it**, resolving identity, consent and catalog at the event rather than in the page.
+
+Which means there is now a **real-time plane above the batch estate** — and you do not have to earn your way onto it by first fixing everything underneath.
+
+That is why LLM-based and agentic commerce is achievable in an enterprise that still runs planning on a nightly cycle and still receives a supplier CSV on Tuesdays. The agent does not query the planning system. It calls a bounded server-side function, which resolves against a mapping you own, which was *fed* by the CSV but is not *arbitrated* by it. The flat file becomes a source among sources rather than the thing that decides what is true.
+
+Stated plainly:
+
+- **The CSV stays.** It is a delivery mechanism, and there is nothing wrong with a delivery mechanism.
+- **The planning estate stays.** It keeps planning. Nobody has to justify a migration.
+- **The resolver is the join**, holding the identifier mapping and answering at event time, with a record.
+- **Agents talk to the resolver**, never to the legacy directly, so their authority is bounded and their actions are attributable.
+
+The batch cadence stops being a correctness problem the moment something authoritative sits above it. That is the whole trick, and it is a smaller piece of work than the size of the surrounding systems suggests.
+
 ---
 
 *Sunrise 2027 is a retailer capability date. The work is a data-model change. And the identifier you assign this year decides whether a scan in 2028 resolves to one product — or to nothing.*
