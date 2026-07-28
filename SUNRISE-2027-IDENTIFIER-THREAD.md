@@ -144,7 +144,13 @@ And once it exists, it is exactly the signal an agent can act on — reconciling
 
 ## The behemoth, and why you should not touch it
 
-Most of this data currently lives behind a planning estate — JDA/Blue Yonder, Manhattan, SAP retail — plus GDSN data pools, supplier onboarding by flat file, and EDI still carrying the volume. Long implementations, change control rather than editing, batch by design, and an item master that quietly became the de facto product truth because the supply chain trusts it more than commerce does. Adding a field is a project.
+Most of this data currently lives behind a planning estate — Blue Yonder, Manhattan, SAP retail — plus GDSN data pools, supplier onboarding by flat file, and EDI still carrying the volume. Long implementations, change control rather than editing, batch by design, and an item master that quietly became the de facto product truth because the supply chain trusts it more than commerce does. Adding a field is a project.
+
+**A note on names, because the rebrands hide the age.** The system your team calls JDA is now Blue Yonder: JDA Software acquired the German ML firm Blue Yonder in 2018 and took the acquired company's name for the whole business in **February 2020**; Panasonic then bought a minority stake in 2020 and the remainder in 2021, and it now sits inside Panasonic Connect. The channel platform many teams still call ChannelAdvisor is now **Rithum** — CommerceHub acquired ChannelAdvisor in 2022 and the combined company rebranded in **2024**.
+
+Both are the same manoeuvre: consolidate the incumbents, retire the name that carries the history. It matters here only because a new name invites the assumption of a new architecture, and the installed base is largely the old one. Modernisation is genuinely under way — Blue Yonder has a SaaS re-platform and bought One Network Enterprises and the returns specialist Doddle in 2024 — but the modern platform runs *alongside* the legacy estate rather than retiring it, and migrations are multi-year.
+
+Which is the practical point: **the vendor's own modernisation programme will not reach most customers before your deadlines do.** Plan as though the estate you have is the estate you will have in September.
 
 **Do not migrate it. Map it.**
 
