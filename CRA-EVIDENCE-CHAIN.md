@@ -10,7 +10,7 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CRA-EVIDEN
 
 *Reporting obligations begin 11 September 2026. What an SBOM actually is, what firmware vaulting replaces, and why the download link is the part that fails the audit.*
 
-**Companion reading:** the reference doc [CRM Sync — Firmware, SBOM & the Cyber Resilience Act](./firmware-sbom-cra.html) and the screen-by-screen deck [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
+**Companion reading:** the reference doc [CRM Sync — Firmware, SBOM & the Cyber Resilience Act](./firmware-sbom-cra.html), the identifier plan [Product Taxonomy, GraphQL and the GID Rename — CPG Planning for Sunrise 2027](./sunrise-2027-identifier-thread.html), and the screen-by-screen deck [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
 
 ---
 
@@ -88,5 +88,7 @@ That last part is not abstract. It is a screen: access is granted by invitation,
 ---
 
 The reference write-up — including a plain-language glossary of every term above (envelope encryption, CEK/KEK, hash-chained ledger, grant-gating, CORS, nosniff) — is [CRM Sync — Firmware, SBOM & the Cyber Resilience Act](./firmware-sbom-cra.html). The full screen-by-screen walkthrough of the entitlement, session, and attestation surfaces is the deck: [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
+
+And the next clock is already running: GS1's Sunrise 2027 turns the product identifier itself into a URI the brand hosts — every item on a shelf resolving to a URL that has to serve something worth trusting. The registry described here is the same shape as what that scan will point at. The identifier work is mapped in [CPG Planning for Sunrise 2027](./sunrise-2027-identifier-thread.html).
 
 *Practical guidance, not legal advice. Whether your product is default category or Class I / II is a question for counsel.*
