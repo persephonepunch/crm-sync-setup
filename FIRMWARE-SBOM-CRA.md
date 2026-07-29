@@ -10,6 +10,7 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FIRMWARE-S
 
 **For:** manufacturers, compliance officers, and security teams selling connected devices or apps into the EU.
 **Companion surfaces:** the live [Protected Firmware service](https://www.crm-sync.dev/pages/firmware) and the [Compliance QA checklist + SBOM registry](https://compliance.crm-sync.dev).
+**Companion reading:** the article [Your Firmware Is a URL — the CRA Assumes an Evidence Chain](./cra-evidence-chain.html) and the screen-by-screen deck [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
 
 This document answers three questions in plain terms — *what is an SBOM*, *what is firmware vaulting*, and *what does the Cyber Resilience Act actually require* — then defines every term the product uses.
 
