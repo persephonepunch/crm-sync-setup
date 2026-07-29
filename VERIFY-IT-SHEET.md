@@ -25,6 +25,8 @@ Open **[crm-sync.dev/verify](https://crm-sync.dev/verify)** and do this in front
 
 If anyone asks how, the **"How does this work?"** button on that page explains it in three steps (seal → pairing → ledger), with the everyday anchors: the SSH key you add to GitHub, the chip in a bank card, the padlock behind `https://`, the `.env` rule — public half publishable anywhere, private half never leaves the server.
 
+**Fifth click, for the data side:** "See a session's story" opens live demo sessions — one visit's record in four panes (consent · entitlement · revenue · engagement), from the platform's own test identity. The one to show IT: **the reset rule** — consent revoked now, honored immediately, re-granted only from the next session, with engagement withheld in the data path itself. Session IDs are bookmarks, not credentials: holding one grants no authority.
+
 The sample token expires in 15 minutes — deliberately. Verify it again after coffee and watch it fail honestly: expiry is enforced by math too.
 
 ---
@@ -48,6 +50,12 @@ console.log(protectedHeader.kid, payload);
   The hosted page at `/verify` is a WebCrypto convenience; its only network call is the JWKS fetch. Verification never contacts the platform API.
 - **Possession is not authority.** The sample token carries `caps: []` — holding it grants nothing. Real tokens carry scoped capabilities that are checked server-side on every call, and are revocable per credential (`jti`) and per subject, in real time. A leaked token is ejected without touching anyone else's access.
 - **Audit.** Every certificate verification lands on a hash-chained register — [`/license/verifications?jti=…`](https://crm-sync.dev/license/verifications) — timestamps, results, anonymized distinct-checker counts, and a `chain_intact` flag your auditor can recompute. History can be visibly broken, never quietly edited.
+
+![An annotated verified record: the token is the container carrying the claims; the kid names which published key to check it against; EdDSA is the verification.](https://crm-sync.dev/kb/media/docs/eddsa-record-annotated.png)
+*This is the record. The token is the container carrying the claims; the `kid` names which published key to check it against; EdDSA is the verification.*
+
+![The three artifacts a grant produces: a signed receipt, a verify result, and the QR that carries the certificate.](https://crm-sync.dev/kb/media/docs/attestations-receipt-verify-qr.png)
+*What the artifacts look like in hand: the receipt, the verify result, and the QR that carries it.*
 
 ### Tests to run
 
