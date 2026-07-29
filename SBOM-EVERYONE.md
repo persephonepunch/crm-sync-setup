@@ -35,6 +35,28 @@ And this will expand. GS1's Sunrise 2027 is the other clock: retailers scanning 
 ![Beat 3 — Everyone. The product surface as URLs — SBOM registry, firmware security, CRA readiness, channel publish — ending on the question from Isaac Hepworth (Google): "How do you solve this problem for SaaS?"](https://crm-sync.dev/kb/media/docs/the-urls-saas-question.png)
 *Beat 3 — the whole surface, closing on the question this piece answers: "How do you solve this problem for SaaS?"*
 
+<div class="uk-video-wrap" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;margin:1.5rem 0 0.5rem;">
+<iframe src="https://www.youtube-nocookie.com/embed/ZYsUbN6oT7Q" title="How do you solve this problem for SaaS? — Isaac Hepworth" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+> "How do you solve this problem for SaaS?"
+> — Isaac Hepworth, Google
+
+Watch on YouTube: <https://youtu.be/ZYsUbN6oT7Q>
+
+## How it ties together
+
+The video asks the question; the login is the answer.
+
+![The connected login — Sign In, Shopify, or Continue with Google: three doors, one subject, PII sealed.](https://crm-sync.dev/kb/media/docs/connected-login-modal.png)
+*The front door: one sign-in, two identity providers, one subject.*
+
+Sign in with Shopify and you arrive as your commerce identity; continue with Google and you arrive as the same subject — both providers' identifiers resolve to a single platform UUID, integrated with both UUID privacy systems so no PII crosses in the clear. PKCE proves the human at the door with no client secret to steal; the actor's identity travels as JWE, sealed and readable only server-side. The identifier does the joining; the person's data never has to.
+
+That one UUID is what every chain in this story hangs off. A purchase mints entitlement — capabilities, not a subscription flag. Teams and agents hold scoped, revocable grants against it (the roles screen in Beat 2). Consent, entitlement, revenue, and engagement key off it in a single session view. And every event — a firmware grant, a consent change, an agent's checkout — lands in the same hash-chained ledger the vault uses.
+
+So the thread runs: the glossary defines the primitives, the roles screen shows who wields them, the product URLs show where they ship, and the login is where it all keys in. Firmware ledgers artifacts by SHA-256. SaaS ledgers sessions by UUID. Sunrise 2027 will point physical products at the same registry. One spine — identity → entitlement → consent → action — with two front doors and one ledger.
+
 #SBOM #Sunrise2027 #Entitlement #CyberSecurity
 
 ---
