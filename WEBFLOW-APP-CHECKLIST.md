@@ -10,6 +10,8 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WEBFLOW-AP
 
 A comprehensive, downloadable checklist for building, submitting, and maintaining a Webflow Marketplace app. Based on [Webflow's official Marketplace guidelines](https://developers.webflow.com/data/v2.0.0-beta/apps/docs/marketplace-guidelines) and the latest platform changes through May 2026.
 
+**Companion:** for the build side of the same app — Vite + TypeScript monorepo, shared types, and the 11ty/Astro islands site setup — see [The Webflow App Stack](./webflow-vite-stack.html).
+
 ---
 
 ## How to Use
