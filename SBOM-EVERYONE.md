@@ -16,15 +16,24 @@ What is an SBOM?
 
 A machine-readable ingredient list for software: every component, library, and version in a build, generated in CI from the lockfile — so that anyone can answer "what is inside this, and is any of it known to be vulnerable?"
 
+![Beat 1 — What is an SBOM? The firmware glossary: SBOM, envelope encryption, hash-chained ledger, grant-gated download, key rotation — every term defined, each with its anchor URL.](https://crm-sync.dev/kb/media/docs/firmware-glossary-table.png)
+*Beat 1 — the receipts. Every term the system uses, defined in plain language with a permalink.*
+
 Who uses this?
 
 Device makers first — the EU Cyber Resilience Act starts its reporting clock on 11 September 2026, and it assumes an evidence chain: SBOMs, provenance, an access record. Then every app team, because every release has components. Then SaaS, because the same evidence question doesn't disappear when there's no binary — it re-keys from artifacts to sessions: who could act on what, under which authority, when.
+
+![Beat 2 — Who uses this? Choose your view: access granted by invitation; you see only the roles you hold — CISO/DPO, Designer, QA/Compliance, Release Manager, Data & Audit, Agent permissions.](https://crm-sync.dev/kb/media/docs/teams-choose-your-view.png)
+*Beat 2 — enterprise teams. Separation of duties by design: the reviewer who signs off is never the one who promotes.*
 
 So the answer is: everyone.
 
 That's the opportunity I built for. I turned a regulatory threat into a composable, enterprise-grade asset manager and publishing system for SBOMs and firmware security. Instead of selling another SaaS subscription, I used Shopify's WASM publishing to securely wrap mini applications — Shopify's versioned, non-destructive app releases, paired with Google login, BigQuery, and forward deploy. Very needed security, in the shape the AI future is taking: use what you already run. The platform is the compiler, the OS, and the DevOps pipeline.
 
 And this will expand. GS1's Sunrise 2027 is the other clock: retailers scanning 2D barcodes at the point of sale by end of 2027, which turns the product identifier into a URI the brand hosts — every item on a shelf resolving to a URL. What should that URL serve? A registry: versioned records, signed attestations, an access ledger. The QR registry that vaults firmware today is the same shape as what every physical product is about to point at.
+
+![Beat 3 — Everyone. The product surface as URLs — SBOM registry, firmware security, CRA readiness, channel publish — ending on the question from Isaac Hepworth (Google): "How do you solve this problem for SaaS?"](https://crm-sync.dev/kb/media/docs/the-urls-saas-question.png)
+*Beat 3 — the whole surface, closing on the question this piece answers: "How do you solve this problem for SaaS?"*
 
 #SBOM #Sunrise2027 #Entitlement #CyberSecurity
 
