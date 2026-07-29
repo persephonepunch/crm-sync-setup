@@ -25,7 +25,9 @@ Open **[crm-sync.dev/verify](https://crm-sync.dev/verify)** and do this in front
 
 If anyone asks how, the **"How does this work?"** button on that page explains it in three steps (seal → pairing → ledger), with the everyday anchors: the SSH key you add to GitHub, the chip in a bank card, the padlock behind `https://`, the `.env` rule — public half publishable anywhere, private half never leaves the server.
 
-**Fifth click, for the data side:** "See a session's story" opens live demo sessions — one visit's record in four panes (consent · entitlement · revenue · engagement), from the platform's own test identity. The one to show IT: **the reset rule** — consent revoked now, honored immediately, re-granted only from the next session, with engagement withheld in the data path itself. Session IDs are bookmarks, not credentials: holding one grants no authority.
+**Fifth click, for the data side:** "See a session's story" opens live demo sessions — one visit's record in four panes (consent · entitlement · revenue · engagement), from the platform's own test identity. The one to show IT: **the reset rule** — consent revoked now, honored immediately, re-granted only from the next session, with engagement withheld in the data path itself.
+
+**Vocabulary that keeps the room straight:** a **token** is a sealed credential you *verify* — the math-gated door; a **session bookmark** is a pointer you *look up* — the role-gated door. Bookmarks contain nothing and grant nothing (like a receipt number, they only say *which* record); tokens carry their claims and prove themselves offline. Never call a bookmark a key.
 
 The sample token expires in 15 minutes — deliberately. Verify it again after coffee and watch it fail honestly: expiry is enforced by math too.
 
