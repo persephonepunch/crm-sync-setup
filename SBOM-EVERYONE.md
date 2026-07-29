@@ -57,6 +57,8 @@ That one UUID is what every chain in this story hangs off. A purchase mints enti
 
 The division of labor is clean. **Shopify's app system provides the secure WASM wrapper** — versioned, non-destructive, reviewed code executing inside the platform, not loose JavaScript in the buyer's browser. **Google provides the segments** — audiences, Smart Bidding, BigQuery. And the spine links privacy to **predictive lifetime value**: consent-gated, pLTV-weighted signals flow from the same UUID into bidding. Which means all you need is consent. Granted, it powers prediction; revoked, the boundary fails closed and everything downstream goes quiet. That is the whole trade — evidence-grade privacy in exchange for signals worth predicting on.
 
+Why Shopify? Why Google? Because they need each other. Shopify holds the commerce substrate — catalog, checkout, and the app system that executes trusted code. Google holds the demand substrate — search, segments, and the identity rails buyers already carry. The **Universal Commerce Protocol** for agentic commerce is built on exactly this partnership: an agent discovers through one side, transacts through the other, and does both under a mandate the buyer signed. Building on the pair is not a vendor bet; it is the protocol's own shape.
+
 So the thread runs: the glossary defines the primitives, the roles screen shows who wields them, the product URLs show where they ship, and the login is where it all keys in. Firmware ledgers artifacts by SHA-256. SaaS ledgers sessions by UUID. Sunrise 2027 will point physical products at the same registry. One spine — identity → entitlement → consent → action — with two front doors and one ledger.
 
 #SBOM #Sunrise2027 #Entitlement #CyberSecurity
