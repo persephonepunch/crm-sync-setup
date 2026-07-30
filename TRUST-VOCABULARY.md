@@ -46,6 +46,11 @@ What **actually happened**: the append-only ledger of serves, plays, scans — w
 The portable **proof** handed to the counterparty: a signed token (or its QR) that anyone verifies offline against the published public key — no account, no trust in the platform. It outlives the access it documents.
 **Acts on it:** the licensee carries · their IT verifies · nobody has to be believed.
 
+### Verify
+
+The **act** performed on a receipt — by anyone, any number of times, forever: fetch the published public key the receipt names, test the signature, check the time window. No account, no call to the platform; verification works *against* the issuer, not through them. **The receipt is the claim; verify is the test the claim survives.** And each server-side verify is itself an event on the chain-of-custody register — checking the record extends the record.
+**Acts on it:** anyone — that is the point.
+
 ### Fingerprint
 
 The **stand-in for identity where none is shared** — two distinct senses, do not mix them:
@@ -85,6 +90,16 @@ The **account-shaped sum** of what a subject holds: features, capabilities, scop
 
 ---
 
+## The GitHub bridge (for anyone who knows git — that's everyone's IT)
+
+You already trust this exact machinery every time you use GitHub; the platform just applies it to business records. Three mappings:
+
+- **A commit SHA = the hash-chained ledger.** A git commit's hash includes its parent's hash — precisely the ledger's trick: each row seals the one before it, so history can be visibly broken but never quietly edited. Anyone can recompute the chain; no keys involved. A hash proves *what* — this exact content, untouched — but never *who*: a bare SHA has no author.
+- **A signed commit's "Verified" badge = receipt + verify.** A signed commit is a hash sealed with a private key, and GitHub checks it against the published public key. That green badge is exactly what [crm-sync.dev/verify](https://crm-sync.dev/verify) does with a receipt: same math, same trust model, different subject matter.
+- **The layering:** SHA-256 identifies (the firmware image, the record hash, each ledger row) · the signature attests (the receipt, the certificate, the mandate) · the chain orders it all in tamper-evident time. **Hash for *what*, signature for *who*, chain for *when*.**
+
+One line for the room: *a SHA says "this is the thing, untouched"; a receipt says "this is the thing, untouched, and we sealed it — check for yourself."*
+
 ## The confusions that cost meetings
 
 - **A bookmark is not a key.** One is a pointer, one is a credential. Sharing a bookmark shares nothing; sharing a credential shares everything until revoked.
@@ -92,6 +107,7 @@ The **account-shaped sum** of what a subject holds: features, capabilities, scop
 - **A permission is not a license.** Roles are employment-shaped and mutable; licenses are purchase-shaped and durable.
 - **A receipt is not the record.** The record is the platform's ledger; the receipt is the counterparty's proof. They corroborate each other precisely because they are held by different parties.
 - **A fingerprint is not a signature.** A signature proves *authorship* of a document; a fingerprint proves *distinctness* (of an actor) or *possession* (of a key) without revealing anything else.
+- **A hash is not a signature.** A hash (a git-SHA-style number) proves the content is untouched; a signature is a hash *sealed with the private key* and also proves who sealed it. Anyone can hash; only the keyholder can sign.
 - **Possession is not authority.** The system's first principle. Everything above exists so that holding a thing — a link, a bookmark, even a token past its expiry — confers exactly and only what was signed.
 
 ---
