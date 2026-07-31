@@ -164,3 +164,16 @@ body{
   font-size:1.15rem; line-height:1.5; color:var(--g5); margin:0 0 26px; max-width:52ch;
 }
 @media(max-width:640px){ .doc .jumbo{font-size:28px; margin-top:44px} }
+
+/* ── Site nav — the way back to the application ──────────────────────────────
+   The public docs are a GitHub Pages island; without this a reader who lands
+   on a spec from search has no path to the product. Injected at the top of
+   every page (index + doc shells), above .hero. */
+.sitenav{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;
+  padding:13px 0 12px;margin:0 0 26px;border-bottom:1px solid var(--g2);
+  font:600 11px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase}
+.sitenav a{color:var(--g5);text-decoration:none;white-space:nowrap}
+.sitenav a:hover{color:var(--ink)}
+.sitenav a.home{color:var(--ink)}
+.sitenav a.app{margin-left:auto;color:var(--ink)}
+@media print{.sitenav{display:none}}
