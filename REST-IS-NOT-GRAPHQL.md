@@ -86,6 +86,50 @@ For an integration that has already moved, these questions find most of the dama
 6. **Which objects you depend on are GraphQL-only?** If the answer is "none," verify it rather than assuming it.
 7. **Do you have contract tests against the API you actually call?** Not mocks — tests that would fail if the response shape changed.
 
+## The other half: user data does not mix with product data
+
+Everything above is the **product** side of a REST integration. There is a second audit, and keeping the two apart is the point.
+
+**CRM Sync holds user data. PIM Sync holds product data. They are separate systems, with separate credentials, and they do not mix.**
+
+That is a design decision rather than an accident of history. A product catalogue is published deliberately — it exists to be read by storefronts, feeds, marketplaces and agents. A customer record is the opposite: held under obligation, carrying consent and erasure duties, and every additional system that can reach it widens the blast radius of a leaked credential.
+
+Fusing them is the common failure. When one platform holds both, the credential that syndicates your catalogue can also read your customers, and the review regime that governs marketing data starts governing your product feed. Kept apart, a product integration can never become a privacy incident. PIM Sync requests product scopes only — no customer or order access. Neither system is a smaller version of the other.
+
+### Auditing the user-data side
+
+The questions below are answerable from your own systems. None of them requires trusting a vendor's claim.
+
+**Marketing platform — Klaviyo or equivalent**
+
+1. **Is consent one flag, or one per purpose?** Consent Mode v2 asks for four signals. A single boolean cannot express them, and cannot be split later.
+2. **Does a withdrawal reach every storefront**, or only the ones a sync happened to touch?
+3. **For a named person on a named date, can you state which consent applied** — from a record, not from what the configuration probably was?
+4. **Does a profile carry a market**, or is the market implied by whichever store the record arrived from?
+
+**CRM or MDM — Salesforce or equivalent**
+
+5. **Is identity keyed to a stable pseudonymous id, or to an email address?** Erasure against an email is destructive; against a key it is surgical.
+6. **Can you erase a subject without destroying the transaction record** you are required to retain?
+7. **Does the order carry the price actually paid**, in that market's currency, under the tax treatment that applied — or the list price at import time?
+8. **Is history retained**, or does current state overwrite what came before?
+
+**PMAX and predictive audiences**
+
+9. **Are conversions sent with a lawful basis attached**, or modelled because no basis was recorded?
+10. **If an audience was built partly from unconsented events, can you identify and rebuild it** — or only delete it?
+11. **Does the feed price match the price displayed in that market** at the moment of the click?
+12. **Can you say which product identifier the bid was optimised against**, and does it still resolve?
+
+**The separation test**
+
+13. **Can the credential that syndicates your catalogue also read your customer table?** If yes, you have one system wearing two names.
+14. **Can you revoke a product integration's access without touching customer data, and the reverse?**
+
+The product half of this audit lives with the product system. [**PIM Sync**](https://www.crm-sync.dev/pages/pim-sync) is that system — catalog shape, the market and time axes, and migrating a flat export to catalogs and metaobjects — with the argument in [REST is not GraphQL: ten places the missing dimension shows up](https://pim-sync.pages.dev/rest-is-not-graphql) and the procedure in [From product.csv to Catalog and metaobjects](https://pim-sync.pages.dev/csv-to-catalog).
+
+Read the product side there; keep the user side here. That the two have separate checklists, separate systems and separate credentials is not an inconvenience to route around — it is the control.
+
 ## Why this belongs to you
 
 The deeper point is not about either API. It is about **who owns the integration layer**.
