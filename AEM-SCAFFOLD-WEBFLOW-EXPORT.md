@@ -177,6 +177,14 @@ adoption path above, executed:
   the session-contract and modal APIs came up; the brand plane served the
   theme CSS and self-hosted fonts. Tenant resolution came from one
   origin-to-shop pair on the worker.
+- **Identity (§5), signed in:** a real login on the AEM origin — the
+  account menu and the **Choose-your-view** role picker (CISO/DPO,
+  Designer, Revenue BA, QA/Compliance, Release Manager…) rendering as a
+  headless modal on Adobe's glass. Separation of duties, served by the
+  worker, no AEM-side identity anywhere:
+
+![The Choose-your-view role picker — the entitlement plane — on the AEM page](https://crm-sync.dev/kb/media/docs/aem-choose-your-view.png)
+
 - **Boundary held:** no AEM credential, key, or secret exists anywhere in
   the exchange. The environment was a stock 30-day trial; everything
   durable lives in git.
