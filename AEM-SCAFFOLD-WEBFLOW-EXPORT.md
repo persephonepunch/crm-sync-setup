@@ -158,6 +158,35 @@ where the gate runs, not what the system does.
 
 ---
 
+## Demonstrated — phases 1–3 on a live AEMaaCS tenancy
+
+Run on 2026-08-02 against an AEM as a Cloud Service environment (Edge
+Delivery + Universal Editor, xwalk boilerplate). Not a mockup — the
+adoption path above, executed:
+
+![The point-of-difference grid and the consent plane, served by AEM Edge Delivery](https://crm-sync.dev/kb/media/docs/aem-front-live.png)
+
+- **Scaffold (§2):** the point-of-difference card grid — the same section
+  that runs on [the Shopify store](https://www.crm-sync.dev/) and the
+  Webflow site — shipped into the AEM repo as a block (markup, CSS, and a
+  three-field content model), appeared in the Universal Editor's component
+  palette, was authored as content, and published through Edge Delivery.
+- **Substrate (§5):** `stack-loader.js` first in the page head, footer
+  embed deferred. On the AEM origin, the worker injected the footer, the
+  login host, and the consent banner (Accept All / Customize / Reject);
+  the session-contract and modal APIs came up; the brand plane served the
+  theme CSS and self-hosted fonts. Tenant resolution came from one
+  origin-to-shop pair on the worker.
+- **Boundary held:** no AEM credential, key, or secret exists anywhere in
+  the exchange. The environment was a stock 30-day trial; everything
+  durable lives in git.
+
+For comparison, the same section on the Shopify store:
+
+![The same card grid on the Shopify storefront](https://crm-sync.dev/kb/media/docs/store-home-cards.png)
+
+---
+
 ## 8. Boundaries
 
 - **No standing credentials** in AEM, the page, or the transport. There is
