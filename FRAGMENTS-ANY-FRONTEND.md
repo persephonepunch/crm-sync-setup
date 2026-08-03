@@ -277,6 +277,41 @@ Three rules keep a mounted fragment pixel-true, learned the hard way:
 
 ---
 
+## 5a. Social and microservice data direction
+
+Every arrow in this architecture points one way, and the direction is
+itself a datum. Nothing holds a standing two-way channel — that is the
+bus's sin, and the ceiling-tier's, restated.
+
+**Social has two directions, never conflated.** *Outbound* is
+presentation: the share card a crawler unfurls from a minted link — a tile
+and a title, carrying no routing data, counted by no one, swappable after
+the fact because it is *about* the link, not the link. *Inbound* is the
+click or scan: a redirect stamped with channel, campaign, and product
+identifier, counted in the ledger, joinable to the order it eventually
+becomes. A crawler is not a reader; a card is not a visit. Keeping the two
+directions in separate artifacts is what keeps attribution honest — the
+ledger records who came *from* the video and who came *to* it as two rows,
+not one blur.
+
+**Microservices have four verbs, each one-directional.** Rails **pull** —
+a consumer fetches markup, stylesheet, or live catalog at the moment of
+need, against a short TTL. Planes **hydrate** — embeds bind behavior onto
+hooks after paint, downward from the worker, never as markup. Events
+**emit** — consent changes, auth changes, readiness signals fan out on the
+bus with no expectation of reply. Tools **call** — under a mandate,
+authorized by a row at call time, ledgered on completion. Four verbs, four
+directions, one authority check per arrow — and no resident channel for an
+attacker to live in or a vendor to meter.
+
+**Direction is the data model.** Writes land at the record first and
+projections flow outward only; scans flow inward only and settle as rows.
+Draw the system and every edge is an arrow, not a line — which is exactly
+what makes it auditable: an arrow says who moved, toward what, under whose
+judgment. A line says only that two things are entangled.
+
+---
+
 ## 6. Demonstrated
 
 The full chain runs live on an AEM as a Cloud Service tenancy: Webflow
