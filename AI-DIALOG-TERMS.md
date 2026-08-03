@@ -28,9 +28,19 @@ be used in a meeting, not to survive a computer-science exam.
 that other platforms display verbatim by fetching it. Not a copy: a feed.
 Edit the original, and every platform shows the edit within a minute.
 
-**Symbol** *(Webflow's term, our usage)* — a reusable element (nav,
-footer) defined once. In this stack the idea extends across platforms:
-one definition, every site, no copies to maintain.
+**Symbol** *(Adobe's design term; Webflow's legacy name for what it now
+calls Components; our cross-platform usage)* — in the design tools
+(Illustrator, XD, Animate), a reusable element defined once: edit the
+symbol, every instance updates. Webflow adopted the word, then renamed
+its version **Components** — same idea, nav and footer defined once.
+Developers know the word differently: in Ruby, a symbol (`:name`) is an
+**immutable, unique identifier** — a name interned once, so every
+reference points to the same single thing and comparison is instant;
+JavaScript's `Symbol` primitive makes the same guarantee. The two senses
+are secretly one: a symbol is **one canonical identity that is referenced
+everywhere and copied nowhere.** That is exactly the cross-platform usage
+in this stack — the nav's DOM id is the symbol; AEM, Shopify, and every
+other consumer hold references to it, never copies of it.
 
 **Hydration** *(industry)* — the moment JavaScript "wakes up" static
 HTML: the page paints first as an inert document, then scripts attach the
