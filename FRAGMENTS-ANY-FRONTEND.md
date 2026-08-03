@@ -1,0 +1,143 @@
+---
+title: "Fragments on Any Frontend — One Webflow Source, Every Platform"
+description: "The platform-agnostic fragment architecture: sections authored once in Webflow mount verbatim on AEM, WordPress, Astro, Next, 11ty, or a Shopify theme — markup travels through two worker rails, behavior and identity never leave the worker."
+canonical: https://persephonepunch.github.io/crm-sync-setup/fragments-any-frontend.html
+category: "Specs"
+date: 2026-08-03
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FRAGMENTS-ANY-FRONTEND.md
+---
+# Fragments on any frontend — one Webflow source, every platform
+
+**What this is:** the architecture that lets a section authored once in
+Webflow render verbatim on any consuming platform — AEM, WordPress, Astro,
+Next, 11ty, a Shopify theme — without exports to maintain or copies that
+drift.
+
+**The one-line contract:** edit the section in Webflow, publish, and every
+platform reflects it within a minute. Markup travels; behavior never does.
+
+**Companion:** [the AEM adoption path](./aem-scaffold-webflow-export.html)
+is this architecture worked end-to-end on an Adobe estate, with proof
+screenshots from a live tenancy.
+
+---
+
+## 1. The split that makes it work
+
+Webflow is the **authoring plane**: designers own layout, type, and copy
+there, with full visual tooling. The consuming platforms own their **glass**
+— routing, content wells, platform-native pages. Neither imports the other.
+
+Between them sit two small worker rails, and a rule:
+
+> **Markup travels. Behavior never does.**
+
+A fragment arrives as clean HTML — scripts stripped, internal links
+rewritten. Everything interactive on the consuming page (login, consent,
+popups, forms) comes from the worker's own embeds, which are already
+framework-agnostic. That is why the same fragment works everywhere: there is
+nothing platform-specific inside it.
+
+---
+
+## 2. The two rails
+
+| Rail | What it does |
+|---|---|
+| **Fragment proxy** — `/wf-fragment?id=<dom-id>&page=<path>` | Extracts ONE element by DOM id from the published source page: script- and iframe-stripped, internal links rewritten, served with open CORS, edge-cached 60 seconds. |
+| **Stylesheet resolver** — `/wf-css` | The source site's compiled CSS URL is publish-hashed and rotates on every Webflow publish. This endpoint resolves the *current* URL and redirects to it — a stable `<link href>` no republish can rot. |
+
+Both rails enforce a source allowlist (which sites may be extracted from)
+and resolve the consuming origin to a tenant — a page can only mount
+fragments its tenant is entitled to.
+
+One deliberate exclusion: **prices and inventory never travel as fragments.**
+A fragment is a snapshot; commerce data must be live at render time
+(price-transparency rules like the EU Omnibus directive assume nothing
+less). Product surfaces ride a separate live-JSON rail and render through a
+web component, so a price on any platform is always the store's price now.
+
+---
+
+## 3. The authoring contract (Webflow side)
+
+- Give the section a **semantic DOM id** on the published page — that id is
+  the fragment's address. Discoverable ids beat generated hashes.
+- Convert to a **Component only when the element repeats** across Webflow
+  pages (navigation, footer). A one-page section gains nothing from it; the
+  proxy extracts from one source page either way.
+- **Publish is the deploy.** The 60-second fragment cache is the entire
+  release pipeline — no build, no export, no ticket.
+
+---
+
+## 4. The platform matrix
+
+Per platform, exactly three things change: how the fragment mounts, at what
+tier it is fetched, and what "publish" means on that platform. The rails and
+the behavior planes are identical bytes everywhere.
+
+| Platform | Mount primitive | Fetch tier | Publish verb |
+|---|---|---|---|
+| AEM / Edge Delivery | authorable block in the Universal Editor | client | Sites API |
+| WordPress / Drupal | shortcode or block, fetched server-side | SSR | REST API |
+| Astro / 11ty | component or shortcode at build time | build | git push |
+| Next / Nuxt / SvelteKit | server component / load function | SSR or ISR | git push / deploy |
+| Shopify theme | Liquid section (runtime) or baked section push | client or baked | theme asset API |
+
+Two notes on fetch tiers:
+
+- **Server and build tiers put the fragment in the initial HTML** — no CORS
+  in play, and answer engines see the markup without executing anything.
+  Prefer them where the platform offers the tier.
+- **Static builds freeze fragments until the next build.** Fine for copy;
+  never acceptable for prices — which is exactly why commerce data has its
+  own live rail (§2).
+
+---
+
+## 5. The consuming-page discipline
+
+Three rules keep a mounted fragment pixel-true, learned the hard way:
+
+1. **The platform's base styles must never outrank fragment markup.** Every
+   frontend ships a reset or utility layer; scope it *away* from mounted
+   chrome rather than escalating specificity. The two rules that actually
+   bite in practice: link-color resets (`a:any-link` outranks class
+   selectors) and image normalization (`img { width/height: auto }` defeats
+   HTML attribute sizing).
+2. **Behavior planes stay client-side on every platform.** Embeds hydrate
+   hooks after paint — login mounts, consent controls, form sockets. Only
+   markup moves between tiers.
+3. **The design tokens bridge, they don't fork.** The consuming platform's
+   own token layer consumes the brand tokens with literal fallbacks
+   (`var(--brand-font-body, "…")`), so native content and mounted fragments
+   render from one type and color system — fonts self-hosted on the worker,
+   no third-party font CDN on any platform.
+
+---
+
+## 6. Demonstrated
+
+The full chain runs live on an AEM as a Cloud Service tenancy: Webflow
+navigation and footer as symbols, a hero section with its interaction plane,
+a capability table, and the worker's login, consent, and modal planes — all
+on Adobe's glass, with no AEM-side credentials anywhere.
+
+![The Webflow-authored hero, mounted verbatim on AEM Edge Delivery](https://crm-sync.dev/kb/media/docs/aem-front-live.png)
+
+Details, phases, and the enterprise substrate election are in
+[the AEM adoption path](./aem-scaffold-webflow-export.html).
+
+---
+
+## 7. Boundaries
+
+- **No credentials in transport.** The rails serve published, public markup;
+  identity and entitlement stay in the worker and its rows.
+- **Webflow remains the editing plane for mirrored sections.** A mounted
+  fragment is deliberately read-only on the consuming platform — the trade
+  that guarantees zero drift.
+- **One consuming origin, one tenant.** Fragments resolve through the same
+  origin-to-tenant pairing as every other worker surface; an unpaired origin
+  gets nothing.
