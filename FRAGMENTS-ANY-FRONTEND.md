@@ -161,6 +161,29 @@ ephemeral: authority exists for the duration of one call, per tenant, and
 there is no resident middleware to breach or to license. The integration
 layer stops being a product you install and becomes a permission you grant.
 
+<div class="uk-video-wrap" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;margin:1.5rem 0 0.5rem;">
+<iframe src="https://www.youtube-nocookie.com/embed/mT5bhj1Wygg" title="Event-Driven Architecture" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+*Watch: Event-Driven Architecture — the messaging pattern this section
+argues with. Events decouple the systems; the open question is always who
+holds the authority when one fires. The bus answers with standing
+credentials; the tool runner answers with a row, at call time.*
+
+**Two patterns, one grid.** Read the construction against the two
+architectures the industry already names. **Event-driven** is the
+horizontal axis: the stack's event bus (consent changes, auth changes,
+`crm_pim_ready`) decouples the planes, and the tool runner grounds every
+event's authority in a call-time row instead of a resident bus.
+**Vertical slice** is the other axis: a fragment is a *vertical slice* in
+the strict sense — one feature cut through every layer at once (authored
+section → stylesheet → identifiers → record) that ships independently,
+instead of a change negotiated across each platform's horizontal layers.
+The nav is a slice; the hero is a slice; a product card is a slice. Slices
+travel; the event plane coordinates; the rows decide. That grid — vertical
+slices over an event-driven substrate, both answering to the record — is
+the whole architecture in one sentence.
+
 **Fees follow the chain, not the silo.** Two pricing physics:
 
 | | Data that stops (SLA pricing) | Data everywhere (chain pricing) |
@@ -278,3 +301,34 @@ Details, phases, and the enterprise substrate election are in
 - **One consuming origin, one tenant.** Fragments resolve through the same
   origin-to-tenant pairing as every other worker surface; an unpaired origin
   gets nothing.
+
+---
+
+## Summary — the data-driven content build, and the AI services it carries
+
+**The content build is data-driven end to end.** Nothing on any surface is
+hand-copied: product pages render from identifiers, product cards from the
+store's live catalog JSON, knowledge-base rows from the documentation
+index, mirrored sections from the published Webflow source, share cards
+from the mint's own row. Every surface is a *projection of a record* —
+rebuilt on demand, correct by regeneration, never maintained by hand. The
+build itself is judgment-based (§4b): a page assembles at load time from
+whatever the rows, the consent state, and the page's demonstrated need
+permit — vertical slices over an event-driven substrate, both answering to
+the record.
+
+**The AI services ride the same substrate, under the same gates.** What
+runs today: retrieval-grounded answers over the documentation corpus (the
+search that cites its sources), semantic product search, edge translation
+of authored content, predictive-value modeling feeding ad bidding — and
+the agentic tier: tool calls under signed mandates, spend-capped and
+individually revocable, with the tool runner standing where the
+integration bus used to. None of it gets a bypass: consent is evaluated
+before any signal fires, the entitlement row before any action, the
+boundary before any fee. AI here is not a feature bolted to a product —
+it is a set of services *licensed by the record*, which is what makes them
+safe to offer and safe to meter.
+
+**The one-sentence version:** author once, record once — every surface is
+a projection, every behavior a judgment, every fee a motion, and the row
+is the only thing that is ever allowed to be true.
