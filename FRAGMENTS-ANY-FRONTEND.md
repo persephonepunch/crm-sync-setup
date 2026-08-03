@@ -183,6 +183,29 @@ this — access to your own record *is* the paid feature, so the boundary and
 the bill become the same mechanism, and the gate's integrity inherits the
 billing relationship's health.
 
+**The automation-tier ceiling — the third fee model.** Between the SLA silo
+and the chain sits the tier most teams actually run: Zapier, n8n, Airtable.
+Their model is *data metered per motion, with a ceiling*:
+
+| | Zapier / n8n (cloud) | Airtable | Xano as SoR |
+|---|---|---|---|
+| Metered unit | tasks / executions per month | records per base, API rate | authority rows — never per-record fees |
+| At the ceiling | the workflow **pauses** — the chain stops mid-month | the base stops accepting the record | the record always lands; fees attach to operated services |
+| Credential model | standing OAuth grants to every connected system — the per-tenant ESB, rebuilt in miniature | API keys held by every consumer | scoped, call-time authorization; revocation is a row delete |
+| Record authority | none — a relay between other systems' records | an accidental SoR that caps out | the system of record, by definition and by design |
+
+Two structural problems hide in that tier. **The ceiling is a scheduled
+latent collision:** a paused Zap doesn't fail loudly — it queues, and the
+records arrive after the decisions they should have informed. Metering data
+per motion means the *busier your business, the more your own data costs
+you* — and the month you grow is the month the chain stops. And **the
+credential model is the ESB problem at SMB scale:** an automation account
+holding standing grants to the store, the CRM, the mailer, and the
+spreadsheet is one perimeter around everything, priced per task. The
+replacement is the same as at enterprise scale (§4b above): authority per
+call, record in your own SoR, fees only where the chain does operated work
+— and no ceiling on how often your own record is allowed to be true.
+
 **Data on time, or the latent collision.** A decision made now against a
 record that arrives later is not an integration — it is a collision: the
 bid placed on a page-view-inferred conversion, the agent acting on an
