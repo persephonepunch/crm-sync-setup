@@ -244,7 +244,9 @@ and call time, replacing configuration at build time** — and it is the
 foundation the whole construction stands on: the additive compile is
 judgment about what a page becomes, the fragment TTL is judgment about what
 is still true, the chain fee is judgment about when work was actually done,
-and the gate before the fee is the judgment no invoice can buy.
+and the gate before the fee is the judgment no invoice can buy. A judgment
+framework is only as honest as its parameters — those are defined, term by
+term, in [the AI dialog glossary](./ai-dialog-terms.html).
 
 ---
 
@@ -266,6 +268,44 @@ Three rules keep a mounted fragment pixel-true, learned the hard way:
    (`var(--brand-font-body, "…")`), so native content and mounted fragments
    render from one type and color system — fonts self-hosted on the worker,
    no third-party font CDN on any platform.
+
+**The failure mode that hides: client-side-only Shopify.** A word to the
+Liquid developers resisting server-side tooling, from the field. A store
+rendered entirely client-side keeps working in the only place anyone
+watches: **checkout is Shopify-hosted, so revenue never stops.** That is
+precisely the trap. In the page-view era, the data plane rode the render
+for free — every server-rendered page fired its signals on arrival. Move
+rendering client-side and every backend write, plugin event, and event-bus
+signal fires only if someone wired it deliberately — and when it isn't
+wired, *nothing errors*. Orders complete. Attribution, consent history,
+and bidding signals quietly go dark, and the failure surfaces weeks later
+in the month's numbers instead of a stack trace. A failure that pays out
+at checkout has no alarm attached to it. This is why the event plane is
+infrastructure, not decoration: the arrows of §5a must be *observed*, not
+assumed — and it is the practical case for the server and worker rails
+this article describes, which exist exactly because the silent client
+path emits no signal when it fails.
+
+**What the silence costs, and what privacy streaming returns.** The
+revenue impact of a silent data failure is real but never itemized,
+because it books as something else. Bidding algorithms that stop
+receiving tagged, real-revenue conversions don't stop bidding — they bid
+on inference, and paid efficiency decays week over week. Audiences built
+on stale segments keep mailing and keep spending. Budget reallocates by
+guess. And the P&L files all of it under "market conditions," because the
+one number everyone watches — checkout — never flinched. The course
+correction is **logging as privacy streaming**: every event consented
+*before* it fires, streamed in real time to the record and the bidding
+signal, redacted at the source, ledgered on arrival. That returns revenue
+through four channels at once: the algorithm bids on truth again
+(consented identity, real revenue, flagged the moment it happens);
+budget follows observed arrows instead of inferred ones; failures become
+alarms instead of month-end archaeology, because a ledgered stream that
+stops is *visible*; and — the durable part — a consent-gated stream is
+the only one that keeps flowing as browsers and regulators keep
+tightening. Unconsented logging is a signal with an expiry date.
+Privacy streaming is not the compliant version of analytics; it is the
+version whose revenue contribution survives.
 
 ---
 
