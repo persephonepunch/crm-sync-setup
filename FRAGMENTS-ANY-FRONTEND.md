@@ -216,6 +216,21 @@ the moment they are consulted. The chain evaluates the row at call time:
 the record and the decision share a clock, which is the only arrangement an
 agent acting under a mandate can safely inhabit.
 
+**The foundation: judgment-based loading.** Strip everything above down and
+one primitive remains. A conventional script manager loads JavaScript by
+static configuration — triggers a human wrote last quarter, firing whether
+or not they should. The helmet is a script manager whose additions are
+**judgment-based**: every layer loads only when the judgment passes *at that
+moment* — consent permits it, the entitlement row grants it, the page
+demonstrably needs it. The AI tool runner is the same primitive lifted from
+loading to integration: a tool call happens only when the row says yes,
+now, under this mandate. One idea, two altitudes — **judgment at load time
+and call time, replacing configuration at build time** — and it is the
+foundation the whole construction stands on: the additive compile is
+judgment about what a page becomes, the fragment TTL is judgment about what
+is still true, the chain fee is judgment about when work was actually done,
+and the gate before the fee is the judgment no invoice can buy.
+
 ---
 
 ## 5. The consuming-page discipline
