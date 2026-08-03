@@ -77,13 +77,14 @@ Per platform, exactly three things change: how the fragment mounts, at what
 tier it is fetched, and what "publish" means on that platform. The rails and
 the behavior planes are identical bytes everywhere.
 
-| Platform | Mount primitive | Fetch tier | Publish verb |
-|---|---|---|---|
-| AEM / Edge Delivery | authorable block in the Universal Editor | client | Sites API |
-| WordPress / Drupal | shortcode or block, fetched server-side | SSR | REST API |
-| Astro / 11ty | component or shortcode at build time | build | git push |
-| Next / Nuxt / SvelteKit | server component / load function | SSR or ISR | git push / deploy |
-| Shopify theme | Liquid section (runtime) or baked section push | client or baked | theme asset API |
+| Platform | Mount primitive | Fetch tier | Publish verb | Status |
+|---|---|---|---|---|
+| AEM / Edge Delivery | authorable block in the Universal Editor | client | Sites API | **shipped, live** |
+| Shopify theme | Liquid section (runtime) or baked section push | client or baked | theme asset API | **shipped, live** |
+| 11ty | component or shortcode at build time | build | git push | prototyped |
+| WordPress / Drupal | shortcode or block, fetched server-side | SSR | REST API | pattern ready |
+| Astro | component at build time | build | git push | pattern ready |
+| Next / Nuxt / SvelteKit | server component / load function | SSR or ISR | git push / deploy | pattern ready |
 
 Two notes on fetch tiers:
 
@@ -93,6 +94,38 @@ Two notes on fetch tiers:
 - **Static builds freeze fragments until the next build.** Fine for copy;
   never acceptable for prices — which is exactly why commerce data has its
   own live rail (§2).
+
+---
+
+## 4a. The other way to share UI — the compile comparison
+
+The conventional answer to "one design, many platforms" is a compiled
+component library: build the sections as React or Vue components, publish a
+package, make every consumer install it. It works — at a price the fragment
+rail was designed not to pay.
+
+| | Compiled component library (React / Vue) | Fragment rail |
+|---|---|---|
+| Distribution unit | npm package of components | published markup at a DOM id |
+| Consumer requirement | same framework, compatible version, build pipeline | one fetch — or one script tag |
+| Framework lock-in | every consumer runs the framework | none; HTML + CSS land anywhere |
+| Update propagation | version bump → rebuild → redeploy **every** consumer | publish once; live everywhere in 60 seconds |
+| Who edits the section | developers, in JSX / SFC | designers, in Webflow |
+| Runtime cost per page | framework + hydration, on every consumer | none — fragment markup is inert |
+| Behavior | bundled into components, duplicated per app | one worker plane hydrating hooks on all surfaces |
+| Design tokens | a theme provider per framework | CSS custom properties with literal fallbacks |
+| Drift risk | each consumer pins its own version | structurally zero — one source, no copies |
+| Where it wins | app-grade interactive UI, typed props | brand and content surfaces that must never drift |
+
+The last row is the honest one: these approaches **compose rather than
+compete**. A Next or React application can mount fragments for its brand
+chrome — navigation, footer, marketing sections — while keeping its
+framework for application UI; the fragment arrives as plain HTML and never
+conflicts with the host's renderer. What the rail refuses is making the
+*framework* a precondition for the *brand*: the stack itself stays
+framework-free, reaching for a small reactive layer (petite-vue) only where
+a surface actually carries reactive state, and never requiring a consumer
+to compile anything to receive design.
 
 ---
 
