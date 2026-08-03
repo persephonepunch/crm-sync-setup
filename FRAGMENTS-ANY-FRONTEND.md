@@ -175,6 +175,24 @@ own record. The chain model holds the record where you put it and charges
 only **in motion** — evidence logging, registries, metered publish rails —
 never for storing what was already yours.
 
+**The boundary is gated prior to the fee, and agnostic to it.** Consent,
+entitlement, and verification evaluate before any commercial event and
+independently of the plan: no fee unlocks a bypass, and no lapsed invoice
+switches the gate off. Trust is not a tier. The SLA model quietly inverts
+this — access to your own record *is* the paid feature, so the boundary and
+the bill become the same mechanism, and the gate's integrity inherits the
+billing relationship's health.
+
+**Data on time, or the latent collision.** A decision made now against a
+record that arrives later is not an integration — it is a collision: the
+bid placed on a page-view-inferred conversion, the agent acting on an
+entitlement that was revoked an export-window ago. Silo pricing
+manufactures that latency by design — batch windows, rate-limited access to
+your own record — and latency converts records into liabilities at exactly
+the moment they are consulted. The chain evaluates the row at call time:
+the record and the decision share a clock, which is the only arrangement an
+agent acting under a mandate can safely inhabit.
+
 ---
 
 ## 5. The consuming-page discipline
