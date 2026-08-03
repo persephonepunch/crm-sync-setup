@@ -32,11 +32,10 @@ Between them sit two small worker rails, and a rule:
 
 > **Markup travels. Behavior never does.**
 
-A fragment arrives as clean HTML — scripts stripped, internal links
-rewritten. Everything interactive on the consuming page (login, consent,
-popups, forms) comes from the worker's own embeds, which are already
-framework-agnostic. That is why the same fragment works everywhere: there is
-nothing platform-specific inside it.
+A fragment arrives as clean HTML. Everything interactive on the consuming
+page — login, consent, popups, forms — comes from the worker's own embeds.
+That is why the same fragment works everywhere: there is nothing
+platform-specific inside it.
 
 ---
 
@@ -122,10 +121,8 @@ compete**. A Next or React application can mount fragments for its brand
 chrome — navigation, footer, marketing sections — while keeping its
 framework for application UI; the fragment arrives as plain HTML and never
 conflicts with the host's renderer. What the rail refuses is making the
-*framework* a precondition for the *brand*: the stack itself stays
-framework-free, reaching for a small reactive layer (petite-vue) only where
-a surface actually carries reactive state, and never requiring a consumer
-to compile anything to receive design.
+*framework* a precondition for the *brand* — no consumer should have to
+compile anything to receive design.
 
 ---
 
@@ -172,17 +169,14 @@ credentials; the tool runner answers with a row, at call time.*
 
 **Two patterns, one grid.** Read the construction against the two
 architectures the industry already names. **Event-driven** is the
-horizontal axis: the stack's event bus (consent changes, auth changes,
-`crm_pim_ready`) decouples the planes, and the tool runner grounds every
-event's authority in a call-time row instead of a resident bus.
-**Vertical slice** is the other axis: a fragment is a *vertical slice* in
-the strict sense — one feature cut through every layer at once (authored
-section → stylesheet → identifiers → record) that ships independently,
-instead of a change negotiated across each platform's horizontal layers.
-The nav is a slice; the hero is a slice; a product card is a slice. Slices
-travel; the event plane coordinates; the rows decide. That grid — vertical
-slices over an event-driven substrate, both answering to the record — is
-the whole architecture in one sentence.
+horizontal axis: the stack's event plane (consent changes, auth changes,
+readiness signals) decouples the surfaces. **Vertical slice** is the
+other: a fragment is a *vertical slice* in the strict sense — one feature
+cut through every layer at once (authored section → stylesheet →
+identifiers → record) that ships independently, instead of a change
+negotiated across each platform's horizontal layers. The nav is a slice;
+the hero is a slice; a product card is a slice. Slices travel; the event
+plane coordinates; the rows decide.
 
 **Fees follow the chain, not the silo.** Two pricing physics:
 
@@ -221,13 +215,11 @@ Two structural problems hide in that tier. **The ceiling is a scheduled
 latent collision:** a paused Zap doesn't fail loudly — it queues, and the
 records arrive after the decisions they should have informed. Metering data
 per motion means the *busier your business, the more your own data costs
-you* — and the month you grow is the month the chain stops. And **the
-credential model is the ESB problem at SMB scale:** an automation account
-holding standing grants to the store, the CRM, the mailer, and the
-spreadsheet is one perimeter around everything, priced per task. The
-replacement is the same as at enterprise scale (§4b above): authority per
-call, record in your own SoR, fees only where the chain does operated work
-— and no ceiling on how often your own record is allowed to be true.
+you* — and the month you grow is the month the chain stops. And the
+credential model is the bus problem at SMB scale — one automation account,
+standing grants to everything, priced per task. The answer is the one
+already given above, and it holds at every scale: no ceiling on how often
+your own record is allowed to be true.
 
 **Data on time, or the latent collision.** A decision made now against a
 record that arrives later is not an integration — it is a collision: the
@@ -280,8 +272,7 @@ Three rules keep a mounted fragment pixel-true, learned the hard way:
 ## 5a. Social and microservice data direction
 
 Every arrow in this architecture points one way, and the direction is
-itself a datum. Nothing holds a standing two-way channel — that is the
-bus's sin, and the ceiling-tier's, restated.
+itself a datum.
 
 **Social has two directions, never conflated.** *Outbound* is
 presentation: the share card a crawler unfurls from a minted link — a tile
@@ -364,8 +355,7 @@ from the mint's own row. Every surface is a *projection of a record* —
 rebuilt on demand, correct by regeneration, never maintained by hand. The
 build itself is judgment-based (§4b): a page assembles at load time from
 whatever the rows, the consent state, and the page's demonstrated need
-permit — vertical slices over an event-driven substrate, both answering to
-the record.
+permit — the slice-and-event grid of §4b, assembling per visitor.
 
 **The AI services ride the same substrate, under the same gates.** What
 runs today: retrieval-grounded answers over the documentation corpus (the
