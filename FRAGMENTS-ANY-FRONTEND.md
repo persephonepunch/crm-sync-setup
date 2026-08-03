@@ -129,6 +129,54 @@ to compile anything to receive design.
 
 ---
 
+## 4b. Beneath the fragments — additive compile, one system of record
+
+**Non-destructive, higher-order, progressive — and strictly additive.** The
+stack never asks a platform to become something else. A working page
+compiles *upward*: first the regulatory baseline (consent before any signal
+fires), then per-need behavior, then brand tokens, then fragments — each
+layer an opt-in script or stylesheet, each removable by deleting one tag,
+none rewriting what the host already does. Adoption is not a migration and
+removal is not a teardown; that is what non-destructive means here, and it
+is the opposite of the rip-and-replace that platform vendors call
+"modernization."
+
+**The system of record, defined.** A system of record is the one place
+where a fact is *authoritative* — where writes land first and disputes
+resolve. Every other copy is a projection with lineage back to it. In this
+architecture **Xano holds the rows**: identity, consent, entitlement,
+catalog mappings. Fragments, metaobjects, CDN caches, even the copies
+inside a CRM are projections — regenerable at any time precisely because
+they are never the record. A fragment can be wrong for sixty seconds; a row
+cannot be wrong at all.
+
+**The AI tool runner replaces the per-tenant ESB.** An enterprise service
+bus earns its keep by routing and transforming between systems — and pays
+for it by holding standing credentials to every one of them, licensed per
+tenant, one perimeter around everything. The replacement is not another
+bus: it is an **AI tool runner** — an agent loop executing scoped tools
+under a signed mandate, where every call is authorized by a row *at call
+time*, ledgered, and individually revocable. Orchestration becomes
+ephemeral: authority exists for the duration of one call, per tenant, and
+there is no resident middleware to breach or to license. The integration
+layer stops being a product you install and becomes a permission you grant.
+
+**Fees follow the chain, not the silo.** Two pricing physics:
+
+| | Data that stops (SLA pricing) | Data everywhere (chain pricing) |
+|---|---|---|
+| Where the data lives | the vendor's silo | your system of record |
+| What you pay for | the place it is kept, plus the promise of access | operated services, when the chain does work |
+| Reaching a new surface | another integration project, another fee | already reachable — the plane runs everywhere by construction |
+| When you leave | the data stops at their boundary | the rows were always yours; projections regenerate |
+
+The SLA model charges for data **at rest** and meters your access to your
+own record. The chain model holds the record where you put it and charges
+only **in motion** — evidence logging, registries, metered publish rails —
+never for storing what was already yours.
+
+---
+
 ## 5. The consuming-page discipline
 
 Three rules keep a mounted fragment pixel-true, learned the hard way:
