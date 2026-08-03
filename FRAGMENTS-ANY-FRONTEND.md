@@ -124,6 +124,23 @@ conflicts with the host's renderer. What the rail refuses is making the
 *framework* a precondition for the *brand* — no consumer should have to
 compile anything to receive design.
 
+**The toolchain you don't need.** The same logic dissolves the wider
+toolchain. A Shopify theme is Ruby-era technology — Liquid templates, a
+folder of files, a Git repo; Shopify's GitHub integration deploys a
+commit as a theme with no build step at all. The documentation you are
+reading is markdown files on GitHub Pages — no `node_modules`, no
+bundler, no file-system router. That simplicity used to be the thing you
+outgrew: the moment a page needed dynamic data, the Node toolchain
+arrived — packages to manage state, bundlers to ship the packages,
+frameworks to route the bundles. The trade is different now. **The
+dynamic data is handled by the AI plane** — live rails for prices,
+judgment-based loading for behavior, tool calls for integration — so the
+file-shaped substrate never has to grow an application inside it. Ruby,
+Liquid, GitHub, markdown: boring, durable, versioned, reviewable by
+anyone. Complexity didn't disappear; it moved to the one place it is
+owned and operated — the worker — and everything it left behind was
+allowed to become simple again.
+
 ---
 
 ## 4b. Beneath the fragments — additive compile, one system of record
