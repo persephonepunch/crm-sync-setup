@@ -310,6 +310,21 @@ Draw the system and every edge is an arrow, not a line — which is exactly
 what makes it auditable: an arrow says who moved, toward what, under whose
 judgment. A line says only that two things are entangled.
 
+**The hash is the multiplier — and the trust anchor.** A semantic DOM id
+is not one thing; it is four addresses wearing one name. It is the
+fragment's *extraction* address on the rail; the *deep link* that opens
+the exact section for a human (`#fragments-any-frontend` survives the
+minted redirect intact); the *mint target* that turns one page into many
+attributable destinations — N addressable sections × M channels is a
+combinatorial fan-out from a single authored source; and the *JSON-LD
+`@id`* an answer engine cites, anchored to the canonical URL. That last
+one is the AEO verification frame: the same `#id` resolves identically
+for the crawler that cites it, the human who clicks the citation, and the
+agent that transacts against it — one address, three audiences, no
+translation layer where trust could leak. A hash that means the same
+thing to every reader is the cheapest verifiable claim on the web; nested
+well, it turns a page into a lattice of them.
+
 ---
 
 ## 6. Demonstrated
