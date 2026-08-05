@@ -81,6 +81,30 @@ not recorded after she declined,"* a client-side stack has nothing to
 produce. The absence of the record **is** the case. Statutory damages run
 $5,000 per violation — arguably per session — with no regulator required.
 
+### The forty days nobody noticed
+
+The regulator has now said it directly. In May 2025, California's privacy
+agency fined **Todd Snyder, Inc.** — a Shopify Plus menswear retailer —
+**$345,178** (CPPA enforcement action). For roughly **forty days** its
+third-party consent banner was silently broken: visitors clicked opt-out,
+the requests went nowhere, and tracking continued. Nobody inside the
+company noticed, because there was nothing that *could* notice — no
+server-side register in which forty days of missing opt-out rows would
+have read as an alarm. The CPPA's stated lesson: deploying a
+consent-management platform does not outsource the obligation — the
+business must verify its tools actually work.
+
+The same action's second finding completes the picture: the retailer
+demanded photo identification before honoring privacy requests — friction
+as a dark pattern, over-collection in the name of verification. Both
+findings are records failures with the same cure. A server-side register
+makes the first failure impossible to miss — a broken banner shows up as
+the row count going to zero **the same day**, not the day the regulator
+calls. And it makes the second unnecessary — the session-joined record
+*is* the verification, no photo ID required. A theme can pass every visual
+QA on earth while its consent tool is broken; only a register knows the
+difference between quiet and silence.
+
 ## The rule that makes it safe
 
 UI may be added to any theme — AI-generated, red/green test-driven,
