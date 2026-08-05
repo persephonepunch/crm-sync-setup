@@ -163,6 +163,19 @@ only place a rule can live when the storefronts themselves disagree. Add a
 platform, port a theme, acquire a brand on a different stack: the record
 doesn't move, because it was never in the thing you changed.
 
+There is also a structural reason the records gap keeps recurring on one
+platform in particular. Enterprise-scale Shopify stores are comparatively
+rare — the platform's globalization ceiling historically kept large
+multi-market estates on other stacks — so the agency labor market is
+overwhelmingly trained on **small-business Shopify**: theme customization,
+Liquid, app installs. When one of those merchants grows into global
+obligations — multi-market pricing evidence, consent regimes, nexus
+reporting — the team that built the store has often never seen the
+problems the store now has. "That's not how Shopify sites work" isn't a
+philosophy; it's the boundary of an expertise. The register exists so that
+growing past your builder's experience doesn't mean growing past your
+evidence.
+
 ## SOC 2, ISO, GDPR is a method, not a thing
 
 You don't buy it, you don't install it, and a certificate doesn't contain
