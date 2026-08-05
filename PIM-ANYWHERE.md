@@ -59,6 +59,22 @@ plugin. Works identically in classic themes and block themes.
 Astro, 11ty, Next, Nuxt, Svelte, Drupal, Salesforce Experience, plain HTML —
 same two tags. If it renders HTML, it renders the catalog.
 
+## The two rails Google ships
+
+The Merchant API keeps both eras in one surface. `DataSource.FetchSettings`
+is the batch era encoded as schema — `frequency`, `dayOfWeek`, `timeOfDay`,
+`timeZone`, and a `fetchUri` with `username`/`password` fields for SFTP file
+pulls. A cron schedule and a file credential, as API fields: it exists so
+file-feed pipelines can keep running on a clock.
+
+PIM Anywhere rides the other rail: `ProductInput`, pushed from the live
+record at the moment the record changes. No schedule, no fetch window, no
+credential stored in a schema — the projection is computed and pushed when
+truth changes, and the observation ledger timestamps it. Scheduled fetch
+answers "when should we read your file"; the push rail answers "the record
+changed — here is the current state." The migration that matters is not
+Content API to Merchant API; it is the fetch rail to the push rail.
+
 ## Why this shape
 
 Every platform migration and every new channel re-implements "show the
