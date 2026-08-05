@@ -75,6 +75,26 @@ answers "when should we read your file"; the push rail answers "the record
 changed — here is the current state." The migration that matters is not
 Content API to Merchant API; it is the fetch rail to the push rail.
 
+## Data alignment — where each axis lands
+
+The Merchant API organizes ingestion as **data-source families**. The
+orthogonal record lands on them one-to-one — the alignment is structural,
+not a mapping project:
+
+| Record axis | Merchant API family | Status |
+|---|---|---|
+| The live record (system of record) | `PrimaryProductDataSource` → `ProductInput` | **Live** — the merchant feed ships from it today |
+| Market × price (per-market variants, FX) | `RegionalInventoryDataSource` | Aligned — regional price/availability project from the same market rows |
+| Physical location / stores | `LocalInventoryDataSource` | Aligned |
+| Channel and campaign enrichment | `SupplementalProductDataSource` | Aligned — supplemental attributes ride the same record, per channel |
+| Price reductions + the observation ledger | `PromotionDataSource` | Gate live — a reduction publishes only with a verified 30-day reference; the promotion source inherits the gate |
+| Reviews and knowledge surfaces | `ProductReviewDataSource` | Later |
+
+The consequence: adding a Merchant capability is choosing which axis to
+project, not building a new pipeline. The gate — deterministic checks, then
+verdicts — rides every one of these pushes, because they all pass through
+the same mapping.
+
 ## Why this shape
 
 Every platform migration and every new channel re-implements "show the
