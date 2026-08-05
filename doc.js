@@ -99,6 +99,11 @@
     marked.setOptions({ gfm: true, breaks: false });
     var art = document.getElementById('doc');
     art.innerHTML = marked.parse(head.body);
+    // Audience line ("**For:** ...") renders uppercase — global doc convention (2026-08-05).
+    art.querySelectorAll('p').forEach(function (p) {
+      var s = p.firstElementChild;
+      if (s && s.tagName === 'STRONG' && /^For:/.test(s.textContent)) p.classList.add('doc-for');
+    });
     art.querySelectorAll('table').forEach(function (t) {
       var w = document.createElement('div'); w.style.overflowX = 'auto';
       t.parentNode.insertBefore(w, t); w.appendChild(t);

@@ -180,3 +180,6 @@ body{
 .sitenav a.home{color:var(--ink)}
 .sitenav a.app{margin-left:auto;color:var(--ink)}
 @media print{.sitenav{display:none}}
+
+/* audience line — uppercase, global (2026-08-05) */
+.doc .doc-for{text-transform:uppercase;letter-spacing:.06em;font-size:.8125rem;color:#555}
