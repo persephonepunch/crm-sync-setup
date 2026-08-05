@@ -84,8 +84,8 @@ $5,000 per violation — arguably per session — with no regulator required.
 ### The forty days nobody noticed
 
 The regulator has now said it directly. In May 2025, California's privacy
-agency fined a **Shopify Plus menswear retailer $345,178** (CPPA
-enforcement action, public record). For roughly **forty days** its
+agency fined **Todd Snyder, Inc.** — a Shopify Plus menswear retailer —
+**$345,178** (CPPA enforcement action, public record). For roughly **forty days** its
 third-party consent banner was silently broken: visitors clicked opt-out,
 the requests went nowhere, and tracking continued. Nobody inside the
 company noticed, because there was nothing that *could* notice — no
