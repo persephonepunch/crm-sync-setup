@@ -183,3 +183,9 @@ body{
 
 /* audience line — uppercase, global (2026-08-05) */
 .doc .doc-for{text-transform:uppercase;letter-spacing:.06em;font-size:.8125rem;color:#555}
+
+/* Framed in the store's KB modal: drop host-page chrome so the article does not
+   link back to the page that is displaying it. */
+html.crm-framed .sitenav,
+html.crm-framed .docfoot { display: none !important; }
+html.crm-framed .wrap { padding-top: 8px; }

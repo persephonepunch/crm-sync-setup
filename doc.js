@@ -11,6 +11,14 @@
    ========================================================================== */
 (function () {
   var body = document.body;
+  // Framed rendering (the store's KB modal iframes these docs): the site nav
+  // and footer are chrome that belongs to the HOST page — inside the modal the
+  // "Knowledge base" link pointed back at the page holding the modal, which
+  // reads as the article referencing itself. Hide chrome when framed; the
+  // standalone page is unchanged.
+  try {
+    if (window.self !== window.top) document.documentElement.classList.add('crm-framed');
+  } catch (e) { document.documentElement.classList.add('crm-framed'); }
   var cfg = {
     md: body.dataset.md,
     kicker: body.dataset.kicker || 'Reference',
