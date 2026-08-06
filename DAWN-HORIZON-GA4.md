@@ -29,6 +29,8 @@ Every date below is an obligation that assumes the evidence already exists when 
 
 Two of these are already behind us and are the ones most estates have not absorbed: since June 15 the consent signal *is* the ads data control, and since June 30 any un-migrated Script is a checkout rule that stopped without an error.
 
+The same timeline, live and machine-readable (human table plus a JSON block any agent can parse): **[crm-sync.dev/pages/difference#calendar](https://www.crm-sync.dev/pages/difference#calendar)**
+
 ## Globalization and time are first-class in the new API
 
 The Merchant API is not a rename of the Content API — it is a reshape, and the axes it adds are exactly the ones a single-border stack never had.
@@ -160,5 +162,17 @@ Work top to bottom. Groups A–B are the hard-dated urgent thread; C–F are the
 - [ ] Per-locale forks replaced with edge translation.
 
 ---
+
+## See it running
+
+Every claim in this guideline is demonstrable on a live store rather than described:
+
+- **The calendar** — the dates above, rendered for humans and for machines from one array: [crm-sync.dev/pages/difference#calendar](https://www.crm-sync.dev/pages/difference#calendar)
+- **Price evidence, fail-closed** — a real markdown with its 30-day window bounds, and a refusal where coverage is short: [crm-sync.dev/pages/omnibus](https://www.crm-sync.dev/pages/omnibus) · raw record: [`/pim/omnibus?handle=asset-sample-model`](https://crm-sync.dev/pim/omnibus?handle=asset-sample-model&shop=segment-data.myshopify.com)
+- **The identity plane** — how a login binds accounts you already own, and why permissions are rows: [Trust With Login](https://persephonepunch.github.io/crm-sync-setup/trust-with-login.html)
+- **The same records on another CMS** — the identical elements rendering on AEM, no data stored there: [trust-login](https://main--livelylynx76577--aemsitestrial.aem.live/trust-login) · [omnibus](https://main--livelylynx76577--aemsitestrial.aem.live/omnibus2)
+- **Server-side or it didn't happen** — the doctrine behind the guideline: [the dev doc](https://persephonepunch.github.io/crm-sync-setup/server-side-or-it-didnt-happen.html)
+- **Machine discovery** — what the estate advertises to agents: [`crm-sync.dev/stack/config`](https://crm-sync.dev/stack/config)
+- **The whole catalog plane, any frontend** — [PIM Anywhere](https://persephonepunch.github.io/crm-sync-setup/pim-anywhere.html)
 
 *The migration is not a theme project with a compliance appendix. It is one move — logic to the server, consent into the data plane — and the theme rebuild is what falls out of it.*
