@@ -16,16 +16,22 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DAWN-HORIZ
 
 Every date below is an obligation that assumes the evidence already exists when it arrives.
 
-| Date | Authority | What changes |
-|---|---|---|
-| 2024-03 | Google | Consent Mode v2 becomes **mandatory** for EEA/UK ads measurement and audiences |
-| 2024-10-01 | Shopify | REST Admin API **declared legacy** |
-| 2025-04 | Shopify | New apps must use the **GraphQL Admin API** |
-| **2026-06-15** | Google | **Google Signals retired** as a control — Consent Mode `ad_storage` becomes the **sole** control over what GA4 sends to Google Ads |
-| **2026-06-30** | Shopify | **Script Editor removed** — surviving Scripts stop silently |
-| **2026-08-18** | Google | **Content API for Shopping shuts down** — product feeds ride the **Merchant API** only |
-| 2027-02 | EU | Battery **Digital Product Passport** — first product class where passport data is mandatory at the border |
-| 2027 | GS1 | **Sunrise 2027** — retail point-of-sale expected to scan 2D barcodes (GS1 Digital Link) |
+| Date | What changes |
+|---|---|
+| **2018** | *Wayfair* (585 U.S. 162) makes tax borders real; GDPR makes consent law. The mandates begin. |
+| **May 2022** | Omnibus Directive applies: 30-day price evidence per market — a ledger obligation, not a lookup. |
+| **2023** | Netflix paid sharing: the first mass entitlement retrofit — built for the fee, not the subject. |
+| **March 2024** | Consent Mode v2 becomes mandatory for EEA conversion measurement — the stack's first enforced consent coordinate. |
+| **June 2024** | FTC v. Adobe filed: subscription exit dark patterns reach federal court. |
+| **October 2024** | Shopify's REST Admin API goes legacy: GraphQL required for new apps; the schema grows weekly. |
+| **June 15 2026** | Google Signals retired as a control — Consent Mode `ad_storage` becomes the sole control of the GA4 → Google Ads flow. |
+| **June 30 2026** | Shopify Script Editor removed — surviving payment, shipping, and discount Scripts stop silently. |
+| **August 2026** · *now* | EU AI Act Article 50 transparency obligations apply. Cloudflare Wallets launches. |
+| **August 18 2026** | Content API for Shopping shuts down. |
+| **September 2026** · *next month* | Cyber Resilience Act vulnerability-reporting obligations begin. |
+| **February 2027** | Battery Digital Product Passport: the first product class where passport data is mandatory at the border. |
+| **2027** | GS1 Sunrise 2027: retail point-of-sale worldwide expected to scan 2D barcodes. The GS1 Digital Link QR becomes the product's on-pack URL — one code carrying identity, passport, and evidence. |
+| **December 2027** | Cyber Resilience Act applies in full — €15M or 2.5% of global turnover. |
 
 Two of these are already behind us and are the ones most estates have not absorbed: since June 15 the consent signal *is* the ads data control, and since June 30 any un-migrated Script is a checkout rule that stopped without an error.
 
