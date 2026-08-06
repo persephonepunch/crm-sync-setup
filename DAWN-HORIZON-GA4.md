@@ -12,6 +12,34 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DAWN-HORIZ
 
 **Immovable clock.** Shopify's Script Editor is removed as of **2026-06-30**. Any reorder/hide-payment, shipping, or line-item-discount Script still live means checkout logic has **silently stopped**. Checkout-touching work and the Scripts→Functions conversion are the urgent thread — do these before the broader theme rebuild.
 
+## The clock, in full
+
+Every date below is an obligation that assumes the evidence already exists when it arrives.
+
+| Date | Authority | What changes |
+|---|---|---|
+| 2024-03 | Google | Consent Mode v2 becomes **mandatory** for EEA/UK ads measurement and audiences |
+| 2024-10-01 | Shopify | REST Admin API **declared legacy** |
+| 2025-04 | Shopify | New apps must use the **GraphQL Admin API** |
+| **2026-06-15** | Google | **Google Signals retired** as a control — Consent Mode `ad_storage` becomes the **sole** control over what GA4 sends to Google Ads |
+| **2026-06-30** | Shopify | **Script Editor removed** — surviving Scripts stop silently |
+| **2026-08-18** | Google | **Content API for Shopping shuts down** — product feeds ride the **Merchant API** only |
+| 2027-02 | EU | Battery **Digital Product Passport** — first product class where passport data is mandatory at the border |
+| 2027 | GS1 | **Sunrise 2027** — retail point-of-sale expected to scan 2D barcodes (GS1 Digital Link) |
+
+Two of these are already behind us and are the ones most estates have not absorbed: since June 15 the consent signal *is* the ads data control, and since June 30 any un-migrated Script is a checkout rule that stopped without an error.
+
+## Globalization and time are first-class in the new API
+
+The Merchant API is not a rename of the Content API — it is a reshape, and the axes it adds are exactly the ones a single-border stack never had.
+
+- **Time is scheduled, not assumed.** Data sources carry explicit fetch settings — `timeZone` (IANA, UTC by default), `frequency`, `dayOfWeek`, `dayOfMonth`, `timeOfDay` — so a feed states *when* it is true, per market, in a declared zone. A nightly job with an implicit server clock is no longer a description of anything.
+- **Location is a declared axis.** Regions, regional inventory, and local inventory are separate resources; availability and price can differ per region without forking the catalog.
+- **Prices changed shape.** `value: string` + `currency: string` becomes `amountMicros: int64` + `currencyCode` — a data-model change, not a rename, and the reason "just repoint the URL" migrations fail.
+- **Identifiers consolidate.** Resource `name` strings replace separate IDs, and `customBatch` gives way to parallel async calls.
+
+The consequence for a global estate: **time zone, region, language, and currency stop being feed columns and become coordinates**. A record that carries them can answer per market; one that doesn't has to be re-exported per market, forever. This is the same fusion argument as above, wearing the feed's clothes — machine-addressable *and* correctly qualified, or neither.
+
 ## GraphQL + GA4 signals — one seismic move, not two chores
 
 Enterprises are forced through two migrations they treat as unrelated: **REST → GraphQL** (REST Admin API declared legacy October 2024; GraphQL required for new apps since April 2025) and **GA4 Consent Mode v2** (four signals — `ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization` — mandatory for EEA/UK ads features since March 2024). The recognition worth having: they are the *same* migration toward one thing — a **consent-gated, agent-addressable data plane**.
