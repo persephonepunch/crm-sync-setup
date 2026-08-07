@@ -1,9 +1,9 @@
 ---
 title: "The Compliance Calendar — 2018 to 2027"
-description: "Every dated obligation shaping commerce data, from GDPR and Wayfair to the Content API sunset, the CRA, and GS1 Sunrise 2027 — all public record. Plus what the calendar obliges of builders: signed non-destructive releases, self-improving test loops that keep their own verdicts, and an adoption path for security that does not wait six months for procurement."
+description: "Every dated obligation shaping commerce data, from GDPR and Wayfair to the Content API sunset, the CRA, and GS1 Sunrise 2027 — all public record, including the two Shopify pixel changes that took effect without asking anything of the merchant. Plus what the calendar obliges of builders: signed non-destructive releases, self-improving test loops that keep their own verdicts, and an adoption path for security that does not wait six months for procurement."
 canonical: https://persephonepunch.github.io/crm-sync-setup/compliance-calendar.html
 category: "Global"
-date: 2026-08-06
+date: 2026-08-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/COMPLIANCE-CALENDAR.md
 ---
 # The compliance calendar — 2018 to 2027
