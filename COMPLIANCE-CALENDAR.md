@@ -31,17 +31,24 @@ Every entry below is public record — a statute, a published ruling or enforcem
 | 2025-04 | Shopify | **New apps must use the GraphQL Admin API** — typed, bulk, server-resolved becomes the only forward path. |
 | 2025-05 | US (CPPA) | **Enforcement action over roughly forty days of silently failed opt-outs** ($345,178). A broken consent path is an enforcement event, not a bug report. |
 | 2025-12-09 | Google | **Data Manager API launches** — one ingestion point for first-party data across Ads, Analytics, and DV360. |
+| 2025-12-10 | Shopify | **Web pixel payloads redact customer PII** — email, phone, name, and address return null for apps without approved protected-customer-data access. |
+| 2026-01-13 | Shopify | **Marketing app pixels default to "Optimized"** — the platform may pause some or all of a pixel's data sharing when it judges the signal is not useful. |
+| 2026-02-28 | Google | **Merchant API v1beta retired.** Integrations must be on v1. |
 | 2026-04 | Google | Enhanced conversions for web and leads **unified into a single toggle**, accepting tag, Data Manager, and API sources together. |
 | **2026-06-15** | Google | **Google Signals retired as a control.** Consent Mode `ad_storage` becomes the *sole* control over what GA4 sends to Google Ads. |
 | **2026-06-30** | Shopify | **Script Editor removed.** Surviving payment, shipping, and discount Scripts stop — silently. |
 | **2026-08-02** | EU | **AI Act Article 50 transparency obligations apply.** |
-| **2026-08-18** | Google | **Content API for Shopping shuts down.** Product feeds ride the Merchant API only — regions, ISO time, `amountMicros`. |
+| **2026-08-18** | Google | **Content API for Shopping shuts down.** Product feeds ride the Merchant API only — regions, ISO time, `amountMicros`. Feed labels do not carry over automatically. |
 | 2026-09 | EU | **Cyber Resilience Act vulnerability-reporting obligations begin.** |
+| **2026-10** | Shopify | **Customer Account API removes `Customer.lastIncompleteCheckout`** and the Checkout Classic types. |
+| **2026 H2 — date not yet announced** | Google | **Second consolidation wave.** Ads personalization moves out of GA4 into Google Ads under `ad_personalization`; tag-collected IP addresses are encrypted and flow to the linked Ads account rather than staying in Analytics. |
+| **2026 H2 — date not yet announced** | Shopify | **Final sunset date for legacy customer accounts** to be announced. The deprecation is already in force: no new features, no support, unavailable to new stores. |
+| 2027-01 | Shopify | Fields deprecated in the 2026-10 release are **removed**. The overlap is roughly nine months, every release. |
 | 2027-02 | EU | **Battery Digital Product Passport** — the first product class where passport data is mandatory at the border. |
 | 2027 | GS1 | **Sunrise 2027** — retail point-of-sale expected to scan 2D barcodes (GS1 Digital Link). |
 | 2027-12 | EU | **Cyber Resilience Act applies in full.** |
 
-Three of these are already behind us and are the ones most estates have not absorbed: the consent signal is *already* the ads data control, any un-migrated Script has *already* stopped, and the feed deadline is weeks away, not quarters.
+Several of these are already behind us, and those are the ones most estates have not absorbed: the consent signal is *already* the ads data control, any un-migrated Script has *already* stopped, third-party pixels *already* receive less than they used to and can *already* be paused by the platform — and the feed deadline is weeks away, not quarters. Two entries carry no date at all yet, which is its own kind of planning problem: an obligation you can see coming but cannot schedule around.
 
 ## What replaced Google Signals — and why it moves work onto you
 
@@ -80,6 +87,33 @@ conversions, and no way to explain either. Same date, same platform change,
 opposite outcomes — decided entirely by whether the records existed beforehand.
 
 *The live version of this calendar — the same rows plus a machine-readable JSON block — is at [crm-sync.dev/pages/difference#calendar](https://www.crm-sync.dev/pages/difference#calendar).*
+
+## When the platform changes the pipe and nobody tells the record
+
+Two Shopify entries above are unusual, because they are the only changes in this
+calendar that took effect **without requiring anything of the merchant** — and
+without leaving a mark on the merchant's side.
+
+On 10 December 2025, web pixel payloads began returning null for email, phone,
+name, and address to any app without approved protected-customer-data access.
+Five weeks later, on 13 January 2026, marketing app pixels moved to an
+"Optimized" default, under which the platform monitors pixels and may pause some
+or all of a pixel's data sharing when it judges the signal is not useful.
+
+Read those together and the implication is uncomfortable in a specific way.
+**What a merchant's own records say was sent, and what was actually sent, can now
+diverge with no event on the merchant's side.** No error, no notification, no row.
+The tool still renders. The dashboard still populates, thinner. This is the same
+failure shape as an opt-out that silently fails to take effect — a path that
+stops working while every interface reports health — except the cause is a
+platform default rather than a misconfiguration, so no amount of care on the
+merchant's part would have surfaced it.
+
+The mitigation is not to argue with the platform's judgement, which is often
+correct. It is to hold a record on your own side that can be *compared* to the
+platform's behaviour: what you believe you sent, to which destination, for which
+subject, under which consent posture. A divergence you can see is an operational
+finding. A divergence you cannot see is what a discovery request finds for you.
 
 ## What the calendar actually asks for
 
