@@ -30,6 +30,8 @@ Every entry below is public record — a statute, a published ruling or enforcem
 | 2024-10-01 | Shopify | **REST Admin API declared legacy.** The GraphQL-first turn begins. |
 | 2025-04 | Shopify | **New apps must use the GraphQL Admin API** — typed, bulk, server-resolved becomes the only forward path. |
 | 2025-05 | US (CPPA) | **Enforcement action over roughly forty days of silently failed opt-outs** ($345,178). A broken consent path is an enforcement event, not a bug report. |
+| 2025-12-09 | Google | **Data Manager API launches** — one ingestion point for first-party data across Ads, Analytics, and DV360. |
+| 2026-04 | Google | Enhanced conversions for web and leads **unified into a single toggle**, accepting tag, Data Manager, and API sources together. |
 | **2026-06-15** | Google | **Google Signals retired as a control.** Consent Mode `ad_storage` becomes the *sole* control over what GA4 sends to Google Ads. |
 | **2026-06-30** | Shopify | **Script Editor removed.** Surviving payment, shipping, and discount Scripts stop — silently. |
 | **2026-08-02** | EU | **AI Act Article 50 transparency obligations apply.** |
@@ -40,6 +42,42 @@ Every entry below is public record — a statute, a published ruling or enforcem
 | 2027-12 | EU | **Cyber Resilience Act applies in full.** |
 
 Three of these are already behind us and are the ones most estates have not absorbed: the consent signal is *already* the ads data control, any un-migrated Script has *already* stopped, and the feed deadline is weeks away, not quarters.
+
+## What replaced Google Signals — and why it moves work onto you
+
+The June 15 change is usually read as one toggle being retired. It is bigger than
+that: **two different things were replaced, the control and the data model.**
+
+**The control moved to consent.** Google Signals stopped being a co-controller of
+what Analytics sends to Google Ads; the Consent Mode `ad_storage` parameter now
+decides alone. Signals still exists, demoted to a reporting toggle inside
+Analytics — whether Analytics data is associated with signed-in user information
+for behavioural reports. It governs a *view*, no longer a *flow*.
+
+**The data model moved from Google's identity graph to yours.** Signals was
+Google's own cross-device graph, assembled from signed-in Google users and
+borrowed by advertisers. What replaced it is first-party data, hashed and matched:
+Enhanced Conversions, Customer Match, and the **Data Manager API** — launched
+9 December 2025 as a single ingestion point for first-party data across Google Ads,
+Analytics, and Display & Video 360 — with enhanced conversions for web and leads
+unified into one toggle in April 2026.
+
+Read as a sequence, the intent is unmistakable:
+
+> Consent Mode v2 (2023–24) → Enhanced Conversions (2024) → Data Manager
+> (December 2025) → Signals demoted (15 June 2026).
+
+Google spent three years replacing *its* identity graph with *your* first-party
+data, gated by consent. Targeting was not removed; **the burden of identity was
+moved onto the merchant.**
+
+The consequence is uneven, and it is the reason this calendar is a strategy
+document rather than a compliance one. An organisation holding a real consent
+record and a genuine first-party identity spine now gets *sharper* measurement
+than it had under Signals — its own data, matched, with lineage. An organisation
+holding a banner and no record gets shrinking remarketing lists, modelled
+conversions, and no way to explain either. Same date, same platform change,
+opposite outcomes — decided entirely by whether the records existed beforehand.
 
 *The live version of this calendar — the same rows plus a machine-readable JSON block — is at [crm-sync.dev/pages/difference#calendar](https://www.crm-sync.dev/pages/difference#calendar).*
 
