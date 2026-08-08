@@ -94,6 +94,65 @@ Setup is a CLI-and-console sitting; the runtime adds **no new infrastructure dep
 
 ---
 
+## 4b. The Merchant calendar — two retirement dates, one checklist
+
+Google is retiring its batch-era surfaces on a published calendar. Both dates share a
+property worth taking seriously: **nothing errors when you miss them.** A feed simply
+stops refreshing, listings go stale and are then disqualified — and the reporting keeps
+rendering the whole time.
+
+| Date | What retires | What replaces it |
+|---|---|---|
+| **April 1, 2026** | Customer Match list uploads via the Ads API | **Data Manager API** — per-member consent fields required on the wire (§1) |
+| **August 18, 2026** | **Content API for Shopping** | **[Merchant API](https://developers.google.com/merchant/api)** — API-native data sources only |
+
+After August 18 there is no rollback path: the old surface no longer exists. A cutover
+that fails on the 19th has no reverse gear — which is why the checklist below ends with a
+written contingency, not a general assurance.
+
+**The migration is coupled.** A product feed *reads* the catalog from the commerce
+platform and *writes* it to Google, and both sides changed: Shopify moved catalog reads
+to the **GraphQL Admin API**, and Google is moving writes to the **Merchant API**. You
+cannot push a catalog you can no longer retrieve — so the read side must work before the
+write side can. (Note the layer distinction: Liquid renders pages; the Admin API is how
+anything reads the catalog programmatically. "We only use Liquid" is a statement about
+the theme, not an answer to how a feed gets its data.)
+
+**Why the API replaces the spreadsheet.** In the Merchant API, a feed is a declared
+[`accounts.dataSources`](https://developers.google.com/merchant/api/reference/rest/datasources_v1/accounts.dataSources#productreviewdatasource)
+resource whose `FetchSettings` carry `frequency` (required), `timeOfDay`, and an IANA
+`timeZone` (UTC by default) — the fetch calendar is part of the API contract, and every
+sync is timestamped on both sides. A CSV upload has none of that: **you cannot verify a
+timestamp with a file someone loaded.** The same resource model carries primary,
+supplemental, inventory, promotion, and product-review data sources — current-state
+syndication, keyed to the identifiers (GTIN / MPN) your catalog and analytics already
+share.
+
+**The deadline checklist:**
+
+1. **Check the data source type on every feed** in Merchant Center — five minutes, no
+   dependencies. Anything still reading "Content API" is on the August 18 clock.
+2. **Confirm the read side:** the Shopify GraphQL Admin API is enabled and serving
+   catalog reads today (the REST Admin API is retired; a Liquid theme does not answer
+   this question).
+3. **Confirm the write side:** feeds are declared as Merchant API `dataSources` — with
+   `frequency` and `timeZone` set explicitly, not inherited from a file-upload habit.
+4. **Key rows to identifiers** (GTIN / MPN) so listings, orders, and analytics join to
+   the same product entity in real time.
+5. **Prove the timestamps:** price and availability updates flow through the API with
+   verifiable sync times — the same evidence discipline as an Omnibus price history.
+   If your compliance story depends on *when* data was true, batch files cannot carry it.
+6. **Get the contingency in writing before the date, not during it:** how long until a
+   stale feed is detected, what the recovery path is now that rollback does not exist,
+   and who is on call that day. If it proves unnecessary, it cost an afternoon.
+
+For CRM Sync merchants: this platform does not run a Content API feed — product identity
+publishes through structured data and the API-native rails above, so the retirement is a
+calendar entry here, not a migration. The checklist exists because most stacks are not in
+that position.
+
+---
+
 ## 5. The warehouse feed
 
 Deltas come off a **sync queue**, not a timestamp watermark — the queue gives idempotency, retry, and dead-lettering, and keeps the feed inside the audit chain (watermarks silently miss hard-deletes).
