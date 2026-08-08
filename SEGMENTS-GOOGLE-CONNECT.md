@@ -151,6 +151,35 @@ publishes through structured data and the API-native rails above, so the retirem
 calendar entry here, not a migration. The checklist exists because most stacks are not in
 that position.
 
+## 4c. Two doors into Google — the feed and the SERP
+
+Product presence in Google is two channels off **one identifier**, and a store wins by
+keeping them consistent, not by choosing between them:
+
+- **The feed → Shopping & free listings.** The Merchant API `dataSources` above push the
+  catalog into Merchant Center; that is what populates Google Shopping, free product
+  listings, and the shopping surfaces AI agents transact against. Keyed on GTIN / MPN.
+- **On-page JSON-LD → the organic SERP.** The same product page carries
+  [`schema.org/Product` + `Offer`](https://www.crm-sync.dev/products/download-app)
+  structured data, which is what earns the organic rich result (price, availability,
+  review stars) and lets answer engines cite the product. Keyed on the **same** GTIN / MPN.
+
+When the feed row and the page's JSON-LD disagree — a price in one, a different price in
+the other — Google distrusts both, and a merchant usually never sees why. The fix is
+structural: publish product identity from **one record** so the Merchant feed and the
+page's JSON-LD are two projections of it, not two hand-maintained copies. That is the
+[PIM-plane model](pim-anywhere.html) — the catalog as a plane, not a page — where the same
+record ships to Google through the Merchant API *and* renders as JSON-LD on every
+front-end. See [`PIM-ANYWHERE.md`](pim-anywhere.html) for the projection mechanism and
+[`FRAGMENTS-ANY-FRONTEND.md`](fragments-any-frontend.html) for how one record renders
+identically across Shopify, Webflow, AEM, and plain HTML.
+
+**Why this matters for traffic:** the readers arriving at this article and the shoppers
+running Google/Shopify product searches are the same audience one step apart — a question
+about the mechanism, and a search for the product it produces. Cross-linking the two (the
+deadline mechanics here → the product surfaces and their structured data) keeps that
+traffic inside surfaces you own instead of leaking it to a generic result.
+
 ---
 
 ## 5. The warehouse feed
@@ -346,3 +375,6 @@ already keeps.
 - [`ARCHITECTURE.md`](architecture.html) — where the worker, data layer, and consent plane sit.
 - [`KEY-MANAGEMENT-LIFECYCLE`](key-management-lifecycle.html) — the ceremony that admits the service-account credential.
 - [`GLOBAL-PAYOUTS.md`](https://persephonepunch.github.io/crm-sync-setup/GLOBAL-PAYOUTS.md) — the settlement side of the same market boundaries the Nations domain scopes.
+- [`PIM-ANYWHERE.md`](pim-anywhere.html) — the catalog as a plane: one record → Merchant API feed **and** on-page JSON-LD, so Shopping listings and organic SERP rich results never disagree (§4c).
+- [`FRAGMENTS-ANY-FRONTEND.md`](fragments-any-frontend.html) — how that one record renders identically across Shopify, Webflow, AEM, and plain HTML.
+- [`SHOPIFY-2026-RISK-BRIEF.md`](https://persephonepunch.github.io/crm-sync-setup/SHOPIFY-2026-RISK-BRIEF.md) — the August 18 Content API retirement and the coupled GraphQL read-side in risk-brief form (§4b).
