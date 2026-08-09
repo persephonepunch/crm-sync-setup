@@ -1,6 +1,6 @@
 ---
 title: "Permissions for AI, in plain terms — capability, not perimeter"
-description: "Permissions for AI agents in plain 1-2-3: what RBAC, ABAC, RuBAC, OIDC and OAuth mean, why a filesystem perimeter + Next.js RBAC breaks for AI, and three use cases — household streaming, HIPAA remote 3D printing, and a private mortgage. Money- and privacy-gated. Own your auth (Google/Shopify), run everywhere."
+description: "Permissions for AI agents in plain 1-2-3: what RBAC, ABAC, RuBAC, OIDC and OAuth mean, why a filesystem perimeter + Next.js RBAC breaks for AI, and four use cases — household streaming, HIPAA remote 3D printing, a private mortgage, and a dark warehouse where robots read GS1 QR (Sunrise 2027). Money- and privacy-gated. Own your auth (Google/Shopify), run everywhere."
 canonical: https://persephonepunch.github.io/crm-sync-setup/capability-not-perimeter.html
 category: "Security"
 date: 2026-08-09
@@ -48,13 +48,14 @@ Role-based access control is the right answer to a question we no longer only as
 
 ---
 
-## Permissions for AI — three real-world proofs
+## Permissions for AI — four real-world proofs
 
-The theory is one thing; here is what minting actually *does* across three industries — the same model against three problems people feel every day. This is the selling point.
+The theory is one thing; here is what minting actually *does* across four settings — the same model against four problems people feel every day. This is the selling point.
 
 1. **Streaming, for a household.** Stop sharing **one password** (a key to everything, un-revocable, un-auditable). **Mint five scoped grants** — one per member/device. Kick one person off = delete one grant; the other four keep working.
 2. **Remote 3D printing of a medical device (HIPAA).** A print file, once sent, is shared forever with no record. Instead, the master stays encrypted and you **mint a per-print grant** — single-use (idempotency key), bound to that printer's device session. Every print is a signed ledger row: chain of custody as a side effect. *(This is the [prosthetics demo](https://crm-sync.dev/demo/prosthetics).)*
 3. **Qualifying for a mortgage, privately.** Don't hand the lender your SSN, statements, and tax returns. **Mint a verification grant** that proves the predicates — *income ≥ X ✓, DTI ≤ Y ✓, identity ✓* — without surrendering the documents. The lender verifies the **proof**, not a **copy**. Prove the predicate; keep the data.
+4. **The dark warehouse — robots read the QR (GS1 Sunrise 2027).** It isn't only *agents who shop*; it's **robots who inventory stock and run deliveries** in a lights-out warehouse. Each robot **reads the GS1 Digital Link QR** on the item and acts on a **scoped, expiring mandate** — pick, count, move, ship — verified against the running ledger, with device, screen, and application recorded per scan. This is a new capability a **CPG company can build on the QR Sunrise 2027 rollout**: the same QR that carries the product's identity to a shopper carries the *instruction* to a machine. You don't share a password with a robot — you **grant** it a mandate, and **revoke** it the moment the shift ends.
 
 ---
 
@@ -71,6 +72,8 @@ No role model does both. RBAC has no money dimension and no consent dimension. *
 <img src="https://crm-sync.dev/kb/media/docs/aug18-revenue-comparison.svg" alt="August 18, 2026 — CSV/PMax by app vs Permissions/Consent: same cohort, $0 captured vs $670 value-weighted" style="width:100%;display:block;border:1px solid #B8B0A4;background:#EDE8E0" loading="lazy">
 <figcaption style="font-size:0.9rem;color:#555;margin-top:0.5rem">August 18: the same consented cohort earns <strong>$0</strong> through a CSV/PMax app (emails only, rails rejected) vs a value-weighted <strong>$670</strong> ($223 avg) through consented, timestamped permissions. Demo cohort, sanitized.</figcaption>
 </figure>
+
+**A date makes it accessible — it isn't a doomsday.** August 18 isn't a disaster to absorb, and it isn't "your agency should have done this." It's a *legible deadline with an immediate fix*: you don't need a post-mortem or someone to blame — you need a grant, and you can issue it today. A date you can act on beats a threat you can't.
 
 ## Why the stakes are enterprise, not startup — the single dev vs. the compliance team
 
