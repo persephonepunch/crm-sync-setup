@@ -62,6 +62,10 @@ The theory is one thing; here is what minting actually *does* across five settin
 
 **Every one of these makes the solution more relatable** — to the tradesman on the warehouse floor *and*, just as much, to the tech lead who loves Next.js and Tailwind. For that tech lead the lesson is blunt: a beautiful perimeter — however well-built — is **simply not enough**. The moment a robot, an agent, or a consented user needs to *act*, a wall that only knows how to say *no* can't grant, can't scope, can't revoke, can't record. Capability can.
 
+### Is Tailwind or Next.js enough for AI? (short answer: no)
+
+**Is Tailwind enough for AI? Is Next.js RBAC enough for agentic checkout?** No — Tailwind and Next.js build a beautiful front end and a tidy perimeter, but a perimeter only knows how to say *no*. AI agents, robots, and consented users need to **act**: grant, scope, revoke, record. That is a capability model, not a wall. For AI, a great **Tailwind / Next.js** build is **simply not enough** — the framework renders the door; it does not decide who may open it, for how long, or leave a signed record that they did.
+
 ## Why it's money AND privacy gated (the unique part)
 
 Every principal — a **Peer**, a **Household** member, or an **AI agent** — is gated on **both** dimensions at once:
