@@ -11,7 +11,11 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY
 **For:** BAs, growth marketers, CISOs/DPOs, and the Next.js/Tailwind devs who handle permissions the "senior-dev" way.
 **See it live:** [prosthetics demo](https://crm-sync.dev/demo/prosthetics) · [building-inspection demo](https://crm-sync.dev/demo/inspection).
 
-<video controls preload="metadata" playsinline width="100%" style="max-width:760px;display:block;margin:1.25rem 0;border:1px solid #B8B0A4;background:#EDE8E0" src="https://crm-sync.dev/kb/media/videos/capability-not-perimeter.mp4">Your browser can&rsquo;t play this video &mdash; <a href="https://crm-sync.dev/kb/media/videos/capability-not-perimeter.mp4">download it</a>.</video>
+<div style="max-width:760px;margin:1.25rem 0"><div style="position:relative;padding-top:56.25%"><iframe src="https://www.youtube-nocookie.com/embed/Zi5ok36ptXo" style="position:absolute;top:0;left:0;width:100%;height:100%;border:1px solid #B8B0A4" title="Agentic Checkout Needs More Than RBAC — permissions for AI agents (Next.js)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></div>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoObject","name":"Agentic Checkout Needs More Than RBAC — permissions for AI agents (Next.js)","description":"Why capability-based permissions beat RBAC for AI agents at checkout: a signed grant for one action on one record, minted, just-in-time, revocable, verifiable — a PMax-era alternative to Next.js RBAC.","thumbnailUrl":["https://i.ytimg.com/vi/Zi5ok36ptXo/maxresdefault.jpg"],"uploadDate":"2026-08-09","duration":"PT2M24S","contentUrl":"https://www.youtube.com/watch?v=Zi5ok36ptXo","embedUrl":"https://www.youtube.com/embed/Zi5ok36ptXo","publisher":{"@type":"Organization","name":"CRM Sync","logo":{"@type":"ImageObject","url":"https://www.crm-sync.dev/favicon.png"}},"keywords":"agentic checkout, permissions for AI, capability-based access control, RBAC, ABAC, Next.js, OAuth, OIDC"}
+</script>
 
 **Watch the 2-minute explainer above**, then do what its **last screen** says: scan or visit **[crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** to try it.
 
