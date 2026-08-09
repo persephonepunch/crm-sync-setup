@@ -48,7 +48,9 @@ Role-based access control is the right answer to a question we no longer only as
 
 ---
 
-## Permissions for AI — three use cases
+## Permissions for AI — three real-world proofs
+
+The theory is one thing; here is what minting actually *does* across three industries — the same model against three problems people feel every day. This is the selling point.
 
 1. **Streaming, for a household.** Stop sharing **one password** (a key to everything, un-revocable, un-auditable). **Mint five scoped grants** — one per member/device. Kick one person off = delete one grant; the other four keep working.
 2. **Remote 3D printing of a medical device (HIPAA).** A print file, once sent, is shared forever with no record. Instead, the master stays encrypted and you **mint a per-print grant** — single-use (idempotency key), bound to that printer's device session. Every print is a signed ledger row: chain of custody as a side effect. *(This is the [prosthetics demo](https://crm-sync.dev/demo/prosthetics).)*
