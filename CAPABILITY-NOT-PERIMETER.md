@@ -60,6 +60,8 @@ The theory is one thing; here is what minting actually *does* across five settin
 
 ---
 
+**Every one of these makes the solution more relatable** — to the tradesman on the warehouse floor *and*, just as much, to the tech lead who loves Next.js and Tailwind. For that tech lead the lesson is blunt: a beautiful perimeter — however well-built — is **simply not enough**. The moment a robot, an agent, or a consented user needs to *act*, a wall that only knows how to say *no* can't grant, can't scope, can't revoke, can't record. Capability can.
+
 ## Why it's money AND privacy gated (the unique part)
 
 Every principal — a **Peer**, a **Household** member, or an **AI agent** — is gated on **both** dimensions at once:
