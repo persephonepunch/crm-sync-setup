@@ -63,6 +63,11 @@ Every principal — a **Peer**, a **Household** member, or an **AI agent** — i
 
 No role model does both. RBAC has no money dimension and no consent dimension. **The moment the search runs, if a consented, ISO-timestamped grant exists → conversion + a value-weighted (pLTV) audience is enabled — for free.** Behind a fortress RBAC perimeter, the dynamic AI function is *never enabled at all*, so the sale never happens. Security that **sells**, not security that only blocks.
 
+<figure style="margin:1.5rem 0;max-width:900px">
+<img src="https://crm-sync.dev/kb/media/docs/aug18-revenue-comparison.svg" alt="August 18, 2026 — CSV/PMax by app vs Permissions/Consent: same cohort, $0 captured vs $670 value-weighted" style="width:100%;display:block;border:1px solid #B8B0A4;background:#EDE8E0" loading="lazy">
+<figcaption style="font-size:0.9rem;color:#555;margin-top:0.5rem">August 18: the same consented cohort earns <strong>$0</strong> through a CSV/PMax app (emails only, rails rejected) vs a value-weighted <strong>$670</strong> ($223 avg) through consented, timestamped permissions. Demo cohort, sanitized.</figcaption>
+</figure>
+
 ## Why the stakes are enterprise, not startup — the single dev vs. the compliance team
 
 1. **The single dev.** A Turbopack/Tailwind developer builds you a fast, **responsive** e-commerce theme; the agency invoices for it; everyone moves on. A theme is a *look*. **A theme is not a system of record.**
