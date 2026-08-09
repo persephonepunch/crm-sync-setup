@@ -1,6 +1,6 @@
 ---
 title: "Permissions for AI, in plain terms — capability, not perimeter"
-description: "Permissions for AI agents in plain 1-2-3: what RBAC, ABAC, RuBAC, OIDC and OAuth mean, why a filesystem perimeter + Next.js RBAC breaks for AI, and four use cases — household streaming, HIPAA remote 3D printing, a private mortgage, and a dark warehouse where robots read GS1 QR (Sunrise 2027). Money- and privacy-gated. Own your auth (Google/Shopify), run everywhere."
+description: "Permissions for AI agents in plain 1-2-3: what RBAC, ABAC, RuBAC, OIDC and OAuth mean, why a filesystem perimeter + Next.js RBAC breaks for AI, and five use cases — household streaming, HIPAA remote 3D printing, a private mortgage, a dark warehouse where robots read GS1 QR (Sunrise 2027), and a geo-verified BIM building inspection. Money- and privacy-gated. Own your auth (Google/Shopify), run everywhere."
 canonical: https://persephonepunch.github.io/crm-sync-setup/capability-not-perimeter.html
 category: "Security"
 date: 2026-08-09
@@ -48,14 +48,15 @@ Role-based access control is the right answer to a question we no longer only as
 
 ---
 
-## Permissions for AI — four real-world proofs
+## Permissions for AI — five real-world proofs
 
-The theory is one thing; here is what minting actually *does* across four settings — the same model against four problems people feel every day. This is the selling point.
+The theory is one thing; here is what minting actually *does* across five settings — the same model against five problems people feel every day. This is the selling point.
 
 1. **Streaming, for a household.** Stop sharing **one password** (a key to everything, un-revocable, un-auditable). **Mint five scoped grants** — one per member/device. Kick one person off = delete one grant; the other four keep working.
 2. **Remote 3D printing of a medical device (HIPAA).** A print file, once sent, is shared forever with no record. Instead, the master stays encrypted and you **mint a per-print grant** — single-use (idempotency key), bound to that printer's device session. Every print is a signed ledger row: chain of custody as a side effect. *(This is the [prosthetics demo](https://crm-sync.dev/demo/prosthetics).)*
 3. **Qualifying for a mortgage, privately.** Don't hand the lender your SSN, statements, and tax returns. **Mint a verification grant** that proves the predicates — *income ≥ X ✓, DTI ≤ Y ✓, identity ✓* — without surrendering the documents. The lender verifies the **proof**, not a **copy**. Prove the predicate; keep the data.
 4. **The dark warehouse — robots read the QR (GS1 Sunrise 2027).** It isn't only *agents who shop*; it's **robots who inventory stock and run deliveries** in a lights-out warehouse. Each robot **reads the GS1 Digital Link QR** on the item and acts on a **scoped, expiring mandate** — pick, count, move, ship — verified against the running ledger, with device, screen, and application recorded per scan. This is a new capability a **CPG company can build on the [QR Sunrise 2027](https://www.gs1us.org/industries-and-insights/by-topic/sunrise-2027) rollout**: the same QR that carries the product's identity to a shopper carries the *instruction* to a machine. You don't share a password with a robot — you **grant** it a mandate, and **revoke** it the moment the shift ends. The QR Sunrise 2027 migration isn't a single feature — it's a **whole category of startups** this model can stand up.
+5. **A geo-verified building inspection (BIM), for the architect.** An inspector shouldn't walk away with a permanent copy of the whole building model. **Mint a grant bound to the site** — *geo-verified to the device standing in the building* — that opens the relevant BIM layer for the visit and closes after. Every inspection is a signed, **located** ledger row: who, where, when, and which model version. *(This is the [BIM inspection demo](https://crm-sync.dev/demo/inspection).)*
 
 ---
 
