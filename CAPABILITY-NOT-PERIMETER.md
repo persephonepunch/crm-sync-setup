@@ -76,6 +76,12 @@ No role model does both. RBAC has no money dimension and no consent dimension. *
 
 That is the whole difference: a theme is thrown away and re-bought; a utility with the flags built in is written once and carried everywhere.
 
+## Log in with what you already have — extended to your peers and agents
+
+1. **No new account.** Users sign in with the accounts they already have — **Google OAuth** and **Shopify OAuth**. `auth/me` resolves *who this request is* at the moment it happens; there's no password for you to store and no credential to leak. Own your auth, don't rent it.
+2. **One identity, extended to the network.** The same authorization utility reaches past the individual to their **peers** (human teammates) and their **agents** (AI acting under a mandate). You don't provision a separate login for each — you **invite a peer** or **grant an agent**, and each is a scoped, revocable capability issued off that one identity.
+3. **Frictionless updating.** Because authorization is a **utility, not a rebuild**, changing who can do what — add a peer, revoke an agent, widen or narrow a scope — is a *data change* that propagates instantly across every surface. No redeploy, no re-implementation, no waiting on the developer who left. Grant is an insert, revoke is a delete, and it's live everywhere the moment you make it.
+
 ## Vanilla, everywhere — own your auth, don't rent it
 
 CRM Sync **owns its auth** — Google OAuth + Shopify OAuth, resolved by `auth/me` — instead of renting a "buy-auth" vendor (Cognito, Clerk, permit.io, Okta, Better Auth) whose fees and egress grow with you. The output is **vanilla**: the same grant gates **Shopify, Webflow, WordPress, Drupal, Sitecore, Adobe Experience Manager, Salesforce Experience Cloud, Azure, and AWS** — including legacy stacks a framework runtime can't reach. It is **described at the edge, per request** — not compiled into one frontend bundle (one build = one point of failure).
