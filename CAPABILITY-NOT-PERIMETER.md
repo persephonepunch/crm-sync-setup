@@ -81,6 +81,7 @@ That is the whole difference: a theme is thrown away and re-bought; a utility wi
 1. **No new account.** Users sign in with the accounts they already have — **Google OAuth** and **Shopify OAuth**. `auth/me` resolves *who this request is* at the moment it happens; there's no password for you to store and no credential to leak. Own your auth, don't rent it.
 2. **One identity, extended to the network.** The same authorization utility reaches past the individual to their **peers** (human teammates) and their **agents** (AI acting under a mandate). You don't provision a separate login for each — you **invite a peer** or **grant an agent**, and each is a scoped, revocable capability issued off that one identity.
 3. **Frictionless updating.** Because authorization is a **utility, not a rebuild**, changing who can do what — add a peer, revoke an agent, widen or narrow a scope — is a *data change* that propagates instantly across every surface. No redeploy, no re-implementation, no waiting on the developer who left. Grant is an insert, revoke is a delete, and it's live everywhere the moment you make it.
+4. **No app bound to a desktop.** Reset your password, invite team and household members — all self-service, with **no native app to download and no install locked to one machine**. Because the output is vanilla, the same login and grants work on **TVs, IoT devices, game worlds, and the CRM/CMS systems you already have** — not just a browser on a laptop.
 
 ## Vanilla, everywhere — own your auth, don't rent it
 
