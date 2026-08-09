@@ -9,8 +9,11 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY
 # Permissions for AI, in plain terms — capability, not perimeter
 
 **For:** BAs, growth marketers, CISOs/DPOs, and the Next.js/Tailwind devs who handle permissions the "senior-dev" way.
-**Watch first:** the 2-minute explainer — then do what its **last screen** says: scan or visit **[crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** to try it. *(Video: `<!-- YouTube embed — fill VIDEO_ID on publish -->`.)*
 **See it live:** [prosthetics demo](https://crm-sync.dev/demo/prosthetics) · [building-inspection demo](https://crm-sync.dev/demo/inspection).
+
+<video controls preload="metadata" playsinline width="100%" style="max-width:760px;display:block;margin:1.25rem 0;border:1px solid #B8B0A4;background:#EDE8E0" src="https://crm-sync.dev/kb/media/videos/capability-not-perimeter.mp4">Your browser can&rsquo;t play this video &mdash; <a href="https://crm-sync.dev/kb/media/videos/capability-not-perimeter.mp4">download it</a>.</video>
+
+**Watch the 2-minute explainer above**, then do what its **last screen** says: scan or visit **[crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** to try it.
 
 Role-based access control is the right answer to a question we no longer only ask. RBAC answers *"is this **person** allowed in?"* But the actor is now often an **AI agent**, and an agent is inside the perimeter by definition. Here it is in plain terms.
 
