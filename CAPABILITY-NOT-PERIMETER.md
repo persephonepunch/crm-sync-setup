@@ -17,7 +17,7 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY
 {"@context":"https://schema.org","@type":"VideoObject","name":"Agentic Checkout Needs More Than RBAC — permissions for AI agents (Next.js)","description":"Why capability-based permissions beat RBAC for AI agents at checkout: a signed grant for one action on one record, minted, just-in-time, revocable, verifiable — a PMax-era alternative to Next.js RBAC.","thumbnailUrl":["https://i.ytimg.com/vi/Zi5ok36ptXo/maxresdefault.jpg"],"uploadDate":"2026-08-09","duration":"PT2M24S","contentUrl":"https://www.youtube.com/watch?v=Zi5ok36ptXo","embedUrl":"https://www.youtube.com/embed/Zi5ok36ptXo","publisher":{"@type":"Organization","name":"CRM Sync","logo":{"@type":"ImageObject","url":"https://www.crm-sync.dev/favicon.png"}},"keywords":"agentic checkout, permissions for AI, capability-based access control, RBAC, ABAC, Next.js, OAuth, OIDC"}
 </script>
 
-**Watch the 2-minute explainer above**, then do what its **last screen** says: scan or visit **[crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** to try it.
+**Watch the 2-minute explainer above.** Then **claim a discount** &mdash; this link applies it automatically at checkout: **[crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)**.
 
 Role-based access control is the right answer to a question we no longer only ask. RBAC answers *"is this **person** allowed in?"* But the actor is now often an **AI agent**, and an agent is inside the perimeter by definition. Here it is in plain terms.
 
@@ -109,7 +109,7 @@ CRM Sync **owns its auth** — Google OAuth + Shopify OAuth, resolved by `auth/m
 
 Watch the 2-minute explainer to the end, then do exactly what the final screen shows:
 
-> **Scan the QR, or visit [crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** — the grant applies, and you can try it.
+> **Scan the QR, or visit [crm-sync.dev/r/du2qxzd](https://crm-sync.dev/r/du2qxzd)** — your discount is applied automatically at checkout.
 
 *Verify any grant yourself against the public key at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json). No account required — that is the point.*
 
