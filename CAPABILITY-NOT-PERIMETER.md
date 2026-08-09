@@ -113,4 +113,11 @@ Watch the 2-minute explainer to the end, then do exactly what the final screen s
 
 *Verify any grant yourself against the public key at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json). No account required — that is the point.*
 
+**Also view — [Better than PMax](https://youtu.be/70oetzntjzQ)** (the same architecture, for growth): reach the customer the minute they search. Scan the code on the last screen, or watch on YouTube.
+
+<figure style="margin:1.25rem 0;max-width:720px">
+<a href="https://youtu.be/70oetzntjzQ"><img src="https://crm-sync.dev/kb/media/docs/pltv-lastscreen.jpg" alt="Better than PMax — the video's last screen with a scan-to-try QR (50% off)" style="width:100%;display:block;border:1px solid #B8B0A4" loading="lazy"></a>
+<figcaption style="font-size:0.9rem;color:#555;margin-top:0.5rem">Also view &mdash; <a href="https://youtu.be/70oetzntjzQ">Better than PMax: reach the buyer the minute they search</a>. Scan the QR on the last screen, or watch on YouTube.</figcaption>
+</figure>
+
 **The one-line version:** RBAC asks *"are you inside?"* A capability asks *"may you do exactly this, right now — and can anyone verify it later?"* The senior-dev answer for humans is the wrong answer for agents.
