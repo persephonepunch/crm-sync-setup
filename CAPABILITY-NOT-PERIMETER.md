@@ -44,7 +44,7 @@ Role-based access control is the right answer to a question we no longer only as
 2. **The mint IS the grant.** A link or QR *is* a scoped grant; every use is a signed row in a ledger anyone can verify against a public key. A file behind a login is shared once, shared forever. **A grant is a receipt.**
 3. **Three principals, not one.** **Agent** (a scoped, expiring mandate — not a login) · **Peer** (a human teammate) · **View** (read-only). The verbs: **Grant = insert, Revoke = delete, Audit = read.**
 
-**AI is the just-in-time security partner.** Rules-based functions run *with* AI at request time — every transaction is verified against a **running ledger** that can recall the exact **device, agent, screen, and application** behind it, per request. A CSV file throws all of that away the moment it is exported: no device, no agent, no screen, no record — just a row.
+**AI is the security partner — and the compliance and mandate checks.** Rules-based functions run at request time: **AI verifies the mandate and runs the compliance checks; the agent manages the running ledger** — every transaction recording the exact **device, agent, screen, and application** behind it, per request. A CSV file throws all of that away the moment it is exported: no device, no agent, no screen, no record — just a row.
 
 ---
 
