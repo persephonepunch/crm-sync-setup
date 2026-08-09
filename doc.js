@@ -72,8 +72,10 @@
   // ---- build the sticky download / nav bar -------------------------------
   function bar() {
     var b = document.createElement('nav'); b.className = 'docbar';
+    // No "Docs index" back-link: this reader renders inside the store/site modal,
+    // which already provides its own ← BACK and ✕ controls, so the link was
+    // redundant (and pointed at a route that 404'd off the Pages host).
     var parts = ['<div class="inner">',
-      '<a href="./">' + ICON.back + 'Docs index</a>',
       '<span class="spacer"></span>'];
     if (cfg.pdf)    parts.push('<a class="dl" href="' + cfg.pdf + '" download>' + ICON.pdf + 'PDF</a>');
     if (cfg.md)     parts.push('<a class="dl" href="' + cfg.md + '" download>' + ICON.md + 'Markdown</a>');
