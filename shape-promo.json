@@ -1,0 +1,10 @@
+{
+  "model": "promo",
+  "version": 1,
+  "headline": "The shape is the contract.",
+  "message": "This banner is a data model versioned in git. Designers and devs exchange shapes, not page edits — the edge merges, gates, and ledgers every change.",
+  "cta_label": "See the live shape",
+  "cta_href": "/shape/promo",
+  "accent": "#0a0a0a",
+  "updated_by": "git:crm-sync-setup"
+}
