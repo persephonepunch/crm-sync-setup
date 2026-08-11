@@ -8,7 +8,7 @@ hashtags: [content:kb/specs, content:page/design]
 ---
 ## The article is a shape
 
-This post was not typed into a CMS. It is a markdown file in a public repository, and everything you are reading is a projection of that file.
+This post was not typed into a CMS — and this sentence arrived by webhook. It is a markdown file in a public repository, and everything you are reading is a projection of that file.
 
 The pipeline it rides:
 
