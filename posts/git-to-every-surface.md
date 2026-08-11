@@ -3,7 +3,6 @@ name: Git to Every Surface — the Article Pipeline
 slug: git-to-every-surface
 summary: One markdown commit becomes a Webflow article, a Shopify metaobject, and an AEM Content Fragment — with hashtags as the filter dimension and ALT text carried from the source.
 category: Specs
-doc-group: Posts
 hashtags: [content:kb/specs, content:page/design]
 ---
 ## The article is a shape
