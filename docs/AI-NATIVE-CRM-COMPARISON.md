@@ -86,7 +86,7 @@ This is also why AI-paired system development stays **front-end agnostic** here:
 | [Download App](https://www.crm-sync.dev/products/download-app) — the configurator: use as you wish, on as many Webflow/Shopify instances as you run | $90 |
 | [Verified Transaction Layer — License](https://www.crm-sync.dev/products/verified-transactions) | $90 |
 | [Firmware SBOM — Per-Image Analysis](https://www.crm-sync.dev/products/sbom-firmware-image) | $250 |
-| [Firmware Security — ceremony-signed distribution](https://www.crm-sync.dev/products/firmware-security) | $499 |
+| [Firmware Security — ceremony-signed distribution](https://www.crm-sync.dev/products/firmware-security) | $1,900 |
 | [CRA Readiness Assessment](https://www.crm-sync.dev/products/cra-readiness) — fixed-fee working session, all ten CRA documents in order | $900 |
 
 **CRA compliance line** (what an EU Cyber Resilience Act posture costs here, versus a platform's enterprise-compliance add-on tier):
@@ -95,7 +95,7 @@ This is also why AI-paired system development stays **front-end agnostic** here:
 |---|---|
 | [SBOM Registry — App Coverage](https://www.crm-sync.dev/products/sbom-registry) | $49/mo |
 | [Firmware SBOM — Per-Image Analysis](https://www.crm-sync.dev/products/sbom-firmware-image) | $250 one-time |
-| [Firmware Security — vault + certificates](https://www.crm-sync.dev/products/firmware-security) | $499 one-time |
+| [Firmware Security — vault + certificates](https://www.crm-sync.dev/products/firmware-security) | $1,900 one-time |
 | [CRA Readiness Assessment](https://www.crm-sync.dev/products/cra-readiness) | $900 one-time |
 
 Distribution and creator rails ([Channel Publish](https://www.crm-sync.dev/products/channel-publish), [3D Publisher](https://www.crm-sync.dev/products/3d-publisher)) are $49 each. Every price above is the live store price — the catalog is the price list.

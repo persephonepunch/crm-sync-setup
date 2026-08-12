@@ -42,7 +42,7 @@ A firmware image enters through an **encrypted vault** and only leaves through a
 
 Your firmware is never a plain file at a URL: it is vaulted under **per-image encryption**, every upload is **certified**, every download is **granted**, and every event lands in a **tamper-evident ledger**. This is the evidence chain the EU Cyber Resilience Act assumes you already have.
 
-Firmware vaulting (encrypted distribution with certificates and the ledger) is the **Firmware Security** product at **$499**. Per-image SBOM analysis is **$250**. A full **CRA Readiness Assessment** is a **$900** engagement.
+Firmware vaulting (encrypted distribution with certificates and the ledger) is the **Firmware Security** product at **$1,900**. Per-image SBOM analysis is **$250**. A full **CRA Readiness Assessment** is a **$900** engagement.
 
 ### Accepted upload formats
 
