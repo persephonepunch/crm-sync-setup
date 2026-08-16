@@ -31,6 +31,10 @@ That last row is the one with no equivalent on the other side. Vault protects se
 
 ---
 
+![Feature map: Vault and Consul mapped onto Xano, Cloudflare, Docker and Webflow across seven capabilities](../assets/design-ops-map.svg)
+
+---
+
 ## Start with the interface
 
 Before any feature row, the thing that quietly decides everything: **how you actually use it.**
@@ -111,27 +115,6 @@ A single store of everything is simultaneously the biggest prize and the tightes
 </div>
 
 *Keys to the Castle — three minutes. Privacy-enhanced: YouTube sets no tracking cookie until you press play. The written version is at [crm-sync.dev/keep-the-castle](https://crm-sync.dev/keep-the-castle).*
-
----
-
-## The stack benefit: designer/BA versus the developer stance
-
-HashiCorp's interface stance is coherent and deliberate. Vault and Consul are built for infrastructure teams, so they are addressed the way infrastructure is addressed: a binary, a config language, a pipeline. For a platform team running a fleet, that is the correct surface — expressive, reviewable, version-controlled.
-
-It also decides who the capability belongs to.
-
-| | HashiCorp | CRM Sync on Webflow / Xano / Cloudflare |
-|---|---|---|
-| **Surface** | `vault` CLI, HCL policies, HTTP API. Consul: HCL, manifests, Envoy config | A browser — configurator and Designer Extension |
-| **Who holds it** | Whoever has the CLI and cluster access | The person who owns the business outcome |
-| **Cost of a change** | Edit, review, deploy, roll. Governance moves at release cadence | A grant written to a row, effective on the next request |
-| **Prerequisite** | A cluster kept alive, unsealed, upgraded | A stack the team already runs |
-| **When the engineer leaves** | The capability leaves with the access | The capability stays with the role |
-| **Depth of control** | Very high — path-level ACLs, a dozen auth methods, per-engine tuning | Deliberately narrower — fewer things to express, fewer to misconfigure |
-
-The benefit is not that a browser is nicer than a terminal. It is that **the person accountable for a decision can make it**, see it recorded, and revoke it — without opening a ticket against a team that has its own backlog and no context on the commercial question.
-
-This is why the comparison keeps landing on the same sentence: the primitives are the same, and the gate is who is allowed to hold them. A designer or BA operating envelope encryption, Ed25519 signatures, leases and a hash-chained ledger is not running a lesser system. They are running the same controls, on a stack they already own, with the governance work no longer queued behind someone else's roadmap.
 
 ---
 
