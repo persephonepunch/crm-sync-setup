@@ -1,6 +1,6 @@
 ---
 title: "CRM Sync — Keys to the Castle with Design Ops Tools"
-description: "Distributed entitlement built with Design Ops tools — Webflow, Xano and Cloudflare — mapped feature by feature against HashiCorp Vault and Consul. Same security primitives; a browser instead of a CLI. Marks honestly where HashiCorp is still the right answer."
+description: "You want security with the tools you use. Same utility, same security, same scaling as an infrastructure secrets stack — plus minting, which turns a file into an asset a customer can be granted. Mapped feature by feature, with the honest column intact."
 canonical: https://persephonepunch.github.io/crm-sync-setup/keys-to-the-castle-design-ops.html
 category: "Security"
 date: 2026-08-16
@@ -9,17 +9,33 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/KEYS-
 
 # Keys to the Castle with Design Ops Tools
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-08-16
-**Scope:** Distributed entitlement built on Design Ops tooling, mapped against HashiCorp Vault and Consul — feature by feature, and interface by interface.
+**For:** Designers, design ops and business analysts who already run Webflow, Xano and Cloudflare.
 
-> Keep the castle. Distribute the gold. Hold the keys. The same security primitives an infrastructure team runs, operated by the person who owns the outcome.
+> **You want security with the tools you use.**
+> Not a second stack. Not a ticket to a team that owns the terminal. The same protections an infrastructure team runs, in the tools already open on your screen.
+
+---
+
+## What you actually get
+
+| | |
+|---|---|
+| **Same utility** | Hold credentials, push settings to every surface, keep one source of truth. The everyday job, unchanged. |
+| **Same security** | Credentials encrypted at rest. Signatures anyone can check. Keys that expire and can be revoked. A log that cannot be quietly edited. |
+| **Same scaling** | Runs at the edge, everywhere at once. Nothing to keep alive, nothing to patch at 2am. |
+| **Plus minting** | Something a secrets engine was never built to do: turn a **file** into an asset a customer can be *granted* — a 3D print file, firmware, a document — sealed, tracked, and revocable. |
+
+That last row is the one with no equivalent on the other side. Vault protects secrets. This protects secrets *and* the things you sell.
 
 ---
 
 ## Start with the interface
 
-Before any feature row, the thing that decides who can hold the capability at all: **how you operate it.**
+Before any feature row, the thing that quietly decides everything: **how you actually use it.**
+
+This is the difference between a tool you can pick up and a tool you have to be granted access to.
 
 | | Interface | What that means |
 |---|---|---|
