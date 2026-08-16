@@ -1,17 +1,19 @@
 ---
-title: "CRM Sync — Vault, Consul and the Config Manager"
-description: "A feature map from HashiCorp Vault onto the CRM Sync config manager, and from Consul onto the Worker and its runners. Starts with the interface, because that decides who can operate any of it — and marks honestly where HashiCorp is still the right answer."
-canonical: https://persephonepunch.github.io/crm-sync-setup/hashicorp-mapped.html
+title: "CRM Sync — Keys to the Castle with Design Ops Tools"
+description: "Distributed entitlement built with Design Ops tools — Webflow, Xano and Cloudflare — mapped feature by feature against HashiCorp Vault and Consul. Same security primitives; a browser instead of a CLI. Marks honestly where HashiCorp is still the right answer."
+canonical: https://persephonepunch.github.io/crm-sync-setup/keys-to-the-castle-design-ops.html
 category: "Security"
 date: 2026-08-16
-source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/HASHICORP-MAPPED.md
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/KEYS-TO-THE-CASTLE.md
 ---
 
-# Vault, Consul and the Config Manager
+# Keys to the Castle with Design Ops Tools
 
 **Version:** 1.0
 **Date:** 2026-08-16
-**Scope:** How HashiCorp's two governance products map onto what a designer or business analyst runs on Webflow, Xano and Cloudflare.
+**Scope:** Distributed entitlement built on Design Ops tooling, mapped against HashiCorp Vault and Consul — feature by feature, and interface by interface.
+
+> Keep the castle. Distribute the gold. Hold the keys. The same security primitives an infrastructure team runs, operated by the person who owns the outcome.
 
 ---
 
@@ -74,6 +76,49 @@ Consul exists to make a **fleet** of services find each other, prove who they ar
 
 ---
 
+## Keys to the Castle — distributed entitlement
+
+The feature rows above describe *what* each system does. This is the shape underneath, and it is the reason the rows come out the way they do.
+
+**Vault is a vault.** That is not a criticism — it is the design. One guarded store, a barrier around it, a door you authenticate at. Everything Vault does well follows from concentrating the valuable thing in one place and defending that place extremely competently.
+
+**Distributed entitlement is the opposite shape.** The value does not sit in one store. Card data stays in Shopify. Identity and consent stay in Xano — in the customer's own instance. Draft content is a Webflow mirror, not a source. What travels between them is not the secret but a **grant**: signed, scoped, revocable, and verifiable against a published key by anyone, without calling us.
+
+The consequence is the whole argument:
+
+> Keep the castle. Keep the moat. But being *inside* the walls no longer grants you anything — every request is re-verified per action. The castle governs access; it does not store the treasure.
+
+A single store of everything is simultaneously the biggest prize and the tightest bottleneck. Breach a distributed shape and you get a fragment, never the hoard. And because the value is spread out *for people and agents to use*, distributing it **is** the accessibility — security and reach in the same move, which is normally the trade you are asked to make.
+
+<div style="position:relative;width:100%;padding-top:56.25%;background:#000;margin:1.6rem 0 .6rem">
+<iframe src="https://www.youtube-nocookie.com/embed/jp7sOvo1a6Y" title="Keys to the Castle — CRM Sync" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+</div>
+
+*Keys to the Castle — three minutes. Privacy-enhanced: YouTube sets no tracking cookie until you press play. The written version is at [crm-sync.dev/keep-the-castle](https://crm-sync.dev/keep-the-castle).*
+
+---
+
+## The stack benefit: designer/BA versus the developer stance
+
+HashiCorp's interface stance is coherent and deliberate. Vault and Consul are built for infrastructure teams, so they are addressed the way infrastructure is addressed: a binary, a config language, a pipeline. For a platform team running a fleet, that is the correct surface — expressive, reviewable, version-controlled.
+
+It also decides who the capability belongs to.
+
+| | HashiCorp | CRM Sync on Webflow / Xano / Cloudflare |
+|---|---|---|
+| **Surface** | `vault` CLI, HCL policies, HTTP API. Consul: HCL, manifests, Envoy config | A browser — configurator and Designer Extension |
+| **Who holds it** | Whoever has the CLI and cluster access | The person who owns the business outcome |
+| **Cost of a change** | Edit, review, deploy, roll. Governance moves at release cadence | A grant written to a row, effective on the next request |
+| **Prerequisite** | A cluster kept alive, unsealed, upgraded | A stack the team already runs |
+| **When the engineer leaves** | The capability leaves with the access | The capability stays with the role |
+| **Depth of control** | Very high — path-level ACLs, a dozen auth methods, per-engine tuning | Deliberately narrower — fewer things to express, fewer to misconfigure |
+
+The benefit is not that a browser is nicer than a terminal. It is that **the person accountable for a decision can make it**, see it recorded, and revoke it — without opening a ticket against a team that has its own backlog and no context on the commercial question.
+
+This is why the comparison keeps landing on the same sentence: the primitives are the same, and the gate is who is allowed to hold them. A designer or BA operating envelope encryption, Ed25519 signatures, leases and a hash-chained ledger is not running a lesser system. They are running the same controls, on a stack they already own, with the governance work no longer queued behind someone else's roadmap.
+
+---
+
 ## Where HashiCorp is still the right answer
 
 A comparison that only flatters itself is not evidence.
@@ -85,11 +130,3 @@ A comparison that only flatters itself is not evidence.
 The claim is narrower than displacement. For a team whose surface is a website, a catalogue and a set of agents acting on a customer's behalf, the fleet was never the shape of the problem — and the operational cost of governing one is exactly the part a designer or BA cannot carry.
 
 ---
-
-## The three-minute version
-
-The same argument as a film: the fortress, the distributed gold, and the keys staying in your hand.
-
-**[Keys to the Castle](https://youtu.be/jp7sOvo1a6Y)** — 3 minutes.
-
-The written companion, with the film embedded, is at **[crm-sync.dev/keep-the-castle](https://crm-sync.dev/keep-the-castle)**.
