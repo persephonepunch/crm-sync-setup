@@ -31,6 +31,10 @@ That last row is the one with no equivalent on the other side. Vault protects se
 
 ---
 
+![At a glance: eight capabilities, each with a one-sentence description of what it does](../assets/design-ops-glance.svg)
+
+*Feature by feature against the infrastructure equivalents:*
+
 ![Feature map: Vault and Consul mapped onto Xano, Cloudflare, Docker and Webflow across seven capabilities](../assets/design-ops-map.svg)
 
 ---
