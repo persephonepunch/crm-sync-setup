@@ -31,7 +31,7 @@ That last row is the one with no equivalent on the other side. Vault protects se
 
 ---
 
-![At a glance: eight capabilities, each with a one-sentence description of what it does](../assets/design-ops-glance.svg)
+![Parity: seven capabilities matched box for box against Vault, Consul, Nomad and Docker — and minting, which has no counterpart](../assets/design-ops-parity.svg)
 
 *Feature by feature against the infrastructure equivalents:*
 
