@@ -93,21 +93,39 @@ This is why the runtime and the permission model are one conversation. A rule sa
 
 ## Provision and package are not the same word
 
-One word gets used for three jobs, and conflating them puts a customer's laptop in the same column as your storage. They are worth separating before anyone budgets for them, because only one of the three has a running cost.
+One word does three jobs. Conflating them puts a customer's laptop in the same column as your storage, and it produces the wrong answer to the only question a buyer actually asks: *what does it cost to add one more customer?*
 
-**Provisioning a resource** — creating something on your side that will hold or serve. A storage namespace, a bucket, a database, a certificate for a customer's domain. On a traditional stack this is where the money goes: servers sized, networks drawn, capacity bought before demand arrives. On an edge stack it is much lighter, because what you are creating is a namespace rather than a machine. Nothing is running while idle and there is no capacity to size.
+### Provisioning a resource
 
-**Provisioning a tenant** — bringing a customer into existence. Writing their configuration, minting the key only they hold, pointing them at their own data instance, mapping their domain. Nothing is created in a cloud; a relationship is created in a register. This is the one that has commercial meaning, because it is the step between *sold* and *serving*, and its cost is measured in minutes of a person's attention rather than in infrastructure.
+**Business definition:** buying capacity on your side of the line, before anyone uses it.
 
-**Packaging** — putting an application on someone else's device. A desktop binary, an installable web app. This is distribution, and it runs in the opposite direction from the other two: provisioning prepares your side to serve, packaging delivers to their side to be used.
+**What it costs:** on a traditional stack, this is where the money goes — servers sized, networks drawn, licences counted, capacity bought ahead of demand and paid for whether it arrives or not. On an edge stack you are creating a namespace rather than a machine: nothing runs while idle, there is no capacity to size, and the bill follows use rather than intent.
 
-| | Direction | Cost |
-|---|---|---|
-| **Provision a resource** | your side, prepared to serve | metered by use, nothing while idle |
-| **Provision a tenant** | your register, a customer added | minutes of attention, once |
-| **Package** | their device, an app delivered | a build, then distribution |
+**Utility use case:** a manufacturer needs EU firmware records held separately from US ones for residency reasons. You create a second storage bucket and point the EU tenants at it. On the old model that is a procurement conversation and a lead time. Here it is one command, and the cost starts when the first file lands.
 
-The distinction matters when someone asks what it costs to add a customer. If provisioning a customer means standing up infrastructure, the answer is a capacity conversation and a lead time. If it means writing a configuration row and minting a key, the answer is minutes — and the difference between those two answers is most of why one business can serve a long tail and the other cannot.
+### Provisioning a tenant
+
+**Business definition:** the step between *sold* and *serving*.
+
+**What it costs:** minutes of one person's attention, not infrastructure. Nothing is created in a cloud — a customer is written into a register: their configuration, the key only they hold, the pointer to their own data instance, their domain on the login screen.
+
+**Utility use case:** a merchant buys on Tuesday. By Wednesday they have their own key, their records in their own workspace, and their brand on the sign-in page. Nobody sized anything, nobody waited for a provisioning queue, and no engineer was scheduled. **This is the number that decides whether a business can serve a long tail** — if adding a customer means standing up infrastructure, the tail is uneconomic no matter how good the product is.
+
+### Packaging
+
+**Business definition:** delivering the application to someone else's device.
+
+**What it costs:** a build and a distribution channel — an installer, a store listing, a signing certificate, an update path. It runs in the opposite direction from the other two: provisioning prepares your side to serve, packaging hands something to their side to use.
+
+**Utility use case:** a compliance officer wants the configurator open all day without a browser tab and without a login every morning. You wrap the same web app as a desktop application and hand them an installer. Nothing changed on your side — no new resource, no new tenant. One artifact, delivered.
+
+| | Direction | What it costs | Triggered by |
+|---|---|---|---|
+| **Provision a resource** | your side, prepared to serve | metered by use; nothing while idle | a new data class, region or storage need |
+| **Provision a tenant** | your register, a customer added | minutes, once | a sale |
+| **Package** | their device, an app delivered | a build and a distribution channel | a request for how they want to use it |
+
+The distinction earns its keep the moment someone asks what onboarding costs. If provisioning a customer means infrastructure, the answer is a capacity conversation and a lead time. If it means writing a row and minting a key, the answer is minutes — and the gap between those two answers is most of why one business can profitably serve small customers and another cannot.
 
 ---
 
