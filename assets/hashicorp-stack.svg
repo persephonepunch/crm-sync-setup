@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" aria-label="The HashiCorp stack: each product in a box with what it does underneath, grouped by job">
+  <rect id="canvas" width="1440" height="1120" fill="#ffffff"/>
+
+  <g id="header">
+    <text x="60" y="76" font-family="Arial, sans-serif" font-size="13" fill="#767676" letter-spacing="4">THE STACK</text>
+    <text x="60" y="132" font-family="Georgia, 'Iowan Old Style', serif" font-size="42" fill="#111">What each HashiCorp product does</text>
+    <text x="60" y="170" font-family="Arial, sans-serif" font-size="17" fill="#444">Ten products, four jobs. The three in blue are the ones with a Design Ops counterpart.</text>
+    <line x1="60" y1="204" x2="1380" y2="204" stroke="#111" stroke-width="2"/>
+  </g>
+
+  <!-- ══ BAND 1 — PROVISION ══════════════════════════════════════ -->
+  <g id="band-provision">
+    <text x="60" y="248" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">PROVISION &#8212; build the infrastructure</text>
+
+    <g id="box-terraform">
+      <rect x="60" y="266" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="84" y="312" font-family="Georgia, serif" font-size="26" fill="#111">Terraform</text>
+      <text x="84" y="344" font-family="Arial, sans-serif" font-size="15" fill="#444">Declares cloud infrastructure as code and</text>
+      <text x="84" y="366" font-family="Arial, sans-serif" font-size="15" fill="#444">provisions it. Their flagship product.</text>
+    </g>
+
+    <g id="box-packer">
+      <rect x="510" y="266" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="534" y="312" font-family="Georgia, serif" font-size="26" fill="#111">Packer</text>
+      <text x="534" y="344" font-family="Arial, sans-serif" font-size="15" fill="#444">Bakes machine images, so a server boots</text>
+      <text x="534" y="366" font-family="Arial, sans-serif" font-size="15" fill="#444">already configured.</text>
+    </g>
+
+    <g id="box-vagrant">
+      <rect x="960" y="266" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="984" y="312" font-family="Georgia, serif" font-size="26" fill="#111">Vagrant</text>
+      <text x="984" y="344" font-family="Arial, sans-serif" font-size="15" fill="#444">Reproducible local development</text>
+      <text x="984" y="366" font-family="Arial, sans-serif" font-size="15" fill="#444">environments.</text>
+    </g>
+  </g>
+
+  <!-- ══ BAND 2 — SECURE ═════════════════════════════════════════ -->
+  <g id="band-secure">
+    <text x="60" y="454" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">SECURE &#8212; who may hold what</text>
+
+    <g id="box-vault">
+      <rect x="60" y="472" width="420" height="132" fill="#12557a"/>
+      <text x="84" y="518" font-family="Georgia, serif" font-size="26" fill="#ffffff">Vault</text>
+      <text x="84" y="550" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">Stores secrets, issues short-lived</text>
+      <text x="84" y="572" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">credentials, encrypts as a service.</text>
+    </g>
+
+    <g id="box-boundary">
+      <rect x="510" y="472" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="534" y="518" font-family="Georgia, serif" font-size="26" fill="#111">Boundary</text>
+      <text x="534" y="550" font-family="Arial, sans-serif" font-size="15" fill="#444">Identity-based access to hosts and</text>
+      <text x="534" y="572" font-family="Arial, sans-serif" font-size="15" fill="#444">services, without a VPN or bastion.</text>
+    </g>
+  </g>
+
+  <!-- ══ BAND 3 — CONNECT & RUN ══════════════════════════════════ -->
+  <g id="band-run">
+    <text x="60" y="660" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">CONNECT &amp; RUN &#8212; keep the fleet talking and alive</text>
+
+    <g id="box-consul">
+      <rect x="60" y="678" width="420" height="132" fill="#12557a"/>
+      <text x="84" y="724" font-family="Georgia, serif" font-size="26" fill="#ffffff">Consul</text>
+      <text x="84" y="756" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">Service discovery, health checks, and a</text>
+      <text x="84" y="778" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">service mesh with mTLS between services.</text>
+    </g>
+
+    <g id="box-nomad">
+      <rect x="510" y="678" width="420" height="132" fill="#12557a"/>
+      <text x="534" y="724" font-family="Georgia, serif" font-size="26" fill="#ffffff">Nomad</text>
+      <text x="534" y="756" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">Schedules and restarts workloads &#8212;</text>
+      <text x="534" y="778" font-family="Arial, sans-serif" font-size="15" fill="#cfe0ea">containers, binaries, JVMs, VMs.</text>
+    </g>
+
+    <g id="box-waypoint">
+      <rect x="960" y="678" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="984" y="724" font-family="Georgia, serif" font-size="26" fill="#111">Waypoint</text>
+      <text x="984" y="756" font-family="Arial, sans-serif" font-size="15" fill="#444">One build-and-deploy workflow across</text>
+      <text x="984" y="778" font-family="Arial, sans-serif" font-size="15" fill="#444">those runtimes.</text>
+    </g>
+  </g>
+
+  <!-- ══ BAND 4 — ACROSS EVERYTHING ══════════════════════════════ -->
+  <g id="band-across">
+    <text x="60" y="866" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">ACROSS EVERYTHING</text>
+
+    <g id="box-sentinel">
+      <rect x="60" y="884" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="84" y="930" font-family="Georgia, serif" font-size="26" fill="#111">Sentinel</text>
+      <text x="84" y="962" font-family="Arial, sans-serif" font-size="15" fill="#444">Policy as code, enforced across the</text>
+      <text x="84" y="984" font-family="Arial, sans-serif" font-size="15" fill="#444">other products.</text>
+    </g>
+
+    <g id="box-hcp">
+      <rect x="510" y="884" width="420" height="132" fill="#ffffff" stroke="#c4c4c4" stroke-width="1.5"/>
+      <text x="534" y="930" font-family="Georgia, serif" font-size="26" fill="#111">HCP</text>
+      <text x="534" y="962" font-family="Arial, sans-serif" font-size="15" fill="#444">HashiCorp Cloud Platform &#8212; managed</text>
+      <text x="534" y="984" font-family="Arial, sans-serif" font-size="15" fill="#444">versions of the above.</text>
+    </g>
+
+    <g id="box-vocabulary">
+      <rect x="960" y="884" width="420" height="132" fill="#f4f4f4" stroke="#c4c4c4" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text x="984" y="924" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.2">VOCABULARY</text>
+      <text x="984" y="952" font-family="Arial, sans-serif" font-size="15" fill="#444">A container is a <tspan font-style="italic">task</tspan>. A placed</text>
+      <text x="984" y="974" font-family="Arial, sans-serif" font-size="15" fill="#444">instance is an <tspan font-style="italic">allocation</tspan>. Docker is</text>
+      <text x="984" y="996" font-family="Arial, sans-serif" font-size="15" fill="#444">a <tspan font-style="italic">task driver</tspan>, one of several.</text>
+    </g>
+  </g>
+
+  <g id="footer">
+    <line x1="60" y1="1052" x2="1380" y2="1052" stroke="#111" stroke-width="1.5"/>
+    <text x="60" y="1086" font-family="Arial, sans-serif" font-size="15" fill="#767676">All of it IBM-owned since 2025. Vault is a command line; Consul is code, dev only.</text>
+  </g>
+</svg>
