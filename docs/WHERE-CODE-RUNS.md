@@ -125,24 +125,62 @@ The common thread is not paranoia about the algorithm. It is that **the algorith
 
 ---
 
-## Why this stopped being an engineering preference
+## Why the practice that worked last year stopped working
 
-For twenty years the runtime was a matter of taste. That ended when the code started being written and run by something other than a person.
+Start from what already works, because it does work.
 
-**Your systems now execute code nobody read.** An agent composes a call, generates a transformation, runs a query, and does it a thousand times before anyone looks. The review step that used to sit between *code exists* and *code runs* is not in that path any more.
+**A restricted server, role-based access and human supervision is a good control.** It has protected serious systems for decades and it is not obsolete. But it rests on four assumptions, and they are load-bearing:
 
-When that is true, the runtime becomes the enforcement point, because it is the last thing standing between generated code and your customers' data.
+- **Rate** — a person acts at human speed, so supervision can happen *while* it happens
+- **Enumerable actions** — someone in a role does a knowable set of things; you granted the role because you could picture the work
+- **Stable intent** — a person's actions follow a plan you can ask them about, and they are the same person before and after reading a document
+- **Accountability** — the subject has a name, a contract and consequences, and that backing does more work than the permission model does
 
-| What you will be asked | What answers it |
-|---|---|
-| Could this have read data it was not asked for? | Only if the runtime gave it a way to reach it |
-| Could a credential have been written to disk? | Only if there is a disk |
-| Could one customer's request have seen another's? | Only if they shared a kernel, or a process's memory |
-| Can you show what it was *able* to do, not just what it did? | Only if capability was granted rather than assumed |
+### What generated code breaks
 
-That last line is the difference between an audit trail and a guarantee, and it is the one that decides a deal. **A log tells you what happened. A boundary tells you what was possible** — and when the actor writes its own next instruction, only the second answer holds.
+**Rate.** An agent takes thousands of actions before anyone looks. Review after the fact is not supervision, it is forensics — you cannot intervene in something that has finished.
 
-This is why the runtime and the permission model are one conversation. A rule saying an agent may read one record is worth exactly what the runtime does when it reaches for a second. On ambient authority, policy is advice. On a capability boundary, policy is enforcement.
+**Enumerable actions.** The agent composes its next action from the result of the last one. The action set is not knowable in advance because it is being written at runtime. You granted a role; the behaviour inside that role is now open-ended.
+
+**Stable intent.** This one has no human equivalent. An employee does not change objective because a customer record contained a sentence instructing them to. An agent processing untrusted content can have its instructions rewritten *by the data it was asked to handle*. Role-based access assumes the subject's intent originates with the subject.
+
+**Accountability.** The agent runs as a service account, or as the user. The access model sees one authorised subject performing permitted operations — and it is correct, every individual action is permitted. The harm is in the **sequence**, and a role has no concept of a sequence.
+
+### Why a filesystem compounds it
+
+File permissions grant access to **paths**, which is coarse in two directions. Read access to a directory covers everything in it, including what lands there tomorrow. And a filesystem **persists** — something written now is readable later by anything holding the path, including the next run and any process nobody audited.
+
+The realistic failure requires no violation at all. An agent with legitimate read access writes an intermediate file — a cache, an export, a debug dump — into a location a more broadly readable process can see. No rule was broken. The data moved anyway.
+
+On a runtime with no disk, that sequence has no first step.
+
+### The distinction underneath
+
+> **Role-based access answers *who is acting*. Capability answers *what this code can reach at all*.**
+
+For a person, "who" is a sound proxy for "what will happen", because a human is bounded by judgment and consequence as well as by permission. For generated code that proxy has nothing behind it. It will do whatever the next generated instruction says, inside its permissions, at machine rate.
+
+### Where the older model is still right
+
+**A restricted server with role-based access remains sufficient when:**
+
+- volume is low enough for a person to stay in the loop **per action**, not per batch
+- the code paths are deterministic and were reviewed before they ran
+- the process never reads untrusted input — no customer text, no web content, no uploaded documents
+
+Hold all three and the established practice is fine, and cheaper. It is the third that usually fails first, because the reason to deploy an agent at all is to have it read things nobody has time to read.
+
+### Why this is the hardest part to hear
+
+This is not a story about people being careless. **It is a story about expertise depreciating.**
+
+The practice was correct. It was correct last year. The engineers who hold it most firmly are usually the ones who learned it most thoroughly — who can explain why least privilege matters, who have configured it properly, who have been right about it in every previous argument. Their confidence is earned.
+
+What changed is not the quality of the practice but the shape of the actor it was designed for. Every assumption above was safe when the subject was a person or a program a person wrote and reviewed. None of them was ever written down as an assumption, because none of them needed to be.
+
+That is the difficult part commercially. The risk is not the team that does not know. It is the team that knows very well, is applying a control correctly, and has no signal that the ground moved — because nothing failed, no alert fired, and the practice still looks exactly as sound as it did when it was.
+
+**The only durable answer is a check that asks rather than a convention that is remembered.** A runtime with no disk does not require anyone to have kept up. A capability that must be granted does not depend on someone recalling that the assumptions changed.
 
 ---
 
