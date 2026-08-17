@@ -122,6 +122,23 @@ A single store of everything is simultaneously the biggest prize and the tightes
 
 ---
 
+## What they assume, and what that leaves out
+
+The four blanks in the diagram are not gaps in HashiCorp's product line. They are the shape of an assumption, and it is invisible to their buyer because their buyer always has it.
+
+The suite presumes two things already exist and are already someone's job:
+
+- **Postgres lives somewhere in a cloud**, provisioned and operated. Vault mints users into it, Terraform declared it, but neither holds a row.
+- **The front end lives somewhere as code**, in a repo, through a build, deployed to a runtime. Waypoint standardises the deploy, Packer bakes the image, Nomad places it. None of them is the surface.
+
+HashiCorp governs the space *between* those two ends and never occupies either. That is a coherent product line for a company whose customer already has both — and it only becomes visible when someone without a platform team looks at Vault and asks where their rows go. The honest answer is *somewhere else, and that is yours to run*.
+
+The Design Ops stack does not compete with that assumption. It inverts it. Postgres is not provisioned, it is inside Xano. The front end is not built and deployed, it is authored in Webflow. The runtime is not scheduled, it is the edge.
+
+> **They secure the stack you already have. This is the stack, already secured.**
+
+---
+
 ## Where HashiCorp is still the right answer
 
 A comparison that only flatters itself is not evidence.
