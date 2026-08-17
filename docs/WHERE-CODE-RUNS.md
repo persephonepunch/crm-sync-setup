@@ -70,6 +70,61 @@ Defaults decide outcomes, because the default is what happens on the busy day wh
 
 ---
 
+## Secrets: why a file in a repository is the wrong shape
+
+Almost every stack starts the same way — credentials in a `.env` file, committed or nearly committed, copied into CI, pasted into a chat when a colleague is stuck. It works, until it doesn't, and the reason it fails is worth stating precisely.
+
+**A file in a repository is copied by design.** Every clone is another copy. Every fork, every CI runner, every laptop, every backup. You cannot revoke a copy you do not know about, and you cannot count them. The failure is not that someone was careless; it is that the format's whole purpose is duplication, and you are using it to hold the one thing that must not duplicate.
+
+The second failure is quieter: a credential in version control is in the **history**, not just the working tree. Removing it in a later commit does not remove it. It is still in the diff, still in every clone taken before the fix, and still readable by anyone who ever had access.
+
+### What a secret store changes
+
+**Business definition:** the credential stops being a file that copies and becomes a value the system holds.
+
+- **One copy, and no person holds it.** It is written once and never displayed again. No dashboard shows it, no log prints it, no support process can retrieve it.
+- **Revocable centrally.** One action ends its use everywhere, immediately, without a deploy or a hunt for copies.
+- **Rotatable without touching code.** The value changes; the code that reads it does not.
+- **Absent from the diff.** Nothing to leak in a pull request, because nothing about it is in the repository at all.
+
+Cloudflare and Vault both deliver that, by different routes. **Cloudflare pushes**: the value is written into the runtime at deploy and read as an environment value — it never travels again, and there is no token an attacker could steal to fetch it. **Vault pulls**: the application asks at runtime, holding a token, and policy decides. Vault's model is more flexible and needs a policy to be safe; Cloudflare's is narrower and safe by construction.
+
+**Utility use case:** a contractor finishes an engagement. With credentials in a repository you are auditing clones, rotating everything they might have touched, and hoping. With a secret store you revoke one key, and the ledger shows what it did while it was valid.
+
+### The hazard the command line reintroduces
+
+A secret store does not help if the value passes through a terminal. Vault's most-copied documented form puts the secret directly on the command line:
+
+```
+vault kv put secret/app api_key=REAL_VALUE       ← now in shell history and scrollback
+```
+
+Both tools have safe forms — piping, stdin, `@file` — but the default is what people copy, and shell history, terminal scrollback and screen shares are all real disclosure paths. **Treat any command containing a live credential as a disclosure**, including one you intend to paste later and forget.
+
+---
+
+## Key ceremony: the control banks use, and why it applies here
+
+The riskiest moment in a credential's life is not while it is stored. It is the moment it **exists in the open** — being generated, being loaded, being rotated. Encryption protects it before and after. Nothing protects it during, except procedure.
+
+**Business definition:** a key ceremony is a scripted, witnessed procedure for creating or rotating a key, arranged so that no single person is ever in a position to take it.
+
+This is not a software convention. It comes from payments and cryptography, where the stakes forced it early:
+
+- **Banking and card payments** — loading keys into hardware security modules is done under **split knowledge and dual control**: the key is assembled from components held by separate custodians, and no one custodian can reconstruct it. PCI's key-management requirements mandate exactly this for manual clear-text key operations.
+- **Certificate authorities** — a root signing ceremony is scripted in advance, performed by named officers, witnessed, and recorded. The root key of a public CA is created once, in a room, on camera.
+- **DNS** — the DNSSEC root key ceremony is held in public, filmed, and published, precisely so that no participant has to be trusted individually.
+
+The common thread is not paranoia about the algorithm. It is that **the algorithm was never the weak point** — the person holding the key at the moment it existed was.
+
+**What it buys you commercially:** the ability to answer "who could have taken this?" with *nobody, and here is the record*. That is a different answer from "we trust our team," and it is the one that survives an audit, an incident review or a due-diligence question.
+
+**Utility use case:** a platform key needs rotating. One person prepares the change and verifies the result but never touches the value. Another executes the privileged write. The secret appears in no transcript, no log and no chat. Afterwards the ledger shows a key changed, when, and by which fingerprint — and there is no copy of the old value anywhere for anyone to find.
+
+**What it costs:** coordination. Two people and a written procedure, for an operation that one person could technically do alone in a minute. That cost is the control. A ceremony one person can complete unaccompanied is not a ceremony — it is a habit.
+
+---
+
 ## Why this stopped being an engineering preference
 
 For twenty years the runtime was a matter of taste. That ended when the code started being written and run by something other than a person.
