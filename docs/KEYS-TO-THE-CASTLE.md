@@ -126,6 +126,24 @@ None of the above is a proposal. It is the shape of a system that is serving req
 
 Nothing in that table is concentrated. Take any one row and the others still stand — which is the distribution argument stated as an inventory rather than a metaphor.
 
+### The front end, and why publishing cannot break the record
+
+The comparison has an empty column on the infrastructure side for design and forms, and this is what sits in it.
+
+**Webflow is the design surface, and it holds no dynamic data by design.** That is a deliberate constraint rather than a limitation. Product prices, customer records, consent state — none of it lives there. Webflow authors what things look like and say; the record lives where the record belongs.
+
+Which produces two properties that are hard to buy any other way.
+
+**Publishing is non-destructive.** A page compiles *upward* — baseline, then behaviour, then tokens, then fragments — and each layer is one removable tag. Adding a capability is adding a line; removing it is deleting that line and finding the page still works. **Adoption is not a migration, and removal is not a teardown**, which is what makes it safe to try something on a live site on a Tuesday.
+
+**And it heals.** Because the front end holds a *mirror* rather than a source, a bad publish cannot destroy anything that matters — there was nothing authoritative there to destroy. Delete the mirror and it rebuilds from the record. That is the answer to the first of the four failures a closed system cannot recover from: a corrupted copy is repaired by re-deriving it, and re-deriving is only possible when you were honest about which copy was the original.
+
+The contrast with the alternative is exact. A content system that syncs product data *into* itself now holds a second copy of commerce records, and the reconciliation between the two becomes a permanent job that someone owns forever. One publish out of order and you are diffing two systems to find out which one is lying.
+
+> A mirror can be wrong for sixty seconds. A record cannot be wrong at all. Keeping those two things in different places is the entire trick.
+
+---
+
 ### What the AI plane gets from this shape
 
 The runner is an agent loop at `/mcp`, executing scoped tools under a signed mandate. It inherits four properties from the architecture rather than from anything written for it:

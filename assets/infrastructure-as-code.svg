@@ -116,7 +116,7 @@
   <text class="st5" transform="translate(193.2 79.1)"><tspan x="0" y="0">PROVISION — build the infrastructure</tspan></text>
   <rect class="Graphic_x0020_Style" x="193.2" y="87.2" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(203.9 107.8)"><tspan x="0" y="0">Terraform</tspan></text>
-  <text class="st4" transform="translate(203.9 122.1)"><tspan x="0" y="0">Declares cloud infrastructure as code and</tspan></text>
+  <text class="st4" transform="translate(203.9 122.1)"><tspan x="0" y="0">Runs the code and serves the request &#8212; no image</tspan></text>
   <text class="st4" transform="translate(203.9 132)"><tspan x="0" y="0">provisions it. Their flagship product.</tspan></text>
   <rect class="Graphic_x0020_Style" x="417.1" y="174.4" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(427.8 195)"><tspan x="0" y="0">Packer</tspan></text>
@@ -362,7 +362,7 @@
   <text/>
   <rect class="Graphic_x0020_Style" x="416.3" y="248" width="188.3" height="118"/>
   <text class="st3" transform="translate(427.1 268.6)"><tspan x="0" y="0">Packer</tspan></text>
-  <text class="st4" transform="translate(427.1 282.9)"><tspan x="0" y="0">Setup packer init</tspan><tspan x="0" y="8.1" xml:space="preserve">Hygiene  packer fmt</tspan><tspan x="0" y="16.1">Check packer validate</tspan><tspan x="0" y="24.2">Build packer build</tspan><tspan x="0" y="32.3">Inspect packer inspect</tspan><tspan x="0" y="40.3">Try</tspan><tspan class="st13" x="9.7" y="40.3">	</tspan><tspan x="16.1" y="40.3">packer console</tspan><tspan x="0" y="48.4">Migrate packer hc12_upgrade</tspan><tspan x="0" y="56.5">Plugins packer plugins</tspan></text>
+  <text class="st4" transform="translate(427.1 282.9)"><tspan x="0" y="0">Setup packer init</tspan><tspan x="0" y="8.1" xml:space="preserve">Hygiene  packer fmt</tspan><tspan x="0" y="16.1">Check packer validate</tspan><tspan x="0" y="24.2">Build packer build</tspan><tspan x="0" y="32.3">Inspect packer inspect</tspan><tspan x="0" y="40.3">Try</tspan><tspan class="st13" x="9.7" y="40.3">	</tspan><tspan x="16.1" y="40.3">packer console</tspan><tspan x="0" y="48.4">Migrate packer hcl2_upgrade</tspan><tspan x="0" y="56.5">Plugins packer plugins</tspan></text>
   <text/>
   <rect class="st20" x="415.5" y="85.1" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(426.2 105.8)"><tspan x="0" y="0">AWS</tspan></text>
@@ -377,7 +377,7 @@
   <text class="st0" transform="translate(751 -209.3)"><tspan x="0" y="0">Vagrant</tspan></text>
   <text class="st1" transform="translate(751 -177.3)"><tspan x="0" y="0">Reproducible local development</tspan></text>
   <text class="st1" transform="translate(751 -155.3)"><tspan x="0" y="0">environments.</tspan></text>
-  <text class="st11" transform="translate(196.1 388.5)"><tspan x="0" y="0">wrangler build - Code is live</tspan></text>
+  <text class="st11" transform="translate(196.1 388.5)"><tspan x="0" y="0">wrangler deploy - Code is live</tspan></text>
   <text class="st11" transform="translate(418.1 388.5)"><tspan x="0" y="0">packer build generates an </tspan><tspan x="0" y="9.6">image in a registry</tspan></text>
   <rect class="Graphic_x0020_Style" x="614.6" y="248" width="188.3" height="156.3"/>
   <text class="st3" transform="translate(625.3 268.6)"><tspan x="0" y="0">Vagrant</tspan></text>
