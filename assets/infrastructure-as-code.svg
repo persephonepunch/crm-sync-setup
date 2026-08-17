@@ -116,7 +116,7 @@
   <text class="st5" transform="translate(193.2 79.1)"><tspan x="0" y="0">PROVISION — build the infrastructure</tspan></text>
   <rect class="Graphic_x0020_Style" x="193.2" y="87.2" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(203.9 107.8)"><tspan x="0" y="0">Terraform</tspan></text>
-  <text class="st4" transform="translate(203.9 122.1)"><tspan x="0" y="0">Runs the code and serves the request &#8212; no image</tspan></text>
+  <text class="st4" transform="translate(203.9 122.1)"><tspan x="0" y="0">Declares cloud infrastructure as code and</tspan></text>
   <text class="st4" transform="translate(203.9 132)"><tspan x="0" y="0">provisions it. Their flagship product.</tspan></text>
   <rect class="Graphic_x0020_Style" x="417.1" y="174.4" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(427.8 195)"><tspan x="0" y="0">Packer</tspan></text>
@@ -127,8 +127,8 @@
   <text class="st4" transform="translate(626 209.4)"><tspan x="0" y="0">Local development</tspan></text>
   <rect class="st19" x="196.1" y="176" width="188.3" height="59.2"/>
   <text class="st3" transform="translate(206.9 196.6)"><tspan x="0" y="0">Cloudflare</tspan></text>
-  <text class="st4" transform="translate(206.9 210.9)"><tspan x="0" y="0">Declares cloud infrastructure as code and</tspan></text>
-  <text class="st4" transform="translate(206.9 220.8)"><tspan x="0" y="0">provisions it. Their flagship product.</tspan></text>
+  <text class="st4" transform="translate(206.9 210.9)"><tspan x="0" y="0">Runs the code and serves the request itself &#8212;</tspan></text>
+  <text class="st4" transform="translate(206.9 220.8)"><tspan x="0" y="0">no image to bake, no machine to place.</tspan></text>
   <rect class="st19" x="196.1" y="248" width="188.3" height="118.6"/>
   <text class="st3" transform="translate(206.9 268.6)"><tspan x="0" y="0">Wrangler</tspan></text>
   <text class="st4" transform="translate(206.9 282.9)"><tspan x="0" y="0">Build and run wrangler dev</tspan><tspan x="0" y="8.1">Ship wrangler deploy</tspan><tspan x="0" y="16.1">Storage wrangler kv key get / list / put</tspan><tspan x="0" y="24.2">Secrets wrangler secret put</tspan><tspan x="0" y="32.3">Hosting wrangler pages deploy / pages secret</tspan><tspan x="0" y="40.3">History wrangler deployments list</tspan></text>
