@@ -100,6 +100,10 @@ Consul exists to make a **fleet** of services find each other, prove who they ar
 
 ---
 
+![Provisioning compared: Terraform, Packer and Vagrant produce images that a hyperscaler has to run; Wrangler writes, ships and serves](../assets/infrastructure-as-code.svg)
+
+---
+
 ## Keys to the Castle — distributed entitlement
 
 The feature rows above describe *what* each system does. This is the shape underneath, and it is the reason the rows come out the way they do.
@@ -119,6 +123,42 @@ A single store of everything is simultaneously the biggest prize and the tightes
 </div>
 
 *Keys to the Castle — three minutes. Privacy-enhanced: YouTube sets no tracking cookie until you press play. The written version is at [crm-sync.dev/keep-the-castle](https://crm-sync.dev/keep-the-castle).*
+
+---
+
+## The same story, in the objects people actually hold
+
+Every term below arrived because the shape of the problem changed. Read in order, they are the history.
+
+**Monolith** — One room with everything in it: a single build, a single database, and every valuable thing stacked together, because for years that was simply how software was made.
+
+**Microservices** — Not smaller rooms. **Pockets.** The same value broken into many small containers, each holding one thing, each separately owned and carried rather than visited — so you can hand over one without opening all of them.
+
+**Wrappers** — What makes a pocket safe to hold: a container that protects what is inside and gives you something to grip, so the valuable thing is never what your hand is actually touching.
+
+**Proxy services** — The counter you hand a pocket across, so whatever is inside never has to be laid on the table just to be checked.
+
+**Credential** — The key in your own hand. Not a description of you — a thing you hold, which is why it can be lost, copied or taken in a way that a fact about you cannot.
+
+**Identity authorization** — The point where standing nearby stopped counting. With everything in one room, being in the room was permission. With pockets, each one opens for its own reason.
+
+**Identity broker** — Someone who vouches for you once so every pocket does not demand its own proof, invented because nine separate proofs is how a person ends up writing the key down.
+
+**Wallet** — The one place your keys are kept together on purpose: not a vault holding everyone's, but a personal object holding yours, which you carry and can put down.
+
+**Sessions** — Being remembered between reaches, so you are not asked to prove yourself every time you touch a pocket. Convenient exactly until the memory outlasts the reason for it.
+
+**Idempotency** — Putting the same coin in the same pocket twice leaves one coin, not two. It barely mattered when everything was in one room, and became essential the moment instructions had to cross a distance that can drop, delay or repeat them.
+
+**Key ceremony** — The oldest habit here, older than any of it, borrowed from banking and certificate authorities: making or changing a key with witnesses and a script, so that no single pair of hands is ever holding enough of it to walk away.
+
+Then portability arrived, because the value stopped living in one provider — and a vault that only works in one of them is a vault you cannot leave.
+
+Which is where walls stop being the protection:
+
+> **A room protects things by being closed. Pockets protect things by being yours** — many, small, separately held, and useless to anyone who takes one.
+
+That is the whole shift, and it is why the last question is never how thick the walls are, but whose hand the keys are in.
 
 ---
 
