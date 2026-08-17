@@ -179,26 +179,41 @@ Which is a claim that has to be shown rather than asserted. The rest of this sec
 
 ![Parity: six capabilities matched box for box against Vault, Consul, Nomad and Docker — and three with no counterpart](../assets/design-ops-parity.svg)
 
-### The format each vendor ran toward tells you who they built for
+### Three vendors, one conclusion about who writes JSON
 
-Two format decisions, made at roughly the same time, in opposite directions.
+Three format decisions, made independently, by parties who share no market and no incentive to agree.
 
-**Shopify moved *to* JSON.** Online Store 2.0 replaced hardcoded Liquid templates with `templates/product.json`, which declares which sections appear, in what order, with what settings. The rendering stays in Liquid; the structure becomes data — and a merchant rearranges the page in the theme editor without touching code.
+**Shopify moved *to* JSON.** Online Store 2.0 replaced hardcoded Liquid templates with `templates/product.json`, declaring which sections appear, in what order, with what settings. Rendering stays in Liquid; structure becomes data — and a merchant rearranges the page in the theme editor without touching code.
 
-**HashiCorp moved *away* from JSON.** Packer deprecated its JSON templates in favour of HCL2, and Terraform had already made the same move: a configuration language with types, conditionals, `for` expressions and functions.
+**Google moved *to* JSON.** The Content API for Shopping gives way to the Merchant API on **18 August 2026** — versioned, modular, JSON. Programmatic integrations must speak it. File uploads and scheduled fetches survive, which matters more than it first appears.
 
-Neither chose on aesthetics. They chose for whoever was holding the keyboard:
+**HashiCorp moved *away* from JSON.** Packer deprecated its JSON templates for HCL2, and Terraform had already made the same move: types, conditionals, `for` expressions, functions.
 
-| | JSON is | Because |
-|---|---|---|
-| **Shopify** | the destination | a machine writes it and a human edits a UI on top. No merchant ever types it. |
-| **HashiCorp** | the thing to escape | no editor exists, so a human types the file directly — and JSON is miserable to type. No comments, no expressions, punctuation everywhere. |
+That looks like disagreement. It is the opposite.
 
-> **Shopify moved to JSON because there was an interface. HashiCorp moved away from JSON because there wasn't.**
+| | Where JSON sits | Who writes it | Who touches it |
+|---|---|---|---|
+| **Shopify** | the template format | the theme editor | a merchant, in a UI |
+| **Google** | the Merchant API | your integration | a system, programmatically |
+| **HashiCorp** | the interoperability input | machines, explicitly | nobody by hand — humans get HCL |
 
-This is not an inference about them. HashiCorp documents the split as deliberate: HCL is "designed to be written and modified by humans", and its API accepts JSON as input **"so that machines can generate JSON instead of trying to generate HCL"**. Their stated objections to JSON are the practical ones — no comments, and quotes everywhere that make it hard for a person to read. They built a human language and kept JSON as the machine layer, on purpose.
+**All three reached the same conclusion: JSON is the machine-written layer, and humans should not be typing it.**
 
-That is the interface argument proved by two vendors' own decisions rather than asserted by us. And each decision locked in an assumption that shows up in everything downstream: the merchant rearranges a page on a Friday, while the engineer writes a type constraint and the merchant equivalent never enters the building.
+HashiCorp says it outright — the HCL API accepts JSON as input *"so that machines can generate JSON instead of trying to generate HCL"*, and HCL itself is "designed to be written and modified by humans". Their objections are the practical ones: no comments, and quotes everywhere that make it hard for a person to read.
+
+Shopify never states it, but a theme editor writing `product.json` is the same sentence in software. Google never states it either, and an API that emits JSON is the same sentence again.
+
+They differ only on the **remedy**, and the remedy each chose was decided by what they already had:
+
+| | Diagnosis | Remedy | Because they had |
+|---|---|---|---|
+| **HashiCorp** | humans should not type JSON | give humans a *language* | no UI — the user is in a terminal |
+| **Shopify** | humans should not type JSON | give humans an *editor* | a UI as the primary surface |
+| **Google** | humans should not type JSON | give machines an *API* | neither — the client is a system |
+
+> **If you have an interface, JSON is the right destination. If you do not, you need a language instead.**
+
+HashiCorp could not take Shopify's route — not because it is wrong, but because a visual editor for infrastructure configuration was never their product. That is not a criticism. It is the same interface argument, arrived at independently by three vendors, and none of them was arguing our case when they decided it.
 
 ---
 
@@ -206,7 +221,11 @@ That is the interface argument proved by two vendors' own decisions rather than 
 
 The same format decision is now happening to product data, and it is the reason governance stops being a principle and becomes a purchase.
 
-Shopify's Global Catalog exposes products as **typed JSON over GraphQL** — a field graph an agent asks for in a single round trip. Google Merchant consumes the same shape. That is not a feed format. It is an interface, and a REST or CSV catalog cannot present one.
+Shopify's Global Catalog exposes products as **typed JSON over GraphQL** — a field graph an agent asks for in a single round trip. The Merchant API consumes the same shape. That is not a feed format. It is an interface, and a REST or CSV catalog cannot present one.
+
+And the deadline sorts merchants in a way that is easy to misread. **File uploads and scheduled fetches keep working after 18 August 2026** — only programmatic integrations must move. So a merchant on a scheduled XML fetch passes the date untouched, and concludes nothing needed doing.
+
+That is precisely the population that cannot present a catalog an agent can query. **They pass the deadline and fail the shape**, and the second thing does not announce itself.
 
 **An interface changes the questions.** A feed you publish raises none: you export, someone imports, and the arrangement is between two people and a schedule. A catalog that agents *query* raises three immediately —
 
