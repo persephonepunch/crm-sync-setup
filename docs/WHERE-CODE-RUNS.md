@@ -91,6 +91,26 @@ This is why the runtime and the permission model are one conversation. A rule sa
 
 ---
 
+## Provision and package are not the same word
+
+One word gets used for three jobs, and conflating them puts a customer's laptop in the same column as your storage. They are worth separating before anyone budgets for them, because only one of the three has a running cost.
+
+**Provisioning a resource** — creating something on your side that will hold or serve. A storage namespace, a bucket, a database, a certificate for a customer's domain. On a traditional stack this is where the money goes: servers sized, networks drawn, capacity bought before demand arrives. On an edge stack it is much lighter, because what you are creating is a namespace rather than a machine. Nothing is running while idle and there is no capacity to size.
+
+**Provisioning a tenant** — bringing a customer into existence. Writing their configuration, minting the key only they hold, pointing them at their own data instance, mapping their domain. Nothing is created in a cloud; a relationship is created in a register. This is the one that has commercial meaning, because it is the step between *sold* and *serving*, and its cost is measured in minutes of a person's attention rather than in infrastructure.
+
+**Packaging** — putting an application on someone else's device. A desktop binary, an installable web app. This is distribution, and it runs in the opposite direction from the other two: provisioning prepares your side to serve, packaging delivers to their side to be used.
+
+| | Direction | Cost |
+|---|---|---|
+| **Provision a resource** | your side, prepared to serve | metered by use, nothing while idle |
+| **Provision a tenant** | your register, a customer added | minutes of attention, once |
+| **Package** | their device, an app delivered | a build, then distribution |
+
+The distinction matters when someone asks what it costs to add a customer. If provisioning a customer means standing up infrastructure, the answer is a capacity conversation and a lead time. If it means writing a configuration row and minting a key, the answer is minutes — and the difference between those two answers is most of why one business can serve a long tail and the other cannot.
+
+---
+
 ## What each tool was built to solve
 
 Each of these solved a real problem and is good at it. The confusion is usually about which problem is being solved.
