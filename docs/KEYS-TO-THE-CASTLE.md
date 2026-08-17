@@ -110,6 +110,47 @@ That is the whole shift, and it is why the last question is never how thick the 
 
 ---
 
+## The same architecture, running
+
+None of the above is a proposal. It is the shape of a system that is serving requests now, and the useful thing about a worked example is that every claim in it has an address you can check.
+
+| What | Where it lives | What holds it | How you would check |
+|---|---|---|---|
+| Card data | Shopify | never touched, never mirrored | there is no field for it |
+| Identity, consent, spend | **Your own Xano** | four tables — user, claims, extras, consent records | read every row yourself, without asking |
+| Draft content | Webflow | a mirror, not a source | delete it and the record survives |
+| Config and credentials | Cloudflare KV | AES-256-GCM per document, key derived with HKDF | a dump is ciphertext |
+| Grants and mandates | signed, not stored | Ed25519, public half at `/.well-known/jwks.json` | verify one **without an account** |
+| Consequential events | D1 ledger | hash-chained, `UNIQUE(tenant, stream, prev_hash)` | a break in the chain is detectable |
+| Artifacts | the vault | per-asset key, grant-gated, 120-second links | `/assets/<slug>/ledger` says who opened it |
+
+Nothing in that table is concentrated. Take any one row and the others still stand — which is the distribution argument stated as an inventory rather than a metaphor.
+
+### What the AI plane gets from this shape
+
+The runner is an agent loop at `/mcp`, executing scoped tools under a signed mandate. It inherits four properties from the architecture rather than from anything written for it:
+
+- **No disk to write to.** Generated code cannot leave a file behind, because the runtime has no filesystem. Not a restricted one — none.
+- **Authority checked at call time**, against a row a person can change in a browser and revoke in a second. Not a role assigned last quarter.
+- **Every action ledgered**, so the question after the fact is answerable without trusting anyone's memory.
+- **A capability, not a login.** The agent never holds a credential to your data; it holds a grant to one action.
+
+That is why the AI services sit on it comfortably: product vectors and `/admin/products/reindex`, ask-the-docs at `/docs/ask`, translation at `/edge/translate`. Each is a tool the runner may call — and each is subject to the same gate as everything else, rather than being a special case with its own permissions.
+
+### What the shape makes possible that a vault cannot
+
+These are not extra features bolted on. They exist because a ledger, a capability model and an artifact vault were already there, and each is a small addition on top rather than a new system:
+
+- **Minting** — a file becomes an asset a customer can be granted: print files, firmware, documents. Sealed, tracked, revocable.
+- **Price-history evidence** — EU Omnibus 30-day tracking, written before the question is asked rather than reconstructed after.
+- **Firmware provenance** — `/firmware/vault` and a public record for the thing you shipped.
+- **Published SBOM** — `/.well-known/sbom`, so what runs can be inspected without a request to anyone.
+- **Consent as a live gate** — `/consent/resolve` and `/consent/regime`, decided per request rather than reported quarterly.
+
+Each one is the same three primitives applied to a different noun. That is what an architecture buys you that a product does not: the second thing is cheap because the first one was built properly.
+
+---
+
 ## Substrate is not security
 
 People hear no-code and assume toy. But the tools are only *where this runs* — not *what makes it safe*. The controls are the primitives enterprise systems use: signed mandates, PKCE and OIDC, per-action authorization, offline-verifiable grants, real-time consent.
