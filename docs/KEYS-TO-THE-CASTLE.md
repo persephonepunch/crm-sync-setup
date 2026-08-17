@@ -196,6 +196,8 @@ Neither chose on aesthetics. They chose for whoever was holding the keyboard:
 
 > **Shopify moved to JSON because there was an interface. HashiCorp moved away from JSON because there wasn't.**
 
+This is not an inference about them. HashiCorp documents the split as deliberate: HCL is "designed to be written and modified by humans", and its API accepts JSON as input **"so that machines can generate JSON instead of trying to generate HCL"**. Their stated objections to JSON are the practical ones — no comments, and quotes everywhere that make it hard for a person to read. They built a human language and kept JSON as the machine layer, on purpose.
+
 That is the interface argument proved by two vendors' own decisions rather than asserted by us. And each decision locked in an assumption that shows up in everything downstream: the merchant rearranges a page on a Friday, while the engineer writes a type constraint and the merchant equivalent never enters the building.
 
 ---
