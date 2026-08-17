@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1200" viewBox="0 0 1440 1200" aria-label="Parity diagram: seven capabilities matched box for box between Design Ops tools and infrastructure tools, plus minting which has no counterpart">
-  <rect id="canvas" width="1440" height="1200" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1310" viewBox="0 0 1440 1310" aria-label="Parity diagram: seven capabilities matched box for box between Design Ops tools and infrastructure tools, plus minting which has no counterpart">
+  <rect id="canvas" width="1440" height="1310" fill="#ffffff"/>
 
   <!-- ══ HEADER ══════════════════════════════════════════════════ -->
   <g id="header">
     <text x="80" y="76" font-family="Arial, sans-serif" font-size="14" fill="#767676" letter-spacing="4">PARITY</text>
     <text x="80" y="132" font-family="Georgia, 'Iowan Old Style', serif" font-size="42" fill="#111">Keys to the Castle with Design Ops Tools</text>
-    <text x="80" y="170" font-family="Arial, sans-serif" font-size="18" fill="#444">Seven capabilities, matched box for box. One with no counterpart.</text>
+    <text x="80" y="170" font-family="Arial, sans-serif" font-size="18" fill="#444">Seven capabilities, matched box for box. Two with no counterpart at all.</text>
     <line x1="80" y1="204" x2="1360" y2="204" stroke="#111" stroke-width="2"/>
     <text x="300"  y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#12557a" letter-spacing="2.6">DESIGN OPS</text>
     <text x="720"  y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">CAPABILITY</text>
@@ -99,7 +99,19 @@
     <text x="1140" y="1082" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
   </g>
 
+  <!-- Second blank: an entire category they never entered. No design surface, no form
+       handling, no content model — and nothing in the suite receives a browser POST. -->
+  <g id="row-webflow">
+    <rect class="ours" x="80"  y="1138" width="440" height="86" fill="#0b333f"/>
+    <text x="300" y="1190" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Webflow</text>
+    <line x1="520" y1="1181" x2="920" y2="1181" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
+    <rect x="580" y="1163" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="1189" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Design &amp; forms</text>
+    <rect class="theirs" x="920" y="1138" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
+    <text x="1140" y="1188" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
+  </g>
+
   <g id="footer">
-    <text x="80" y="1170" font-family="Arial, sans-serif" font-size="15" fill="#767676">Seven at parity &#8212; the difference is the interface. Vault is a command line, Consul is code, this is a browser.</text>
+    <text x="80" y="1278" font-family="Arial, sans-serif" font-size="15" fill="#767676">Seven at parity &#8212; the difference is the interface. Vault is a command line, Consul is code, this is a browser.</text>
   </g>
 </svg>
