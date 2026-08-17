@@ -1,117 +1,106 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1310" viewBox="0 0 1440 1310" aria-label="Parity diagram: seven capabilities matched box for box between Design Ops tools and infrastructure tools, plus minting which has no counterpart">
-  <rect id="canvas" width="1440" height="1310" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1330" viewBox="0 0 1440 1330" aria-label="Six capabilities matched box for box between Design Ops tools and infrastructure tools, and three with no counterpart">
+  <rect id="canvas" width="1440" height="1330" fill="#ffffff"/>
 
-  <!-- ══ HEADER ══════════════════════════════════════════════════ -->
   <g id="header">
     <text x="80" y="76" font-family="Arial, sans-serif" font-size="14" fill="#767676" letter-spacing="4">PARITY</text>
     <text x="80" y="132" font-family="Georgia, 'Iowan Old Style', serif" font-size="42" fill="#111">Keys to the Castle with Design Ops Tools</text>
-    <text x="80" y="170" font-family="Arial, sans-serif" font-size="18" fill="#444">Seven capabilities, matched box for box. Two with no counterpart at all.</text>
+    <text x="80" y="170" font-family="Arial, sans-serif" font-size="18" fill="#444">Six capabilities, matched box for box. Three with no counterpart at all.</text>
     <line x1="80" y1="204" x2="1360" y2="204" stroke="#111" stroke-width="2"/>
     <text x="300"  y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#12557a" letter-spacing="2.6">DESIGN OPS</text>
     <text x="720"  y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">CAPABILITY</text>
     <text x="1140" y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">INFRASTRUCTURE</text>
   </g>
 
-  <!-- ══ ROWS ════════════════════════════════════════════════════
-       Every row is one <g>. Boxes are identical on both sides on
-       purpose — the parity is the message, so nothing is styled to
-       favour one column. Edit a label by editing its <text>.
-  ═══════════════════════════════════════════════════════════════ -->
-
   <g id="row-config-manager">
     <rect class="ours" x="80"  y="278" width="440" height="86" fill="#12557a"/>
     <text x="300" y="330" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Configurator</text>
     <line x1="520" y1="321" x2="920" y2="321" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="303" width="240" height="36" fill="#ffffff"/>
+    <rect x="580" y="303" width="280" height="36" fill="#ffffff"/>
     <text x="720" y="329" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Config manager</text>
     <rect class="theirs" x="920" y="278" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
     <text x="1140" y="330" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Vault</text>
   </g>
-
   <g id="row-encryption">
     <rect class="ours" x="80"  y="384" width="440" height="86" fill="#12557a"/>
     <text x="300" y="436" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">JWE</text>
     <line x1="520" y1="427" x2="920" y2="427" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="409" width="240" height="36" fill="#ffffff"/>
+    <rect x="580" y="409" width="280" height="36" fill="#ffffff"/>
     <text x="720" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Encryption</text>
     <rect class="theirs" x="920" y="384" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
     <text x="1140" y="436" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Vault</text>
   </g>
-
   <g id="row-key-rotation">
     <rect class="ours" x="80"  y="490" width="440" height="86" fill="#12557a"/>
     <text x="300" y="542" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">JWKS</text>
     <line x1="520" y1="533" x2="920" y2="533" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="515" width="240" height="36" fill="#ffffff"/>
+    <rect x="580" y="515" width="280" height="36" fill="#ffffff"/>
     <text x="720" y="541" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Key rotation</text>
     <rect class="theirs" x="920" y="490" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
     <text x="1140" y="542" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Vault</text>
   </g>
+  <g id="row-orchestration">
+    <rect class="ours" x="80"  y="596" width="440" height="86" fill="#12557a"/>
+    <text x="300" y="648" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Runners</text>
+    <line x1="520" y1="639" x2="920" y2="639" stroke="#c9c9c9" stroke-width="1"/>
+    <rect x="580" y="621" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="647" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Orchestration</text>
+    <rect class="theirs" x="920" y="596" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
+    <text x="1140" y="648" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Nomad</text>
+  </g>
+  <g id="row-function-stack">
+    <rect class="ours" x="80"  y="702" width="440" height="86" fill="#12557a"/>
+    <text x="300" y="754" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">AI</text>
+    <line x1="520" y1="745" x2="920" y2="745" stroke="#c9c9c9" stroke-width="1"/>
+    <rect x="580" y="727" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="753" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Function Stack</text>
+    <rect class="theirs" x="920" y="702" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
+    <text x="1140" y="754" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Docker</text>
+  </g>
+  <g id="row-access-control">
+    <rect class="ours" x="80"  y="808" width="440" height="86" fill="#12557a"/>
+    <text x="300" y="860" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Caps</text>
+    <line x1="520" y1="851" x2="920" y2="851" stroke="#c9c9c9" stroke-width="1"/>
+    <rect x="580" y="833" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="859" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Access control</text>
+    <rect class="theirs" x="920" y="808" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
+    <text x="1140" y="860" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Boundary</text>
+  </g>
+
+  <!-- The parity ends here. Everything below has nothing on the other side, and each is
+       blank for its own reason: data because they never hold a record, minting because
+       they never built it, design because they never entered the category. -->
+  <line x1="80" y1="900" x2="1360" y2="900" stroke="#111" stroke-width="1.5"/>
+  <text x="80" y="922" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.6">NO COUNTERPART</text>
 
   <g id="row-data-binding">
-    <rect class="ours" x="80"  y="596" width="440" height="86" fill="#12557a"/>
-    <text x="300" y="648" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Xano</text>
-    <line x1="520" y1="639" x2="920" y2="639" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="621" width="240" height="36" fill="#ffffff"/>
-    <text x="720" y="647" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Data binding</text>
-    <rect class="theirs" x="920" y="596" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
-    <text x="1140" y="648" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Consul</text>
+    <rect class="ours" x="80"  y="940" width="440" height="86" fill="#0b333f"/>
+    <text x="300" y="992" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Xano</text>
+    <line x1="520" y1="983" x2="920" y2="983" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
+    <rect x="580" y="965" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="991" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Data binding</text>
+    <rect class="theirs" x="920" y="940" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
+    <text x="1140" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
   </g>
-
-  <g id="row-orchestration">
-    <rect class="ours" x="80"  y="702" width="440" height="86" fill="#12557a"/>
-    <text x="300" y="754" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Runners</text>
-    <line x1="520" y1="745" x2="920" y2="745" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="727" width="240" height="36" fill="#ffffff"/>
-    <text x="720" y="753" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Orchestration</text>
-    <rect class="theirs" x="920" y="702" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
-    <text x="1140" y="754" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Nomad</text>
-  </g>
-
-  <g id="row-function-stack">
-    <rect class="ours" x="80"  y="808" width="440" height="86" fill="#12557a"/>
-    <text x="300" y="860" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">AI</text>
-    <line x1="520" y1="851" x2="920" y2="851" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="833" width="240" height="36" fill="#ffffff"/>
-    <text x="720" y="859" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Function Stack</text>
-    <rect class="theirs" x="920" y="808" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
-    <text x="1140" y="860" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Docker</text>
-  </g>
-
-  <g id="row-access-control">
-    <rect class="ours" x="80"  y="914" width="440" height="86" fill="#12557a"/>
-    <text x="300" y="966" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Caps</text>
-    <line x1="520" y1="957" x2="920" y2="957" stroke="#c9c9c9" stroke-width="1"/>
-    <rect x="600" y="939" width="240" height="36" fill="#ffffff"/>
-    <text x="720" y="965" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Access control</text>
-    <rect class="theirs" x="920" y="914" width="440" height="86" fill="#ffffff" stroke="#b4b4b4" stroke-width="1.5"/>
-    <text x="1140" y="966" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#767676">Boundary</text>
-  </g>
-
-  <!-- The one asymmetry: filled on the left, an empty dashed box on the right. -->
   <g id="row-minting">
-    <rect class="ours" x="80"  y="1032" width="440" height="86" fill="#0b333f"/>
-    <text x="300" y="1084" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Vault</text>
-    <line x1="520" y1="1075" x2="920" y2="1075" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
-    <rect x="600" y="1057" width="240" height="36" fill="#ffffff"/>
-    <text x="720" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Minting</text>
-    <rect class="theirs" x="920" y="1032" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
-    <text x="1140" y="1082" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
+    <rect class="ours" x="80"  y="1046" width="440" height="86" fill="#0b333f"/>
+    <text x="300" y="1098" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Vault</text>
+    <line x1="520" y1="1089" x2="920" y2="1089" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
+    <rect x="580" y="1071" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="1097" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Minting</text>
+    <rect class="theirs" x="920" y="1046" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
+    <text x="1140" y="1096" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
   </g>
-
-  <!-- Second blank: an entire category they never entered. No design surface, no form
-       handling, no content model — and nothing in the suite receives a browser POST. -->
   <g id="row-webflow">
-    <rect class="ours" x="80"  y="1138" width="440" height="86" fill="#0b333f"/>
-    <text x="300" y="1190" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Webflow</text>
-    <line x1="520" y1="1181" x2="920" y2="1181" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
-    <rect x="580" y="1163" width="280" height="36" fill="#ffffff"/>
-    <text x="720" y="1189" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Design &amp; forms</text>
-    <rect class="theirs" x="920" y="1138" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
-    <text x="1140" y="1188" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
+    <rect class="ours" x="80"  y="1152" width="440" height="86" fill="#0b333f"/>
+    <text x="300" y="1204" text-anchor="middle" font-family="Georgia, serif" font-size="27" fill="#ffffff">Webflow</text>
+    <line x1="520" y1="1195" x2="920" y2="1195" stroke="#c9c9c9" stroke-width="1" stroke-dasharray="4 4"/>
+    <rect x="580" y="1177" width="280" height="36" fill="#ffffff"/>
+    <text x="720" y="1203" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#0b333f">Design &amp; forms</text>
+    <rect class="theirs" x="920" y="1152" width="440" height="86" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5" stroke-dasharray="7 6"/>
+    <text x="1140" y="1202" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" fill="#a0a0a0">no counterpart</text>
   </g>
 
   <g id="footer">
-    <text x="80" y="1278" font-family="Arial, sans-serif" font-size="15" fill="#767676">Seven at parity &#8212; the difference is the interface. Vault is a command line, Consul is code, this is a browser.</text>
+    <text x="80" y="1298" font-family="Arial, sans-serif" font-size="15" fill="#767676">Six at parity &#8212; the difference is the interface. Vault is a command line, Consul is code, this is a browser.</text>
   </g>
 </svg>
