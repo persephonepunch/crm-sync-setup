@@ -179,6 +179,52 @@ Which is a claim that has to be shown rather than asserted. The rest of this sec
 
 ![Parity: six capabilities matched box for box against Vault, Consul, Nomad and Docker — and three with no counterpart](../assets/design-ops-parity.svg)
 
+### The format each vendor ran toward tells you who they built for
+
+Two format decisions, made at roughly the same time, in opposite directions.
+
+**Shopify moved *to* JSON.** Online Store 2.0 replaced hardcoded Liquid templates with `templates/product.json`, which declares which sections appear, in what order, with what settings. The rendering stays in Liquid; the structure becomes data — and a merchant rearranges the page in the theme editor without touching code.
+
+**HashiCorp moved *away* from JSON.** Packer deprecated its JSON templates in favour of HCL2, and Terraform had already made the same move: a configuration language with types, conditionals, `for` expressions and functions.
+
+Neither chose on aesthetics. They chose for whoever was holding the keyboard:
+
+| | JSON is | Because |
+|---|---|---|
+| **Shopify** | the destination | a machine writes it and a human edits a UI on top. No merchant ever types it. |
+| **HashiCorp** | the thing to escape | no editor exists, so a human types the file directly — and JSON is miserable to type. No comments, no expressions, punctuation everywhere. |
+
+> **Shopify moved to JSON because there was an interface. HashiCorp moved away from JSON because there wasn't.**
+
+That is the interface argument proved by two vendors' own decisions rather than asserted by us. And each decision locked in an assumption that shows up in everything downstream: the merchant rearranges a page on a Friday, while the engineer writes a type constraint and the merchant equivalent never enters the building.
+
+---
+
+### Why the catalog shape makes this commercial
+
+The same format decision is now happening to product data, and it is the reason governance stops being a principle and becomes a purchase.
+
+Shopify's Global Catalog exposes products as **typed JSON over GraphQL** — a field graph an agent asks for in a single round trip. Google Merchant consumes the same shape. That is not a feed format. It is an interface, and a REST or CSV catalog cannot present one.
+
+**An interface changes the questions.** A feed you publish raises none: you export, someone imports, and the arrangement is between two people and a schedule. A catalog that agents *query* raises three immediately —
+
+- Who is asking?
+- What are they allowed to see?
+- What did they do, and on whose behalf?
+
+Nobody needed answers in the CSV era, because the reader was a person with a login and a contract. Those are exactly the assumptions that break when the reader is generated code.
+
+**Which is why encryption as a service becomes load-bearing, and why it takes both halves:**
+
+- **Signed, and verifiable by strangers.** An agent acting under a mandate must prove it to a party with no relationship to you and no reason to trust you. That is a published key — verification without an account, without a callback, without asking permission.
+- **Encrypted, not merely signed.** The claims travel through hops you do not own. A JWE stays opaque to the browser holding it, the agent carrying it and any middleware that terminates TLS on the way. Signing proves origin; only encryption stops the carrier reading the contents.
+
+A catalogue in the old shape has neither — and the part that matters commercially is that **nobody discovers this as a security problem.** It surfaces as not appearing, or as being unable to answer a question a partner asks. The gap arrives as an absence, not an alarm.
+
+> The format change makes you legible to agents. Being legible to agents is what turns governance from a principle into a purchase.
+
+---
+
 ### Start with the interface
 
 Before any feature row, the thing that quietly decides everything: **how you actually use it.**
