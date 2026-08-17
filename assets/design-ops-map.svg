@@ -2,111 +2,111 @@
   <rect width="1440" height="1010" fill="#ffffff"/>
 
   <!-- ── masthead ─────────────────────────────────────────────── -->
-  <text x="64" y="70" font-size="15" fill="#767676" letter-spacing="4" font-family="ui-monospace, Menlo, monospace">FEATURE MAP</text>
+  <text x="64" y="70" font-size="15" fill="#767676" letter-spacing="4" font-family="Arial, sans-serif">FEATURE MAP</text>
   <text x="64" y="118" font-size="38" fill="#111">Keys to the Castle with Design Ops Tools</text>
-  <text x="64" y="152" font-size="17" fill="#444" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">Same utility, same security, same scaling &#8212; plus minting.</text>
+  <text x="64" y="152" font-size="17" fill="#444" font-family="Arial, sans-serif">Same utility, same security, same scaling &#8212; plus minting.</text>
   <line x1="64" y1="180" x2="1376" y2="180" stroke="#111" stroke-width="2"/>
 
   <!-- ── column headers ───────────────────────────────────────── -->
-  <text x="64"   y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="ui-monospace, Menlo, monospace">INFRASTRUCTURE STACK</text>
-  <text x="470"  y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="ui-monospace, Menlo, monospace">CAPABILITY</text>
-  <text x="800"  y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="ui-monospace, Menlo, monospace">SERVICE &#183; DELIVERY</text>
-  <text x="1096" y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="ui-monospace, Menlo, monospace">DESIGN OPS STACK</text>
+  <text x="64"   y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="Arial, sans-serif">INFRASTRUCTURE STACK</text>
+  <text x="470"  y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="Arial, sans-serif">CAPABILITY</text>
+  <text x="800"  y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="Arial, sans-serif">SERVICE &#183; DELIVERY</text>
+  <text x="1096" y="216" font-size="12" fill="#767676" letter-spacing="2.4" font-family="Arial, sans-serif">DESIGN OPS STACK</text>
   <line x1="64" y1="232" x2="1376" y2="232" stroke="#c9c9c9" stroke-width="1"/>
 
   <!-- ── row template repeated ────────────────────────────────── -->
   <!-- ROW 1 — Config manager -->
   <g>
     <text x="64" y="284" font-size="19" fill="#111">Vault</text>
-    <text x="64" y="306" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">KV v2 secrets</text>
+    <text x="64" y="306" font-size="13" fill="#767676" font-family="Arial, sans-serif">KV v2 secrets</text>
     <path d="M300 288 H430" stroke="#111" stroke-width="1.2"/><path d="M424 283 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="284" font-size="21" fill="#111">Config manager</text>
     <path d="M760 288 H890" stroke="#111" stroke-width="1.2"/><path d="M884 283 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="312" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">Configurator &#183; Push</text>
+    <text x="800" y="312" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">Configurator &#183; Push</text>
     <text x="1096" y="284" font-size="17" fill="#111">Cloudflare</text>
-    <text x="1096" y="306" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">one document per tenant</text>
+    <text x="1096" y="306" font-size="13" fill="#767676" font-family="Arial, sans-serif">one document per tenant</text>
     <line x1="64" y1="330" x2="1376" y2="330" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 2 — Encryption -->
   <g>
     <text x="64" y="382" font-size="19" fill="#111">Vault</text>
-    <text x="64" y="404" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">barrier &#183; transit</text>
+    <text x="64" y="404" font-size="13" fill="#767676" font-family="Arial, sans-serif">barrier &#183; transit</text>
     <path d="M300 386 H430" stroke="#111" stroke-width="1.2"/><path d="M424 381 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="382" font-size="21" fill="#111">Encryption</text>
     <path d="M760 386 H890" stroke="#111" stroke-width="1.2"/><path d="M884 381 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="410" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">JWE &#183; Sealed</text>
+    <text x="800" y="410" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">JWE &#183; Sealed</text>
     <text x="1096" y="382" font-size="17" fill="#111">Xano</text>
-    <text x="1096" y="404" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">claims sealed, not just signed</text>
+    <text x="1096" y="404" font-size="13" fill="#767676" font-family="Arial, sans-serif">claims sealed, not just signed</text>
     <line x1="64" y1="428" x2="1376" y2="428" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 3 — Key rotation -->
   <g>
     <text x="64" y="480" font-size="19" fill="#111">Vault</text>
-    <text x="64" y="502" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">unseal &#183; rekey</text>
+    <text x="64" y="502" font-size="13" fill="#767676" font-family="Arial, sans-serif">unseal &#183; rekey</text>
     <path d="M300 484 H430" stroke="#111" stroke-width="1.2"/><path d="M424 479 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="480" font-size="21" fill="#111">Key rotation</text>
     <path d="M760 484 H890" stroke="#111" stroke-width="1.2"/><path d="M884 479 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="508" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">JWKS &#183; Ceremony</text>
+    <text x="800" y="508" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">JWKS &#183; Ceremony</text>
     <text x="1096" y="480" font-size="17" fill="#111">Cloudflare</text>
-    <text x="1096" y="502" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">Ed25519, published key</text>
+    <text x="1096" y="502" font-size="13" fill="#767676" font-family="Arial, sans-serif">Ed25519, published key</text>
     <line x1="64" y1="526" x2="1376" y2="526" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 4 — Data binding -->
   <g>
     <text x="64" y="578" font-size="19" fill="#111">Consul</text>
-    <text x="64" y="600" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">KV &#183; ConfigMaps</text>
+    <text x="64" y="600" font-size="13" fill="#767676" font-family="Arial, sans-serif">KV &#183; ConfigMaps</text>
     <path d="M300 582 H430" stroke="#111" stroke-width="1.2"/><path d="M424 577 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="578" font-size="21" fill="#111">Data binding</text>
     <path d="M760 582 H890" stroke="#111" stroke-width="1.2"/><path d="M884 577 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="606" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">Xano &#183; Rows</text>
+    <text x="800" y="606" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">Xano &#183; Rows</text>
     <text x="1096" y="578" font-size="17" fill="#111">Xano &#8594; Webflow</text>
-    <text x="1096" y="600" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">record, then mirror</text>
+    <text x="1096" y="600" font-size="13" fill="#767676" font-family="Arial, sans-serif">record, then mirror</text>
     <line x1="64" y1="624" x2="1376" y2="624" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 5 — Orchestration -->
   <g>
     <text x="64" y="676" font-size="19" fill="#111">Consul &#183; Kubernetes</text>
-    <text x="64" y="698" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">Nomad &#183; schedulers</text>
+    <text x="64" y="698" font-size="13" fill="#767676" font-family="Arial, sans-serif">Nomad &#183; schedulers</text>
     <path d="M300 680 H430" stroke="#111" stroke-width="1.2"/><path d="M424 675 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="676" font-size="21" fill="#111">Orchestration</text>
     <path d="M760 680 H890" stroke="#111" stroke-width="1.2"/><path d="M884 675 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="704" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">Runners &#183; Mandate</text>
+    <text x="800" y="704" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">Runners &#183; Mandate</text>
     <text x="1096" y="676" font-size="17" fill="#111">Xano &#183; Cloudflare</text>
-    <text x="1096" y="698" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">schedules authority</text>
+    <text x="1096" y="698" font-size="13" fill="#767676" font-family="Arial, sans-serif">schedules authority</text>
     <line x1="64" y1="722" x2="1376" y2="722" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 6 — Function logic -->
   <g>
     <text x="64" y="774" font-size="19" fill="#111">Docker &#183; Kubernetes</text>
-    <text x="64" y="796" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">containers &#183; sidecars</text>
+    <text x="64" y="796" font-size="13" fill="#767676" font-family="Arial, sans-serif">containers &#183; sidecars</text>
     <path d="M300 778 H430" stroke="#111" stroke-width="1.2"/><path d="M424 773 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="774" font-size="21" fill="#111">Function Stack</text>
     <path d="M760 778 H890" stroke="#111" stroke-width="1.2"/><path d="M884 773 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="802" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">AI &#183; Edge</text>
+    <text x="800" y="802" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">AI &#183; Edge</text>
     <text x="1096" y="774" font-size="17" fill="#111">Xano &#183; AI</text>
-    <text x="1096" y="796" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">written by AI, run at the edge</text>
+    <text x="1096" y="796" font-size="13" fill="#767676" font-family="Arial, sans-serif">written by AI, run at the edge</text>
     <line x1="64" y1="820" x2="1376" y2="820" stroke="#e5e5e5" stroke-width="1"/>
   </g>
 
   <!-- ROW 7 — Directional gating -->
   <g>
     <text x="64" y="872" font-size="19" fill="#111">Consul</text>
-    <text x="64" y="894" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">intentions &#183; mesh</text>
+    <text x="64" y="894" font-size="13" fill="#767676" font-family="Arial, sans-serif">intentions &#183; mesh</text>
     <path d="M300 876 H430" stroke="#111" stroke-width="1.2"/><path d="M424 871 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
     <text x="470" y="872" font-size="21" fill="#111">Directional gating</text>
     <path d="M760 876 H890" stroke="#111" stroke-width="1.2"/><path d="M884 871 l7 5 -7 5" fill="none" stroke="#111" stroke-width="1.2"/>
-    <text x="800" y="900" font-size="14" fill="#0b333f" font-family="ui-monospace, Menlo, monospace">Caps &#183; Grants</text>
+    <text x="800" y="900" font-size="14" fill="#0b333f" font-family="Arial, sans-serif">Caps &#183; Grants</text>
     <text x="1096" y="872" font-size="17" fill="#111">Xano</text>
-    <text x="1096" y="894" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">one arrow, one check</text>
+    <text x="1096" y="894" font-size="13" fill="#767676" font-family="Arial, sans-serif">one arrow, one check</text>
     <line x1="64" y1="918" x2="1376" y2="918" stroke="#111" stroke-width="2"/>
   </g>
 
   <!-- ── footer ───────────────────────────────────────────────── -->
-  <text x="64" y="952" font-size="14" fill="#111" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">Interface: Vault is a command line. Consul is code, dev only. This is a browser.</text>
-  <text x="64" y="978" font-size="13" fill="#767676" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">Plus minting &#8212; a file becomes an asset a customer can be granted. No equivalent on the infrastructure side.</text>
+  <text x="64" y="952" font-size="14" fill="#111" font-family="Arial, sans-serif">Interface: Vault is a command line. Consul is code, dev only. This is a browser.</text>
+  <text x="64" y="978" font-size="13" fill="#767676" font-family="Arial, sans-serif">Plus minting &#8212; a file becomes an asset a customer can be granted. No equivalent on the infrastructure side.</text>
 </svg>
