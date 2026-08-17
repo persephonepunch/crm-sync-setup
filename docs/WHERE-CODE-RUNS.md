@@ -180,6 +180,24 @@ What changed is not the quality of the practice but the shape of the actor it wa
 
 That is the difficult part commercially. The risk is not the team that does not know. It is the team that knows very well, is applying a control correctly, and has no signal that the ground moved — because nothing failed, no alert fired, and the practice still looks exactly as sound as it did when it was.
 
+### The same thing happens to a contract
+
+It is not only practices that depreciate. Vetted purchases do too, and the mechanism is identical.
+
+An organisation evaluates a platform properly — security posture, SOC 2, the data processing agreement, financials, references. All of it real, all of it right. **What no evaluation examines is whether the shape of the product will still fit in three years**, because that is not a vendor risk question and there is no section in the questionnaire for it.
+
+The rigour then compounds the exposure. A thorough evaluation justifies a longer term, because the effort has to be amortised and the discount arrives with the commitment. **The more carefully it was chosen, the longer the commitment to the choice.**
+
+And the weight that keeps it in place is not the money already spent.
+
+> Sunk cost is money. The real weight is that the decision is defended by everyone who approved it.
+
+A rigorous procurement creates institutional confidence — signatures, a business case, a steering group, people who staked judgment on it publicly. Revisiting it stops being a technical question and becomes a political one. The person best placed to see the problem is the person who would have to say *the thing I championed is now the constraint*, in front of the people who backed them.
+
+Same shape as the engineer holding a practice that was right until it was not. In both cases the strongest resistance comes from the most capable person, and in neither case is it stubbornness. It is that saying so costs them something real, while nothing has visibly failed to force the conversation.
+
+**Which is why the only workable move is one that requires no admission.** A capability that sits beside the existing contract, does the thing the contract cannot, and leaves it running, asks nobody to say they were wrong. The vendor keeps being paid. The business case stands. Nothing is ripped out. That is not a softer sell — it is the only version of the conversation a buyer in that position can actually have.
+
 **The only durable answer is a check that asks rather than a convention that is remembered.** A runtime with no disk does not require anyone to have kept up. A capability that must be granted does not depend on someone recalling that the assumptions changed.
 
 ---
