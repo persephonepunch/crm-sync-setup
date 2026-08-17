@@ -97,12 +97,14 @@
       <text x="534" y="984" font-family="Arial, sans-serif" font-size="15" fill="#444">versions of the above.</text>
     </g>
 
-    <g id="box-vocabulary">
+    <!-- Descriptive only — not a product. The primitive itself, named, because the
+         rest of the stack is described in terms of it. -->
+    <g id="box-primitive">
       <rect x="960" y="884" width="420" height="132" fill="#f4f4f4" stroke="#c4c4c4" stroke-width="1.5" stroke-dasharray="6 5"/>
-      <text x="984" y="924" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.2">VOCABULARY</text>
-      <text x="984" y="952" font-family="Arial, sans-serif" font-size="15" fill="#444">A container is a <tspan font-style="italic">task</tspan>. A placed</text>
-      <text x="984" y="974" font-family="Arial, sans-serif" font-size="15" fill="#444">instance is an <tspan font-style="italic">allocation</tspan>. Docker is</text>
-      <text x="984" y="996" font-family="Arial, sans-serif" font-size="15" fill="#444">a <tspan font-style="italic">task driver</tspan>, one of several.</text>
+      <text x="984" y="920" font-family="Arial, sans-serif" font-size="12" fill="#767676" letter-spacing="2.2">THE PRIMITIVE</text>
+      <text x="984" y="952" font-family="Georgia, serif" font-size="24" fill="#111">Container</text>
+      <text x="984" y="980" font-family="Arial, sans-serif" font-size="14" fill="#444">Nomad calls one a <tspan font-style="italic">task</tspan>; a placed instance</text>
+      <text x="984" y="1000" font-family="Arial, sans-serif" font-size="14" fill="#444">an <tspan font-style="italic">allocation</tspan>. Docker is a <tspan font-style="italic">task driver</tspan>.</text>
     </g>
   </g>
 
