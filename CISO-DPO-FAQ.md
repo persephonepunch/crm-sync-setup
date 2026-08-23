@@ -8,7 +8,7 @@ source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CISO-DPO-F
 ---
 # Security & Privacy — Questions from CISOs and DPOs
 
-**Last updated:** 2026-07-14 · **Worker version:** `d2065f3d` · This document is versioned and public.
+**Last updated:** 2026-08-23 · **Worker version:** `d2065f3d` · This document is versioned and public.
 
 **Before you start.** You are probably assuming that a system built on Webflow, Xano, and Cloudflare
 is less secure than one built on Salesforce. That is a reasonable prior. This document gives you the
@@ -107,6 +107,29 @@ Our answer: the data subject sees their own record — consent history, which sy
 orders and returns on one timeline. No ticket, no admin, no tier. A DSAR that answers itself is one
 your DPO never has to file a request to answer.
 
+**"What credentials exist, and what can each one actually do?"**
+
+The question behind it is usually *what happens when one leaks*, so that is the last column.
+Every credential here is bounded on five axes — scope, what it is bound to, expiry, whether it
+can be used more than once, and who may revoke it. A credential with none of those bounds is a
+copy of somebody's whole authority, and that is the shape we work to remove rather than to
+store more carefully.
+
+| Credential | What it is | Scope | Bound to | Expires | Single-use | If it leaks |
+|---|---|---|---|---|---|---|
+| Platform admin key | The operator's credential | Unrestricted | — | No | No | The estate. Which is why no app, no browser and no distributed binary holds one |
+| Provisioning key | Lets one app mint per-shop credentials at install | A ceiling fixed when the key is created — it cannot grant a scope it was not given | Optionally a named list of stores | Optional | No | The ability to provision *that one app*. It cannot read a store, and it can only revoke tokens it minted |
+| Tenant token | What an app or console uses to act for one store | Named scopes | One store, enforced server-side — a mismatch is refused, not silently redirected | Optional | No | One store |
+| Review link | Authorises one review | One action | One product and one person | 30 days | **Yes** | One review on one product |
+| Storefront public token | Public by design | Public catalogue reads | One store | No | No | Nothing that was not already public |
+| Data-subject session | A person's own session over their own record | Their own data | One subject | Short | No | One person's own data |
+
+Two things this table is meant to let you check rather than take on faith. The credential handed
+to a stranger — the review link — carries the *most* bounds, not the fewest. And the platform key
+is the only unbounded row, held by an operator and by nothing that ships.
+
+---
+
 ---
 
 ## 4 · Us, as a vendor
@@ -168,7 +191,7 @@ Disable any partner integration with one authenticated config call. No code chan
 | Consent writes are best-effort idempotent, not exactly-once (duplicate records possible) | High | Sprint 2 |
 | Conflict resolution is most-recent-write-wins — a later sync can overwrite an earlier consent withdrawal; correcting to last-intent-wins (this is the §2 "limitation we'll name" finding) | High | Sprint 2 |
 | Consent Mode v2: `ad_storage`, `ad_user_data`, `ad_personalization` all driven by one marketing flag — not separately electable | Medium | Planned |
-| Platform admin key authenticates tenant routes and cannot yet be disabled per tenant | Medium | Sprint 2 |
+| Platform admin key authenticates tenant routes and cannot yet be disabled per tenant | Medium | **Narrowed 2026-08-23** — apps no longer hold it. Installed apps now carry a scoped provisioning key that can mint and revoke their own per-store tokens and nothing else. The key still authenticates operator routes |
 | Ed25519 signing private key resides in Cloudflare KV, not a dedicated secrets vault | Medium | Sprint 2 |
 | No revocation of a signed mandate faster than its expiry (mandates are short-lived + scoped) | Medium | Planned |
 | CSP headers on embedded pages | Low | Open |
@@ -184,6 +207,72 @@ Disable any partner integration with one authenticated config call. No code chan
   `/admin/webflow-ensure-fields`, `/admin/webflow-sync-test`, `/admin/webflow-test`,
   `/admin/shopify-customers`, `/admin/shopify-test`, `/sync/customers`, `/sync/webflow`,
   `/tags/create`.
+
+---
+
+## Appendix · The vocabulary, defined
+
+Published because these terms get used in security reviews by people who were never shown what
+they mean, and a control you cannot define is a control you cannot evaluate.
+
+### Keys and tokens
+
+**PKI — Public Key Infrastructure.** The arrangement that makes a public key trustworthy: how
+keys are issued, published, rotated and retired. Classic PKI answers *why should I trust this
+key* with a certificate authority's signature. We answer it with a key set published on a domain
+we own — no authority in the chain, nothing to renew with a vendor, and the domain is the root
+of trust.
+
+**JWT — JSON Web Token.** The general container. In practice almost always a JWS.
+
+**JWS — JSON Web Signature.** *Signed.* Anyone can read it; nobody can forge it. Our certificates
+are JWS, because public readability is the point — "no account required" only means something if
+a stranger can open one and check it.
+
+**JWE — JSON Web Encryption.** *Encrypted.* Only the holder of the decryption key can open it at
+all. Our identity plane is JWE, which is what makes "the relay is empty" a fact rather than a
+promise: it carries ciphertext it cannot read.
+
+**JWKS — JSON Web Key Set.** The published list of **public** keys. It contains no private
+material. It is what lets you verify a certificate offline, without an account and without
+calling us.
+
+**kid — Key ID.** A label in a token's header naming *which* key signed it. Not a secret. It
+exists so rotation does not break history: a new key is published, the previous one stays until
+its tokens expire, and last year's certificates still verify.
+
+**Bearer token.** A credential that proves only possession — whoever holds it is you. A GitHub
+personal access token is the familiar example. It carries no signature and no proof of origin, so
+it records nothing about *which* holder called. This is why the table above is about bounds: a
+bearer token is only as safe as the limits placed on it.
+
+### Access control
+
+**RBAC — Role-Based Access Control.** Permission follows from what you *are*. Assign a role, and
+the role carries a bundle of permissions. Simple to reason about, and it degrades in two known
+ways: roles multiply until nobody can say what one grants, and you cannot revoke half a role.
+
+**ABAC — Attribute-Based Access Control.** Permission is computed from attributes of the subject,
+the resource and the context ("a manager, in the EU, during business hours"). More expressive
+than RBAC, and the trade is that a decision lives in a policy engine rather than in the data —
+so *why* someone had access last March can be hard to reconstruct.
+
+**Row-level.** Permission is a **row**: one subject, one capability, one asset. The grant is data
+rather than configuration, which has three consequences a security office can test. Revocation is
+deleting a row, not editing a policy. Every grant and every denial is a record, so the audit
+question is a query rather than a reconstruction. And nothing holds standing authority over
+everything — there is no central bundle to compromise.
+
+### How they combine here
+
+Roles exist, because humans need them and a purchase has to grant something legible. But a role
+is a **convenience over rows, not a substitute for them**: buying grants roles, roles map to
+capability rows, and the row is what is checked at the point of access.
+
+That ordering is the whole data strategy. An RBAC-only system answers "who can do this" by
+inspecting configuration. A row-level system answers it by reading data — and can therefore also
+answer "who *did*", "when was that granted", and "what exactly stops working if I delete this",
+which are the three questions that actually get asked after an incident.
 
 ---
 
