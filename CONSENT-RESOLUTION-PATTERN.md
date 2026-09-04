@@ -402,14 +402,24 @@ Phase 3 raise them; the cost of doing so in a non-opt-in region is one `consent 
 
 ### Third parties are inside the gate, not beside it
 
-The same capture found the Merchant Center trust badge loading unconditionally from a footer loader,
-pulling `apis.google.com`, a `google.com` iframe and RPC, `gstatic.com`, and Google Fonts on every page load.
-The badge is low-risk in itself; the font fetch is not. Google Fonts served from `fonts.googleapis.com` was
-held an unlawful transfer of a visitor's IP address absent consent (LG München I, 3 O 17493/20, 2022).
+In the source capture a Merchant Center trust badge appeared to load unconditionally from a footer
+loader, pulling `apis.google.com`, a `google.com` iframe and RPC, `gstatic.com`, and Google Fonts.
+Reading the loader source settled it the other way: the badge injects `platform.js` only from inside a
+mount function guarded on marketing consent, and it loaded 250 ms **after** the consent bootstrap
+because it had been waiting for it. The gate was working.
 
-The rule generalises: **anything that opens a connection to a third party is inside the consent gate** —
-badges, fonts, chat widgets, map embeds, video players, review widgets, A/B tools. Gate each on the
-functional category, or self-host it. Self-hosting fonts is the cheaper of the two and removes the question entirely.
+**Keep that correction in view, because the method matters more than the verdict.** A HAR cannot
+distinguish "not gated" from "gated, and consent resolved a moment ago" — both look like a third-party
+request shortly after page load. Ordering is suggestive, never conclusive. Only two things settle it: the
+loader source, or a **reject-all capture**, where a correctly gated resource is simply absent. Treat a
+third-party request in a consented capture as a question, not a finding.
+
+The rule it illustrates stands regardless: **anything that opens a connection to a third party is inside
+the consent gate** — badges, fonts, chat widgets, map embeds, video players, review widgets, A/B tools.
+Gate each on the functional category, or self-host it. The exposure is real even when the widget is
+trivial: Google Fonts served from `fonts.googleapis.com` was held an unlawful transfer of a visitor's IP
+address absent consent (LG München I, 3 O 17493/20, 2022). Self-hosting fonts is the cheaper of the two
+answers and removes the question entirely.
 
 ---
 
@@ -455,6 +465,13 @@ Then confirm the resolution actually happened at load:
 4. **The ledger write is present as a completed 2xx, not only as a `204` preflight.** Seven `OPTIONS`
    requests returned 204 in the source capture with no matching `POST` recorded. A preflight proves the
    browser asked permission. It does not prove the write landed.
+
+   When a sanitized export hides the follow-up, the **server side settles it** and is the stronger
+   evidence anyway. In the source case the consent ledger held five hash-chained rows whose
+   `ga_session_id` carried the session component `s1788525894` — byte-identical to the session half of
+   the HAR's own temporary client ID `362792477.1788525894` — written 28 seconds after that session
+   began. The write had landed all along; only the proof was missing from the capture. Join on the
+   identifier the client sent, not on wall-clock time, and a sanitized HAR stops being the last word.
 
 ### Adversarial captures
 
