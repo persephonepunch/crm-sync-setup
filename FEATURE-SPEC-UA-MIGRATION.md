@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/feature-spec-ua-migr
 category: "Specs"
 date: 2026-06-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FEATURE-SPEC-UA-MIGRATION.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — Feature Specification Addendum
 

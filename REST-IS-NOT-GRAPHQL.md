@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.
 category: "Shopify"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/REST-IS-NOT-GRAPHQL.md
+licence: CC-BY-4.0
 ---
 # REST Is Not GraphQL
 

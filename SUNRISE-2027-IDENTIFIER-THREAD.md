@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/sunrise-2027-identif
 category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SUNRISE-2027-IDENTIFIER-THREAD.md
+licence: CC-BY-4.0
 ---
 # Product Taxonomy, GraphQL and the GID Rename
 ## CPG planning toward Sunrise 2027

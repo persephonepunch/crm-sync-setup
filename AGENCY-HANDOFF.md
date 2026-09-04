@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/agency-handoff.html
 category: "Setup"
 date: 2026-06-12
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENCY-HANDOFF.md
+licence: CC-BY-4.0
 ---
 # Agency → Client Deploy Handoff
 

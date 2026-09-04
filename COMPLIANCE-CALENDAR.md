@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/compliance-calendar.
 category: "Global"
 date: 2026-08-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/COMPLIANCE-CALENDAR.md
+licence: CC-BY-4.0
 ---
 # The compliance calendar — 2018 to 2027
 

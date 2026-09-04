@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/global-payouts.html
 category: "Global"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBAL-PAYOUTS.md
+licence: CC-BY-4.0
 ---
 # Global Payouts — Dependency Map
 

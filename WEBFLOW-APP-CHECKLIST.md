@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/webflow-app-checklis
 category: "Webflow"
 date: 2026-05-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WEBFLOW-APP-CHECKLIST.md
+licence: CC-BY-4.0
 ---
 # Webflow App Requirements Checklist (2026)
 

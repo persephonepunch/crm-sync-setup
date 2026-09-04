@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/soc-sox-app-review.h
 category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SOC-SOX-APP-REVIEW.md
+licence: CC-BY-4.0
 ---
 # SOC / SOX Application Review
 

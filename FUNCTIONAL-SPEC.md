@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/functional-spec.html
 category: "Specs"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md
+licence: CC-BY-4.0
 ---
 # Omen — Functional Specification & UAT Release Plan
 

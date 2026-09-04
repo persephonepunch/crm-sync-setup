@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/js-execution-order.h
 category: "Specs"
 date: 2026-07-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/JS-EXECUTION-ORDER.md
+licence: CC-BY-4.0
 ---
 # JS Execution Order — Challenge & Solution
 

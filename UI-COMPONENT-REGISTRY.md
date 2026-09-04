@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/ui-component-registr
 category: "Specs"
 date: 2026-07-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/UI-COMPONENT-REGISTRY.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — UI Component & ID Registry
 

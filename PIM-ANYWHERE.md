@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/pim-anywhere.html
 category: "Specs"
 date: 2026-08-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PIM-ANYWHERE.md
+licence: CC-BY-4.0
 ---
 # PIM Anywhere — one catalog record, any frontend
 

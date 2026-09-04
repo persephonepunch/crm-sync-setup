@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/capability-not-perim
 category: "Security"
 date: 2026-08-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY-NOT-PERIMETER.md
+licence: CC-BY-4.0
 ---
 # Permissions for AI, in plain terms — capability, not perimeter
 

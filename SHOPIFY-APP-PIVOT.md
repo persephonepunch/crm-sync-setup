@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-app-pivot.ht
 category: "Shopify"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-APP-PIVOT.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — Shopify App Platform Changes
 

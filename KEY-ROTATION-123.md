@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/key-rotation-123.htm
 category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/KEY-ROTATION-123.md
+licence: CC-BY-4.0
 ---
 # Rotate a Key in Three Steps — the AI-Safe Ceremony for Webflow Teams
 

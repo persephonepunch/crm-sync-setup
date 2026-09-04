@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/webflow-vite-stack.h
 category: "Webflow"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WEBFLOW-VITE-STACK.md
+licence: CC-BY-4.0
 ---
 # The Webflow App Stack — Vite + TypeScript Monorepo, with 11ty/Vue/Svelte Islands
 

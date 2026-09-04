@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/cybersecurity-for-ai
 category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CYBERSECURITY-FOR-AI.md
+licence: CC-BY-4.0
 ---
 # Cybersecurity for AI
 

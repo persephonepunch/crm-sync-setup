@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/trust-framework.html
 category: "Global"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-FRAMEWORK.md
+licence: CC-BY-4.0
 ---
 # The Trust Framework
 

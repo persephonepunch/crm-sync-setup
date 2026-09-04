@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/fragments-any-fronte
 category: "Specs"
 date: 2026-08-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FRAGMENTS-ANY-FRONTEND.md
+licence: CC-BY-4.0
 ---
 # Fragments on any frontend — one Webflow source, every platform
 

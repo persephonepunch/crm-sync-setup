@@ -4,6 +4,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/home-sections.md
 category: "General"
 date: 2026-07-13
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/home-sections.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — Home Page Section Spec (design-sync.myshopify.com)
 

@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/dawn-horizon-ga4.htm
 category: "Shopify"
 date: 2026-06-24
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DAWN-HORIZON-GA4.md
+licence: CC-BY-4.0
 ---
 # Dawn → Horizon: Agentic Cart Functions
 

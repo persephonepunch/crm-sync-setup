@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitle
 category: "Security"
 date: 2026-07-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
+licence: CC-BY-4.0
 ---
 # Dark Factory Entitlement Security
 

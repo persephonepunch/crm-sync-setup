@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/server-side-function
 category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-FUNCTION-TOOLS.md
+licence: CC-BY-4.0
 ---
 # Server-Side Function Tools with AI Runners
 

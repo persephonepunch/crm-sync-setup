@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/server-side-or-it-di
 category: "Security"
 date: 2026-08-05
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md
+licence: CC-BY-4.0
 ---
 # Server-Side or It Didn't Happen
 

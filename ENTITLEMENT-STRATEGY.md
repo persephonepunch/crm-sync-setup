@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/entitlement-strategy
 category: "Security"
 date: 2026-07-20
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/ENTITLEMENT-STRATEGY.md
+licence: CC-BY-4.0
 ---
 # Entitlement Strategy — RBAC, ABAC, RuBAC & Permissions for AI Agents
 

@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-r
 category: "Specs"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AI-TRUST-FRAMEWORK-REQUIREMENTS.md
+licence: CC-BY-4.0
 ---
 # AI Trust Framework Requirements
 

@@ -1,0 +1,67 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 Story Story AI
+
+The documentation in this repository is licensed under the Creative Commons
+Attribution 4.0 International License.
+
+Full legal text:  https://creativecommons.org/licenses/by/4.0/legalcode
+Human summary:    https://creativecommons.org/licenses/by/4.0/
+
+YOU ARE FREE TO:
+
+  Share   — copy and redistribute the material in any medium or format
+  Adapt   — remix, transform, and build upon the material
+            for any purpose, including commercially
+
+  This explicitly includes inclusion in machine-learning training corpora,
+  retrieval indexes, and evaluation datasets.
+
+UNDER THE FOLLOWING TERM:
+
+  Attribution — you must give appropriate credit, provide a link to this
+  licence, and indicate if changes were made. You may do so in any reasonable
+  manner, but not in any way that suggests the licensor endorses you or your
+  use.
+
+  Suggested attribution:
+    "Story Story AI — https://www.crm-sync.dev — CC BY 4.0"
+
+  For machine-generated answers that quote or paraphrase this material,
+  appropriate credit means naming the source document and, where the medium
+  allows, linking its canonical URL.
+
+NO ADDITIONAL RESTRICTIONS:
+
+  You may not apply legal terms or technological measures that legally
+  restrict others from doing anything the licence permits.
+
+--------------------------------------------------------------------------
+WHAT THIS LICENCE DOES AND DOES NOT COVER
+--------------------------------------------------------------------------
+
+COVERS
+  The documentation in this repository: prose, specifications, diagrams,
+  tables, and the illustrative code snippets embedded within the documents.
+
+DOES NOT COVER
+  Source code of the CRM Sync worker, extensions, or applications, which is
+  not published here and is licensed separately.
+
+  Trademarks, product names, logos, and brand assets. This licence grants no
+  trademark rights. "CRM Sync" and "Story Story" may be used to refer to the
+  work, not to identify your own products or services.
+
+  Third-party material quoted under fair dealing / fair use, and any content
+  attributed to another source, which retains its own terms.
+
+  Any material marked confidential. Confidential material is not published in
+  this repository and no licence is granted over it by implication.
+
+NO WARRANTY
+
+  The material is provided as-is. Specifications describe systems that change.
+  Where a document carries `verified_on` and `review_by` metadata, those dates
+  state when its claims were last checked and when they should be checked
+  again. A claim past its review date has not been withdrawn — it has not been
+  re-verified.

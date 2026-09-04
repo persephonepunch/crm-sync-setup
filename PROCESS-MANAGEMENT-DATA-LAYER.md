@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/process-management.h
 category: "Specs"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md
+licence: CC-BY-4.0
 ---
 # Process Management Guide — Webflow · Xano · Cloudflare · Shopify
 

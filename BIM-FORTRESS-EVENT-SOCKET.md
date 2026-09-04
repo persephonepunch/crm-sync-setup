@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/bim-fortress-event-s
 category: "Security"
 date: 2026-07-18
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BIM-FORTRESS-EVENT-SOCKET.md
+licence: CC-BY-4.0
 ---
 # BIM Fortress Exposure vs the Event-Socket Heal
 

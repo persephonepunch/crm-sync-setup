@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/architecture.html
 category: "Specs"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/ARCHITECTURE.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — Why This Architecture Is Safer
 

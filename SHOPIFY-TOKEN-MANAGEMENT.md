@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-token-manage
 category: "Security"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-TOKEN-MANAGEMENT.md
+licence: CC-BY-4.0
 ---
 # Shopify Expiring Token Management
 

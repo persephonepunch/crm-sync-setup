@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/wrong-size-tool.html
 category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WRONG-SIZE-TOOL.md
+licence: CC-BY-4.0
 ---
 # The Wrong-Size Tool
 

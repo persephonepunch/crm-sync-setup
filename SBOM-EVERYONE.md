@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/sbom-everyone.html
 category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SBOM-EVERYONE.md
+licence: CC-BY-4.0
 ---
 # What Is an SBOM? Who Uses This? Everyone.
 

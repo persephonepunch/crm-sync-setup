@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/globalization-goals.
 category: "Global"
 date: 2026-06-12
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBALIZATION-GOALS.md
+licence: CC-BY-4.0
 ---
 # Globalization — Goal Checklist (Pending / Review State)
 

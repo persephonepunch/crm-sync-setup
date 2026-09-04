@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/segments-google-conn
 category: "Shopify"
 date: 2026-07-10
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GOOGLE-CONNECT.md
+licence: CC-BY-4.0
 ---
 # Google turned off the list upload. We were never uploading lists.
 

@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/segments-ga4-bidding
 category: "Shopify"
 date: 2026-07-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GA4-BIDDING.md
+licence: CC-BY-4.0
 ---
 # Marketing was built on the page view. The funnel now pays for the **consented login**.
 

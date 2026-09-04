@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/readme.html
 category: "Setup"
 date: 2026-07-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/README.md
+licence: CC-BY-4.0
 ---
 # CRM Sync — PWA & Native App Commerce Setup Guide
 

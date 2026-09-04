@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/agent-key-custody-mo
 category: "Security"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-KEY-CUSTODY-MODELS.md
+licence: CC-BY-4.0
 ---
 # Two Ways to Give an Agent a Key
 

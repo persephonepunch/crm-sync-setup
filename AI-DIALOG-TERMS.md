@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/ai-dialog-terms.html
 category: "Global"
 date: 2026-08-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AI-DIALOG-TERMS.md
+licence: CC-BY-4.0
 ---
 # The AI dialog — terms for designers and BAs
 

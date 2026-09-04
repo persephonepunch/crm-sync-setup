@@ -5,6 +5,7 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/agent-authority-brie
 category: "Security"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-AUTHORITY-BRIEF.md
+licence: CC-BY-4.0
 ---
 # Agent Authority — Technical Brief
 
