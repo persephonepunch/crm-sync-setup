@@ -349,10 +349,42 @@ and tested for rather than assumed away.
 | Tag delivery | Tag Manager | Edge tag loader | — |
 | Catalog syndication | Merchant Center | — | — (build the feed via an endpoint) |
 
-Read across a row and you get the job; read down a column and you get a vendor. The rows are the
-useful direction, because a real estate uses all three. The last two rows are not gaps at the
+Read down a column and you get a vendor; read across a row and you get the job — and the row is
+the direction that matters, because **the three are not alternatives.** A real estate runs all of
+them at once. The question is never which vendor, but which of them holds this role. The last two rows are not gaps at the
 edge — as §4 argues, that is where the lifecycle is adjudicated, and the edge is not in that
 business.
+
+### Coexistence is the design, not a compromise
+
+A three-vendor estate used to mean one thing: a nightly sync into a warehouse. Everything was
+copied somewhere central, the copy was stale by construction, and it was authoritative for
+nothing — you reconciled against the source whenever the answer mattered. Integration meant
+duplication, and duplication meant a drift problem nobody owned.
+
+**An AI runner changes the unit of integration.** Instead of materialising a combined dataset in
+advance, it composes across the three at the moment of the question and enriches only what was
+asked for. The record stays where it is authoritative — the catalogue in the commerce platform,
+identity and consent in the system of record, measurement in the warehouse — and the view is
+assembled per call rather than kept in a fourth place that has to be reconciled with the other
+three.
+
+That is the same move as everything else in this document, one layer up. GraphQL shapes the data
+when it is asked for (§0); the metered gate decides when a row wants to move (§3); a dynamically
+loaded rule composes when it runs (§8). Real-time integration with supplemental enrichment on
+demand is that pattern applied to the estate itself: *nothing pre-computed that may not be
+needed, nothing copied that already exists somewhere it is true.*
+
+Two things it makes your problem, and both are worth designing rather than discovering:
+
+- **Latency becomes a design input rather than a batch window.** Every call is a fresh read across
+  systems that fail independently, so caching is deliberate and the degraded answer is designed —
+  which value is served stale, for how long, and how the caller is told. A composed view with no
+  stated staleness is a warehouse with extra steps and worse availability.
+- **Enrichment is egress.** A supplemental read that pulls a subject's data into an answer is data
+  moving, so it passes the same gate as any other movement — and it has to be able to name the
+  person it enriched. Enrichment that cannot say whose record it touched is not a data-quality
+  gap; it is a subject-access request you will not be able to answer.
 
 ### KV, D1 and R2 against one Postgres
 
