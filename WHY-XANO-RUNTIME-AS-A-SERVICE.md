@@ -524,6 +524,55 @@ in front of it.
 
 ---
 
+## 10. The generalisation: every static-data integration becomes a function with declared reach
+
+Nothing in this document is specific to one storefront framework, and the conclusion is not
+"choose this backend." It is that **an entire category of software is about to need a server-side
+function layer it never had** — every plugin, every CRM connector, every integration whose model
+is *read a fixed dataset, render it.*
+
+That model was sufficient while the caller was a person with a browser, because three things were
+handled implicitly and none of them were anyone's responsibility:
+
+- **Privacy** was a banner and a cookie, resolved once per visit, describing a session.
+- **Permission** was implicit in the interface — you could not click what you were not shown.
+- **Idempotency** was unnecessary, because a human who saw a spinner waited rather than retrying.
+
+All three assumptions fail at once the moment the caller is software. Consent has to be a record
+resolvable with no session, permission has to be stated rather than implied by a hidden button,
+and retries stop being an edge case and become normal client behaviour. A plugin that reads
+static data has nowhere to put any of it — not because it was built badly, but because it was
+built for a caller that no longer exclusively exists.
+
+What replaces it has the same shape everywhere, whatever it is written in: **functions that run
+server-side and declare their reach before they run.** Privacy as a call, permission as a
+declaration, and writes that carry a key so the second attempt resolves to the first outcome.
+
+### Tools and rules — Deno-grade permission, at the business layer
+
+"Declare what you may touch before you run" stops sounding like a runtime detail once the caller
+is a model, because that is exactly what a tool definition *is*. A tool names what it does, what
+it takes, and what it may reach; an agent can act only through the tools it was given. It is
+`--allow-net` moved from the process to the business operation.
+
+Rules are the other half: the conditions on those tools, evaluated per call rather than baked in
+— scope, cap, expiry, counterparty, consent state at that instant.
+
+**AI both forces this architecture and makes it possible.** It forces it because intents can no
+longer be enumerated in advance: you cannot ship a screen for every thing an agent might
+reasonably try, so the boundary has to be stated as capability rather than implied by what a
+person was shown. And it makes it possible because the caller *reads declarations* — a tool list
+is machine-readable in a way that a permissions matrix in a wiki never was. For the first time,
+the thing being restricted can parse the restriction.
+
+Which closes the argument the timeline in §0 opened. Permission moved from the template, to the
+request, to the token, to the declaration — and the destination is a set of tools with rules on
+them, evaluated per call and recorded afterwards. That is a Deno-grade permission model with the
+process swapped for the business operation, and it is the first architecture in twenty years that
+the caller itself can read.
+
+---
+
 ## What "runtime as a service" actually has to mean
 
 Not "somewhere to put an API." A runtime that can serve an AI-transacted commerce estate must
