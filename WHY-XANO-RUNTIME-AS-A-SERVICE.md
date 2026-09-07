@@ -127,7 +127,68 @@ because behavioural and conversion models have separate thresholds and below the
 
 ---
 
-## 4. The lifecycle is adjudicated in public
+## 4. What you add to Next.js Commerce to take an agent's order
+
+Next.js Commerce is a good storefront. Point an agent at it and the gap is not the checkout —
+Shopify already has one — it is everything that has to be true *around* the checkout when the
+buyer is software.
+
+**Encryption, because the agent must not hold your keys.** An agent acting for a customer needs
+authority, and authority must not be a copy of your credentials. What replaces it is a
+**mandate**: scoped, spend-capped, expiring, revocable, and *signed*, so the party on the other
+side can verify what was granted without asking you, against a published key set. The merchant's
+admin token stays in custody and never travels; the subject's identity travels encrypted, so it
+opens for the key it was granted to and stays opaque to everything else. A render deployment has
+nowhere to put any of this: environment variables are readable by the function that holds them,
+rotate on a deploy rather than on a schedule, and cannot be scoped per tenant. A mandate nobody
+outside your system can verify is not a mandate — it is a claim.
+
+**Consent, resolved for a caller with no browser.** At the moment of an agent purchase there is
+no page, no tag and no cookie. Whatever the client-side consent tooling asserted for a browsing
+session says nothing about this transaction. The honest answer to "what did this customer
+permit" has to come from a record: which basis, granted when, under what wording, for which
+channel — the same record the receipt, the suppression and the erasure read later. A gate that
+evaluates at hydration does not merely miss an agent order; it never runs.
+
+**An idempotency key, because agents retry.** The one that gets skipped, and the only one on
+this list that shows up on a statement. A network timeout on a checkout call is
+indistinguishable from a failure. A human sees a spinner and waits; an agent retries, because
+retrying is what a well-written client does. Without a key that makes the second attempt resolve
+to the first outcome, the retry is a second order — surfacing as a chargeback days later, to
+someone who was not there.
+
+An idempotency key is not a header you accept and ignore. It is **durable shared state with a
+uniqueness constraint**: the key is recorded as part of the write, the second insert loses to the
+constraint rather than racing it, and a rejected insert is read as "this already happened"
+rather than as an error. Which needs exactly what a render surface does not have — a store that
+outlives the request, shared across every instance, able to enforce that two writers cannot both
+win.
+
+| What agentic checkout needs | Why the storefront does not supply it | What it takes |
+|---|---|---|
+| Signed mandate | No key custody, no signing identity, nothing a third party can verify against | A signing key held server-side, public half published |
+| Consent record | Client-side consent describes a browsing session that did not happen | A record read at decision time, per channel and basis |
+| Idempotency | No durable shared state; retries land as new orders | A constrained store where the second write loses |
+| Revocation | Nothing to revoke against between deployments | A denylist read on every use |
+| Evidence | A route handler leaves no record ordered by anything | Append-only, ordered by a constraint, verifiable later |
+| Machine surface | Pages and route handlers are not tools an agent can enumerate | A tool interface the agent calls directly |
+| Webhook receivers | Must answer while nobody is browsing, and survive a redeploy mid-delivery | An always-on receiver with HMAC and dedupe |
+
+### Headless Shopify does not close this
+
+Shopify Headless plus a JavaScript framework gives you a real cart, a real checkout and a real
+customer identity provider — and none of the seven rows above. Shopify does not hold your consent
+record, does not issue or verify your mandates, does not make *your* side effects idempotent
+(only its own), and does not carry per-tenant credentials for the platforms you sync to
+afterwards. A chatbot that takes an order is a caller with no browser hitting all seven at once.
+
+The layer is additive, not optional — and it does not have to be any particular product. It has
+to be something with a clock, a credential vault, one rule artifact every path calls, and
+evidence with enforced ordering. §9 is about what else satisfies that.
+
+---
+
+## 5. The lifecycle is adjudicated in public
 
 It is tempting to file Tag Manager under "tag delivery" and Merchant Center under "catalog
 syndication", with an edge alternative for each. Both filings are wrong.
@@ -186,7 +247,7 @@ repeated with confidence, and cited as though someone stood behind it. Which som
 
 ---
 
-## 5. Supabase, Firebase, and the enforcement point
+## 6. Supabase, Firebase, and the enforcement point
 
 Both were evaluated closely. Neither lost on features. They lost on one structural question:
 **where enforcement lives.**
@@ -220,7 +281,7 @@ and tested for rather than assumed away.
 
 ---
 
-## 6. Same roles, three vendors
+## 7. Same roles, three vendors
 
 | Role | Google | Cloudflare | Xano |
 |---|---|---|---|
@@ -264,7 +325,7 @@ audit, is the row where zero-egress storage charges nothing.
 
 ---
 
-## 7. The lineage: preload, and the thing no request owns
+## 8. The lineage: preload, and the thing no request owns
 
 Every argument above reduces to two moments, and both predate this stack by fifteen years.
 
@@ -296,9 +357,36 @@ Only the first row is an idea; the rest are ergonomics. And it is the row this a
 built on, because a permission that must be declared up front is one that cannot be forgotten
 later.
 
-**Xano runs its Lambda steps on Deno**, and Supabase's edge functions run there too — the two
-backends compared in §5 disagree about where enforcement lives and agree, without discussing it,
-about the runtime underneath.
+**Xano runs its Lambda steps on Deno** — the JavaScript escape hatch inside a function stack,
+not the whole platform, whose own language is XanoScript — and Supabase's edge functions run
+there too. The two backends compared in §6 disagree about where enforcement lives and agree,
+without discussing it, about the runtime underneath.
+
+### Dynamic loading is the feature, and the dates rule out hindsight
+
+Lambda steps landed well before the agentic wave. Nobody added a JavaScript escape hatch to a
+visual function stack in order to serve AI checkout, because there was no AI checkout to serve.
+The fit is retrospective, which is the only kind worth much: a design that happens to answer a
+question posed years later was answering something structural rather than something fashionable.
+
+The property doing the work is **dynamic loading**. A step is resolved and evaluated when the
+stack runs, not compiled into a deployment beforehand — so the rule that decides a permission is
+*data*, not a build artifact. That is the difference between a runtime where the inputs are
+dynamic and the rule is static, and one where the rule itself can be composed at the moment it is
+needed.
+
+Which is the shape of an agentic checkout authorisation exactly. A mandate is conditional in
+several dimensions at once — scope, spend cap, expiry, counterparty, and the consent state of the
+subject *at that instant* — and those conditions do not compose the same way twice. A new
+market's rule, a new lawful basis, a cap that now depends on a category: in a compiled runtime
+each of those redeploys the thing that does the checking, and a deploy is a poor unit of change
+for a decision measured in seconds.
+
+**The edge cuts both ways.** A rule that can change without a deploy is a rule that *can change
+without a deploy* — no build, no diff, no reviewer between an edited permission and a live one.
+Which is why the evidence layer is not decoration on this architecture but the compensating
+control: a signed entitlement says what was granted in a form a stranger can verify, and an
+append-only ledger says what was decided and when, in an order a constraint enforces.
 
 ### Where it closes
 
@@ -322,6 +410,63 @@ is the same object again, pointed at money instead of memory.
 written to escape — the request owns the work, and when the request ends the work has nowhere to
 live. The framework is not at fault. Rendering is request-shaped. The mistake is only ever
 asking it to hold the things that are not.
+
+---
+
+## 9. Alternatives — assembling the same four properties
+
+Nothing here argues that one product is the only answer. The requirement is four properties, and
+several stacks satisfy them. What follows is what each actually replaces.
+
+### HashiCorp — the enterprise decomposition
+
+The closest thing to a like-for-like alternative *for the custody and runtime half*, and a
+genuinely stronger answer on secrets than a config blob:
+
+| Tool | What it covers | Against the four properties |
+|---|---|---|
+| Vault | Secrets, dynamic short-lived credentials, encryption as a service | The credential vault — and better than static per-tenant tokens, because a credential can be issued per use and expire on its own |
+| Nomad | Scheduling and long-running work | The clock |
+| Consul | Service identity, discovery, mTLS between services | Who may call whom — the machine plane, done properly |
+| Boundary | Human access to infrastructure, with session recording | Operator-side evidence, which is a different audit trail from the subject-side one |
+
+What it does **not** give you is the other half: no data layer, no consent record, no business
+rule as a callable artifact, and no commerce endpoints. You would still add Postgres and a
+service you write and operate. So the honest comparison is not "HashiCorp or Xano" — it is
+*HashiCorp + Postgres + your own API layer* against *one product with a visual rule surface*.
+The first is the right answer when you already run a platform team, want dynamic credentials
+rather than stored ones, and need the audit story to satisfy an enterprise security review. The
+second is the right answer when the rule needs to be shown to an auditor without handing over a
+codebase, and when nobody is available to operate four more services.
+
+### Temporal — the best answer to the row that costs money
+
+Worth naming specifically because §4's idempotency problem is its whole reason for existing.
+Durable execution makes a retry safe by construction: the workflow's state is the record, a
+replayed step resolves to its first outcome, and "did this already happen" stops being a question
+you answer with a uniqueness constraint you remembered to add. If agentic checkout is the
+principal use case and the team is comfortable operating it, this is the strongest single answer
+to retries — and it still leaves consent, custody and evidence to be sited somewhere.
+
+### The rest, briefly
+
+- **Cloud-native (AWS or GCP).** Lambda or Cloud Run for compute, EventBridge Scheduler or Cloud
+  Scheduler for the clock, Secrets Manager with KMS for custody, and conditional writes in
+  DynamoDB or Firestore for idempotency. All four properties, assembled. The cost is that the
+  rule ends up as code in a repository rather than an artifact anyone can be shown.
+- **Supabase, extended.** Postgres with `pg_cron`, edge functions, and its secrets store. The
+  closest single-product alternative, and the enforcement-point argument in §6 is the reason it
+  was not chosen here rather than a criticism of it.
+- **Cloudflare alone.** Workers with cron triggers, Durable Objects for coordination, D1 for
+  constrained writes, Queues, and a secrets store. Most of this document's own infrastructure
+  already runs there; the gap is a system of record with a queryable relational model and a rule
+  surface a non-engineer can read.
+
+The test for any of them is the same, and it is not a feature list: **can it hold a clock, a
+credential vault, one rule artifact every path calls, and evidence whose ordering a constraint
+enforces — while nothing is being rendered?** Four yeses and the choice is about operating cost
+and who has to read the rule. Fewer than four and the gap does not close by adding a framework
+in front of it.
 
 ---
 
