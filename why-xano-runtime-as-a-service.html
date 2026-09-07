@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why Xano + AI + e-commerce is the right runtime as a service</title>
+<meta name="description" content="A runtime as a service is judged by what it holds when nothing is being rendered. The identity path across Shopify OIDC, a Cloudflare Worker and Xano; why a consent gate must be metered rather than loaded; what a render surface structurally cannot hold; and the Liquid-to-Deno lineage that ends in a capability you cannot forget to check.">
+<meta name="keywords" content="Xano, runtime as a service, Xano vs Supabase, Xano vs Firebase, NextAuth, Shopify Customer Account API, OIDC, Cloudflare Workers, KV, D1, R2, consent gate, Consent Mode v2, server-side tagging, Merchant Center, GTM, AEO, answer engine optimization, agentic commerce, AP2 mandate, Deno, Node, Liquid, row level security, entitlement, JWE, e-commerce lifecycle, PIM, WMS, ERP, VAT nexus, ISO 80000, GS1">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="Why Xano + AI + e-commerce is the right runtime as a service">
+<meta property="og:description" content="The usual comparison asks which library owns the session. A runtime as a service is judged by what it holds when nothing is being rendered — because the decisions that matter most in commerce are made when nobody is looking at a page.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html#article","headline":"Why Xano + AI + e-commerce is the right runtime as a service","alternativeHeadline":"A runtime is judged by what it holds when nothing is being rendered","description":"The identity path across Shopify OIDC, a Cloudflare Worker and Xano; why a consent gate must be metered rather than loaded; what a render surface structurally cannot hold; how GTM and Merchant Center adjudicate the commerce lifecycle for PIM, WMS, drop-ship, ERP and VAT nexus; Supabase and Firebase compared on the enforcement point; and the Liquid-to-Node-to-Deno lineage that ends in a capability you cannot forget to check.","datePublished":"2026-09-06","dateModified":"2026-09-06","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"publisher":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/WHY-XANO-RUNTIME-AS-A-SERVICE.md","keywords":["Xano","runtime as a service","Supabase","Firebase","NextAuth","Shopify Customer Account API","OIDC","Cloudflare Workers","consent gate","Consent Mode v2","Merchant Center","answer engine optimization","agentic commerce","Deno","Node","Liquid","row level security","entitlement","VAT nexus","ISO 80000","GS1"],"about":[{"@type":"Thing","name":"Backend as a service"},{"@type":"Thing","name":"Consent enforcement"},{"@type":"Thing","name":"Agentic commerce"},{"@type":"Thing","name":"Answer engine optimization"},{"@type":"Thing","name":"E-commerce data lifecycle"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","@id":"https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html#faq","mainEntity":[{"@type":"Question","name":"Is Xano better than Supabase or Firebase?","acceptedAnswer":{"@type":"Answer","text":"Not better — different in where enforcement lives. Supabase and Firebase enforce at the row, which is stronger than any backend convention when the browser talks to the database directly. In an estate where nothing but a server reaches the data layer, and where the question is whether a row may LEAVE for a marketing platform rather than whether a user may read it, the rule has to be a callable artifact that agents and scheduled jobs also pass through. Supabase gives real Postgres and self-hosting; Firebase gives better realtime and offline sync; the trade is real."}},{"@type":"Question","name":"Why can a consent gate not live in the Next.js app?","acceptedAnswer":{"@type":"Answer","text":"Because it would bind only callers who pass through that surface. A scheduled sync, a webhook-driven erasure and an AI agent purchase all move data with no page rendered, so a gate that evaluates at hydration is not merely expensive for them — it is absent. A metered gate runs once per decision, at the moment a row wants to leave."}},{"@type":"Question","name":"What does a render surface structurally fail to hold?","acceptedAnswer":{"@type":"Answer","text":"Anything that must outlive a request or a build: scheduled work, admin token custody, token exchange, webhook receivers, session revocation, the consent rule, and per-tenant downstream credentials. On a serverless deploy the handler is invoked per request and discarded, so no timer survives and nothing holds shared state."}},{"@type":"Question","name":"Is Google Tag Manager replaceable by an edge tag loader?","acceptedAnswer":{"@type":"Answer","text":"No. An edge loader moves third-party scripts off the main thread, which is a performance tool. Tag Manager is a contract surface with Google's commerce systems — the expected data layer, the four Consent Mode v2 signals in the shape Google reads them, enhanced conversions, and a server container that receives events from callers with no browser. Agent purchases have no browser."}},{"@type":"Question","name":"Why does a feed weight need a declared unit?","acceptedAnswer":{"@type":"Answer","text":"Because 1.5 is not a weight and 1.5 kg is. Carriers rate the packed parcel rather than the product, some jurisdictions treat the unit as a tax input, net content is a legal declaration, and GS1 element strings encode the decimal position in the identifier itself. A unit lost in transit is not a formatting problem."}}]}
+</script>
+<link rel="stylesheet" href="./doc.css?v=b8b664387a">
+</head>
+<body
+  data-md="./WHY-XANO-RUNTIME-AS-A-SERVICE.md"
+  data-title="Why Xano + AI + e-commerce is the right runtime as a service"
+  data-kicker="Specs · Runtime as a service · #Xano · #Supabase · #Firebase · #Deno · #ConsentModeV2 · #AEO · #agenticcommerce"
+  data-sub="A runtime is judged by what it holds when nothing is being rendered — because the decisions that matter most in commerce are made when nobody is looking at a page."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/WHY-XANO-RUNTIME-AS-A-SERVICE.md">
+  <div class="wrap">
+    <nav class="sitenav">
+      <a class="home" href="https://www.crm-sync.dev/">&larr; CRM Sync</a>
+      <a href="./">Docs</a>
+      <a href="https://www.crm-sync.dev/pages/knowledge-base">Knowledge base</a>
+      <a href="https://www.crm-sync.dev/pages/mission">Mission</a>
+      <a class="app" href="https://crm-sync.dev/get">Get the app &rarr;</a>
+    </nav>
+    <header id="hero" class="hero"><span class="doc-status">Loading&hellip;</span></header>
+    <article id="doc" class="doc"></article>
+  </div>
+  <footer class="docfoot">
+    <span>CRM Sync &middot; Webflow &middot; Xano &middot; Cloudflare &middot; Shopify</span>
+    <span>Monochrome &middot; print / PDF ready</span>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="./doc.js?v=cb07abe660"></script>
+</body>
+</html>
