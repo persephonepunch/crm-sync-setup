@@ -9,13 +9,67 @@ licence: CC-BY-4.0
 ---
 # Why Xano + AI + e-commerce is the right runtime as a service
 
-**For:** architects choosing a backend for a commerce estate that AI agents will transact
-against, and anyone who has been handed the NextAuth-versus-Supabase-versus-Firebase
-comparison and found that it does not answer the question they actually have.
+> The usual comparison asks which library owns the session. That is the wrong first question.
+> **A runtime as a service is judged by what it holds when nothing is being rendered** — because
+> the decisions that matter most in commerce are made when nobody is looking at a page.
 
-The usual comparison asks which library owns the session. That is the wrong first question.
-A runtime as a service is judged by **what it holds when nothing is being rendered** — because
-the decisions that matter most in commerce are made when nobody is looking at a page.
+**Written for** architects choosing a backend for a commerce estate that AI agents will transact
+against — and for anyone handed the NextAuth-versus-Supabase-versus-Firebase comparison who found
+it did not answer the question they actually had.
+
+**The question it answers:** what has to exist behind a storefront before an agent can be
+allowed to buy something, and which of it a rendering framework can hold. (None of it.)
+
+---
+
+## 0. How permission moved
+
+The architecture is not a preference. It is where twenty years of e-commerce put the permission
+decision, one displacement at a time — each move forced by a caller the previous design had not
+imagined.
+
+| Era | Where permission lived | What it could express | What it could not |
+|---|---|---|---|
+| **2006 · Liquid** | In the template, by refusing to execute | What a theme may *render* | Anything about a caller — there was one kind, and it had a browser |
+| **2009 · Node and the API era** | In the app server, per request | Who is signed in; what a route allows | Anything after the response ended |
+| **2015 · Headless and the token era** | In a token the client carries | Scope, checked at the boundary | Conditions that change mid-session; a caller with no session at all |
+| **2018 · Declared capability** | Stated before execution, refused if undeclared | What the *code* may touch | Who the human is, or what they consented to |
+| **Now · Agentic** | In a signed mandate, evaluated per call | Scope, cap, expiry, counterparty **and** the subject's consent state at that instant | — which is the point at which a system of record stops being optional |
+
+Read the last column down: every row is a caller the previous row could not describe. Liquid
+never had to name one. The API era named a signed-in human. The token era named a client. Now
+the caller is software acting for a human, holding no session, arriving with no page, and the
+only honest description of its authority is a document that says what it may do and can be
+checked by someone who was not there.
+
+### The same displacement happened to the data, in 2024
+
+Permission was not the only thing that moved. In 2024 both platforms this estate depends on
+retired fixed-shape REST in favour of composed, just-in-time GraphQL: Shopify pushed its Admin
+API to GraphQL-first and began closing REST to new apps, and Google replaced the Content API for
+Shopping with the Merchant API.
+
+It is tempting to file that as a syntax migration. It is the same move as every row above. A REST
+resource returns a shape decided at design time, by whoever wrote the endpoint; a GraphQL query
+returns a shape composed at call time, by whoever is asking. Which is precisely what a caller
+that was never anticipated needs — and precisely why a flat feed cannot carry a parent-child
+variant relationship while the graph can: the relationship is a typed edge rather than a
+substring someone invented inside an identifier.
+
+So the two arcs are one arc. **The rule is composed when it runs, and the data is shaped when it
+is asked for** — because in both cases the party on the other end is no longer one you designed
+the interface around. A runtime that fixes either at build time is answering a question from the
+era before this one.
+
+**Three things follow from that**, and they are what the rest of this document is about:
+
+- **Trust and boundary design.** An agent's reasoning is not its authority. Chain of thought
+  explains what it intends; the mandate governs what it may do, and the boundary is drawn around
+  the second. A system that authorises on intent has authorised on text it cannot verify.
+- **Dynamic data services.** The conditions do not compose the same way twice, so the rule that
+  evaluates them is composed when it runs rather than compiled into a deployment (§8).
+- **A system of record.** Something has to answer afterwards — what was granted, what was
+  decided, in what order — to a party who was not present and does not trust you by default.
 
 ---
 
