@@ -163,11 +163,18 @@ still running when no page is open. Which is the subject of
 
 ## Capturing a good HAR
 
+If you have not done this before, there is a plain-language guide with per-browser steps, the one
+setting most people miss, and how to redact safely:
+**[How to capture a HAR file](https://persephonepunch.github.io/crm-sync-setup/HOW-TO-CAPTURE-A-HAR.md)**.
+
+The short version:
+
 1. Open a private window and the browser's developer tools, Network tab.
 2. Enable **preserve log**, and disable cache.
 3. Sign in as a test customer, visit a product page, add to cart, open the cart, open the account
    page. Stop before submitting payment.
-4. Right-click the request list → **Save all as HAR**.
+4. Right-click the request list and save — choosing the export that **includes response content**,
+   or check 1 above cannot be answered at all.
 5. Redact, per the warning above.
 
 A capture of five to six navigations is enough. Larger files make the audit slower and rarely
