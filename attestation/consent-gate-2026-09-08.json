@@ -1,0 +1,97 @@
+{
+  "typ": "release.attestation.v1",
+  "subject": "https://www.crm-sync.dev",
+  "measured_at": "2026-09-08",
+  "self_attested": true,
+  "third_party_certified": false,
+  "release": {
+    "worker": "cf-worker-crm-sync",
+    "version_id": "94fb775e-6e22-41ae-8f9e-18c979c94a3f",
+    "prior_version_id": "0eb5806d-141e-4b24-a9b7-0873a96e4e52",
+    "commits": [
+      "6671e99",
+      "4b26aba"
+    ]
+  },
+  "method": {
+    "url": "https://persephonepunch.github.io/crm-sync-setup/HAR-PERMISSIONS-AUDIT.md",
+    "licence": "CC-BY-4.0",
+    "harness": "Playwright 1.48.2, Chrome headless, clean profile, empty localStorage",
+    "target_page": "/products/verified-transactions",
+    "egress": "US",
+    "opt_in_cases": "jurisdiction response substituted; exercises the client gate, not the edge geo branch"
+  },
+  "claim": "In an opt-in regime, no analytics or advertising request is transmitted before the visitor decides, and none is transmitted after a refusal.",
+  "measurements": [
+    {
+      "scenario": "pre-change release, opt_in, no decision",
+      "regime": "opt_in",
+      "third_party_before_decision": 4,
+      "third_party_total": 4,
+      "consent_signal": "gcs=G100"
+    },
+    {
+      "scenario": "released, real jurisdiction",
+      "regime": "opt_out",
+      "third_party_before_decision": 6,
+      "third_party_total": 6
+    },
+    {
+      "scenario": "released, opt_in, no decision",
+      "regime": "opt_in",
+      "third_party_before_decision": 0,
+      "third_party_total": 0
+    },
+    {
+      "scenario": "released, opt_in, reject",
+      "regime": "opt_in",
+      "third_party_before_decision": 0,
+      "third_party_total": 0
+    },
+    {
+      "scenario": "released, opt_in, accept",
+      "regime": "opt_in",
+      "third_party_before_decision": 0,
+      "third_party_total": 4,
+      "consent_signal": "gcs=G111"
+    }
+  ],
+  "regime_resolution": {
+    "on_load": true,
+    "first_request_ms": 1513,
+    "fails_closed_to": "opt_in"
+  },
+  "evidence": {
+    "ledger": "append-only, hash-chained, signed",
+    "record_type": "consent.attestation.v1",
+    "alg": "EdDSA",
+    "kid": "esk_51fc138c-4525-4f1c-a530-8a5fa905f026",
+    "verifier": "https://crm-sync.dev/verify",
+    "covers_pre_signin_decisions": true
+  },
+  "regression_guards": [
+    "ORD-G18",
+    "ORD-G19",
+    "GA4-G09"
+  ],
+  "limits": [
+    "US egress; opt-in behaviour verified against the client gate, not a real EEA address",
+    "two pages, no checkout, no authenticated session",
+    "self-attested: proves integrity since writing, not truthfulness at writing",
+    "ledger entries written before this release carry no purpose classification and no signature",
+    "not a Google-certified CMP and not required to be: no Google ad products are served on this property, so the certified-CMP requirement does not apply; where certification is required this gate does not substitute for it",
+    "a single measurement is a snapshot; the regression guards carry the property forward"
+  ],
+  "ad_products_served": {
+    "adsense": false,
+    "ad_manager": false,
+    "admob": false,
+    "verified_by": [
+      "908 request entries across three clean-profile HAR captures: only google-analytics.com and googletagmanager.com",
+      "served markup of ten pages: no adsbygoogle, ca-pub-, googletag.cmd, defineSlot or data-ad-client",
+      "/ads.txt and /app-ads.txt return 404",
+      "no ad-serving integration in application source"
+    ],
+    "note": "Requests to a doubleclick host after Accept are GA4 Google-signals, a feature of Analytics, not ad serving."
+  }
+}
