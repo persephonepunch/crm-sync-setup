@@ -64,6 +64,15 @@ they are usually only counted together at renewal.
 | **Fee** | Pricing scales with contacts stored and events processed, not with value delivered. | It makes storing less the rational choice — the opposite of what AI retrieval needs. You pay to keep the data that makes the rest of the stack worse. |
 | **Vendor lock-in** | The record lives in the vendor's schema. You can join what they sell and nothing else. Export returns rows, not relationships. | Leaving costs a rebuild, so the renewal price only ever goes one way. The switching cost is the product. |
 
+Stated as sentences, because the three are usually argued separately. **CRM latency** means a signup
+syncs on a batch schedule, so an unsubscribe can land after the send and an audience gets built from
+yesterday's state — you end up marketing to people whose current state you do not know, and the
+error stays invisible until someone complains. **Fee** means pricing scales with contacts stored and
+events processed rather than with value delivered, which makes storing less the rational choice at
+exactly the moment AI retrieval needs more. **Vendor lock-in** means the record lives in the
+vendor's schema, so you can join what they sell and nothing else, export returns rows rather than
+relationships, and leaving costs a rebuild — which is why the renewal price only ever moves one way.
+
 ### Solution
 
 Move the socket, not the vendor. The form posts to infrastructure you own, and the record layer
@@ -138,6 +147,14 @@ events table. Each runs on its own clock, is read by a different consumer, and f
 | Users | identity and entitlement | authorization — never analytics | The only stream permitted to gate an action, which is exactly why it must not live where measurement lives. |
 | Discounts | the offer and its eligibility | price rules; Merchant promotions | Eligibility is a policy join across subject and jurisdiction, not an attribute stored on the offer. |
 | Products & attributes | catalog fields and trade identifiers | Merchant Center feed; the vector index | GTIN and MPN are *identity*, resolved against an external authority. Description is not, and the two must not be validated alike. |
+
+The same argument in sentences. Newsletter consent changes on its own clock and the *transition* is
+the event, so a generic events table records the state and loses the flip. A rating is a feed field
+with its own eligibility rules, and a review must never accrue the way a marketing consent does.
+Users are the only stream permitted to gate an action, which is precisely why identity must not live
+where measurement lives. Discount eligibility is a policy join across subject and jurisdiction
+rather than an attribute stored on the offer. GTIN and MPN are identity resolved against an external
+authority while a description is not, so the two must not be validated alike.
 
 ### Every collection gets a mirror
 
@@ -270,6 +287,12 @@ obligation rather than a legal footnote.
 | signal_consent_events | every submit | Xano | Per-event row keyed by `ga_session_id`; `event_key` dedupes a double-fire while keeping two genuine submissions distinct. |
 | escalate | on the transition only | Google | Skipped when marketing was already granted, and never for a request form — nothing was granted to escalate. |
 | Shopify consent | `slug === "newsletter"` | Shopify | Best-effort. A dead tenant token degrades the projection without failing the subscription. |
+
+In sentences: the claim and its `consent_records` evidence row are written unconditionally, because
+the record must exist before anything can project from it. A `signal_consent_events` row is written
+on every submit, keyed by `ga_session_id`, where `event_key` dedupes a double-fire while keeping two
+genuine submissions distinct. The escalation to the Google segment plane fires only on the
+transition, never on a repeat submit. The Shopify projection runs only when the slug is newsletter.
 
 The ordering is the argument. Xano is written first and unconditionally; Shopify is written second,
 conditionally, and is allowed to fail — `index.ts:3462`. There is no path in which a Shopify outage
