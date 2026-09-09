@@ -13,7 +13,7 @@ licence: CC-BY-4.0
 
 **For:** architects, security teams and technical founders running commerce on a composed stack — a CMS, a managed backend, an edge runtime and a warehouse — who are being asked to make that stack legible to AI systems without losing control of it.
 
-**Companion reading:** [Capability, Not Perimeter](./capability-not-perimeter.html) · [Consent Gate Attestation](./consent-gate-attestation.html) · [Forward-Deploy Agentic GraphQL](./forward-deploy-agentic-graphql.html)
+**Companion reading:** [Capability, Not Perimeter](./capability-not-perimeter.html) · [Consent Resolution on Higher-Order Load](./consent-resolution-pattern.html) · [Forward-Deploy Agentic GraphQL](./forward-deploy-agentic-graphql.html)
 
 ---
 
