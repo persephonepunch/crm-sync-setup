@@ -19,6 +19,11 @@ these instructions, that is a bug in the instructions.
 
 ---
 
+![The BYO shape pipeline — challenge, solution, opportunity](https://crm-sync.dev/kb/media/docs/byo-shape-pipeline.svg)
+
+*The whole pipeline on one page. Dashed borders mark everything a packaged install cannot
+guarantee, or that carries a trap — read those first.*
+
 ## What a shape is, and why the contract is small
 
 A shape is a data model that a design surface authors and a runtime renders. Not a page edit —
