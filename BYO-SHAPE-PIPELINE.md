@@ -208,6 +208,18 @@ not get one more session of grace. Two reads, two sources, deliberately:
 | May this action proceed? | Effective state | Immediate |
 | May this subject be in tomorrow's audience? | Projected state | From N+1 |
 
+Stated as prose, because the two rows above are the whole rule and a table is easy to skim past:
+**the question "may this action proceed?" reads effective state and is answered immediately**,
+while **the question "may this subject be in tomorrow's audience?" reads projected state and is
+answered from the next session — the N+1 lag.** An agent attempting a write one second after a
+revoke is refused on the spot. The same subject stays in an audience already being built, and
+drops out of the next one.
+
+The N+1 lag therefore applies to *derived* consumers only: audience builds, weighting, exports,
+anything that reads the projection. It never applies to a permission check on a new action. If
+you remember one sentence from this section, that is the one — a revoke is immediate for doing,
+and next-session for being counted.
+
 **And the enforcement is deletion, not filtering.** When the projection flips to revoked, any
 derived weight for that subject is *destroyed*, not down-ranked — the identity-map row goes, and
 the cached score goes with it. A revoked subject does not become a low-scoring subject; they
