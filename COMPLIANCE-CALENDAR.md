@@ -45,8 +45,11 @@ Two entries below make that concrete rather than theoretical. Feed labels do not
 | 2024-06 | US | **Federal action filed against Adobe** over subscription cancellation and early-termination-fee practices. |
 | 2024-08-01 | EU | **AI Act enters into force**, with obligations phasing in by class. |
 | 2024-10-01 | Shopify | **REST Admin API declared legacy.** The GraphQL-first turn begins. |
+| 2025-03-07 | US (CPPA) | **American Honda fined $632,500** — the CPPA's first settlement. The consent tool was deployed but configured asymmetrically: one click to accept all, two steps to reject. The rights webform demanded eight data elements for every request type, including those needing no verification. |
 | 2025-04 | Shopify | **New apps must use the GraphQL Admin API** — typed, bulk, server-resolved becomes the only forward path. |
-| 2025-05 | US (CPPA) | **Enforcement action over roughly forty days of silently failed opt-outs** ($345,178). A broken consent path is an enforcement event, not a bug report. |
+| 2025-05-06 | US (CPPA) | **Todd Snyder fined $345,178.** For forty days the "Cookie Preferences Center" banner appeared and immediately vanished, so no opt-out could be submitted. The CPPA's enforcement head: *"Using a consent management platform doesn't get you off the hook for compliance."* A broken consent path is an enforcement event, not a bug report. |
+| 2025-07 | FR (DGCCRF) | **SHEIN fined €40M for fake discounts** — prices raised ahead of campaigns and prior reductions ignored; 57% of items checked carried no real discount. The Omnibus price-history obligation, enforced. |
+| 2025-09-01 | FR (CNIL) | **SHEIN fined €150M over cookies.** Advertising cookies were written on arrival, *before* the visitor interacted with the banner at all — and both cookie interfaces were incomplete. The gate ran after the event it was meant to gate. |
 | 2025-12-09 | Google | **Data Manager API launches** — one ingestion point for first-party data across Ads, Analytics, and DV360. |
 | 2025-12-10 | Shopify | **Web pixel payloads redact customer PII** — email, phone, name, and address return null for apps without approved protected-customer-data access. |
 | 2026-01-13 | Shopify | **Marketing app pixels default to "Optimized"** — the platform may pause some or all of a pixel's data sharing when it judges the signal is not useful. |
@@ -66,6 +69,36 @@ Two entries below make that concrete rather than theoretical. Feed labels do not
 | 2027-12 | EU | **Cyber Resilience Act applies in full.** |
 
 Several of these are already behind us, and those are the ones most estates have not absorbed: the consent signal is *already* the ads data control, any un-migrated Script has *already* stopped, third-party pixels *already* receive less than they used to and can *already* be paused by the platform — and the feed deadline is weeks away, not quarters. Two entries carry no date at all yet, which is its own kind of planning problem: an obligation you can see coming but cannot schedule around.
+
+## The tool was bought. The gate never ran.
+
+Four of the entries above are the same finding wearing four coats, and none of them is a case of a company having no consent tool. Every one had bought a consent management platform. Honda ran a mainstream commercial CMP. Todd Snyder ran a third-party privacy portal. SHEIN ran two cookie interfaces at once. The tool was purchased, deployed, and visible on the page — and in every case it was not wired to the thing it was supposed to control.
+
+The regulator said so directly. Announcing the Todd Snyder order, the head of the CPPA's Enforcement Division put it in one line: *"Using a consent management platform doesn't get you off the hook for compliance"* — the buck stops with the business, not the vendor.
+
+**A CMP renders. A gate runs.** That distinction is the whole of it, and the four findings sort cleanly along it:
+
+| Failure | What was actually wrong | Class |
+|---|---|---|
+| Honda — asymmetric banner | The gate ran, in the wrong shape: one click to accept, two steps to reject | Configuration |
+| Honda — eight-field rights form | Verification demanded where none was permitted | Configuration |
+| Todd Snyder — vanishing banner | The UI rendered; the gate was never reachable | Wiring |
+| SHEIN — cookies on arrival | The gate ran *after* the event it existed to gate | **Ordering** |
+
+The last row is the one worth dwelling on, because it is not fixable by configuring the banner better. Advertising cookies were written the moment a visitor arrived, before any interaction with the interface. No setting on that interface could have helped: the tag had already fired. **The dependency is the timeline, not the widget.** A gate that evaluates after the event has been emitted is decoration, however correct its copy.
+
+### Why one CMP configuration cannot serve two regimes
+
+There is a second trap underneath, and it is structural rather than careless. The US and EU consent models have opposite defaults:
+
+- **US (CCPA/CPPA)** is an **opt-out** shape. Collection is lawful until the subject objects, so the tooling's job is to make objecting easy and to honour it. That is why Honda's asymmetry was the violation — the objection path was harder than the acceptance path.
+- **EU (ePrivacy/GDPR)** is an **opt-in** shape. Non-essential cookies are unlawful *until* consent exists, so the tooling's job is to prevent the tag from firing at all. That is why SHEIN's timing was the violation — consent had not yet been given when the cookies were written.
+
+A CMP bought and configured for the US shape does the right thing in the US and the wrong thing in the EU, because "collect until told to stop" is precisely what the EU prohibits. One tool, one configuration, deployed across both, guarantees that one of the two regimes is being broken continuously — and the broken one produces no error, no alert, and no visible symptom. It looks exactly like working software.
+
+The pressure lands hardest on the purchase path, because that is where the tags are densest and where the money is attached. Add-to-cart, checkout, purchase and the conversion ping each carry identifiers to ad platforms, and each one is an event with a consent dependency that has to be resolved *before* it is emitted, per subject, in that subject's jurisdiction. Jurisdiction follows the **subject**, not the store: a French visitor to a US storefront is owed the opt-in shape, and no amount of correct US configuration supplies it.
+
+That is the argument for resolving consent server-side, in the function that mints the event, rather than in a banner that renders beside it. A banner can only ask. A function can refuse — and can record that it refused, with the rule that fired, which is the artefact every one of the four investigations above was actually looking for.
 
 ## What replaced Google Signals — and why it moves work onto you
 
