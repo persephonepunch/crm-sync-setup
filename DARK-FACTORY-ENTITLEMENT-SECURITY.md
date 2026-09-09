@@ -6,6 +6,28 @@ category: "Security"
 date: 2026-07-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
 licence: CC-BY-4.0
+about:
+  - Entitlement-based security
+  - Firmware distribution security
+  - Dark factory / lights-out manufacturing
+  - 3D and BIM asset security
+  - AI-assisted reverse engineering
+alternativeHeadline: "Concede the artifact, defend the ledger — content that executes is an attack surface by definition"
+citation:
+  - name: "Unity Security Update Advisory (CVE-2025-59489)"
+    url: https://unity.com/security/sept-2025-01
+  - name: "NVD — CVE-2025-59489"
+    url: https://nvd.nist.gov/vuln/detail/CVE-2025-59489
+  - name: "CISA ICS Advisory — Trimble Cityworks (CVE-2025-0994)"
+    url: https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-04
+  - name: "CISA alert — Trimble Cityworks security updates"
+    url: https://www.cisa.gov/news-events/alerts/2025/02/07/trimble-releases-security-updates-address-vulnerability-cityworks-software
+  - name: "Shopify Storefront Web Components"
+    url: https://shopify.dev/docs/api/storefront-web-components
+  - name: "Data Layer — WordPress, Astro, Headless (companion)"
+    url: https://www.crm-sync.dev/pages/knowledge-base#wordpress-web-components
+  - name: "CRM Sync Setup Reference"
+    url: https://www.crm-sync.dev/pages/knowledge-base#setup-guide
 ---
 # Dark Factory Entitlement Security
 

@@ -6,6 +6,26 @@ category: "Global"
 date: 2026-07-24
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WAYFAIR-TO-AI-COMMERCE.md
 licence: CC-BY-4.0
+about:
+  - South Dakota v. Wayfair
+  - EU antitrust enforcement against Google
+  - Shopify Markets
+  - Internationalization
+  - Agentic commerce
+  - Semantic HTML components
+  - Privacy by design
+alternativeHeadline: "The Road to Machine-Readable Commerce"
+citation:
+  - name: "South Dakota v. Wayfair, Inc., 585 U.S. 162 (2018)"
+    url: https://supreme.justia.com/cases/federal/us/585/162/
+  - name: "Regulation (EU) 2018/302 — Geo-blocking"
+    url: https://eur-lex.europa.eu/eli/reg/2018/302/oj
+  - name: "Directive (EU) 2019/2161 — Omnibus"
+    url: https://eur-lex.europa.eu/eli/dir/2019/2161/oj
+  - name: "Directive (EU) 2019/882 — European Accessibility Act"
+    url: https://eur-lex.europa.eu/eli/dir/2019/882/oj
+  - name: "GDPR Enforcement Tracker"
+    url: https://www.enforcementtracker.com/
 ---
 # From Wayfair to AI Agents
 

@@ -6,6 +6,35 @@ category: "Specs"
 date: 2026-09-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WHY-XANO-RUNTIME-AS-A-SERVICE.md
 licence: CC-BY-4.0
+keywords:
+  - Xano
+  - runtime as a service
+  - Supabase
+  - Firebase
+  - NextAuth
+  - Shopify Customer Account API
+  - OIDC
+  - Cloudflare Workers
+  - consent gate
+  - Consent Mode v2
+  - Merchant Center
+  - answer engine optimization
+  - agentic commerce
+  - Deno
+  - Node
+  - Liquid
+  - row level security
+  - entitlement
+  - VAT nexus
+  - ISO 80000
+  - GS1
+about:
+  - Backend as a service
+  - Consent enforcement
+  - Agentic commerce
+  - Answer engine optimization
+  - E-commerce data lifecycle
+alternativeHeadline: "A runtime is judged by what it holds when nothing is being rendered"
 ---
 # Why Xano + AI + e-commerce is the right runtime as a service
 

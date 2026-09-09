@@ -6,6 +6,34 @@ category: "Global"
 date: 2026-08-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/COMPLIANCE-CALENDAR.md
 licence: CC-BY-4.0
+keywords:
+  - GDPR
+  - South Dakota v. Wayfair
+  - Omnibus Directive
+  - Consent Mode v2
+  - Content API for Shopping sunset
+  - Merchant API
+  - Shopify Script Editor removal
+  - Cyber Resilience Act
+  - GS1 Sunrise 2027
+  - CPPA enforcement
+  - Honda CCPA settlement
+  - Todd Snyder
+  - SHEIN
+  - CNIL
+  - UK PECR
+  - Data (Use and Access) Act 2025
+  - consent management platform
+  - data timeline attestation
+  - code split
+  - release identity
+about:
+  - Data protection regulation
+  - Consumer protection law
+  - Platform API deprecation
+  - Consent management
+  - Enforcement actions and penalties
+  - Release management
 ---
 # The compliance calendar — 2018 to 2027
 

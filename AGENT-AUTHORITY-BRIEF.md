@@ -6,6 +6,23 @@ category: "Security"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-AUTHORITY-BRIEF.md
 licence: CC-BY-4.0
+keywords:
+  - mandate model
+  - scope
+  - spend cap
+  - expiry
+  - revocation
+  - per-call authorization
+  - agentic commerce
+  - AP2
+  - agent identity
+  - signed mandate
+  - offline verification
+about:
+  - Authorization for AI agents
+  - Agentic commerce
+  - Delegated authority
+  - Payment authorization
 ---
 # Agent Authority — Technical Brief
 

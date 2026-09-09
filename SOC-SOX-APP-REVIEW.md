@@ -6,6 +6,30 @@ category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SOC-SOX-APP-REVIEW.md
 licence: CC-BY-4.0
+about:
+  - SOC 2
+  - SOX IT General Controls
+  - AI middleware
+  - Separation of duties
+  - Operational Success Management
+alternativeHeadline: "AI as free-to-use middleware, security reinforcement, data scaling — SOC + security built in"
+citation:
+  - name: "The Wrong-Size Tool — Why Consent Never Lands on a Server"
+    url: https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool
+  - name: "7 reasons for ERP implementation failure — TechTarget"
+    url: https://www.techtarget.com/searcherp/feature/7-reasons-for-ERP-implementation-failure
+  - name: "AICPA Trust Services Criteria"
+    url: https://www.aicpa-cima.com/resources/download/trust-services-criteria
+  - name: "Axios npm package compromised — Trend Micro"
+    url: https://www.trendmicro.com/en_us/research/26/c/axios-npm-package-compromised.html
+  - name: "Mitigating the Axios npm supply chain compromise — Microsoft Security"
+    url: https://www.microsoft.com/en-us/security/blog/2026/04/01/mitigating-the-axios-npm-supply-chain-compromise/
+  - name: "npm supply chain attack: debug, chalk and 16 packages — Upwind"
+    url: https://www.upwind.io/feed/npm-supply-chain-attack-massive-compromise-of-debug-chalk-and-16-other-packages
+  - name: "Hackers stole access tokens from Okta's support unit — Krebs on Security"
+    url: https://krebsonsecurity.com/2023/10/hackers-stole-access-tokens-from-oktas-support-unit/
+  - name: "xkcd #2347 — Dependency"
+    url: https://xkcd.com/2347/
 ---
 # SOC / SOX Application Review
 

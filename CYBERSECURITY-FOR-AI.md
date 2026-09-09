@@ -6,6 +6,22 @@ category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CYBERSECURITY-FOR-AI.md
 licence: CC-BY-4.0
+about:
+  - EU Cyber Resilience Act
+  - Software Bill of Materials
+  - Firmware security
+  - Google Consent Mode v2
+  - AI middleware for compliance
+alternativeHeadline: "The CRA, firmware, and SBOMs — and why the CISO, CTO, and DPO are the ones exposed"
+citation:
+  - name: "Regulation (EU) 2024/2847 — Cyber Resilience Act"
+    url: https://eur-lex.europa.eu/eli/reg/2024/2847/oj
+  - name: "European Commission — Cyber Resilience Act"
+    url: https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act
+  - name: "GDPR Enforcement Tracker"
+    url: https://www.enforcementtracker.com/
+  - name: "Directive (EU) 2019/2161 — Omnibus"
+    url: https://eur-lex.europa.eu/eli/dir/2019/2161/oj/eng
 ---
 # Cybersecurity for AI
 

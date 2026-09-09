@@ -9,6 +9,7 @@ image: https://crm-sync.dev/wrong-shape-visual.jpg
 date: 2026-07-13
 author: CRM Sync
 tags: [merchant-ai, google-merchant-feed, gpc, graphql, rest, ucp, feedonomics, rithum, salsify, jda-blue-yonder, attio, forward-deployed-infrastructure, egress, cloudflare, r2, oxygen, webflow, xano]
+alternativeHeadline: "Tech debt is legacy tech that can't convert to the AI/Google/Shopify JSON shape"
 ---
 
 # Your Software Investment Is the Barrier to AI Enablement

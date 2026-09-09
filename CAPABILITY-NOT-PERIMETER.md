@@ -6,6 +6,54 @@ category: "Security"
 date: 2026-08-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY-NOT-PERIMETER.md
 licence: CC-BY-4.0
+keywords:
+  - Tailwind
+  - Tailwind CSS
+  - Tailwind is not enough
+  - Next.js
+  - Next.js RBAC
+  - is Tailwind enough for AI
+  - AI is not enough
+  - RBAC
+  - ABAC
+  - RuBAC
+  - OIDC
+  - OAuth
+  - capability-based security
+  - agentic checkout
+  - permissions for AI
+  - JIT authorization
+  - GS1 Digital Link
+  - Sunrise 2027
+  - BIM security
+  - capability not perimeter
+about:
+  - Capability-based security
+  - Role-based access control (RBAC)
+  - Attribute-based access control (ABAC)
+  - Agentic commerce and AI agents
+  - GS1 Digital Link and Sunrise 2027
+  - BIM asset security
+  - Consent and just-in-time authorization
+  - Tailwind CSS
+  - Next.js
+alternativeHeadline: "A perimeter only says no; capability can grant, scope, revoke, and record"
+citation:
+  - name: "GS1 US — What is Sunrise 2027?"
+    url: https://www.gs1us.org/industries-and-insights/by-topic/sunrise-2027
+  - name: "Prosthetics demo (HIPAA remote 3D printing)"
+    url: https://crm-sync.dev/demo/prosthetics
+  - name: "Building-inspection demo (geo-verified BIM)"
+    url: https://crm-sync.dev/demo/inspection
+  - name: "Dark Factory Entitlement Security (companion)"
+    url: https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security
+video:
+  name: "Agentic Checkout Needs More Than RBAC — permissions for AI agents (Next.js)"
+  description: "Why a filesystem perimeter and Next.js RBAC break for AI agents, and the capability model that replaces them."
+  thumbnailUrl: https://i.ytimg.com/vi/Zi5ok36ptXo/hqdefault.jpg
+  uploadDate: 2026-08-08
+  contentUrl: https://youtu.be/Zi5ok36ptXo
+  embedUrl: https://www.youtube-nocookie.com/embed/Zi5ok36ptXo
 ---
 # Permissions for AI, in plain terms — capability, not perimeter
 

@@ -6,6 +6,20 @@ category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WRONG-SIZE-TOOL.md
 licence: CC-BY-4.0
+about:
+  - Consent enforcement
+  - Internal controls (ITGC)
+  - Enterprise service bus
+  - Systems integrator incentives
+  - Design system governance
+alternativeHeadline: "Why Consent Never Lands on a Server"
+citation:
+  - name: "GDPR Enforcement Tracker"
+    url: https://www.enforcementtracker.com/
+  - name: "From Wayfair to AI Agents — The Road to Machine-Readable Commerce"
+    url: https://persephonepunch.github.io/crm-sync-setup/wayfair-to-ai-commerce.html
+  - name: "Cybersecurity for AI — CISO · CTO · DPO"
+    url: https://persephonepunch.github.io/crm-sync-setup/cybersecurity-for-ai.html
 ---
 # The Wrong-Size Tool
 

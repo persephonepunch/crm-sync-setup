@@ -6,6 +6,28 @@ category: "Setup"
 date: 2026-07-18
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WORDPRESS-WEB-COMPONENTS.md
 licence: CC-BY-4.0
+alternativeHeadline: "The migration is theme packaging, not a rebuild"
+citation:
+  - name: "Shopify Storefront Web Components"
+    url: https://shopify.dev/docs/api/storefront-web-components
+  - name: "Udesly — Webflow to WordPress converter"
+    url: https://www.udesly.com/
+  - name: "Pinegrow — native WordPress theme builder from HTML"
+    url: https://pinegrow.com/
+  - name: "EmDash — full-stack TypeScript CMS on Astro"
+    url: https://github.com/emdash-cms/emdash
+  - name: "Introducing EmDash (Cloudflare)"
+    url: https://blog.cloudflare.com/emdash-wordpress/
+  - name: "CRM Sync Setup Reference"
+    url: https://www.crm-sync.dev/pages/knowledge-base#setup-guide
+  - name: "OMEN — production reference build (Webflow + Shopify Web Components)"
+    url: https://omenphase1-1.webflow.io/
+  - name: "Pinata — IPFS pinning and dedicated gateways"
+    url: https://pinata.cloud/
+  - name: "Hypercore Protocol — signed append-only log (the Dat lineage)"
+    url: https://hypercore-protocol.org/
+  - name: "Holepunch — the active Hypercore ecosystem"
+    url: https://holepunch.to/
 ---
 # File System Agnostic Publishing
 

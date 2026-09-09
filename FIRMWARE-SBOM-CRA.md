@@ -6,6 +6,23 @@ category: "Security"
 date: 2026-07-20
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FIRMWARE-SBOM-CRA.md
 licence: CC-BY-4.0
+keywords:
+  - SBOM
+  - CycloneDX
+  - firmware vaulting
+  - Cyber Resilience Act
+  - envelope encryption
+  - AES-256-GCM
+  - hash-chained ledger
+  - grant-gated download
+  - Ed25519 certificate
+  - CORS
+  - nosniff
+about:
+  - Software bill of materials
+  - Firmware security
+  - EU product security regulation
+  - Encryption at rest
 ---
 # CRM Sync — Firmware, SBOM & the Cyber Resilience Act
 

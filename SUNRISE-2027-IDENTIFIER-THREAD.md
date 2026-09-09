@@ -6,6 +6,25 @@ category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SUNRISE-2027-IDENTIFIER-THREAD.md
 licence: CC-BY-4.0
+keywords:
+  - Shopify GID
+  - product taxonomy
+  - GraphQL
+  - GS1 Sunrise 2027
+  - GS1 Digital Link
+  - 2D barcode
+  - Merchant Center
+  - Shopping Graph
+  - product identity
+  - GTIN
+  - MPN
+  - CPG planning
+  - server-side events
+about:
+  - Product identification standards
+  - Retail point of sale
+  - Product data syndication
+  - GraphQL APIs
 ---
 # Product Taxonomy, GraphQL and the GID Rename
 ## CPG planning toward Sunrise 2027

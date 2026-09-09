@@ -5,6 +5,20 @@ canonical: https://persephonepunch.github.io/crm-sync-setup/key-management-lifec
 category: "Security"
 date: 2026-07-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/KEY-MANAGEMENT-LIFECYCLE.md
+keywords:
+  - key ceremony
+  - key rotation
+  - key custody
+  - separation of duties
+  - signing keys
+  - JWKS
+  - secret management
+  - revocation
+  - audit record
+about:
+  - Cryptographic key management
+  - Separation of duties
+  - Operational security
 ---
 # CRM Sync — Key Management Lifecycle
 

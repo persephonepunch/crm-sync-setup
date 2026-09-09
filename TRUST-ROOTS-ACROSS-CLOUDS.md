@@ -6,6 +6,34 @@ category: "Security"
 date: 2026-09-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-ROOTS-ACROSS-CLOUDS.md
 licence: CC-BY-4.0
+keywords:
+  - TLS 1.3
+  - forward secrecy
+  - non-repudiation
+  - permissions boundary
+  - intent mandate policy
+  - RFC 9421 message signatures
+  - SPIFFE
+  - workload identity
+  - Ed25519
+  - JWKS
+  - hash-chained ledger
+  - gates versus weights
+  - prompt injection
+  - confused deputy
+  - Vertex AI lifecycle
+  - actAs
+  - graph traversal permissions
+  - semantic search
+  - retrieval
+  - agentic commerce
+about:
+  - Transport layer security
+  - Key custody
+  - Authorization for AI agents
+  - Data governance
+  - Vector search and retrieval
+  - Graph analytics
 ---
 # Trust Roots Across Clouds
 

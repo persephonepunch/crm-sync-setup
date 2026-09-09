@@ -6,6 +6,20 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CRA-EVIDENCE-CHAIN.md
 licence: CC-BY-4.0
+keywords:
+  - Cyber Resilience Act
+  - SBOM
+  - firmware vaulting
+  - evidence chain
+  - ledger sessions
+  - vulnerability reporting
+  - conformity assessment
+  - records retention
+about:
+  - EU product security regulation
+  - Software bill of materials
+  - Firmware distribution
+  - Audit evidence
 ---
 # Your Firmware Is a URL — the CRA Assumes an Evidence Chain
 

@@ -6,6 +6,21 @@ category: "Security"
 date: 2026-07-18
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BIM-FORTRESS-EVENT-SOCKET.md
 licence: CC-BY-4.0
+about:
+  - BIM asset security
+  - Event-driven architecture
+  - Entitlement-based access
+  - AI tool runners / agent mandates
+alternativeHeadline: "You need more is a different sentence than you need different"
+citation:
+  - name: "CISA ICS Advisory — Trimble Cityworks (CVE-2025-0994)"
+    url: https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-04
+  - name: "Dark Factory Entitlement Security (companion)"
+    url: https://crm-sync.dev/share/dark-factory-entitlement-security
+  - name: "Data Layer — WordPress, Astro, Headless (delivery companion)"
+    url: https://crm-sync.dev/share/wordpress-web-components
+  - name: "CRM Sync Setup Reference"
+    url: https://www.crm-sync.dev/pages/knowledge-base#setup-guide
 ---
 # BIM Fortress Exposure vs the Event-Socket Heal
 

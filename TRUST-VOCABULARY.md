@@ -6,6 +6,22 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-VOCABULARY.md
 licence: CC-BY-4.0
+keywords:
+  - permission
+  - privacy
+  - licence versus grant
+  - receipt
+  - record of consumption
+  - fingerprint
+  - vault
+  - token versus session bookmark
+  - entitlement
+  - consent
+  - provenance
+about:
+  - Security terminology
+  - Access control concepts
+  - Data governance vocabulary
 ---
 # The Trust Vocabulary — Every Term on One Page
 

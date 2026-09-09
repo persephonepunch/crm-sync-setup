@@ -6,6 +6,25 @@ category: "Security"
 date: 2026-08-05
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md
 licence: CC-BY-4.0
+keywords:
+  - server-side rendering
+  - cart
+  - checkout
+  - returns
+  - RMA
+  - fraud
+  - remittance
+  - tax nexus
+  - consent gating
+  - Omnibus price history
+  - evidence records
+  - definition of done
+  - due diligence
+about:
+  - E-commerce architecture
+  - Regulatory compliance in commerce
+  - Consent and tracking
+  - Software quality assurance
 ---
 # Server-Side or It Didn't Happen
 

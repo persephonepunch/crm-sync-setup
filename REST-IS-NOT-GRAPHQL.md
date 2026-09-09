@@ -6,6 +6,21 @@ category: "Shopify"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/REST-IS-NOT-GRAPHQL.md
 licence: CC-BY-4.0
+keywords:
+  - Shopify Admin API
+  - REST deprecation
+  - GraphQL
+  - cost-based rate limiting
+  - query cost
+  - GID identifiers
+  - cursor pagination
+  - error model
+  - bulk operations
+  - migration
+about:
+  - GraphQL APIs
+  - Shopify platform migration
+  - API rate limiting
 ---
 # REST Is Not GraphQL
 

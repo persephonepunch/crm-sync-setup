@@ -6,6 +6,42 @@ category: "Specs"
 date: 2026-09-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BYO-SHAPE-PIPELINE.md
 licence: CC-BY-4.0
+keywords:
+  - BYO Xano
+  - data shape pipeline
+  - per-field provenance
+  - merge order
+  - permissions boundary
+  - N+1 lag
+  - consent projection
+  - compare-and-swap
+  - hash-chained ledger
+  - append-only record
+  - Webflow CMS write-back
+  - GitHub as record
+  - Kubernetes
+  - Google AI
+  - Gemini
+  - remote model
+  - deploy-time service account
+  - self-serve infrastructure
+  - agentic commerce
+  - middleware attachment
+about:
+  - Data provenance
+  - Permission and consent modelling
+  - Compare-and-swap concurrency control
+  - Tamper-evident ledgers
+  - Headless CMS integration
+  - Kubernetes
+  - Large language model integration
+  - Vendor lock-in and procurement
+alternativeHeadline: "The contract is four things; everything else is substitutable"
+citation:
+  - name: "CAS & Cascade Registry"
+    url: https://www.crm-sync.dev/pages/knowledge-base#cas-registry
+  - name: "Capability, not perimeter"
+    url: https://persephonepunch.github.io/crm-sync-setup/capability-not-perimeter.html
 ---
 # BYO Shape Pipeline
 
