@@ -223,6 +223,49 @@ for, and it is the one that quietly costs revenue rather than compliance.
 it is not one. Undocumented, it is the single most expensive thing on this page to explain under
 audit conditions; documented, it takes one sentence.
 
+## Two git paths, two jobs — and why that is the non-blocking order
+
+Sooner or later you will want to publish *more* than the shape back to git: categories, tags,
+product JSON. There is a trap in the obvious way to do it, and a way round the trap that requires
+deciding nothing.
+
+**The trap.** The merge order puts `github-base` at the *bottom* — it is the layer the CMS
+overrides. If the CMS now also **writes** to git, the same value exists at two precedence levels.
+That is stable while the CMS item exists, because the CMS layer still wins. It breaks on delete:
+**removing a field in the CMS will not revert to nothing, it will fall back to the last value the
+CMS itself pushed.** The author deletes something and it stays, wearing a different provenance
+tag. Nothing errors.
+
+**The way round.** Give git two paths with two jobs, and never let one become the other:
+
+| Path | Job | Read by the merge? | Precedence |
+|---|---|---|---|
+| `shape-<name>.json` | **Base layer** — the default a CMS item overrides | Yes | Lowest |
+| `destinations/…` | **Record** — append-only log of what was published | **No** | None; it is not a layer |
+
+Categories, tags and product JSON go to the second path as **records**: append-only,
+sequence-stamped, written by the pipeline and read by nothing in the merge path.
+
+Three things follow, and each one is a decision you no longer have to make:
+
+- **No precedence loop**, because no new value is ever read as a layer.
+- **Delete becomes representable.** A deletion appends a delete record at sequence N. There is no
+  fallback to reason about, because nothing falls back.
+- **No embedding decision.** Records do not touch a vector index, so any question about how
+  overrides overwrite drafts in a search index is deferred, not blocked.
+
+### Stamp the records now, even though nothing reads them
+
+Every record carries `as_of_seq`, the source layer, and the actor — from the first write, while
+it is still write-only. If you later decide these *should* be merge layers, the provenance is
+already present and it is a reader change. Without it, the same decision is a migration over
+history you cannot reconstruct.
+
+**The ordering principle is worth stating on its own:** *write-only first, read-later.* Adding a
+reader to an existing record is cheap and reversible. Removing a layer that other things already
+merge from is neither — you cannot un-publish a default that has been quietly winning for months,
+because you no longer know which of the values downstream came from it.
+
 ## Swapping the runtime: Kubernetes
 
 Nothing in the contract requires a specific runtime. The permissions boundary is a request handler that
@@ -312,6 +355,8 @@ instead of long-lived strings, policy instead of key possession, audit as a firs
 - [ ] Two concurrent writes to the same chain tip produce one commit and one retry — not two
       commits, and not a forked chain.
 - [ ] Replay is by sequence, never by timestamp.
+- [ ] Anything written back to git is either a *base layer* the merge reads, or an append-only
+      *record* it does not — never both for the same field.
 - [ ] The N+1 lag is documented where a reviewer will read it, and the permission check on a
       *new action* reads effective state — not the projection.
 - [ ] No model sits in the authorization path.
