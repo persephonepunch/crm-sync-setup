@@ -1,6 +1,6 @@
 ---
-title: "Trust Roots Across Clouds — Custody, Policy and Weighting for Real-Time AI Commerce"
-description: "What TLS actually buys and where it stops, why a permission is a conjunction of intent, mandate and policy, and how e-commerce data moves from one-directional CSV exports to sequenced, signed records a model can weigh."
+title: "Trust Roots Across Clouds"
+description: "What TLS actually buys and where it stops — and why a permission is intent, mandate and policy together, never a token anybody carries."
 canonical: https://persephonepunch.github.io/crm-sync-setup/trust-roots-across-clouds.html
 category: "Security"
 date: 2026-09-09
