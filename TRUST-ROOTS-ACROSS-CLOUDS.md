@@ -328,6 +328,12 @@ Semantic search does not fail loudly. It returns a confident nothing, and a conf
 
 A graph endpoint — one route that answers how this connects to that — is the natural next analytics surface, and it is the query shape that breaks every permission model above.
 
+**Further viewing.** Big Data LDN's conference talk *Graph Analytics in BigQuery — Unifying Analytics and AI at Scale* covers the query-side half of this — unifying analytics and AI over a graph at scale. It is a good account of the capability. The permission problem below is the part that sits outside its scope.
+
+<div style="max-width:760px;margin:1.25rem 0"><div style="position:relative;padding-top:56.25%"><iframe src="https://www.youtube-nocookie.com/embed/ylUaoy1musw" style="position:absolute;top:0;left:0;width:100%;height:100%;border:1px solid #B8B0A4" title="Graph Analytics in BigQuery — Unifying Analytics and AI at Scale (Big Data LDN)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></div>
+
+<p style="font-size:.85rem;color:#6E7276;margin:-.6rem 0 1.4rem">Video: <a href="https://www.youtube.com/watch?v=ylUaoy1musw" rel="noopener">Graph Analytics in BigQuery — Unifying Analytics and AI at Scale</a> — <a href="https://www.youtube.com/@Bigdataldn" rel="noopener">Big Data LDN</a>. Embedded for reference; not a CRM Sync production.</p>
+
 The reason is structural. Row-level authorization assumes the answer is a set of rows, each of which you may or may not see. A traversal's answer is a *path*, and a path crosses ownership boundaries by definition. Filtering the endpoints of a path while returning the path itself leaks the middle. Filtering the middle changes the answer without saying so. Neither is a bug in the engine; it is what a join across permission domains does.
 
 Engines differ in what they can enforce. A property-graph database with label-based access control can gate individual nodes and relationships. A managed graph analytics service typically authorises per IAM action across the whole graph. A graph layer over a relational store inherits table and column grants. And recursive common table expressions over an ordinary relational database enforce whatever row-access policies that database has.
