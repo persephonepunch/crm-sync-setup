@@ -183,6 +183,46 @@ when it started may not be entitled now. Resolve per request, per subject.
 
 ---
 
+### The N+1 lag: when a permission change takes effect
+
+A permission change has two moments, not one, and a BYO implementer has to know which of them
+their code is reading.
+
+- **Effective state** — the latest event in the current session. Changes the instant the subject
+  acts. This is what a permission check at the point of action must read.
+- **Projected state** — the per-subject projection that downstream consumers read: audience
+  builders, weighting, exports. It is honoured **from the next session (N+1)**, not this one.
+
+So a subject who revokes in session N sees `effective: revoked` sitting next to
+`projected: granted` for the remainder of that session. That is a design decision, not a
+lag you failed to close, and it exists for a reason worth stating: the projection is what a
+whole audience or export is built from, and recomputing it mid-session would make one session
+internally inconsistent — half its rows built under the old state, half under the new.
+
+**What must never lag.** The permission check on a *new action* reads effective state. If a
+subject revokes and then an agent attempts a write, that write is refused immediately — it does
+not get one more session of grace. Two reads, two sources, deliberately:
+
+| Question | Reads | Timing |
+|---|---|---|
+| May this action proceed? | Effective state | Immediate |
+| May this subject be in tomorrow's audience? | Projected state | From N+1 |
+
+**And the enforcement is deletion, not filtering.** When the projection flips to revoked, any
+derived weight for that subject is *destroyed*, not down-ranked — the identity-map row goes, and
+the cached score goes with it. A revoked subject does not become a low-scoring subject; they
+stop having a score at all. This is the gate-versus-weight rule made operational: a permission
+removes the row, a weight orders the rows that survived.
+
+**Reconcile in both directions.** A drift pass should count subjects who are *targetable but not
+consented* and subjects who are *consented but not targetable*. Most estates check only the
+first. The second one — someone permitted you and is unreachable — is the failure nobody looks
+for, and it is the one that quietly costs revenue rather than compliance.
+
+**Say the N+1 lag out loud before a reviewer finds it.** It looks like a bug in a screenshot and
+it is not one. Undocumented, it is the single most expensive thing on this page to explain under
+audit conditions; documented, it takes one sentence.
+
 ## Swapping the runtime: Kubernetes
 
 Nothing in the contract requires a specific runtime. The permissions boundary is a request handler that
@@ -272,6 +312,8 @@ instead of long-lived strings, policy instead of key possession, audit as a firs
 - [ ] Two concurrent writes to the same chain tip produce one commit and one retry — not two
       commits, and not a forked chain.
 - [ ] Replay is by sequence, never by timestamp.
+- [ ] The N+1 lag is documented where a reviewer will read it, and the permission check on a
+      *new action* reads effective state — not the projection.
 - [ ] No model sits in the authorization path.
 - [ ] Every credential the pipeline uses is held by the component that can refuse a request, and
       by no other.
