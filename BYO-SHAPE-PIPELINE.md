@@ -1,6 +1,6 @@
 ---
 title: "BYO Shape Pipeline"
-description: "How to bring your own Xano to the data-shape pipeline: the merge contract, the write path, the entitlement gate, and how to swap the runtime for Kubernetes or the model for Google AI — without buying anything that isn't self-serve."
+description: "How to bring your own Xano to the data-shape pipeline: the merge contract, the write path, the permissions model, and how to swap the runtime for Kubernetes or the model for Google AI — without buying anything that isn't self-serve."
 canonical: https://persephonepunch.github.io/crm-sync-setup/byo-shape-pipeline.html
 category: "Specs"
 date: 2026-09-09
@@ -10,7 +10,7 @@ licence: CC-BY-4.0
 # BYO Shape Pipeline
 
 **For:** anyone bringing their own Xano instance to this pipeline, and anyone who intends to run
-the decision seam on Kubernetes and the model on Google AI rather than on the defaults.
+the permissions boundary on Kubernetes and the model on Google AI rather than on the defaults.
 
 **The promise this document has to keep:** every dependency named below is self-serve. No
 enterprise agreement, no named account team, no seat you have to negotiate for. Where a
@@ -28,13 +28,13 @@ guarantee, or that carries a trap — read those first.*
 
 A shape is a data model that a design surface authors and a runtime renders. Not a page edit —
 a record with fields, provenance, and a version. Designers and developers exchange shapes; the
-edge merges, gates and ledgers every change.
+edge merges every change, checks permissions, and ledgers it.
 
 The whole contract is four things. Implement these and you are on the pipeline, whatever else
 you swap:
 
 1. **A merge order**, deterministic, with per-field provenance.
-2. **A capability** that gates writes, resolved per subject at request time.
+2. **A permission** that must hold before a write, resolved per subject at request time.
 3. **A ledger append** on every accepted change, hash-chained.
 4. **A read endpoint** that returns the merged shape *and* which layer won each field.
 
@@ -76,18 +76,18 @@ defensible, and the failure mode of picking by accident is a shape that looks co
 
 Two legs. Build the first; the second is what makes it survive contact with a real tenant.
 
-### Leg 1 — the primary path, through the decision seam
+### Leg 1 — the primary path, through the permissions boundary
 
 ```
 CMS publish
   → webhook (HMAC-verified)
-  → decision seam: resolve subject, check capability, merge, decide
+  → permissions boundary: resolve subject, check permission, merge, decide
   → write: system of record + git commit + commerce projection
   → ledger append (hash-chained)
 ```
 
-The decision seam is the only place that may refuse. It holds the credentials, it resolves the
-capability, and it records both outcomes. **A refusal appends to the ledger exactly like an
+The permissions boundary is the only place that may refuse. It holds the credentials, it resolves
+the permission, and it records both outcomes. **A refusal appends to the ledger exactly like an
 acceptance** — a rejection that leaves no trace is indistinguishable from a bug, and the first
 question anyone asks after an incident is what you refused and when.
 
@@ -112,11 +112,11 @@ That last point is the whole BYO problem, and it deserves its own section.
 
 ---
 
-## BYO Xano: the gate must exist twice
+## BYO Xano: the permissions check must exist twice
 
 **Middleware attachment is a UI action.** So is trigger creation. Neither can be reliably
 provisioned into someone else's workspace, which means a packaged install can be *complete* and
-still have the gate half-attached, or absent.
+still have the permissions check half-attached, or absent.
 
 The pattern that survives this is already in the reference implementation, and its own
 description says why it exists:
@@ -161,32 +161,32 @@ most, because nothing looks wrong until an audit asks.
 
 ---
 
-## Entitlement: how the write capability is granted
+## Entitlement: how the write permission is granted
 
-Writes require one capability. It arrives by exactly two routes, and both are self-serve:
+Writes require one permission. It arrives by exactly two routes, and both are self-serve:
 
 | Route | Mechanism |
 |---|---|
-| **Purchase** | A matching purchase grants the capability to the buying subject. |
-| **Invitation** | A team invite carrying the shape role tag grants the same capability. |
+| **Purchase** | A matching purchase grants the permission to the buying subject. |
+| **Invitation** | A team invite carrying the shape role tag grants the same permission. |
 
 Nothing else grants it. In particular, being an administrator of the CMS does not — authoring a
 Collection item and being permitted to change the record are separate decisions, and collapsing
 them hands the record to whoever holds a design seat.
 
-Grant the write capability and nothing adjacent. A shape author needs to write shapes; they do
+Grant the write permission and nothing adjacent. A shape author needs to write shapes; they do
 not need theme control, release promotion, or evidence export. If your role model cannot express
-that distinction, the role model is the thing to fix — not the gate.
+that distinction, the role model is the thing to fix — not the permission.
 
-**Check the capability at the point of action, not at the door.** A session that was entitled
+**Check the permission at the point of action, not at the door.** A session that was entitled
 when it started may not be entitled now. Resolve per request, per subject.
 
 ---
 
 ## Swapping the runtime: Kubernetes
 
-Nothing in the contract requires a specific runtime. The decision seam is a request handler that
-can resolve a subject, check a capability, merge three layers, write, and append to a ledger. A
+Nothing in the contract requires a specific runtime. The permissions boundary is a request handler that
+can resolve a subject, check a permission, merge three layers, write, and append to a ledger. A
 container on Kubernetes does that as well as an edge worker.
 
 What you take on when you move it:
@@ -264,7 +264,7 @@ instead of long-lived strings, policy instead of key possession, audit as a firs
 ## What to check before you call it done
 
 - [ ] A merged read names the winning layer for **every** field.
-- [ ] A write without the capability is refused, and the refusal is in the ledger with the rule
+- [ ] A write without the permission is refused, and the refusal is in the ledger with the rule
       that fired.
 - [ ] The webhook signature is verified, and every unsigned variant is either allow-listed by
       topic or rejected.
