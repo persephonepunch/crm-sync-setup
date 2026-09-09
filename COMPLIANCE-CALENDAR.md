@@ -81,6 +81,7 @@ Two entries below make that concrete rather than theoretical. Feed labels do not
 | 2025-12-09 | Google | **Data Manager API launches** — one ingestion point for first-party data across Ads, Analytics, and DV360. |
 | 2025-12-10 | Shopify | **Web pixel payloads redact customer PII** — email, phone, name, and address return null for apps without approved protected-customer-data access. |
 | 2026-01-13 | Shopify | **Marketing app pixels default to "Optimized"** — the platform may pause some or all of a pixel's data sharing when it judges the signal is not useful. |
+| 2026-02-05 | UK | **PECR fines rise 35-fold.** The Data (Use and Access) Act 2025 lifts the maximum for serious cookie and e-marketing breaches from £500,000 to UK GDPR levels — **£17.5M or 4% of global turnover**. Cookie compliance stops being a rounding error in the UK on this date. |
 | 2026-02-28 | Google | **Merchant API v1beta retired.** Integrations must be on v1. |
 | 2026-04 | Google | Enhanced conversions for web and leads **unified into a single toggle**, accepting tag, Data Manager, and API sources together. |
 | **2026-06-15** | Google | **Google Signals retired as a control.** Consent Mode `ad_storage` becomes the *sole* control over what GA4 sends to Google Ads. |
@@ -114,6 +115,38 @@ The regulator said so directly. Announcing the Todd Snyder order, the head of th
 | SHEIN — cookies on arrival | The gate ran *after* the event it existed to gate | **Ordering** |
 
 The last row is the one worth dwelling on, because it is not fixable by configuring the banner better. Advertising cookies were written the moment a visitor arrived, before any interaction with the interface. No setting on that interface could have helped: the tag had already fired. **The dependency is the timeline, not the widget.** A gate that evaluates after the event has been emitted is decoration, however correct its copy.
+
+### The penalty table — ceilings, and what has actually been levied
+
+Two numbers get confused constantly, so it is worth separating them. The statutory figure is a **ceiling**, not a starting point — GDPR's €20M is "up to €20M **or** 4% of worldwide annual turnover, whichever is **higher**," which for a large company means the percentage is the real number and €20M is the floor of the *cap*, not the floor of the fine. And cookie enforcement in France does not run under GDPR at all.
+
+| Regime | Instrument | Ceiling |
+|---|---|---|
+| EU GDPR — upper tier | Art. 83(5) | €20M **or** 4% of global turnover, whichever is higher |
+| EU GDPR — lower tier | Art. 83(4) | €10M or 2% |
+| **FR cookies / ePrivacy** | **Art. 82, French Data Protection Act** | **€10M or 2%** — and outside the one-stop-shop |
+| UK GDPR | DPA 2018 | £17.5M or 4% |
+| UK PECR — until 2026-02-05 | PECR | £500,000 |
+| **UK PECR — from 2026-02-05** | **Data (Use and Access) Act 2025** | **£17.5M or 4%** |
+| EU Omnibus | Dir. (EU) 2019/2161 | 4% of EU-market turnover |
+| EU Cyber Resilience Act | Reg. (EU) 2024/2847 | €15M or 2.5% |
+| EU AI Act | Reg. (EU) 2024/1689 | €35M or 7% |
+| EU DSA | Reg. (EU) 2022/2065 | 6% of global turnover |
+
+Against those ceilings, what was actually imposed on the four actions above:
+
+| Action | Authority | Legal basis | Levied |
+|---|---|---|---|
+| American Honda | CPPA (California) | CCPA | $632,500 |
+| Todd Snyder | CPPA (California) | CCPA | $345,178 |
+| SHEIN — fake discounts | DGCCRF (France) | Consumer code / Omnibus | €40,000,000 |
+| SHEIN — cookies on arrival | CNIL (France) | Art. 82 French DPA (ePrivacy) | €150,000,000 |
+
+**And it is additive.** That is the part worth planning around, and the mechanism is specific rather than rhetorical. Because CNIL takes cookie cases under Article 82 of the French Data Protection Act rather than under the GDPR, it holds **exclusive jurisdiction and does not go through the one-stop-shop** — so it acts without deferring to a lead supervisory authority in another member state, and an ePrivacy penalty sits *beside* GDPR exposure rather than being absorbed into it.
+
+SHEIN is the worked example: **€150M from CNIL on cookies and €40M from the DGCCRF on pricing — €190M, two authorities, two legal bases, one business, in the same year.** Neither capped the other. GDPR Article 83(3) limits *multiple infringements within a single processing operation* to the gravest of them; it does nothing to stop separate instruments, separate regulators and separate operations from stacking. CNIL alone issued 21 sanctions totalling more than €475M across 2025.
+
+The UK row is the one to diarise. Before 5 February 2026 a cookie breach there was capped at £500,000 — genuinely a cost of doing business for a large retailer. After it, the same breach reaches £17.5M or 4% of global turnover. Nothing about the technical failure changed; only the number attached to it did.
 
 ### Why one CMP configuration cannot serve two regimes
 
