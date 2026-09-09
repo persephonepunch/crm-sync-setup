@@ -13,6 +13,22 @@ licence: CC-BY-4.0
 
 Every entry below is public record — a statute, a published ruling or enforcement action, or a platform's own dated announcement. Nothing here is inside information, and nothing here is a prediction. The pattern only becomes visible when the dates are read together: for eight years, law and platform have been pushing commerce toward the same shape — **a typed, server-resolved data plane where consent, price history, and provenance are records rather than settings.**
 
+## Code split and verification — challenge, solution, benefit
+
+**Challenge.** None of the dates below is a reading assignment. Each one changes behaviour on a day, and every record written after that day was written under different rules than the records before it. When Merchant API v1beta retires, when the Content API stops accepting feeds, when a field deprecated in one release is removed in the next — the code changes, and the data keeps its old shape alongside the new. Months later somebody asks the only question that matters: *was this entitlement granted before or after the migration, and under which behaviour?* A single monolithic deploy answers with a timestamp and a shrug. Reconstructing the rest is archaeology, and it starts exactly when a regulator, an acquirer or a customer is waiting.
+
+**Solution.** Two mechanisms, and neither is sufficient alone.
+
+*Code split* — three independently deployable units: the Webflow extension, the Cloudflare Worker, and the public spec repository. A deadline that touches one does not force a release of the others, so the blast radius of a compliance change is the unit that actually changed, and a pre-deploy guard validates the extension before it ships. Fewer things move per deadline, and the things that moved are named.
+
+*Release identity* — the worker binds its own version, so it can see which release is serving the request. Without that binding the version id exists only in a dashboard, and nothing the worker writes can carry it. With it, every entitlement change is stamped with the release that produced it, alongside the state version, the actor, the actor type, and the mandate the change was made under.
+
+**Benefit.** *Which release wrote this record, under what configuration* stops being an investigation and becomes a lookup. That is the difference between an audit trail and a Day-2 index — one tells you something happened, the other tells you under which rules.
+
+It works because an entitlement here is not a flag holding a current value. It is a **history**: an ordered change bus where every row names the subject, the change, the state version, the actor, the actor type — admin, agent, user or system — and the mandate it was granted under. So the question a regulator or a customer actually asks is answerable by replaying to the point in question: *what was this person entitled to on the day it mattered, and who granted it?* The answer is reproducible, and it is the same every time anyone checks.
+
+Two entries below make that concrete rather than theoretical. Feed labels do not carry over automatically when the Content API shuts down, so the record of what was published under which release is the only way to reconstruct what a feed actually contained. And fields deprecated in the 2026-10 release are removed in 2027-01 — a nine-month overlap, every release, during which both shapes are live and only the release stamp distinguishes them.
+
 ## The calendar
 
 | Date | Authority | What changed |
