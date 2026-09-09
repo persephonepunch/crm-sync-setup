@@ -23,9 +23,37 @@ Every entry below is public record — a statute, a published ruling or enforcem
 
 *Release identity* — the worker binds its own version, so it can see which release is serving the request. Without that binding the version id exists only in a dashboard, and nothing the worker writes can carry it. With it, every entitlement change is stamped with the release that produced it, alongside the state version, the actor, the actor type, and the mandate the change was made under.
 
-**Benefit.** *Which release wrote this record, under what configuration* stops being an investigation and becomes a lookup. That is the difference between an audit trail and a Day-2 index — one tells you something happened, the other tells you under which rules.
+**Benefit — stated as the mandate it places on delivery.** *Which release wrote this record, under what configuration* becomes a lookup rather than an investigation. That is the difference between an audit trail and a Day-2 index: one tells you something happened, the other tells you under which rules it happened. It holds because an entitlement here is not a flag carrying a current value but a **history** — an ordered change bus where every row names the subject, the change, the state version, the actor (admin, agent, user or system), and the mandate it was granted under. So the question a regulator or a customer actually asks is answerable by replaying to the point in question: *what was this person entitled to on the day it mattered, and who granted it?*
 
-It works because an entitlement here is not a flag holding a current value. It is a **history**: an ordered change bus where every row names the subject, the change, the state version, the actor, the actor type — admin, agent, user or system — and the mandate it was granted under. So the question a regulator or a customer actually asks is answerable by replaying to the point in question: *what was this person entitled to on the day it mattered, and who granted it?* The answer is reproducible, and it is the same every time anyone checks.
+For a delivery organisation that is not an architectural nicety. It is an **acceptance criterion**, and it belongs in the definition of done rather than in a retrospective. PMO and QA sign-off must include a **Data Timeline Attestation**: a statement produced *by the release itself* of which rules were in force at the cut — schema version, rule set, release id — not a document assembled afterwards from memory by whoever is still available.
+
+An attestation is only worth what it can be reconciled against, so change logging has to carry four axes, and the sign-off is that they **cross-check**:
+
+| Axis | What it records | What its absence costs |
+|---|---|---|
+| **Device** | Which device the change originated from | One subject on two devices is indistinguishable from two subjects |
+| **Browser** | The user agent, and which consent surface it actually rendered | No way to show the banner the subject saw is the banner you shipped |
+| **Event** | The action that caused the change, in sequence | A change with a timestamp but no cause |
+| **Permissions rule** | Which rule evaluated, and what it returned | The outcome without the authority for it |
+
+Any one axis alone is an assertion. The four together are reconcilable, and reconciliation is the test: if the event says consent was granted and no permissions rule fired, one of the two is wrong and the release does not pass. That check is cheap to run continuously and nearly impossible to reconstruct later.
+
+**And the artefact cannot be a CSV.** A spreadsheet exported without provenance or version evidences none of the above: no release stamp, so nothing says which rules produced it; no ordering, so nothing says what came before; no signature, so nothing says it has not been edited since. It records that somebody believed something on the day they exported it. Every enforcement finding in the calendar below turned on being able to show more than that.
+
+### Reading is not control
+
+Everything above establishes that data in motion can be **read** — attested at the release, logged on four axes, reconciled between them. That is necessary and it is not sufficient, because an observation stops nothing. You could have watched SHEIN's advertising cookies fire on arrival all day; watching would not have prevented a single one.
+
+So the requirement is stronger than observability, and it is symmetric: **humans and machines must both be able to read *and block* data in motion, at a named point on a timeline.** Four words in that sentence are load-bearing.
+
+- **Read** — see what is about to be emitted, for which subject, under which rule, *before* it leaves. After it leaves, you are writing a disclosure, not exercising a control.
+- **Block** — stop it leaving. Not flag it, not annotate it, not correct it downstream in the warehouse. A mechanism that only records is a witness, not a control.
+- **On a timeline** — the block has an address: from this sequence point forward, on this stream, for this subject. A block with no position in the order cannot be replayed, scoped, lifted, or explained afterwards; it is a switch somebody flipped.
+- **Humans *and* machines** — machine-only blocking leaves nobody accountable for a stop that should never have happened. Human-only blocking always arrives late, because events move at machine tempo and approvals do not. The same primitive has to be exercisable at both speeds, by both kinds of actor.
+
+The practical shape follows from that and is the same shape as the rest of this section: the block *is* the gate, it evaluates inside the function that mints the event, and a refusal appends to the same ordered stream the emission would have. Which makes *what did we stop, when, and on whose authority* answerable by exactly the replay that answers *what did we send* — one mechanism, one timeline, two questions.
+
+It is also the sharpest way to state the difference between a consent management platform and a gate. A CMP can read; the four findings above are what happens when reading is all it can do.
 
 Two entries below make that concrete rather than theoretical. Feed labels do not carry over automatically when the Content API shuts down, so the record of what was published under which release is the only way to reconstruct what a feed actually contained. And fields deprecated in the 2026-10 release are removed in 2027-01 — a nine-month overlap, every release, during which both shapes are live and only the release stamp distinguishes them.
 
