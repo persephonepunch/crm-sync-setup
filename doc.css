@@ -52,11 +52,11 @@ body{
 .hero{padding-bottom:30px; margin-bottom:14px; border-bottom:2px solid var(--cyan)}
 .hero .kicker{font:600 12px/1 var(--mono); letter-spacing:.30em; text-transform:uppercase; color:var(--g5)}
 .hero h1{                          /* light display headline (300 — 100 was too faint) */
-  font-weight:300; font-size:clamp(36px,5.4vw,58px); line-height:1.08; letter-spacing:-1px;
-  margin:22px 0 0; max-width:24ch; color:var(--ink);
+  font-weight:300; font-size:clamp(2.25rem,1.7917rem + 2.2917vw,3.625rem); line-height:1.08; letter-spacing:-1px;
+  margin:22px 0 0; max-width:24ch; color:var(--ink); text-wrap:pretty;
 }
 .hero h1 strong,.hero h1 b{font-weight:700} /* bold emphasis spans inside the light headline */
-.hero .sub{color:var(--ink); font-size:1.3rem; line-height:1.55; margin:22px 0 0; max-width:none}
+.hero .sub{color:var(--ink); font-size:1.3rem; line-height:1.55; margin:22px 0 0; max-width:none; text-wrap:pretty}
 .hero .sub strong,.hero .sub b{color:var(--ink); font-weight:600}
 .hero .meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:22px;
   font:600 11px/1 var(--mono); letter-spacing:.08em; color:var(--g5)}
@@ -66,12 +66,12 @@ body{
 .doc{font-size:1.3rem}
 .doc > h1:first-child{display:none}   /* first h1 is lifted into the hero */
 .doc h2{font-size:clamp(2rem,1.7rem + 1vw,2.6rem); font-weight:300; letter-spacing:-.02em;
-  line-height:1.15; text-wrap:balance;
+  line-height:1.15; text-wrap:pretty;
   margin:56px 0 18px; padding-bottom:12px; border-bottom:1.5px solid var(--cyan)}
 .doc h2 strong,.doc h2 b{font-weight:600}
-.doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px}
-.doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6)}
-.doc p{margin:10px 0; max-width:none}
+.doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px; text-wrap:pretty}
+.doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6); text-wrap:pretty}
+.doc p{margin:10px 0; max-width:none; text-wrap:pretty}
 /* Stand-out headline lines — UIkit heading scale + text modifiers, defined locally
    (doc pages ship no uikit.css). Section thesis lines use:
    <p class="uk-heading-small uk-text-secondary">…</p> */
@@ -99,12 +99,12 @@ body{
 .doc strong{font-weight:600}
 .doc em{font-style:italic}
 .doc ul,.doc ol{margin:10px 0; padding-left:22px; max-width:none}
-.doc li{margin:6px 0}
+.doc li{margin:6px 0; text-wrap:pretty}
 .doc li::marker{color:var(--g4)}
 .doc hr{border:none; border-top:1px solid var(--g2); margin:36px 0}
 .doc blockquote{margin:16px 0; padding:14px 20px; border-left:3px solid var(--ink);
   background:var(--g1); color:var(--ink); font-size:15px}
-.doc blockquote p{margin:5px 0; max-width:none}
+.doc blockquote p{margin:5px 0; max-width:none; text-wrap:pretty}
 
 /* code */
 .doc code{font-family:var(--mono); font-size:12.5px; background:var(--g1);
@@ -142,7 +142,7 @@ body{
   .wrap{padding:34px 20px 80px}
   .docbar .inner{padding:10px 20px; gap:12px}
   .docfoot{padding:20px}
-  .hero h1{font-size:34px}
+  .hero h1{font-size:2.125rem}
 }
 
 /* ---- print / PDF ------------------------------------------------------- */
@@ -151,7 +151,7 @@ body{
   .docbar{display:none}
   .wrap{padding:0 0 12px; max-width:none}
   .docfoot{padding:16px 0 0; max-width:none}
-  .hero h1{font-size:42px}
+  .hero h1{font-size:2.625rem}
   .doc table,.doc pre,.doc blockquote,.doc tr{break-inside:avoid}
   .doc h2,.doc h3{break-after:avoid}
   a{color:var(--ink) !important}
@@ -159,14 +159,14 @@ body{
 
 /* ---- jumbo section headline (hero-scale, inside the body) --------------- */
 .doc .jumbo{
-  font-weight:300; font-size:clamp(30px,4.4vw,48px); line-height:1.1; letter-spacing:-1px;
-  margin:64px 0 6px; max-width:22ch; color:var(--ink); border:0; padding:0;
+  font-weight:300; font-size:clamp(1.875rem,1.5rem + 1.875vw,3rem); line-height:1.1; letter-spacing:-1px;
+  margin:64px 0 6px; max-width:22ch; color:var(--ink); border:0; padding:0; text-wrap:pretty;
 }
 .doc .jumbo strong,.doc .jumbo b{font-weight:700}
 .doc .jumbo + .jumbo-sub{
-  font-size:1.15rem; line-height:1.5; color:var(--g5); margin:0 0 26px; max-width:52ch;
+  font-size:1.15rem; line-height:1.5; color:var(--g5); margin:0 0 26px; max-width:52ch; text-wrap:pretty;
 }
-@media(max-width:640px){ .doc .jumbo{font-size:28px; margin-top:44px} }
+@media(max-width:640px){ .doc .jumbo{font-size:1.75rem; margin-top:44px} }
 
 /* ── Site nav — the way back to the application ──────────────────────────────
    The public docs are a GitHub Pages island; without this a reader who lands
