@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When Google Signals was deprecated, what changed for data layer funnel requirements</title>
+<meta name="description" content="Two dated changes — Signals out of GA4's reporting identity (12 Feb 2024) and Signals stripped of ad authority in favour of Consent Mode ad_storage (15 Jun 2026) — turned five optional data layer fields into required ones. Challenge, Solution and Benefit for each, with the event contract, a twenty-minute verification, and an honest account of what no tagging change can recover.">
+<meta name="keywords" content="Google Signals, Google Signals deprecated, Google Signals removed, data layer, data layer funnel requirements, GA4 funnel, reporting identity, Consent Mode v2, ad_storage, ad_user_data, user_id, enhanced conversions, remarketing audience shrink, cross-device tracking, GTM data layer, June 15 2026, February 12 2024">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/google-signals-data-layer.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="Google Signals is gone. The data layer now carries the funnel.">
+<meta property="og:description" content="Signals was a subsidy — it paid for cross-device identity, demographics, and a fallback into remarketing. It stopped paying in two instalments. Five data layer fields that were optional are now load-bearing.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/google-signals-data-layer.html">
+<meta property="og:image" content="https://crm-sync.dev/kb/media/docs/google-signals-data-layer.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="Monochrome card reading: Google Signals is gone. The data layer now carries the funnel. Two dated entries below it — 12 Feb 2024, Signals out of GA4's reporting identity; 15 Jun 2026, Signals loses ad authority and Consent Mode ad_storage becomes the sole control on GA4 to Google Ads.">
+<meta property="article:published_time" content="2026-09-10">
+<meta property="article:modified_time" content="2026-09-10">
+<meta property="article:section" content="Specs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Google Signals is gone. The data layer now carries the funnel.">
+<meta name="twitter:description" content="Two dated changes turned five optional data layer fields into required ones — and one of them cannot be engineered back.">
+<meta name="twitter:image" content="https://crm-sync.dev/kb/media/docs/google-signals-data-layer.png">
+<meta name="twitter:image:alt" content="Monochrome card: Google Signals is gone. The data layer now carries the funnel. Dated 12 Feb 2024 and 15 Jun 2026.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/google-signals-data-layer.html#article","headline":"When Google Signals was deprecated, what changed for data layer funnel requirements","description":"Two dated changes — Signals out of GA4's reporting identity (12 Feb 2024) and Signals stripped of ad authority in favour of Consent Mode ad_storage (15 Jun 2026) — turned five optional data layer fields into required ones. Challenge, Solution and Benefit for each, with the event contract, the verification steps, and an honest account of what no tagging change can recover.","datePublished":"2026-09-10","dateModified":"2026-09-10","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"publisher":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/google-signals-data-layer.html","inLanguage":"en","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/GOOGLE-SIGNALS-DATA-LAYER.md","articleSection":"Specs","license":"https://creativecommons.org/licenses/by/4.0/","image":"https://crm-sync.dev/kb/media/docs/google-signals-data-layer.png","alternativeHeadline":"Signals was a subsidy. The data layer now pays for identity, consent and reach.","citation":[{"@type":"WebPage","name":"GA4 — Google signals removed from the reporting identity (Loves Data)","url":"https://www.lovesdata.com/blog/google-signals-will-be-removed/"},{"@type":"WebPage","name":"Google Signals removed in GA4 (Louder)","url":"https://louder.com.au/2024/01/12/google-signals-removed-in-ga4/"},{"@type":"WebPage","name":"Google Signals loses its ad authority — the June 2026 Consent Mode takeover (Analytico)","url":"https://www.analyticodigital.com/blog/google-signals-consent-mode-june-2026"},{"@type":"WebPage","name":"GA4 + Google Ads data controls: what changes June 15, 2026 (Dataslayer)","url":"https://www.dataslayer.ai/blog/ga4-google-ads-data-controls-june-15-2026"}],"keywords":["Google Signals","Google Signals deprecated","data layer","GA4 funnel","reporting identity","Consent Mode v2","ad_storage","user_id","enhanced conversions","remarketing audience shrink","cross-device tracking","GTM data layer requirements"],"about":[{"@type":"Thing","name":{"name":"Google Analytics 4"}},{"@type":"Thing","name":{"name":"Consent Mode v2"}},{"@type":"Thing","name":{"name":"Data layer and tag management"}},{"@type":"Thing","name":{"name":"First-party identity"}},{"@type":"Thing","name":{"name":"Conversion measurement and remarketing"}}]}</script>
+<link rel="stylesheet" href="./doc.css?v=b8b664387a">
+</head>
+<body
+  data-md="./GOOGLE-SIGNALS-DATA-LAYER.md"
+  data-title="When Google Signals was deprecated, what changed for data layer funnel requirements"
+  data-kicker="Measurement &middot; GA4 &middot; Consent Mode v2 &middot; #GoogleSignals &middot; #dataLayer &middot; #GA4 &middot; #ConsentMode"
+  data-sub="Signals was a subsidy. It paid for cross-device identity, demographics, and a fallback into remarketing &mdash; and it stopped paying in two instalments, in February 2024 and June 2026. Challenge, Solution and Benefit for each of the five fields that are now load-bearing."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/GOOGLE-SIGNALS-DATA-LAYER.md">
+  <div class="wrap">
+    <nav class="sitenav">
+      <a class="home" href="https://www.crm-sync.dev/">&larr; CRM Sync</a>
+      <a href="./">Docs</a>
+      <a href="https://www.crm-sync.dev/pages/knowledge-base">Knowledge base</a>
+      <a href="https://www.crm-sync.dev/pages/mission">Mission</a>
+      <a class="app" href="https://crm-sync.dev/get">Get the app &rarr;</a>
+    </nav>
+    <header id="hero" class="hero"><span class="doc-status">Loading&hellip;</span></header>
+    <article id="doc" class="doc"></article>
+  </div>
+  <footer class="docfoot">
+    <span>CRM Sync &middot; Webflow &middot; Xano &middot; Cloudflare &middot; Shopify</span>
+    <span>Monochrome &middot; print / PDF ready</span>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="./doc.js?v=cb07abe660"></script>
+</body>
+</html>
