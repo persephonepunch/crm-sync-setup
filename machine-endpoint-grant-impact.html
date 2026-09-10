@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paired permissions and grant impact on machine endpoints</title>
+<meta name="description" content="On a machine endpoint a permission and its grant impact are two different statements. Read on a SaaS API is revocable; read on a content-addressed CID is a copy you can never call back. Paired across four endpoint classes — SaaS, content-addressed (IPFS, the DAT endpoint), device attestation in the dark factory, and edge cache — with the shipped envelope gate, and the finding that latency and revocation lag are the same dial unless you enforce at unwrap.">
+<meta name="keywords" content="machine endpoint permissions, grant impact, IoT permissions, device attestation, dark factory, IPFS security, CID access control, DAT endpoint, content-addressed storage, capability caps, entitlement revocation, per-row encryption, healing encryption, data latency and security, SaaS-free gating, firmware distribution, CRA Article 14">
+<link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CRM Sync">
+<meta property="og:title" content="You do not grant a machine access. You grant it a copy.">
+<meta property="og:description" content="A permission is what you wrote down. A grant impact is what the subject can still do after you change your mind. Paired across SaaS, IPFS/CID, device attestation and edge cache — and why latency and revocation are the same dial.">
+<meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html">
+<meta property="og:image" content="https://crm-sync.dev/kb/media/docs/machine-endpoint-grant-impact.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="Monochrome card reading: You do not grant a machine access. You grant it a copy. Four columns beneath it pair each endpoint class with what you can take back — SaaS API, everything; content-addressed IPFS or CID, nothing; device attestation, the next fetch; edge cache, after the TTL.">
+<meta property="article:published_time" content="2026-09-10">
+<meta property="article:modified_time" content="2026-09-10">
+<meta property="article:section" content="Security">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="You do not grant a machine access. You grant it a copy.">
+<meta name="twitter:description" content="Four endpoint classes, paired: what read actually grants, and what you can still take back. Only one of the four lets you take back anything.">
+<meta name="twitter:image" content="https://crm-sync.dev/kb/media/docs/machine-endpoint-grant-impact.png">
+<meta name="twitter:image:alt" content="Monochrome card: You do not grant a machine access. You grant it a copy. Four endpoint classes paired with what you can take back.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html#article","headline":"Paired permissions and grant impact on machine endpoints","description":"On a machine endpoint a permission and its grant impact are two different statements. Read on a SaaS API is revocable; read on a content-addressed CID is a copy you can never call back. Paired across four endpoint classes — SaaS, content-addressed (IPFS, the DAT endpoint), device attestation in the dark factory, and edge cache — with the shipped envelope gate, and the finding that latency and revocation lag are the same dial unless you enforce at unwrap.","datePublished":"2026-09-10","dateModified":"2026-09-10","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"publisher":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html","inLanguage":"en","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/MACHINE-ENDPOINT-GRANT-IMPACT.md","articleSection":"Security","license":"https://creativecommons.org/licenses/by/4.0/","image":"https://crm-sync.dev/kb/media/docs/machine-endpoint-grant-impact.png","alternativeHeadline":"You do not grant a machine access. You grant it a copy.","citation":[{"@type":"WebPage","name":"Dark Factory Entitlement Security (the model this operationalises)","url":"https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security"},{"@type":"WebPage","name":"Capability, not perimeter","url":"https://www.crm-sync.dev/pages/knowledge-base#capability-not-perimeter"},{"@type":"WebPage","name":"Hypercore Protocol — signed append-only log (the Dat lineage)","url":"https://hypercore-protocol.org/"},{"@type":"WebPage","name":"File System Agnostic Publishing — the delivery-side companion (IPFS, Pinata, Dat/Hypercore)","url":"https://www.crm-sync.dev/pages/knowledge-base#universal"},{"@type":"WebPage","name":"Pinata — dedicated IPFS gateways","url":"https://docs.pinata.cloud/gateways/dedicated-ipfs-gateways"}],"keywords":["machine endpoint permissions","grant impact","IoT permissions","device attestation","dark factory","IPFS security","content-addressed storage","DAT endpoint","CID access control","capability caps","entitlement revocation","per-row encryption","data latency and security","SaaS-free gating"],"about":[{"@type":"Thing","name":{"name":"Capability-based permissions for machines"}},{"@type":"Thing","name":{"name":"Content-addressed storage security"}},{"@type":"Thing","name":{"name":"Dark factory and IoT firmware distribution"}},{"@type":"Thing","name":{"name":"Entitlement revocation and key rotation"}},{"@type":"Thing","name":{"name":"Latency and security trade-offs"}}]}</script>
+<link rel="stylesheet" href="./doc.css?v=b8b664387a">
+</head>
+<body
+  data-md="./MACHINE-ENDPOINT-GRANT-IMPACT.md"
+  data-title="Paired permissions and grant impact on machine endpoints"
+  data-kicker="Security &middot; Machine endpoints &middot; IoT &middot; #DarkFactory &middot; #IPFS &middot; #entitlements &middot; #latency"
+  data-sub="A permission is what you wrote down. A grant impact is what the subject can still do after you change your mind. On a machine endpoint those come apart &mdash; and the gap between them is where every irreversible loss lives."
+  data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/MACHINE-ENDPOINT-GRANT-IMPACT.md">
+  <div class="wrap">
+    <nav class="sitenav">
+      <a class="home" href="https://www.crm-sync.dev/">&larr; CRM Sync</a>
+      <a href="./">Docs</a>
+      <a href="https://www.crm-sync.dev/pages/knowledge-base">Knowledge base</a>
+      <a href="https://www.crm-sync.dev/pages/mission">Mission</a>
+      <a class="app" href="https://crm-sync.dev/get">Get the app &rarr;</a>
+    </nav>
+    <header id="hero" class="hero"><span class="doc-status">Loading&hellip;</span></header>
+    <article id="doc" class="doc"></article>
+  </div>
+  <footer class="docfoot">
+    <span>CRM Sync &middot; Webflow &middot; Xano &middot; Cloudflare &middot; Shopify</span>
+    <span>Monochrome &middot; print / PDF ready</span>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="./doc.js?v=cb07abe660"></script>
+</body>
+</html>

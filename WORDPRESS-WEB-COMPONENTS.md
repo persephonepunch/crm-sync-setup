@@ -24,6 +24,8 @@ citation:
     url: https://omenphase1-1.webflow.io/
   - name: "Pinata — IPFS pinning and dedicated gateways"
     url: https://pinata.cloud/
+  - name: "Paired permissions and grant impact on machine endpoints — the security-side companion"
+    url: https://www.crm-sync.dev/pages/knowledge-base#machine-endpoint-grant-impact
   - name: "Hypercore Protocol — signed append-only log (the Dat lineage)"
     url: https://hypercore-protocol.org/
   - name: "Holepunch — the active Hypercore ecosystem"
@@ -168,6 +170,8 @@ The two protocol families answer the same question — "how do peers share data 
 | Commercial hosting | Mature ([Pinata](https://pinata.cloud/), web3.storage, Filecoin) | Essentially none |
 
 For a storefront, IPFS's model is the better fit twice over. The pin-it-for-me industry only exists on the IPFS side — there is no Pinata-of-Hypercore, so a "DAT endpoint" resolves to IPFS in practice. And immutable CIDs are a release-engineering feature, not a limitation: every publish is a cryptographically named artifact, promotion is pointing the gateway at the new CID, and rollback is pointing it back. Hypercore's stable-address, live-updating feed is the right shape for chat and collaborative data (which is exactly where Holepunch took it) — but a storefront wants named releases, and that is what content addressing gives you for free.
+
+**Before you pin anything non-public, read the permissions half.** Content addressing makes retrieval unstoppable by design, which is exactly what you want for a storefront release and exactly what you must not have for a firmware image, a customer dataset, or a 3D master. A CID is world-readable forever the moment the address is known, and nothing you do to the gateway changes that — a restricted gateway controls what *your domain* serves, not what the content is retrievable from. The gate has to move off the endpoint and into the key: encrypt before pinning, and the CID names ciphertext that is inert wherever it travels. [Paired permissions and grant impact on machine endpoints](machine-endpoint-grant-impact.html) works that through for all four endpoint classes, including this one.
 
 ## The publishing-cost ledger — Firebase vs the PWA rails
 
