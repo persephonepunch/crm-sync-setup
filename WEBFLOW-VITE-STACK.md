@@ -6,6 +6,11 @@ category: "Webflow"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WEBFLOW-VITE-STACK.md
 licence: CC-BY-4.0
+tags:
+  - webflow
+  - architecture
+  - theme
+  - migration
 ---
 # The Webflow App Stack — Vite + TypeScript Monorepo, with 11ty/Vue/Svelte Islands
 

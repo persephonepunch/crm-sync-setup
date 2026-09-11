@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-09-10
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/MACHINE-ENDPOINT-GRANT-IMPACT.md
 licence: CC-BY-4.0
+tags:
+  - entitlement
+  - security
+  - firmware
+  - identity
+  - architecture
 alternativeHeadline: "You do not grant a machine access. You grant it a copy."
 verified_on: 2026-09-10
 verified_by: source-inspection

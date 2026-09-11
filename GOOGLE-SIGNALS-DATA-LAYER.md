@@ -6,6 +6,13 @@ category: "Specs"
 date: 2026-09-10
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GOOGLE-SIGNALS-DATA-LAYER.md
 licence: CC-BY-4.0
+tags:
+  - consent
+  - ga4
+  - aeo
+  - audience
+  - theme
+  - identity
 alternativeHeadline: "An agent never views a page, so the page view can no longer be the unit of conversion"
 verified_on: 2026-09-10
 verified_by: published-sources

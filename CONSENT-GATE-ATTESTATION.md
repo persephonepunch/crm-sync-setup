@@ -6,6 +6,12 @@ category: "Compliance"
 date: 2026-09-08
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CONSENT-GATE-ATTESTATION.md
 licence: CC-BY-4.0
+tags:
+  - consent
+  - compliance
+  - security
+  - ledger
+  - ga4
 ---
 # Consent gate attestation
 

@@ -6,6 +6,13 @@ category: "Security"
 date: 2026-07-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
 licence: CC-BY-4.0
+tags:
+  - entitlement
+  - security
+  - firmware
+  - sbom
+  - ledger
+  - architecture
 about:
   - Entitlement-based security
   - Firmware distribution security

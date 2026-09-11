@@ -6,6 +6,11 @@ category: "Setup"
 date: 2026-07-18
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WORDPRESS-WEB-COMPONENTS.md
 licence: CC-BY-4.0
+tags:
+  - webflow
+  - migration
+  - architecture
+  - theme
 alternativeHeadline: "The migration is theme packaging, not a rebuild"
 citation:
   - name: "Shopify Storefront Web Components"

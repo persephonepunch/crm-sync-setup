@@ -6,6 +6,13 @@ category: "Global"
 date: 2026-08-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/COMPLIANCE-CALENDAR.md
 licence: CC-BY-4.0
+tags:
+  - compliance
+  - gdpr
+  - cyber-resilience-act
+  - gs1
+  - consent
+  - migration
 keywords:
   - GDPR
   - South Dakota v. Wayfair

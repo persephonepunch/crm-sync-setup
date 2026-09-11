@@ -6,6 +6,12 @@ category: "Global"
 date: 2026-07-24
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WAYFAIR-TO-AI-COMMERCE.md
 licence: CC-BY-4.0
+tags:
+  - compliance
+  - shopify
+  - graphql
+  - agentic-commerce
+  - architecture
 about:
   - South Dakota v. Wayfair
   - EU antitrust enforcement against Google

@@ -6,6 +6,12 @@ category: "Shopify"
 date: 2026-07-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GA4-BIDDING.md
 licence: CC-BY-4.0
+tags:
+  - ga4
+  - audience
+  - consent
+  - identity
+  - shopify
 ---
 # Marketing was built on the page view. The funnel now pays for the **consented login**.
 

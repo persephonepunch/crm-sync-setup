@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CRA-EVIDENCE-CHAIN.md
 licence: CC-BY-4.0
+tags:
+  - cyber-resilience-act
+  - sbom
+  - firmware
+  - compliance
+  - ledger
 keywords:
   - Cyber Resilience Act
   - SBOM

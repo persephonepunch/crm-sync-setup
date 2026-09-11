@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-09-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CONSENT-RESOLUTION-PATTERN.md
 licence: CC-BY-4.0
+tags:
+  - consent
+  - ga4
+  - theme
+  - identity
+  - architecture
 verified_on: 2026-09-04
 verified_by: execution
 method: "Five-phase contract exercised in a browser over CDP against the live loader: fresh visitor, returning consented visitor, asserted-EEA visitor, and reject-all. Consent Mode state read from the page's own dataLayer; the badge correction settled by a reject-all capture."

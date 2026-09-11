@@ -6,6 +6,13 @@ category: "Shopify"
 date: 2026-06-24
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DAWN-HORIZON-GA4.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - theme
+  - migration
+  - ga4
+  - agentic-commerce
+  - consent
 ---
 # Dawn → Horizon: Agentic Cart Functions
 
