@@ -6,6 +6,11 @@ category: "Setup"
 date: 2026-06-12
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENCY-HANDOFF.md
 licence: CC-BY-4.0
+tags:
+  - key-rotation
+  - security
+  - entitlement
+  - compliance
 ---
 # Agency → Client Deploy Handoff
 

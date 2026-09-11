@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-09-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/COMPILE-TO-UPDATE.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - migration
+  - xano
+  - webflow
+  - shopify
 ---
 # Compile to update — the estate by seven lifecycle stages
 

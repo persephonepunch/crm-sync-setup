@@ -6,6 +6,11 @@ category: "Security"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-TOKEN-MANAGEMENT.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - key-rotation
+  - security
+  - oidc
 ---
 # Shopify Expiring Token Management
 

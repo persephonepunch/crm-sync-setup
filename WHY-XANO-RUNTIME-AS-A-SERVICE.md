@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-09-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WHY-XANO-RUNTIME-AS-A-SERVICE.md
 licence: CC-BY-4.0
+tags:
+  - xano
+  - identity
+  - oidc
+  - consent
+  - architecture
 keywords:
   - Xano
   - runtime as a service

@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-08-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-WITH-LOGIN.md
 licence: CC-BY-4.0
+tags:
+  - identity
+  - oidc
+  - entitlement
+  - shopify
+  - ledger
 ---
 # Trust with login — the bind is the product
 

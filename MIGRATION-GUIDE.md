@@ -6,6 +6,10 @@ category: "Setup"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/MIGRATION-GUIDE.md
 licence: CC-BY-4.0
+tags:
+  - migration
+  - ga4
+  - compliance
 ---
 # CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams
 

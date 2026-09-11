@@ -6,6 +6,13 @@ category: "Setup"
 date: 2026-07-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/README.md
 licence: CC-BY-4.0
+tags:
+  - xano
+  - shopify
+  - webflow
+  - consent
+  - ga4
+  - identity
 ---
 # CRM Sync — PWA & Native App Commerce Setup Guide
 

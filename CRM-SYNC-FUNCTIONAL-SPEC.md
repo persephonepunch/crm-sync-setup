@@ -6,6 +6,9 @@ category: "Specs"
 date: 2026-07-12
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CRM-SYNC-FUNCTIONAL-SPEC.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - compliance
 ---
 # CRM Sync — Functional Specification
 

@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-08-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CAPABILITY-NOT-PERIMETER.md
 licence: CC-BY-4.0
+tags:
+  - entitlement
+  - security
+  - identity
+  - oidc
+  - agentic-commerce
 keywords:
   - Tailwind
   - Tailwind CSS

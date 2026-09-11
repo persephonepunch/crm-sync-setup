@@ -6,6 +6,11 @@ category: "Global"
 date: 2026-06-12
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBALIZATION-GOALS.md
 licence: CC-BY-4.0
+tags:
+  - compliance
+  - consent
+  - architecture
+  - aeo
 ---
 # Globalization — Goal Checklist (Pending / Review State)
 

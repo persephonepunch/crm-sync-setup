@@ -6,6 +6,10 @@ category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WRONG-SIZE-TOOL.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - compliance
+  - architecture
 about:
   - Consent enforcement
   - Internal controls (ITGC)

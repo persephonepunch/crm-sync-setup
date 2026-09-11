@@ -6,6 +6,10 @@ category: "Specs"
 date: 2026-09-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CLAIM-PROVENANCE.md
 licence: CC-BY-4.0
+tags:
+  - compliance
+  - architecture
+  - ledger
 verified_on: 2026-09-04
 verified_by: execution
 method: "Schema applied and parsed by the live index builder; unknown keys confirmed ignored by the frontmatter reader."

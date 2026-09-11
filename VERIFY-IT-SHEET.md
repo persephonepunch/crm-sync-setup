@@ -6,6 +6,10 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/VERIFY-IT-SHEET.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - compliance
+  - ledger
 ---
 # Verify It Yourself — the IT Sheet
 

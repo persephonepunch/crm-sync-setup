@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-FUNCTION-TOOLS.md
 licence: CC-BY-4.0
+tags:
+  - agentic-commerce
+  - entitlement
+  - architecture
+  - security
 ---
 # Server-Side Function Tools with AI Runners
 

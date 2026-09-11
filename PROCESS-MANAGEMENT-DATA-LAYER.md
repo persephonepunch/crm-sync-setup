@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PROCESS-MANAGEMENT-DATA-LAYER.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - xano
+  - webflow
+  - shopify
+  - compliance
 ---
 # Process Management Guide — Webflow · Xano · Cloudflare · Shopify
 

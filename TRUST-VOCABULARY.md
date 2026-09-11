@@ -6,6 +6,10 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-VOCABULARY.md
 licence: CC-BY-4.0
+tags:
+  - entitlement
+  - security
+  - ledger
 keywords:
   - permission
   - privacy

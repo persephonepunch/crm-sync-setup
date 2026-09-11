@@ -6,6 +6,12 @@ category: "Setup"
 date: 2026-07-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SETUP-GUIDE.md
 licence: CC-BY-4.0
+tags:
+  - xano
+  - shopify
+  - webflow
+  - consent
+  - ga4
 ---
 # CRM Sync Setup Reference
 

@@ -6,6 +6,10 @@ category: "General"
 date: 2026-07-13
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/shopify-app-checklist.llm.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - compliance
+  - security
 ---
 # Shopify App Requirements — LLM Audit Prompt
 

@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-08-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FRAGMENTS-ANY-FRONTEND.md
 licence: CC-BY-4.0
+tags:
+  - webflow
+  - theme
+  - architecture
+  - migration
 ---
 # Fragments on any frontend — one Webflow source, every platform
 

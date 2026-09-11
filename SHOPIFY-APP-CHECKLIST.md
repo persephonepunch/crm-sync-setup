@@ -6,6 +6,11 @@ category: "Shopify"
 date: 2026-05-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-APP-CHECKLIST.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - compliance
+  - gdpr
+  - security
 ---
 # Shopify App Requirements Checklist (2026)
 

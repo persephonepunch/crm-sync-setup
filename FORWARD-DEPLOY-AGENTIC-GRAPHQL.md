@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FORWARD-DEPLOY-AGENTIC-GRAPHQL.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - graphql
+  - migration
+  - agentic-commerce
+  - architecture
 ---
 # Forward-Deploy Guideline — Server-Side GraphQL + Agentic Workflows + Tool Runner
 

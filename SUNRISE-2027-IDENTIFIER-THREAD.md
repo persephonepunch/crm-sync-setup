@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-07-28
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SUNRISE-2027-IDENTIFIER-THREAD.md
 licence: CC-BY-4.0
+tags:
+  - gs1
+  - shopify
+  - pim
+  - graphql
+  - migration
 keywords:
   - Shopify GID
   - product taxonomy

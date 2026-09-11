@@ -6,6 +6,11 @@ category: "Security"
 date: 2026-07-14
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CISO-DPO-FAQ.md
 licence: CC-BY-4.0
+tags:
+  - consent
+  - security
+  - compliance
+  - gdpr
 ---
 # Security & Privacy — Questions from CISOs and DPOs
 

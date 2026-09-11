@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-07-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/UI-COMPONENT-REGISTRY.md
 licence: CC-BY-4.0
+tags:
+  - theme
+  - webflow
+  - shopify
+  - architecture
 ---
 # CRM Sync — UI Component & ID Registry
 

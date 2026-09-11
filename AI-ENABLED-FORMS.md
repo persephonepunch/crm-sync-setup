@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-09-08
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AI-ENABLED-FORMS.md
 licence: CC-BY-4.0
+tags:
+  - forms
+  - entitlement
+  - consent
+  - architecture
 ---
 # AI enabled forms with LLM weighting — one form, many outcomes
 

@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AI-TRUST-FRAMEWORK-REQUIREMENTS.md
 licence: CC-BY-4.0
+tags:
+  - compliance
+  - gdpr
+  - graphql
+  - architecture
+  - entitlement
 ---
 # AI Trust Framework Requirements
 

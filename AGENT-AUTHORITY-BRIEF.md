@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AGENT-AUTHORITY-BRIEF.md
 licence: CC-BY-4.0
+tags:
+  - agentic-commerce
+  - entitlement
+  - security
+  - identity
+  - architecture
 keywords:
   - mandate model
   - scope

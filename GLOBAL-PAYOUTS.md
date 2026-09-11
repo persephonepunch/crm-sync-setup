@@ -6,6 +6,10 @@ category: "Global"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBAL-PAYOUTS.md
 licence: CC-BY-4.0
+tags:
+  - agentic-commerce
+  - compliance
+  - architecture
 ---
 # Global Payouts — Dependency Map
 

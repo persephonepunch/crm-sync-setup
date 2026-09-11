@@ -6,6 +6,11 @@ category: "Global"
 date: 2026-08-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AI-DIALOG-TERMS.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - agentic-commerce
+  - entitlement
+  - ledger
 ---
 # The AI dialog — terms for designers and BAs
 

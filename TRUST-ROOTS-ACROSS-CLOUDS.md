@@ -6,6 +6,11 @@ category: "Security"
 date: 2026-09-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-ROOTS-ACROSS-CLOUDS.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - entitlement
+  - agentic-commerce
+  - identity
 keywords:
   - TLS 1.3
   - forward secrecy

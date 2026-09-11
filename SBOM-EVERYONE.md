@@ -6,6 +6,10 @@ category: "Security"
 date: 2026-07-29
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SBOM-EVERYONE.md
 licence: CC-BY-4.0
+tags:
+  - sbom
+  - security
+  - compliance
 ---
 # What Is an SBOM? Who Uses This? Everyone.
 

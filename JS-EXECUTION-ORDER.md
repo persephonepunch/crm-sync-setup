@@ -6,6 +6,10 @@ category: "Specs"
 date: 2026-07-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/JS-EXECUTION-ORDER.md
 licence: CC-BY-4.0
+tags:
+  - consent
+  - theme
+  - architecture
 ---
 # JS Execution Order — Challenge & Solution
 

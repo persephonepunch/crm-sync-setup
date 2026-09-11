@@ -6,6 +6,11 @@ category: "Shopify"
 date: 2026-07-10
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GOOGLE-CONNECT.md
 licence: CC-BY-4.0
+tags:
+  - audience
+  - ga4
+  - consent
+  - shopify
 ---
 # Google turned off the list upload. We were never uploading lists.
 

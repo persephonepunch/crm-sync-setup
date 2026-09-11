@@ -6,6 +6,12 @@ category: "Specs"
 date: 2026-08-02
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/AEM-SCAFFOLD-WEBFLOW-EXPORT.md
 licence: CC-BY-4.0
+tags:
+  - webflow
+  - architecture
+  - shopify
+  - migration
+  - theme
 ---
 # Shopify / Google integration on an AEM scaffold — via Webflow export
 

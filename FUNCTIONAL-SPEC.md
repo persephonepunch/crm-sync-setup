@@ -6,6 +6,9 @@ category: "Specs"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FUNCTIONAL-SPEC.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - security
 ---
 # Omen — Functional Specification & UAT Release Plan
 

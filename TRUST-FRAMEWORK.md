@@ -6,6 +6,12 @@ category: "Global"
 date: 2026-07-27
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-FRAMEWORK.md
 licence: CC-BY-4.0
+tags:
+  - ledger
+  - identity
+  - entitlement
+  - consent
+  - compliance
 ---
 # The Trust Framework
 

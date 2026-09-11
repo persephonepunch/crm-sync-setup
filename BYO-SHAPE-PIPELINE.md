@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-09-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BYO-SHAPE-PIPELINE.md
 licence: CC-BY-4.0
+tags:
+  - xano
+  - entitlement
+  - architecture
+  - migration
 keywords:
   - BYO Xano
   - data shape pipeline

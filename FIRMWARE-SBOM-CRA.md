@@ -6,6 +6,11 @@ category: "Security"
 date: 2026-07-20
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FIRMWARE-SBOM-CRA.md
 licence: CC-BY-4.0
+tags:
+  - sbom
+  - firmware
+  - cyber-resilience-act
+  - security
 keywords:
   - SBOM
   - CycloneDX

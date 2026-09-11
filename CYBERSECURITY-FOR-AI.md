@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-07-25
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CYBERSECURITY-FOR-AI.md
 licence: CC-BY-4.0
+tags:
+  - cyber-resilience-act
+  - sbom
+  - firmware
+  - security
+  - compliance
 about:
   - EU Cyber Resilience Act
   - Software Bill of Materials

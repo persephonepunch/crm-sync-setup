@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-07-14
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SECURITY-POSTURE.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - consent
+  - ledger
+  - entitlement
+  - agentic-commerce
 ---
 # CRM Sync — Security & Compliance Posture
 

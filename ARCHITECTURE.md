@@ -6,6 +6,10 @@ category: "Specs"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/ARCHITECTURE.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - compliance
+  - security
 ---
 # CRM Sync — Why This Architecture Is Safer
 

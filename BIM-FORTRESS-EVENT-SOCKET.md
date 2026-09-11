@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-07-18
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/BIM-FORTRESS-EVENT-SOCKET.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - ledger
+  - entitlement
+  - agentic-commerce
+  - architecture
 about:
   - BIM asset security
   - Event-driven architecture

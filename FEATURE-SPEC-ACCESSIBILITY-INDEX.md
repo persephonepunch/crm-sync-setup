@@ -6,6 +6,10 @@ category: "Specs"
 date: 2026-07-06
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/FEATURE-SPEC-ACCESSIBILITY-INDEX.md
 licence: CC-BY-4.0
+tags:
+  - accessibility
+  - aeo
+  - architecture
 ---
 # CRM Sync — Feature Specification
 

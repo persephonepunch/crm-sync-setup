@@ -6,6 +6,9 @@ category: "Security"
 date: 2026-05-26
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SECURITY-AUDIT.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - compliance
 ---
 # CRM Sync — Security Audit & Paired Data Requirements
 

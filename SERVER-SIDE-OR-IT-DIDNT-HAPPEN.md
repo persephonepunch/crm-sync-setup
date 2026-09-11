@@ -6,6 +6,12 @@ category: "Security"
 date: 2026-08-05
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md
 licence: CC-BY-4.0
+tags:
+  - theme
+  - consent
+  - security
+  - shopify
+  - architecture
 keywords:
   - server-side rendering
   - cart

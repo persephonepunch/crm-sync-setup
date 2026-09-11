@@ -6,6 +6,9 @@ category: "Specs"
 date: 2026-09-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SPEC-IS-THE-SOURCE.md
 licence: CC-BY-4.0
+tags:
+  - architecture
+  - migration
 ---
 # The spec is the source
 

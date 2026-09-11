@@ -6,6 +6,11 @@ category: "Specs"
 date: 2026-08-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PIM-ANYWHERE.md
 licence: CC-BY-4.0
+tags:
+  - pim
+  - architecture
+  - shopify
+  - theme
 ---
 # PIM Anywhere — one catalog record, any frontend
 

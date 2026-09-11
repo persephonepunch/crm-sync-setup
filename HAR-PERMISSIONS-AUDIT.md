@@ -6,6 +6,11 @@ category: "Security"
 date: 2026-09-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/HAR-PERMISSIONS-AUDIT.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - consent
+  - theme
+  - compliance
 ---
 # HAR permissions audit — a portable prompt
 

@@ -6,6 +6,9 @@ category: "Setup"
 date: 2026-09-07
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/HOW-TO-CAPTURE-A-HAR.md
 licence: CC-BY-4.0
+tags:
+  - security
+  - theme
 ---
 # How to capture a HAR file
 

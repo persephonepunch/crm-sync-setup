@@ -6,6 +6,11 @@ category: "Shopify"
 date: 2026-06-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-2026-RISK-BRIEF.md
 licence: CC-BY-4.0
+tags:
+  - shopify
+  - compliance
+  - security
+  - migration
 ---
 # Risk & Liability Brief — The 2026 Client-Side Cliff
 
