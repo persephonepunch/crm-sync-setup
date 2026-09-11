@@ -1,7 +1,7 @@
 ---
 title: "Consent gate attestation — crm-sync.dev, 2026-09-08"
 description: "What the storefront sent before the visitor decided, measured before and after a fix, with the release ids and signed ledger records needed to check the claim independently. A self-attestation with verifiable evidence, not a third-party certification."
-canonical: https://persephonepunch.github.io/crm-sync-setup/CONSENT-GATE-ATTESTATION.md
+canonical: https://persephonepunch.github.io/crm-sync-setup/consent-gate-attestation.html
 category: "Compliance"
 date: 2026-09-08
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/CONSENT-GATE-ATTESTATION.md
