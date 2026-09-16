@@ -34,7 +34,7 @@ keywords:
 **Owner** Platform engineer (role)
 **Evidence basis** Vendor list prices read 16 September 2026; AI models in use read from the worker source the same day
 **Review cycle** Quarterly, and before 1 January 2027, when Gemini Flash introductory pricing ends
-**Related** [Logging and trace fees](https://persephonepunch.github.io/crm-sync-setup/logging-and-trace-fees.html) · [Interactive comparison: Metered or Flat](https://claude.ai/artifact/5LafXpaGpt4tzryYrGxDbk)
+**Related** [The BYO data plane fallback ladder](https://persephonepunch.github.io/crm-sync-setup/byo-data-plane-fallback-ladder.html) · [Logging and trace fees](https://persephonepunch.github.io/crm-sync-setup/logging-and-trace-fees.html) · [Interactive comparison: Metered or Flat](https://claude.ai/artifact/5LafXpaGpt4tzryYrGxDbk)
 
 ---
 
