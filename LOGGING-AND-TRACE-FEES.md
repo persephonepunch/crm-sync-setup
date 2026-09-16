@@ -33,6 +33,7 @@ keywords:
 **Owner** Platform engineer (role)
 **Evidence basis** Vendor list prices read 16 September 2026
 **Review cycle** Quarterly, and whenever a vendor announces a billing change
+**Related** [BYO Xano and BigQuery against Google's agent platform](https://persephonepunch.github.io/crm-sync-setup/byo-xano-bigquery-vs-google-agent-costs.html)
 
 ---
 
