@@ -67,6 +67,18 @@ In words: deprecated means it still works; retired means the platform stops hono
 
 ---
 
+## Where these changes land: one word, three runtimes
+
+[![One word, three runtimes: what a function is in Xano, Shopify and Cloudflare — who calls it, what it reads, where it runs, and who can call it](https://crm-sync.dev/kb/media/docs/functions-three-runtimes.png)](https://crm-sync.dev/kb/media/docs/functions-three-runtimes.svg)
+
+**[Open the illustration as SVG](https://crm-sync.dev/kb/media/docs/functions-three-runtimes.svg)**
+
+A sunset is only urgent where the retiring thing runs, and "function" means three different things in this estate. A Xano custom function is called by your own API endpoints, tasks, triggers and other function stacks, takes named inputs, runs its function stack beside the database, and returns a response. A Shopify Function is called only by Shopify as the cart and checkout run, reads JSON shaped by its GraphQL input query, runs as a WebAssembly module inside Shopify's infrastructure, and returns operations for Shopify to carry out. A Cloudflare Worker is called by an HTTP request, a Cron Trigger or a queue message, runs in a V8 isolate in 330+ cities, and is billed for CPU time.
+
+In words: the difference that decides where a rule belongs is who can call it. Only your own Xano stacks can call a Xano function, so it holds the record. Only Shopify can call a Shopify Function, so it holds rules that must apply inside checkout. Anyone who can reach a Worker's URL can call it, which is why the Worker holds the permissions boundary. The Shopify API version and token changes below reach code that calls Shopify from a Worker or from Xano; checkout extension changes reach code that runs inside Shopify.
+
+---
+
 ## Everything dated inside the window
 
 | Date | Change | Exposure | Status |
