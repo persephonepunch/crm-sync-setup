@@ -46,6 +46,22 @@ A bring-your-own deployment means the buyer owns the Xano workspace and the BigQ
 
 ---
 
+## The findings, briefly
+
+**A Conversational Agents Playbooks chat request costs $0.012. The same chat turn on Cloudflare Workers AI with Mistral Small costs about $0.0009**, so Google's managed Playbooks layer is about fourteen times the cost of the bring-your-own path per chat turn.
+
+**Agent Search costs $4 per 1,000 queries on the Enterprise edition, and Grounding with Google Search on Gemini 3 costs $14 per 1,000 grounded queries.** These per-request fees, not the Gemini model tokens, are what make Google's agent platform expensive at volume.
+
+**Gemini tokens and Workers AI tokens cost about the same.** Gemini 2.5 Flash is $0.30 input and $2.50 output per million tokens; Llama 3.3 70B on Workers AI is $0.293 and $2.253.
+
+**For batch enrichment, BigQuery calling Gemini at the batch rate is cheaper than Workers AI**: about $475 against about $634 for a million records.
+
+**Below about 27,000 chat turns a month, Google's assembled path is cheaper than bring-your-own**, because the Xano Essential plan is an $85 monthly floor.
+
+**Gemini 3.8, 3.7 and 3.6 Flash introductory pricing ends on 1 January 2027**, when their token prices double.
+
+---
+
 ## Vocabulary
 
 Google renamed these products in 2026. The old names are still what most people search for.
