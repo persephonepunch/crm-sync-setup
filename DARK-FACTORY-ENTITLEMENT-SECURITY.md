@@ -172,6 +172,78 @@ or image is running someone else's content in all but name. Do it where a crash 
 network, no filesystem, a hard timeout, a typed input and a typed output. Shopify has already
 demonstrated the pattern at a scale nobody else has had to survive.
 
+## Hardening what you already run
+
+The bargain above is an architecture, and most estates cannot adopt one this quarter. So take
+the same principle down to the stack you actually have. The order matters: shrink what the
+parser may do, then take work away from it, then make sure the controls in front cannot be
+walked around.
+
+**Start with the file almost nobody has opened.** ImageMagick reads a `policy.xml` —
+usually `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml` — and ships
+permissive by default on most distributions. Deny the coders that exist to reference other
+things: `MVG` and `MSL` first, then `PS`, `EPS`, `PDF`, `XPS`, and `URL`, plus `SVG` unless
+something genuinely needs it. On ImageMagick 7 you can revoke the whole delegate mechanism in
+one line rather than naming formats one at a time. Then set the resource ceilings — memory,
+map, area, width, height, disk, time, `list-length` — because the decompression bomb does not
+need a CVE and a timeout is the only thing that stops it. Confirm with `identify -list policy`
+that the file you edited is the file the binary loads; multiple installs and a stale
+`MAGICK_CONFIGURE_PATH` are the usual reason a correct policy does nothing. And read it as
+ImageMagick does — an earlier permissive entry can shadow the restriction you added below it.
+
+**Treat Ghostscript as its own decision.** The PDF, EPS and PS delegates hand the file to
+Ghostscript, which is a language interpreter with its own history of sandbox escapes; `-dSAFER`
+has been the default since 9.50 but has been bypassed before. If nothing in the product needs
+PostScript rendering, uninstalling Ghostscript removes the chain outright and is worth more
+than any policy line. If something does need it, that job belongs on a worker that holds no
+credentials and no network route worth having.
+
+**WordPress** picks `WP_Image_Editor_Imagick` whenever the extension is present and falls back
+to GD otherwise, so the decision is already made for you unless you make it. The
+`wp_image_editors` filter lets you return GD alone, which is the single highest-value change on
+a site that only ever resizes JPEGs and PNGs. Separately, PDF upload thumbnails are the
+Ghostscript chain arriving through the media library — if you do not need them, stop generating
+them. Constrain `upload_mimes` to the types the site genuinely accepts, and keep
+`ALLOW_UNFILTERED_UPLOADS` off. The plugin surface matters more than core here: any gallery,
+optimiser or PDF-preview plugin can reintroduce the delegate path core just gave up.
+
+**Drupal** defaults to the GD toolkit in core, and ImageMagick only arrives through the contrib
+toolkit module. That makes the question explicit rather than implicit: check which toolkit is
+selected under the image toolkit settings, and if it is ImageMagick, confirm the estate needs
+what it adds. The module passes arguments to a binary, so the `policy.xml` on that host is the
+real control, not a Drupal setting.
+
+**AEM** does most raster work in its own libraries, but the DAM Update Asset workflow can shell
+out through a command-line process step for the formats it will not handle natively — EPS,
+PostScript and some PSD and AI paths — and that step is where ImageMagick and Ghostscript enter
+an authoring environment that holds far more than images. Audit which renditions actually
+require it, remove the step where they do not, and apply the same `policy.xml` on any host that
+keeps it. The Cloud Service direction is the instructive one: Adobe moved asset processing off
+the author runtime into isolated compute, which is the Shopify Functions bargain reached from
+the other end — not a safer parser, a parser that holds nothing.
+
+**Then put work where the parser is not.** Cloudflare's image transformation runs resize,
+crop and format conversion at the edge and returns bytes the platform authored, which is
+precisely the incidental hardening the media platforms get and the 3D pipeline does not. Every
+transform served that way is a parse your origin never performed. Cloudflare's managed WAF
+rules cover known ImageMagick exploitation patterns, and upload scanning on the higher plans
+inspects file content rather than trusting the declared type — worth having, though it is
+detection and the format is content-sniffed, so it is a layer and not the boundary. Rate limit
+the upload endpoints, because resource exhaustion needs no vulnerability at all. Put Turnstile
+on public upload forms and Access in front of `wp-admin`, `/user/login` and the AEM author tier,
+since most real exploitation needs an authenticated upload first.
+
+**And close the door the rest depends on.** Every edge control above is worth nothing if the
+origin answers on its own address. Lock the origin to Cloudflare with authenticated origin
+pulls, or remove inbound reachability entirely with a tunnel so the host has no listening port
+to find. This is the one people skip, and it is the one that decides whether the others are
+controls or decoration.
+
+None of this makes the parser safe. It makes the parser less useful to reach: fewer formats it
+will touch, less work sent to it, less it can do when it succeeds, and no path to it that
+bypasses the things in front. That is the same sentence as the section above, written for an
+estate that cannot be rebuilt this quarter.
+
 ## Nobody supports 3D files securely
 
 Say it plainly, because the market has not: **there is no platform today that accepts a 3D or CAD
