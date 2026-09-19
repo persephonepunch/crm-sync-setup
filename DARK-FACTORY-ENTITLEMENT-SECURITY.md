@@ -69,6 +69,35 @@ This is not a hypothetical argument. Two documented 2025 events mark the two end
 
 **ImageMagick — CVE-2016-3714, "ImageTragick," and the decade of CVEs behind it.** The third pole is neither the artifact nor the silo but **the parser** — the thing that opens the file. ImageMagick's delegate system passed parts of a filename into shell commands, so a crafted image achieved remote code execution simply by being processed. It is the canonical case because of where it lives: embedded in upload pipelines, thumbnailers, CMSes and asset services, usually as a transitive dependency nobody deliberately chose, frequently invoked automatically on user-supplied input, and often running with more privilege than the request that triggered it. The same shape recurs across media and 3D/CAD parsers — SketchUp, FBX and USD each carry their own histories.
 
+> **Sidebar — who is actually running it, and what it exposes**
+>
+> Almost nobody chooses ImageMagick. It arrives with a CMS, a base image, or a dependency three
+> levels down, which is why the honest question is not *do we use it* but *does anything in our
+> stack generate a preview.*
+>
+> **Where it lives.** The PHP `Imagick` extension is the largest single exposure — **WordPress
+> uses it whenever it is available**, falling back to GD, for every upload, resize and thumbnail;
+> Drupal, Joomla, Magento and Laravel's Intervention Image follow the same pattern. In Ruby,
+> MiniMagick shells out to the CLI and rmagick binds natively, historically behind CarrierWave,
+> Paperclip and ActiveStorage. Python's Wand binds to MagickWand, though most of that ecosystem
+> defaults to Pillow. In Node the wrappers `gm` and `imagemagick` are legacy; the modern path is
+> sharp on libvips. And then the ones nobody inventories: Docker base images, CI runners,
+> document and attachment preview pipelines, avatar services, image proxies.
+>
+> **What it exposes.** The `delegates.xml` system maps formats to *external commands* and passes
+> filenames into shell invocations — insufficient filtering there is what made ImageTragick remote
+> code execution from an uploaded image. Its own **MVG and MSL** formats can reference local files
+> and remote URLs. **Format is determined by content, not extension**, so a file named `.jpg`
+> holding MVG is processed as MVG and validating the extension buys nothing. Constructs like
+> `label:@/path` read local files *into the output image*, making the thumbnail you hand back the
+> exfiltration channel. `url:` and delegate fetches give SSRF. And PDF, EPS and PS **delegate to
+> Ghostscript**, so a "generate a PDF preview" feature quietly chains two heavily targeted
+> parsers — people rarely realise the second one is there.
+>
+> **The hardening is known and unevenly applied**: a `policy.xml` disabling MVG, MSL, `url:` and
+> the PS/EPS/PDF delegates, with caps on memory, area and time. Then the structural version — run
+> it where a crash costs nothing, which is the Shopify Functions bargain again.
+
 What makes the parser pole distinct is the trigger. Unity's flaw needs you to have shipped something. Trimble's needs you to run the silo. **The parser is invoked by the act of receiving a file at all** — accepting an upload is sufficient. An organisation that ships nothing and runs no monolith still has this surface the moment it lets a partner send it a model, a document or an image.
 
 It also reframes what custody can and cannot do. Encrypting an asset, granting it to a named recipient and ledgering every served byte is a containment and attribution control: it proves what was delivered, to whom, and when, and a rotated key heals a suspected leak without a recall. **It does not make a hostile file safe to open.** That is a validation problem, and it belongs on the way in — reject external resource references, cap decompression ratios, determine the type from the bytes rather than the declaration, parse in isolation with a hard timeout, and where possible re-serialise so what you store is your own output rather than the sender's input. Custody and validation are two controls, and a vendor claiming the first has not delivered the second.
