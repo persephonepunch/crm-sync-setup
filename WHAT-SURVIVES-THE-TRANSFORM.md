@@ -33,6 +33,8 @@ citation:
     url: https://c2pa.org/
 ---
 
+# What Survives the Transform
+
 **For media managers, DAM owners, front-end leads and the person who has to answer why the
 product page is four megabytes.**
 
