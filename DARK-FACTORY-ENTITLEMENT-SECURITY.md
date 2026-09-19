@@ -72,8 +72,11 @@ This is not a hypothetical argument. Two documented 2025 events mark the two end
 > **Sidebar — who is actually running it, and what it exposes**
 >
 > Almost nobody chooses ImageMagick. It arrives with a CMS, a base image, or a dependency three
-> levels down, which is why the honest question is not *do we use it* but *does anything in our
-> stack generate a preview.*
+> levels down, so *do we use it* is not a question anyone can answer honestly — only *does
+> anything in our stack generate a preview.*
+>
+> Which is why our claim is not that we don't run it. The claim is that it would not matter if
+> we did.
 >
 > **Where it lives.** The PHP `Imagick` extension is the largest single exposure — **WordPress
 > uses it whenever it is available**, falling back to GD, for every upload, resize and thumbnail;
@@ -95,8 +98,28 @@ This is not a hypothetical argument. Two documented 2025 events mark the two end
 > parsers — people rarely realise the second one is there.
 >
 > **The hardening is known and unevenly applied**: a `policy.xml` disabling MVG, MSL, `url:` and
-> the PS/EPS/PDF delegates, with caps on memory, area and time. Then the structural version — run
-> it where a crash costs nothing, which is the Shopify Functions bargain again.
+> the PS/EPS/PDF delegates, with caps on memory, area and time. Every deployment should do it,
+> and a `policy.xml` is a file someone has to remember — which makes it the weakest kind of
+> control there is.
+>
+> **The structural version is to make the parser's success irrelevant.** Grant the attacker the
+> whole win: assume the parse is compromised. Now count what the compromised process can reach.
+> Our media buckets have **no public domain and no direct origin** — every byte is served through
+> a Worker, so there is no address at which stored content exists independently of the code that
+> decides who may have it. Tenancy is in the **object key prefix**, not in a query parameter, and
+> filenames are normalised to a restricted character set with path separators stripped, so a
+> crafted name cannot walk out of its own namespace. The serve path sends `nosniff`
+> unconditionally and renders inline only what is on a render allow-list; everything else comes
+> back as an octet-stream attachment, which is how the SVG question answers itself. And the
+> cross-origin rules **nest**: the allow-list that decides who may *read* a response is strictly
+> wider than the one that decides who may read it *as the signed-in user*, and the literal origin
+> `null` — which any sandboxed frame on the internet can assume at will — is never reflected into
+> either. Same gates for the Shopify storefront and the Webflow mirror, because both load their
+> media through the same path.
+>
+> That is the whole argument in miniature. A parser you cannot audit sits inside a runtime with
+> no ambient network, no host origin, no reachable neighbour and no authority it was not handed —
+> the Shopify Functions bargain again, applied to somebody else's C code.
 
 What makes the parser pole distinct is the trigger. Unity's flaw needs you to have shipped something. Trimble's needs you to run the silo. **The parser is invoked by the act of receiving a file at all** — accepting an upload is sufficient. An organisation that ships nothing and runs no monolith still has this surface the moment it lets a partner send it a model, a document or an image.
 
