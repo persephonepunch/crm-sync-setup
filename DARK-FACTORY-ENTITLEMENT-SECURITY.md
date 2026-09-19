@@ -1,6 +1,6 @@
 ---
 title: "Dark Factory Entitlement Security"
-description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity and Trimble Cityworks receipts and the entitlement architecture that survives AI-speed extraction."
+description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
 canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html
 category: "Security"
 date: 2026-07-19
@@ -119,6 +119,52 @@ Which is exactly the shape a validation pipeline should take. Parsing an untrust
 or image is running someone else's content in all but name. Do it where a crash costs nothing: no
 network, no filesystem, a hard timeout, a typed input and a typed output. Shopify has already
 demonstrated the pattern at a scale nobody else has had to survive.
+
+## Nobody supports 3D files securely
+
+Say it plainly, because the market has not: **there is no platform today that accepts a 3D or CAD
+file, validates it, and can prove who opened it.** Every vendor does one of those three things and
+calls it the set.
+
+The media platforms — Cloudinary, and the asset side of suites like OpenText — are built around a
+real and different job: ingest an image or a video, *transform* it, deliver it fast and cached.
+That pipeline is their product, and it incidentally hardens images, because a re-encoded raster is
+a new file the platform authored. A JPEG that arrives hostile leaves as bytes the CDN produced.
+
+3D does not get that. Models arrive as **pass-through bytes** — stored and delivered, not parsed,
+not re-emitted, not inspected — because no transform pipeline exists for GLB, STEP, IFC or USD the
+way one exists for JPEG. So you get CDN delivery with none of the incidental safety, which is the
+worst combination available: fast global distribution of a file nobody looked inside.
+
+And the reason nobody built that pipeline is the reason it matters. **Validating a model means
+parsing it, and the parser is the attack surface** — the same lesson ImageTragick taught for
+images, waiting to be relearned on formats with far more structure: external resource references,
+zip containers, layer composition, scripting-adjacent scene description. Building it safely
+requires the Shopify Functions bargain — no network, no filesystem, typed in, typed out, hard
+timeout — and almost nobody has bothered, because the market treats a model as a picture that
+spins.
+
+Meanwhile the third leg is missing entirely. A storage link, once shared, is shared forever, and
+no media CDN can tell you which customer opened which revision of a part. For an image that is an
+acceptable loss. For a controlled part file, a firmware image, or a model under licence, it is the
+whole question.
+
+### The descriptor gap, and why it is Markdown
+
+There is a second absence underneath. Media platforms describe an asset with tags and
+transformation parameters, because that is what a delivery pipeline needs. An **artifact** needs
+something else: provenance, licence, the entitlement that governs it, the SBOM or certificate it
+is bound to, the market it may be sold into, and the validation it passed.
+
+That description has to travel — from a repository to a CMS, into a product feed, onto a channel,
+and into the context window of a model being asked about it. **Markdown with YAML frontmatter is
+the only form that survives all of those**, and survives them in a way both a person and a machine
+read the same: it diffs in Git, renders as a page, parses as structured data, and needs no vendor
+runtime to open. A proprietary asset record in a DAM is legible to that DAM. A front-matter block
+is legible to everything, including the next tool nobody has built yet.
+
+Which is the whole argument in a different key. The artifact travels; the descriptor travels with
+it; the **grant** stays behind and decides who may open either.
 
 ## The dark factory raises the stakes to maximum
 
