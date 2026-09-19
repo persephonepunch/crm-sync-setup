@@ -264,6 +264,27 @@ the upload endpoints, because resource exhaustion needs no vulnerability at all.
 on public upload forms and Access in front of `wp-admin`, `/user/login` and the AEM author tier,
 since most real exploitation needs an authenticated upload first.
 
+**The PHP estates need this named path by path, because of how they generate derivatives.**
+WordPress does its resizing at upload, which is bad enough. Drupal image styles and Magento's
+catalog image cache generate on *request* — the derivative is built when someone first asks for
+that URL. So on those two, **an unauthenticated GET can trigger an ImageMagick parse**, with no
+upload and no account, and a URL pattern that varies can trigger a great many of them. That is
+the parse you cannot see in an upload log, and it is precisely what edge rules are good at
+containing.
+
+| Estate | The path that matters | Rules to put in front | What it denies |
+|---|---|---|---|
+| **WordPress** | `/wp-content/uploads/*` | Response header transform forcing `nosniff`, and `Content-Disposition: attachment` for anything not a known image type; WAF custom rule refusing `.php` under the uploads prefix; rate limit on `admin-ajax.php` and the media REST route; Access on `/wp-login.php` and `/wp-admin` | Script executing on your own origin from the media library; the upload-to-RCE classic; brute force against the one door most exploitation needs |
+| **Drupal** | `/sites/default/files/*`, and especially `/sites/default/files/styles/*` | The same header transform and `.php` refusal on the files prefix; **cache rule plus rate limit on the `styles` prefix**, so a derivative is generated once and a varying URL cannot mint parses on demand; Access on `/user/login` | An anonymous request stream that turns image styles into a parser DoS, and an image style request that reaches the origin at all after the first |
+| **Magento** | `/media/*`, and `/media/catalog/product/cache/*` | Header transform on `/media/*` first, because this origin also serves checkout; cache rule and rate limit on the resize cache prefix; WAF and rate limit on customizable-option upload endpoints; Access on the admin path; **origin rule moving `/media/*` to object storage** | The stored-file-to-script chain that becomes card skimming on the payment page, and — with the origin rule — the parser's presence in PCI scope at all |
+| **Any PHP origin** | Every writable directory | Refuse execution of `.php` under any upload or cache prefix; enable the managed ruleset covering ImageMagick and PHP exploitation patterns; normalise the URL in a transform rule before anything downstream interprets it | The gap between what the application thinks a path is and what the filesystem resolves it to |
+
+Two honest limits on all of it. The managed ruleset matches known patterns, so it is detection
+and not a boundary — the format is decided by content, and a novel payload is still a parse. And
+an origin rule that moves `/media/*` elsewhere only reduces PCI scope if the *new* location is
+genuinely outside it; pointing the prefix at a second server in the same environment moves the
+path and keeps the problem.
+
 **And close the door the rest depends on.** Every edge control above is worth nothing if the
 origin answers on its own address. Lock the origin to Cloudflare with authenticated origin
 pulls, or remove inbound reachability entirely with a tunnel so the host has no listening port
