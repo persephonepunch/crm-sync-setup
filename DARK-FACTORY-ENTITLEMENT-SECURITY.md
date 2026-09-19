@@ -19,7 +19,7 @@ about:
   - Dark factory / lights-out manufacturing
   - 3D and BIM asset security
   - AI-assisted reverse engineering
-alternativeHeadline: "Concede the artifact, defend the ledger — content that executes is an attack surface by definition"
+alternativeHeadline: "Concede the artifact, defend the ledger — executable content is safe in proportion to what the runtime denies it"
 citation:
   - name: "Unity Security Update Advisory (CVE-2025-59489)"
     url: https://unity.com/security/sept-2025-01
@@ -61,13 +61,64 @@ Each of these is "content that executes" or "value inside the artifact." Each is
 
 ## The receipts: where the vulnerability lives now
 
-This is not a hypothetical argument. Two documented 2025 events mark the two ends of the artifact problem.
+This is not a hypothetical argument. Two documented 2025 events mark the two ends of the artifact problem, and a third, older and still recurring, sits between them.
 
 **Unity — CVE-2025-59489.** A runtime flaw (untrusted search path) affecting applications built on Unity 2017.1 and later — which is to say, a substantial fraction of every game shipped in eight years. The remediation, per [Unity's own advisory](https://unity.com/security/sept-2025-01): rebuild and redistribute every affected application. There is no server-side fix, **because the vulnerable thing is the shipped bundle itself.** One flaw in a bundled runtime replicates into millions of client-side artifacts, each needing individual rebuilding. When value and logic ship inside the artifact, so do the vulnerabilities — at 1:1 scale with your distribution success.
 
 **Trimble Cityworks — CVE-2025-0994.** A deserialization flaw in the asset-management platform that holds the infrastructure records of local governments, utilities, and manufacturers — [actively exploited](https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-04), added to CISA's Known Exploited Vulnerabilities catalog, with attackers observed delivering in-memory loaders and Cobalt Strike through it. Here the artifact problem inverts: the vulnerability lives in the **silo monolith** — one on-premises application ingesting opaque blobs, holding the entire asset graph, unjoinable by outside systems and therefore unauditable by them. The properties that make such platforms commercially entrenched — proprietary data shape, organizational depth in institutions that patch slowest — are precisely the properties that maximize blast radius.
 
+**ImageMagick — CVE-2016-3714, "ImageTragick," and the decade of CVEs behind it.** The third pole is neither the artifact nor the silo but **the parser** — the thing that opens the file. ImageMagick's delegate system passed parts of a filename into shell commands, so a crafted image achieved remote code execution simply by being processed. It is the canonical case because of where it lives: embedded in upload pipelines, thumbnailers, CMSes and asset services, usually as a transitive dependency nobody deliberately chose, frequently invoked automatically on user-supplied input, and often running with more privilege than the request that triggered it. The same shape recurs across media and 3D/CAD parsers — SketchUp, FBX and USD each carry their own histories.
+
+What makes the parser pole distinct is the trigger. Unity's flaw needs you to have shipped something. Trimble's needs you to run the silo. **The parser is invoked by the act of receiving a file at all** — accepting an upload is sufficient. An organisation that ships nothing and runs no monolith still has this surface the moment it lets a partner send it a model, a document or an image.
+
+It also reframes what custody can and cannot do. Encrypting an asset, granting it to a named recipient and ledgering every served byte is a containment and attribution control: it proves what was delivered, to whom, and when, and a rotated key heals a suspected leak without a recall. **It does not make a hostile file safe to open.** That is a validation problem, and it belongs on the way in — reject external resource references, cap decompression ratios, determine the type from the bytes rather than the declaration, parse in isolation with a hard timeout, and where possible re-serialise so what you store is your own output rather than the sender's input. Custody and validation are two controls, and a vendor claiming the first has not delivered the second.
+
 Between those two poles sits everything a modern operation ships and stores: **IoT and device firmware** (expanding EXEs with embedded secrets), **game and metaverse distribution** (Roblox and Unity bundles carrying your product's 3D twins), **3D/BIM assets in business operations** (models locked in PIM/BIM silos, exchanged as executable-adjacent XML). The vulnerability does not live in your network perimeter. It lives in your artifacts and your silos — the two places perimeter security cannot reach.
+
+## The exception that proves it: Shopify Functions
+
+If executable content is an attack surface by definition, consider the case that ought to be the
+worst of all and is not. **Shopify Functions let third parties upload compiled WebAssembly that
+runs inside Shopify's own infrastructure**, on the checkout path, for every merchant who installs
+the app. Arbitrary vendor code, executing in the payment flow of a platform carrying a
+significant share of global commerce.
+
+It is not a catastrophe, and the reasons are the whole argument in miniature. A Function has **no
+network and no filesystem** — it cannot open a socket, read a file, or call home. It receives a
+typed JSON input and returns a typed JSON output, and the platform validates the output against
+what that extension point is allowed to change: a discount, a cart transform, a delivery option.
+Execution is bounded, so it cannot hang or mine. The sandbox is a property of the runtime rather
+than a policy anyone has to enforce.
+
+Set that beside ImageMagick and the contrast is exact. ImageMagick's delegate system **shells
+out** — maximum I/O, invoked automatically on untrusted input, running with whatever privilege
+the host handed it. Shopify's runtime takes everything away and hands back two typed ports. Both
+are running content someone else authored. One was a decade of remote code execution; the other
+is a checkout extension point nobody writes advisories about.
+
+The lesson is not *don't run untrusted content*. Modern operations run it constantly and cannot
+stop. The lesson is that **executable content is safe in proportion to what the runtime denies
+it** — and that this is an architectural property, not a diligence one. It survives a supplier
+who ships something hostile, deliberately or otherwise, because the guarantee never depended on
+the supplier.
+
+We are not admiring this from outside. It is the substrate this platform runs on. A Cloudflare
+Worker is a V8 isolate with **no filesystem and no ambient network**, and every external reach it
+has is declared as a binding: this KV namespace, that R2 bucket, that database, that AI endpoint.
+Anything not declared does not exist to the code. A leaked credential cannot read a bucket the
+worker never bound, because there is no path to reach for.
+
+And the entitlement model in this article is the same idea moved one layer up. **A binding says
+what the code may reach. A capability says what a subject may reach.** Same shape, different
+altitude — declared rather than assumed, enforced by the runtime rather than by the caller's good
+behaviour, and unchanged by whether the caller is a person, an agent or a machine on a line at
+3 a.m. Arguing for entitlement security while running on ambient-authority infrastructure would be
+a position, not an architecture.
+
+Which is exactly the shape a validation pipeline should take. Parsing an untrusted model, document
+or image is running someone else's content in all but name. Do it where a crash costs nothing: no
+network, no filesystem, a hard timeout, a typed input and a typed output. Shopify has already
+demonstrated the pattern at a scale nobody else has had to survive.
 
 ## The dark factory raises the stakes to maximum
 
