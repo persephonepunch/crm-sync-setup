@@ -213,6 +213,24 @@ selected under the image toolkit settings, and if it is ImageMagick, confirm the
 what it adds. The module passes arguments to a binary, so the `policy.xml` on that host is the
 real control, not a Drupal setting.
 
+**Magento is where this stops being about images.** Adobe Commerce lets you choose the image
+adapter — GD2 or ImageMagick — in developer settings, and either way the parser is running
+inside a system that holds customer PII and sits in PCI DSS scope. That changes what a
+successful parse is worth. On a content site, code execution in the image pipeline costs you
+the content site. In commerce it lands in the cardholder data environment, next to order
+records, customer addresses and the checkout itself.
+
+Two things make it sharper than the CMS cases. First, the upload path is not only
+administrative: customizable options accept customer file uploads, so untrusted bytes reach the
+parser from the storefront side. Second, `pub/media` serves that user-supplied content **from
+the same origin as checkout**, which means a file that renders as a document rather than an
+image is script on the payment page — the Magecart pattern exactly, and the reason the serve
+rules in this article are not fussiness. Set the adapter deliberately, harden `policy.xml` on
+the host, keep execution off the media directory, and then do the thing that actually reduces
+scope: move media ingest and delivery to a separate origin so the parser is not in the CDE at
+all. PCI rewards that structurally — scope follows the data and the systems that touch it, so
+taking the pipeline out of the environment is worth more than hardening it inside.
+
 **AEM** does most raster work in its own libraries, but the DAM Update Asset workflow can shell
 out through a command-line process step for the formats it will not handle natively — EPS,
 PostScript and some PSD and AI paths — and that step is where ImageMagick and Ghostscript enter
@@ -225,7 +243,20 @@ the other end — not a safer parser, a parser that holds nothing.
 **Then put work where the parser is not.** Cloudflare's image transformation runs resize,
 crop and format conversion at the edge and returns bytes the platform authored, which is
 precisely the incidental hardening the media platforms get and the 3D pipeline does not. Every
-transform served that way is a parse your origin never performed. Cloudflare's managed WAF
+transform served that way is a parse your origin never performed.
+
+**On a hosted platform, the edge is the only place you own.** This is the governance argument
+rather than a performance one. With Webflow or Shopify there is no host to configure, no
+`policy.xml`, no way to set a response header on someone else's CDN — so Cloudflare Rules is
+where policy can exist at all. Response header transform rules will put
+`X-Content-Type-Options: nosniff` and a `Content-Disposition` on media paths, which applies this
+article's own serve discipline to bytes served by a platform that never asked your opinion.
+Origin rules route a path prefix somewhere else entirely, which is how media ingest and delivery
+leave the commerce origin without migrating the storefront. Cache rules decide what is allowed
+to persist at the edge, and normalisation in a transform rule means the canonical form of a URL
+is settled before anything downstream interprets it — the same reason naming rules carried the
+content-addressed asset paths. None of it touches the vendor's stack, which is the point: it is
+policy you can state, version and audit for surfaces you do not control. Cloudflare's managed WAF
 rules cover known ImageMagick exploitation patterns, and upload scanning on the higher plans
 inspects file content rather than trusting the declared type — worth having, though it is
 detection and the format is content-sniffed, so it is a layer and not the boundary. Rate limit
