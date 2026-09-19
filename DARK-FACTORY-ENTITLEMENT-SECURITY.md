@@ -184,8 +184,8 @@ That pipeline is their product, and it incidentally hardens images, because a re
 a new file the platform authored. A JPEG that arrives hostile leaves as bytes the CDN produced.
 
 3D does not get that. Models arrive as **pass-through bytes** — stored and delivered, not parsed,
-not re-emitted, not inspected — because no transform pipeline exists for GLB, STEP, IFC or USD the
-way one exists for JPEG. So you get CDN delivery with none of the incidental safety, which is the
+not re-emitted, not inspected — because no transform pipeline exists for GLB, STEP, IFC, USD or
+Apple's zipped USDZ the way one exists for JPEG. So you get CDN delivery with none of the incidental safety, which is the
 worst combination available: fast global distribution of a file nobody looked inside.
 
 And the reason nobody built that pipeline is the reason it matters. **Validating a model means
