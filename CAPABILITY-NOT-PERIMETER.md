@@ -121,6 +121,114 @@ The theory is one thing; here is what minting actually *does* across five settin
 
 **Is Tailwind enough for AI? Is Next.js RBAC enough for agentic checkout?** No — Tailwind and Next.js build a beautiful front end and a tidy perimeter, but a perimeter only knows how to say *no*. AI agents, robots, and consented users need to **act**: grant, scope, revoke, record. That is a capability model, not a wall. For AI, a great **Tailwind / Next.js** build is **simply not enough** — the framework renders the door; it does not decide who may open it, for how long, or leave a signed record that they did.
 
+## Where a mandate comes from — four definitions, each as a challenge and its answer
+
+The words below get used interchangeably and are not interchangeable. Each is stated as the
+problem it exists to solve, because a definition without its problem is a term nobody can apply.
+
+### System of record
+
+**Challenge.** Authority accumulates in the surfaces that need it. Who may grant what ends up
+expressed in a theme conditional, an app's middleware, a spreadsheet of roles and somebody's
+memory. Asked *who was allowed to do this*, the estate answers by reading four places and
+guessing at the fifth.
+
+**Solution.** One row per subject, holding permissions, state and a version, in a store that can
+be queried and audited — here, Xano. It is not in the request path for rendering and it is not a
+cache. It is the thing that gets asked, and the only thing entitled to answer. Its job is to be
+*correct and revocable*, not fast.
+
+### Mandate
+
+**Challenge.** An agent needs to act for a person — place an order, book a slot, pull a record.
+A standing API key cannot express *for whom*, *how much*, or *until when*, and it cannot be
+withdrawn from one agent without breaking every other holder.
+
+**Solution.** A signed, scoped, time-boxed artifact naming the subject it acts for, the
+permission it carries, the limits that bound it and the moment it stops being true. It is
+evidence, not configuration: a verifier needs the signature and the published key, not an
+account on your platform.
+
+### How the two combine to produce one
+
+**Challenge.** Minting a mandate needs two things that must not live together — the *authority*
+to issue one, and the *key* that makes it verifiable. Put the key where the authority lives and
+a database compromise mints mandates. Put the authority where the key lives and revocation stops
+being possible.
+
+**Solution.** They stay apart and both are consulted:
+
+1. The **system of record** answers whether this subject may delegate this scope right now. It never sees a signing key.
+2. The **worker** mints and signs, in a runtime whose only secret is a signing key it cannot export. It holds no entitlement data of its own.
+3. The **published key set** lets any party verify without asking either of them — the property that makes a mandate portable rather than a session.
+4. **Edge rules** bound the traffic carrying it: rate limits on the mint route, header discipline on the response, origin routing so the mint path is not the same surface as the storefront.
+
+Nothing in that list is the boundary on its own. The boundary is step 1 and 2 together —
+**authority consulted, signature applied, neither able to do the other's job.**
+
+### Compile-time placement is not a runtime permission
+
+**Challenge.** Modern frameworks make a developer feel they have drawn a security line when they
+have drawn a packaging line. `"use client"` and `"use server"` decide **where code is bundled**.
+Nothing checks them at runtime, nothing refuses at them, and — as the serialisation problem
+elsewhere in this estate shows — crossing one is a *disclosure* event, not an authorisation one.
+A compiler decides placement. A compiler cannot refuse a request.
+
+**Solution.** Treat framework directives as what they are: a statement about transport. Then
+put the actual permission where something can say no at the moment of asking.
+
+The contrast worth holding is **Deno's model**, because it is the same idea done at the layer
+where it works. A Deno process starts with nothing and receives only what it was granted:
+`--allow-net` for named hosts, `--allow-read` for named paths, `--allow-env` for named variables.
+Deny by default, declared before the code runs, **enforced by the runtime rather than by
+convention**. Xano runs Lambda steps on Deno, which is where this becomes practical rather than
+theoretical — an untrusted transformation can be given the ability to compute and nothing else.
+
+The difference in one line: **a compile-time boundary tells you where code runs; a runtime
+permission decides what it may do.** Only the second one is a control.
+
+### Transport encryption and row-level encryption answer different questions
+
+**Challenge.** TLS is treated as *the* encryption story, and it ends at the socket. Once a
+request terminates, the value is plaintext in the process, in the query result, in the log line
+and in whatever the backup captured. A query returns what it matches; a compromised credential
+returns rows. Neither is a transport problem, so transport security does nothing about them.
+
+**Solution.** Encrypt the *value* to the subject entitled to it, not merely the *pipe* it
+travels down. A row read without the corresponding entitlement yields ciphertext — to an
+over-broad query, to a misconfigured export, to a stolen credential, and to an operator.
+
+| | Protects | Ends when | A breach yields |
+|---|---|---|---|
+| **TLS** | The connection | The socket closes | Plaintext rows |
+| **Row-level encryption** | The value | The entitled party decrypts | Ciphertext |
+
+They compose rather than compete — TLS for everything in flight, row-level for the fields whose
+disclosure is the actual harm. The cost is key management, and it is worth paying exactly where
+the data is regulated and the store is shared, replicated or somebody else's.
+
+### Summary — opportunity, against the baseline risk
+
+Stated last, because the definitions have to be settled before the trade means anything.
+
+| | With the four in place | Baseline, without them |
+|---|---|---|
+| **Answering "who allowed this"** | A query against one row, with a version and a time | A code read across surfaces, under deadline |
+| **Withdrawing an agent's authority** | Revoke the row; outstanding mandates expire on their own clock | Rotate a shared key and break every other holder |
+| **A third party verifying a claim** | Signature plus the published key set — no account needed | They must trust your assertion, or integrate with you |
+| **A database compromise** | Ciphertext for the fields that matter | Plaintext rows, and disclosure measured in records |
+| **An untrusted transformation** | A runtime that grants compute and nothing else | Whatever the process could already reach |
+| **A framework boundary crossed** | A disclosure decision, made deliberately | A packaging decision, mistaken for a control |
+
+**The opportunity is not that this is more secure in the abstract.** It is that each row above
+turns a question that currently takes an investigation into one that takes a query — and every
+one of those questions is asked at the worst possible moment, by a regulator, a customer's
+lawyer or an incident channel.
+
+**The baseline risk is not a breach.** It is arriving at that moment with no answer, and
+discovering that the controls you had were placement, transport and convention: three things
+that look like security in a diagram and refuse nothing in production.
+
 ## Why it's money AND privacy gated (the unique part)
 
 Every principal — a **Peer**, a **Household** member, or an **AI agent** — is gated on **both** dimensions at once:
