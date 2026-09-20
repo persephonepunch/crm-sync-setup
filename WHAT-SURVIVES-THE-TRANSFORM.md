@@ -280,6 +280,46 @@ argument for keeping descriptors in version control — where the pairing is enf
 rather than by whoever dragged the folder — and for a system of record that holds the same
 fields independently.
 
+### One company wrote most of this stack, and that is why the parsers are dangerous
+
+Follow the formats back and they converge on one vendor. **PDF** is Adobe's, from 1993, now
+**ISO 32000**. **PostScript** and **EPS** are Adobe's. **XMP** is Adobe's, now **ISO 16684-1**.
+**PSD** and **AI** remain proprietary. **DNG** is Adobe's open raw format. The pattern is
+consistent: publish the specification, let it become universal, keep the tooling.
+
+That is worth noticing twice over.
+
+**First, it is the strongest position in this document.** Adobe did not win by having the best
+codec. It won by making its formats the ones everything else must read, then selling the tools.
+A standard is a better moat than an invention, because nobody needs permission to adopt it and
+everybody needs your software to author it well.
+
+**Second, and less comfortably: the formats with the worst parser histories are the same ones.**
+The delegate chain that turns a thumbnail request into a second interpreter — PDF, EPS,
+PostScript handed to Ghostscript — is Adobe lineage end to end. That is not hypocrisy on
+anyone's part. It is arithmetic. **Ubiquity is what makes a parser worth attacking**, and a
+format that every system must read is a format every attacker studies. The price of winning the
+standard is that your format becomes the one worth breaking.
+
+### Where the pattern breaks, and what it explains
+
+Three-dimensional content is the exception, and the exception is instructive.
+
+Mesh compression is **not** Adobe. **Draco** is Google's. **meshopt** is independent.
+**KTX2/Basis Universal** came from Binomial, acquired by Google. **glTF** is Khronos. Adobe
+arrived in 3D by acquisition — Substance for materials, Mixamo for characters — into a field
+whose formats were already set by other people.
+
+That timing explains something this document asserts earlier. 3D formats arrived *after* the era
+in which one vendor made a format universal and then had to build the tooling to match, and the
+standards came instead from a consortium and a search company with no document-pipeline business
+to extend. **Nobody ever had Adobe's incentive to build a safe, ubiquitous transform pipeline for
+meshes** — and so, as the section above says, models remain pass-through bytes while a JPEG is
+re-encoded by default.
+
+The absence of a transform pipeline for 3D is not an oversight. It is the predictable result of
+nobody owning the format the way Adobe owned the page.
+
 ### The system of record is the other half
 
 A descriptor beside the file answers *what is this*. It does not answer *which variants exist
