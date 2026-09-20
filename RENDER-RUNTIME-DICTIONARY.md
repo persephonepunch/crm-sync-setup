@@ -304,6 +304,60 @@ Three properties decide it:
 > the source text is allowed to be at the moment it is processed. Design that first; choose the
 > model inside it.
 
+## Data shape, and the cost of an object
+
+**Struct layout (C).** A type *is* a memory layout. A field access compiles to a single load at
+a known offset, there is no type information at runtime, and an array of structs is one
+contiguous block.
+
+**Object protocol (Python).** A type is an object. Every value is a heap allocation with a
+header — a refcount and a type pointer — and attributes live in a per-instance dictionary, so
+`obj.field` is a hash lookup and possibly a walk up the inheritance order. Even an integer is a
+heap object.
+
+> **The decision it changes:** it is not attribute speed, it is **layout**. A list of a million
+> Python objects is a million pointers to scattered allocations, each a probable cache miss. An
+> array of structs is one block the prefetcher can read. That single fact is why NumPy, Polars
+> and Arrow exist — each is a thin Python object wrapping **one raw C buffer**, so the data keeps
+> C's layout and only the handle is Pythonic. `__slots__` is the middle ground: it removes the
+> instance dictionary and restores fixed offsets. Reach for it on anything instantiated in bulk.
+
+The general form, and it recurs: **Python's memory safety is borrowed from its interpreter, and
+its flexibility is purchased with indirection.** Both are paid for in C — increasingly in Rust.
+
+**JSON-LD.** A JSON serialisation of linked data: an object syntactically, an RDF graph
+semantically, with `@id` making nodes referenceable and `@graph` letting several coexist. On a
+product page it is what a crawler reads to learn the offer.
+
+> **The decision it changes:** it is **an object at the edge and a row everywhere it is used.**
+> A Merchant crawler turns one `Product` object into one row — `offers.price` becomes a price
+> column, `gtin`/`mpn`/`brand` become identifier columns — so a missing attribute is a missing
+> column, with no error and no partial credit; the offer is simply never seen. It also cannot be
+> authored in a rich text field, because rich text sanitises HTML and a `<script type=
+> "application/ld+json">` does not survive. Generate it from the record and inject it, or the
+> object and the row have different parents.
+
+**BQML.** Model training expressed in SQL and executed inside BigQuery — `CREATE MODEL … AS
+SELECT …` — so the features are columns in a table rather than fields in a document.
+
+**pLTV — predicted lifetime value.** A model output estimating a customer's future value, fitted
+on an observation window and scored forward. In this estate: features over days 0–7, label over
+days 7–97.
+
+> **The decision it changes:** pLTV is a **weight, not an entitlement.** It may rank an audience
+> or bias a bid. It may never decide whether a subject is permitted to do something, because a
+> score is a description of the past and a permission is a statement about the present. This is
+> the same separation that keeps the warehouse out of authorisation.
+
+**Revenue value automation.** Feeding a modelled value — pLTV, predicted margin, propensity —
+into a bidding or targeting system so spend follows expected return rather than a flat rule.
+
+> **The decision it changes:** the automation is only as lawful as the **gate in front of it.**
+> Every person in an uploaded audience is checked for consent per signal at the moment of upload,
+> jurisdiction following the subject rather than the store, and a withdrawal **removes** rather
+> than pauses. The model does not know any of that and must not be asked to — the check belongs
+> between the score and the upload, where it can refuse and leave a record.
+
 ## Secrets and sessions
 
 **Cookie.** A value the browser stores and presents on subsequent requests. It is an
