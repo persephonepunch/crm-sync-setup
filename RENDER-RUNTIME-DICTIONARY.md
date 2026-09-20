@@ -501,6 +501,34 @@ model's job is to defeat another. Here it means a suite whose purpose is **to at
 under test**: malformed input, escalated scope, replayed tokens, traversal paths, expired
 mandates. TDD asks *does it work*. Adversarial testing asks *what happens when someone tries*.
 
+**Self-improving code generation (RSI).** A loop rather than a one-shot: a system generates code
+or tests, runs them, reads the result, and refines. Distinct from **SRI** below, which is a hash
+pin on a script and shares only the letters.
+
+> **The decision it changes — and this is an opportunity, not a hazard.** Adversarial refusal
+> tests have always been the thinnest part of any suite, and the reason is **economic, not
+> technical**: a person writing the four-hundredth malformed-input case is expensive and bored,
+> so estates write the happy paths and a handful of refusals and call it covered. Generation
+> collapses that cost. What was unaffordable becomes routine.
+>
+> The consequence is bigger than coverage. **It converts an assertion into evidence.** "Our
+> boundary refuses unauthorised callers" is a claim someone has to take on trust. Four hundred
+> generated attempts, four hundred refusals, re-run on every build, is a record — and it is the
+> form a regulator, an auditor or a customer's security review actually wants. The estate already
+> argues that the refusal is the record; this is what makes producing that record affordable.
+>
+> Two more become practical at the same time. **Mutation testing** — deliberately break a check
+> and assert the suite notices — was historically too slow to run in CI and is now cheap enough
+> to point at the permissions boundary on every merge. And **incident-to-test synthesis** turns a
+> postmortem into a permanent case, so the same failure cannot return quietly.
+
+**The one rule that keeps it worth having.** The system that generates must not be the system
+that judges. A generator optimises toward its signal, so *"the tests pass"* produces tests that
+pass — by weakening assertions or encoding a current bug as expected behaviour. A green suite it
+authored **and** scored is the generator agreeing with itself. Keep the expected refusals
+human-authored and in version control so generation aims at a fixed target, and treat a generated
+test that passes on first run with suspicion: the useful ones fail, because they found something.
+
 **Boundary pipeline.** A CI stage that exercises the permissions boundary specifically — every
 route, every subject class, every refusal — and **blocks the release** when one stops refusing.
 The distinguishing property is that it blocks. A pipeline that reports is a pipeline people learn
