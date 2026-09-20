@@ -171,6 +171,73 @@ The entire difference is on the server, and it is total:
 
 ---
 
+## Publishing, and front matter as a machine index
+
+**Jekyll.** A Ruby static site generator that uses **Liquid** for templating — the same language
+as the entry above. Its lasting contribution is not the tool. It is a convention.
+
+**GitHub Pages.** Static hosting served directly from a repository. It will run Jekyll for you,
+**or serve files exactly as committed** if a `.nojekyll` file is present at the root. Both modes
+are ordinary static hosting: a file on disk, no runtime, nothing executing when a request
+arrives.
+
+**YAML front matter.** The fenced block at the top of a source file, before the content:
+
+```
+---
+title: "Render and Runtime: A Working Dictionary"
+description: "Precise definitions for the architecture review…"
+canonical: https://example.org/render-runtime-dictionary.html
+category: "Specs"
+date: 2026-09-20
+tags: [architecture, security, testing]
+---
+```
+
+Jekyll introduced it as a way to pass variables into a template. It has outlived that purpose
+entirely.
+
+### The decision it changes
+
+**Front matter is a machine index that travels inside the document.**
+
+That sentence is doing more work than it appears to. Structured metadata usually lives somewhere
+else — a CMS record, a database row, a sidecar file, an HTML `<meta>` tag emitted at render.
+Every one of those can drift from the content it describes, and most eventually do. Front matter
+cannot, because moving the file moves the index, and changing one in a commit shows the other
+in the same diff.
+
+Four properties follow, and each answers a failure the alternatives have:
+
+| Property | The failure it avoids |
+|---|---|
+| **Readable without rendering** | A build step, a crawler, a worker or an agent parses the metadata without executing a template or loading a browser. HTML `<meta>` is only machine-readable *after* someone renders the page |
+| **Version-controlled with the content** | The pairing is enforced by a commit rather than by whoever remembered to update the other system |
+| **Diffable** | A category change, a canonical change or a retitle is a reviewable line in a pull request, not a silent edit in an admin panel |
+| **Portable** | It survives dropping Jekyll, changing host, or changing renderer. It is text at the top of a text file |
+
+### Where this lands in practice
+
+A docs corpus with disciplined front matter is **queryable before it is rendered**. An index can
+be built by reading the first twenty lines of each file: titles, canonicals, categories, dates,
+tags — no HTML parsing, no headless browser, no scraping heuristics that break when the theme
+changes.
+
+That is the same argument the descriptor makes about assets, arriving from the publishing side:
+**metadata that must survive belongs beside the content in a form both a person and a machine can
+read**, not inside a rendered artifact that a transform will discard.
+
+And the convention genuinely outlived its tool. **You can keep front matter and drop Jekyll
+entirely** — serve the repository raw with `.nojekyll`, render however you like, and have a
+separate system read the front matter to build the index. The metadata contract survives the
+renderer, which is the property that made it worth adopting in the first place.
+
+> **The trap, stated once:** front matter only indexes what it actually contains. A `description`
+> that drifted from the document, a `canonical` pointing at a page that no longer exists, a
+> `date` left at the value it had when the file was created — each is a machine index confidently
+> describing something that is no longer true. It is worth a check in CI, because nothing else
+> will notice.
+
 ## Runtimes
 
 **Node.js.** A JavaScript runtime whose process has, by default, **whatever access the operating
