@@ -560,6 +560,43 @@ logging — it is occasionally a misconfigured client and occasionally someone t
 | **3D — STEP · IFC · USD · USDZ** | **None exists** | — | Pass-through bytes. Custody and entitlement carry what the format cannot |
 | **Archives — ZIP · USDZ · STEP+ZIP** | **None** | — | Container rules: traversal, symlinks, entry caps, ratio caps |
 
+### Office documents, and the direction nobody checks
+
+Word, Excel and PDF deserve their own row set, because SaaS platforms both **accept** them and
+**generate** them — and the second direction is the one that goes unexamined.
+
+**What they actually are** matters more than their icons suggest:
+
+| Format | What it is underneath | Inherits |
+|---|---|---|
+| **DOCX** | A **ZIP archive of XML** | Every archive rule — traversal, entry caps, ratio caps — **and** every XML rule: DTDs and external entities off |
+| **XLSX** | A **ZIP archive of XML**, plus a formula engine | The same two, plus formulas, external workbook links and legacy DDE |
+| **PDF** | A document format descended from a **programming language** | The Ghostscript delegate chain, embedded JavaScript, and attachments |
+
+The first column surprises people: **a Word document is a zip file.** Everything the firmware
+section says about archives applies to a résumé upload, and everything the XML section says
+about entities applies to the `document.xml` inside it.
+
+**Now the direction nobody checks.** A platform that *generates* a document feels safe, because
+the bytes are ones it authored. That reasoning holds for a re-encoded JPEG and fails here:
+
+> **An export carries your users' input to your customer's desktop.** If a field containing
+> `=cmd|…` or `=HYPERLINK(…)` is written into a CSV or XLSX export, the spreadsheet that opens it
+> may evaluate it — on a machine you do not control, belonging to someone who trusts the file
+> because it came from you.
+
+That is **formula injection**, and it is a serving vulnerability rather than an ingestion one.
+The platform is not compromised; its customer is, using a document the platform produced
+correctly. Neutralising it is a one-line discipline at export: prefix any cell beginning `=`,
+`+`, `-` or `@` so it is written as text.
+
+| Direction | What to do |
+|---|---|
+| **Accepting** DOCX or XLSX | Treat as an archive first: extract in the envelope, refuse traversal and symlinks, cap entries and ratio. Then treat the contents as XML with entities disabled |
+| **Accepting** PDF | Extract text with a library. Rasterise only inside the envelope. Do not invoke a preview chain on the request path |
+| **Generating** CSV or XLSX | Neutralise leading formula characters in every user-derived field |
+| **Generating** any of them | Set `Content-Disposition: attachment` and `nosniff`. A generated document is still a document, and browsers render some of them |
+
 **The sentence the table is really making: re-encoding protects the consumer, not you.** It
 converts "a hostile file reaches every viewer" into "a hostile file reaches my decoder" — which
 is a large improvement and not an escape. The decode happens on your infrastructure either way,
