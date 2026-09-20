@@ -95,16 +95,23 @@ In words: on 1 October Shopify refuses new or updated script tags and requires P
 
 ## 1. React Native to Swift and Kotlin
 
-On 10 September 2026 Shopify said it is rebuilding Shopify, Shop, Point of Sale and Inbox natively, in Swift for iOS and Kotlin for Android, six years after going all-in on React Native in 2020. The Shop app was first, rebuilt in 12 weeks: Android cold start roughly halved (4,433 ms to 2,233 ms), iOS down about 23%, and the Android binary 109 MB smaller — a 37% cut. CRM Sync has no React Native code.
+On 10 September 2026 Shopify said it is rebuilding **Shopify, Shop, Point of Sale and Inbox** natively — Swift on iOS, Kotlin on Android — six years after going all-in on React Native in 2020. The Shop app was first, taken from proof of concept to App Store publication in **12 weeks, "assisted by AI."** CRM Sync has no React Native code.
 
-**The stated reason is the one worth reading.** Shopify's head of mobile reassessed the trade after model quality jumped: coding agents became good enough to implement a feature on Android using the iOS version as the reference, and back again, so the duplicate-work cost that justified a single shared codebase in 2020 largely evaporated. **AI did not make the abstraction layer better — it made the reason for the abstraction layer smaller.** That is a different kind of platform change from the rest of this page, and it is likely to recur: any abstraction whose value was *avoiding writing the same thing twice* is now competing with something that writes it twice for nothing.
+**Shopify's post publishes no benchmarks.** Startup and binary-size figures circulating in secondary coverage are not in the announcement; treat them as unverified unless you find a primary source. The absence is itself worth noting on a page about platform change — the argument made was about cost of development, not runtime performance.
 
-**Status: Watch** for Shopify's mobile SDKs following its apps. But two items are no longer a watch, and they are dependency decisions rather than platform ones:
+**The stated reason is the part worth reading.** In Shopify's words, *"LLMs changed one of the core assumptions behind our 2020 decision,"* and by late 2025 *"agents were capable of making us question whether building software twice still meant doing twice the work."* Coding models improved to the point that *"building the same feature in Swift and Kotlin no longer carries the cost it used to."*
 
-- **React Native Skia** — sponsored by Shopify through 2026. After that the maintainer intends to continue it as a fork under a new package name, with the original repository archived. A dependency on the current package name needs a migration plan.
-- **Restyle** — repository to be archived, kept working through 2026, then maintenance ends.
+**AI did not make the abstraction better. It made the reason for the abstraction smaller.** That is a different species of platform change from everything else on this page, and it is likely to recur: any abstraction whose value was *not writing the same thing twice* now competes with something that writes it twice for very little. Worth holding against every framework choice in the estate, not just this one.
 
-**Action:** grep the estate for `@shopify/react-native-skia` and `@shopify/restyle`. If either is present in a shipped surface, it has an end-of-maintenance date inside the next year.
+**Status: Watch** for Shopify's mobile SDKs following its apps. Three open-source dependencies are no longer a watch — they are dated maintenance decisions:
+
+| Package | Shopify's commitment | After |
+|---|---|---|
+| `@shopify/react-native-skia` | Sponsored through **end of 2026** | Forked and republished under a new name by its maintainer; the original archived |
+| `@shopify/restyle` | Supported through **end of 2026** | **Archived, maintenance stops** |
+| `@shopify/flash-list` | Critical fixes only | Shopify is seeking long-term stewardship partners |
+
+**Action:** grep the estate for all three package names. Anything present in a shipped surface has an end-of-maintenance date inside the next year, and `restyle` has no successor named.
 
 ## 2. Short-lived tokens
 
