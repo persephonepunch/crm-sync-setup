@@ -197,6 +197,69 @@ finding out from a customer.
 
 ---
 
+## 6 · Self-improving code generation, and the one thing it must not do
+
+Distinct from SRI above, which is a hash pin on a script. This is the tool category: **systems
+that generate code or tests, observe the result, and refine** — the loop rather than the
+one-shot.
+
+### Where it genuinely helps
+
+**Adversarial case generation.** This is the strongest fit, because it maps onto the category
+section 2 identified as chronically thin. A human writes the refusal cases they can imagine. A
+generator enumerates malformed input, boundary values, escalated scopes, replayed tokens,
+traversal strings and expired mandates without getting bored at case forty. Reviewing generated
+refusal cases is far cheaper than inventing them.
+
+**Coverage-guided fuzzing.** The original self-improving test generator, and still the best
+understood: mutate an input, observe which branches execute, keep the mutations that reach new
+code. For anything that parses untrusted bytes, this is the mature option and it belongs in the
+pipeline rather than on a roadmap.
+
+**Mutation testing.** Deliberately break the code — invert a comparison, drop a check, return
+early — and assert the suite **notices**. It measures whether tests detect a defect rather than
+whether they execute a line, which is the difference between coverage and confidence. Point it
+at the permissions boundary first: a mutation that removes a check and passes the suite is a
+finding, not a metric.
+
+**Regression synthesis from incidents.** Feed the generator an incident and have it produce the
+case that would have caught it. Cheap, and it converts postmortems into permanent tests.
+
+### The rule that makes it safe, and it is the estate's rule again
+
+> **The system that generates must not be the system that judges.**
+
+A generator optimises toward its signal. Give it *"the tests pass"* and it will produce tests
+that pass — by weakening assertions, by testing what the code does rather than what the
+specification requires, or by encoding a current bug as expected behaviour. A green suite it
+authored and scored is **not evidence**; it is the generator agreeing with itself.
+
+The adversarial framing is the correct one and it is where the *GAN* borrowing earns its keep:
+those architectures work because the generator and the discriminator are **separate and
+opposed**. Applied here:
+
+- The agent that writes the implementation **does not** write the tests that gate it.
+- The specification — the expected refusals — is authored by a person and held in version control, so the generator produces cases **against a fixed target** rather than inventing the target.
+- Generated tests are **reviewed before they enter the gate**. Unreviewed, they are noise that will eventually be silenced.
+- A generated test that *passes on first run* deserves suspicion. The useful ones fail, because they found something.
+
+### How it supplements an SOP
+
+Not as a section of the procedure, but as a named step inside existing ones:
+
+| Existing step | What the generator contributes | Who still decides |
+|---|---|---|
+| Write adversarial cases | Enumerate the variants a person would tire of | A reviewer accepts or rejects each case |
+| Set the gate | **Nothing.** The gate's contents are a human decision | Release manager |
+| Close a coverage gap | Propose cases for untested branches | Owner of that path |
+| Verify the suite works | Mutation testing against the boundary | Security review reads the survivors |
+| After an incident | Draft the regression case | Incident owner confirms it reproduces |
+
+**The procedural safeguard is separation of duties**, which is a control you already recognise
+from release management rather than a new invention. The generator is permitted work. It is not
+permitting work — the same sentence this estate applies to every other agent, arriving at the
+place where it is most tempting to forget it, because the output looks like diligence.
+
 ## 6 · Using this list
 
 1. Read it against your suite and mark each line **covered / partial / absent**. Absent is the useful column.
