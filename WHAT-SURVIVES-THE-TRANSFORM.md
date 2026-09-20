@@ -468,7 +468,68 @@ small inputs and in a container for large ones.
 | **SVG** | An XML parser, then a renderer | It **is** XML — external entities. Inlining promotes it from the image sandbox to a DOM node | Never inline untrusted SVG. Rebuild from an allow-list, or serve as `<img>` so the browser sandboxes it. Keep it off the inline-render list on the serve path |
 | **3D — glTF / GLB** | JSON plus binary buffers, then a decoder | External URIs in `buffers` and `images` pull remote content at load. Draco and KTX2 decoders are native code on untrusted input | Reject any external URI reference at ingest — self-contained or refused. Decode inside the envelope |
 | **3D — STEP / IFC / USD** | CAD kernels, and `ifcXML` for the XML flavour | No transform pipeline exists, so these are pass-through bytes. `ifcXML` is XML, with the same entity problem. Models are large enough that memory limits matter | Store and serve without parsing. If you must parse, the envelope is not optional. Entitlement carries what the bytes cannot |
-| **Firmware** | Nothing should open it | The risk is **distribution**, not parsing. An image that is never parsed can still be installed by the wrong device | Content-address it, sign it, and gate the download on entitlement. Verify the signature on the device, not on the server that served it |
+| **Firmware** | Nothing should open it | The risk is **distribution and installation**, not parsing — and it is the worst case in this table. See below | Content-address it, sign the payload, and verify **on the device**. Full treatment in the next section |
+
+### Firmware is the one that deserves its own rules
+
+Everything else in that table fails inside a process you control. Firmware does not, and the
+difference is worth stating in full because it is routinely handled like a download.
+
+**Why it is categorically worse.** A compromised image executes on a device, outside every
+control you own — no container, no allow-list, no endpoint agent, no browser sandbox. It runs
+at or beneath the operating system, so it can persist through a reinstall of everything above
+it. Many devices have no rollback path, so a bad flash is not an incident you remediate, it is
+hardware you replace. And the population is not one machine: a poisoned image reaches every
+device that asks for an update.
+
+**TLS is not provenance.** A download over HTTPS proves you reached a server with a valid
+certificate. It does not prove the bytes are the ones the vendor built. Anyone who can write to
+that origin — a compromised build agent, a mis-scoped storage bucket, a stolen deploy token, a
+CDN misconfiguration — serves signed-looking firmware over a green padlock. **A raw firmware
+download whose only integrity claim is the transport is an exposure waiting for someone to
+notice it.**
+
+#### The bundle is the attack surface, not the image
+
+Firmware rarely ships as a bare image. It ships as an **archive**: a manifest, one or more
+payloads, and an installer. That shape adds a whole attack class before the image is ever
+written to a device.
+
+| Risk | What it looks like | Control |
+|---|---|---|
+| **Path traversal on extract** | Entry names containing `../`, absolute paths, or symlinks that escape the extraction root and overwrite a system file | Extract to a quarantine directory. Reject any entry that resolves outside it, and refuse symlinks and hard links outright |
+| **Archive bombs** | A small archive expanding to fill the disk, or millions of entries | Cap entry count, per-entry and total uncompressed size, and compression ratio, before writing anything |
+| **Signature scope confusion** | The archive is signed but individual files are validated, or files are signed but the manifest is not — so an entry can be substituted after the check | The signature must cover a **manifest that itself carries a digest for every file**. Verify the manifest signature first, then every payload against its digest |
+| **Time-of-check to time-of-use** | Verified in one directory, installed from another, with a window in between | Verify and install from the **same immutable bytes**. Never re-read a file between the check and the flash |
+| **The manifest is a program** | An XML or JSON manifest tells the installer which files go where and what to execute — with the installer running at high privilege | Parse it with **DTD processing and external entities disabled**, validate it against a schema, and treat every path in it as untrusted input |
+
+That last row is where this connects to the section below. **A firmware manifest is XML that
+directs privileged file placement and execution.** External entity resolution turns it into a
+file read; an unvalidated path turns it into an arbitrary file write; and the installer supplies
+the execution. Three ordinary defaults, composed, are a device takeover.
+
+#### What actually protects a firmware channel
+
+1. **Sign the payload, not the transport.** A detached signature over a manifest that digests
+   every file, with the public key held by the device.
+2. **Verify on the device, immediately before flashing** — not on the server that served it, and
+   not by the installer that will also perform the write.
+3. **Content-address the bundle and publish the digest somewhere you do not control.** If the
+   address lives only on the same host as the download, an attacker who owns the host owns both.
+   An independent copy means a device — or a customer — can check what the vendor actually
+   published against what they received.
+4. **Anti-downgrade.** A monotonic version counter enforced by the device, so a *correctly
+   signed* older image with a known flaw cannot be replayed as an update.
+5. **Gate the download on entitlement**, so the serve path refuses rather than merely obscures.
+   An unlisted URL is not access control.
+6. **Keep a bill of materials for the image** and be able to answer, later, what was in a build
+   that shipped two years ago. Regulators increasingly require this; incident response has always
+   required it.
+
+**The test, stated plainly:** if someone replaced the bytes at your download URL tonight, what
+would stop a device from installing them? If the answer is "the certificate," the channel is
+unprotected. If the answer is "the device would refuse the signature, and the published digest
+would not match," it is a channel.
 
 ### Where XML throughput meets the Ghostscript problem
 
