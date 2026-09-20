@@ -485,19 +485,21 @@ permitted work, not permitting work. It belongs behind a permissions boundary wi
 system-of-record answering for it, and moving a compile step to a model without that is a change
 of implementation dressed as a change of posture.
 
-### Four questions, four layers — CORS, Rules and a system of record
+### The stack, and which layer may refuse
 
 CORS judged alone looks like a broken access control. Rules judged alone look like a partial
 security product. A system of record judged alone looks like it never touches the serve path.
 Each reads as a gap, and the reading is the mistake: **these are not three partial solutions.
 They are four different questions, and each layer answers exactly one of them.**
 
-| Question | Answered by |
-|---|---|
-| Who is entitled to this asset, and which variants exist? | **The system of record** — the entitlement, versioned and revocable |
-| Do we serve it, or refuse? | **The worker** — the permissions boundary, server-side, called by every path |
-| How may it be handled once served? | **Rules and response headers** — `nosniff`, disposition, caching, rate limiting |
-| Who may read it cross-origin in a browser? | **CORS** — narrowing what another site's script may do with the response |
+| Layer | Where it runs | May it refuse? | The question it answers |
+|---|---|---|---|
+| **System of record** (Xano) | server | yes | Who is entitled to this asset, and which variants exist |
+| **Worker** (Cloudflare) | edge, server-side | **yes — this is the boundary** | Do we serve it, or refuse |
+| **Rules and response headers** | edge | constrains, does not decide | How may it be handled once served — `nosniff`, disposition, caching, rate limiting |
+| **Content platform** (Webflow) | a **separate origin** | no | Where content is authored, and from which origin its assets are served |
+| **CORS** | the browser, on your instruction | narrows reads | Who may read this response cross-origin |
+| **Presentation** (UIkit) | the browser | **no** | How it looks |
 
 A request passes all four in order. Edge rules apply first — rate limit, managed ruleset, origin
 routing. The worker resolves the subject and asks the system of record whether that subject is
@@ -516,9 +518,34 @@ never asked to be one, and in this arrangement it is not asked to be: entitlemen
 before the response exists, so the cross-origin rules are free to do the narrow job they are
 actually good at. **Paired, they resolve the access question completely.**
 
-Two things sit outside that, and both have their own answers earlier in this document: the
-**parser**, which is contained by isolation rather than by permission, and **provenance**, which
-travels in a descriptor beside the asset. Those are not gaps in this arrangement. They are
+### Two layers that contribute something other than a decision
+
+**Webflow contributes origin isolation, which is real, and no authorisation, which is also
+real.** Its assets come off its own CDN, so a script that manages to run there is not running on
+the origin that serves checkout — the entire reason an SVG is tolerable from a content platform
+and refused from your own upload path. Its re-encoding of rasters hardens images incidentally,
+as the section above describes. What it cannot do is decide anything: **a content row may
+describe an asset; it must never determine who may have it.** A CMS field is an input to the
+system, authored by whoever holds a seat, and inputs are not decisions.
+
+**The presentation layer contributes no security at all, and can spend what the others
+provided.** It runs in the browser, which the attacker owns — devtools, edited DOM, requests
+replayed with no script involved. Nothing there can refuse anything.
+
+The `uk-svg` case is the clean illustration and worth stating because it looks like a hardening
+feature. The server sends an SVG; the browser sandboxes it as an image, where script cannot run;
+a presentation component then fetches it and injects it inline **with all its attributes**,
+which promotes it to a node in your document where script does run. Stylability was bought with
+the sandbox. That trade is correct for a logo in your own repository and catastrophic for
+anything an uploader supplied — and the front end is the wrong place to make it, which is why
+the render allow-list lives on the serve path instead.
+
+**The rule that falls out: decide it where it can be enforced, not where it can be overridden.**
+A client can only spend the safety a server provided. It can never create any.
+
+Two things sit outside the stack entirely, and both have their own answers earlier in this
+document: the **parser**, which is contained by isolation rather than by permission, and
+**provenance**, which travels in a descriptor beside the asset. Those are not gaps in this arrangement. They are
 different problems, and conflating them is how estates end up with four mechanisms that all
 answer "who" and none that answer "what is this" or "what may it execute".
 
