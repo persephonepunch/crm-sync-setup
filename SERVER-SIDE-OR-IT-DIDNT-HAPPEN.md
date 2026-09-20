@@ -155,6 +155,16 @@ functions stay server-side**:
   observation, every gated push writes a timestamped, session-joined row
   the organization holds. When someone says *produce the record*, it's an
   export, not an excavation.
+- **The agent's reach:** the line above says UI may be AI-generated. It is
+  worth saying what that does *not* extend to. A Liquid file, an HTL
+  component, a PHP theme function — these are **code**, and write access to
+  them is execution in the presentation tier with whatever that tier can
+  reach. An agent may be given **content**, into a typed and validated
+  structure, behind an entitlement-gated publish route, with the
+  publication written to the register as an act by a named agent on
+  someone's behalf. It may not be given the executable layer. That stays in
+  version control with human review, for the same reason the functions stay
+  server-side: an AI step is permitted work, not permitting work.
 
 ## One record, three content systems — demonstrated
 
@@ -201,6 +211,37 @@ problems the store now has. "That's not how Shopify sites work" isn't a
 philosophy; it's the boundary of an expertise. The register exists so that
 growing past your builder's experience doesn't mean growing past your
 evidence.
+
+## Where the app itself runs changes what it may reach — not what it may decide
+
+The same argument reaches the packaging question, and the answer is less
+interesting than people expect: **a native app, a progressive web app and a
+desktop shell are all clients.** None of them can enforce a permission,
+because all three run where the person using them can read and change them.
+What differs is what each may *reach*, and therefore what it is safe to put
+in one.
+
+| Shell | May reach | The hazard |
+|---|---|---|
+| **React Native** | Device APIs, local storage, whatever the JS bundle is given | The bundle ships to the device. **A key inside it is a published key** — the firmware problem in a different wrapper. Over-the-air bundle updates are a distribution channel and need the integrity controls of one |
+| **PWA** | Only what the browser grants the origin | The most constrained and the most honest. It cannot hold a secret at rest, which is a feature — it stops anyone trying |
+| **Desktop shell (Tauri or similar)** | Filesystem, local network, OS keychain, under a declared capability list | Full native privilege unless the capability list is actually narrowed. The keychain makes real credential custody possible, which is the one genuine advantage over a PWA |
+
+Three consequences worth writing down:
+
+- **Choose the shell for reach, not for enforcement.** If the requirement is
+  to talk to a device on the local network, a browser cannot and a desktop
+  shell can. That is a reach question. If the requirement is that a landlord
+  may cap a setting but not observe occupancy, no shell answers it — the
+  server does.
+- **A shipped bundle keeps no secrets.** React Native, a PWA's JavaScript, a
+  desktop binary: all readable by whoever holds them. The client gets a
+  public key to verify with, never a private key to act with.
+- **An over-the-air update path is a firmware channel.** If the shell can
+  replace its own executable code from a URL, that URL needs signing,
+  verification on the device, and an anti-downgrade rule — the same
+  treatment as any other image. See
+  [Security Reinforcement: Firmware Asset Publishing](https://www.crm-sync.dev/pages/knowledge-base#firmware-asset-publishing).
 
 ## SOC 2, ISO, GDPR is a method, not a thing
 
