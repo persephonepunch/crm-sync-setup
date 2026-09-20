@@ -1,5 +1,5 @@
 ---
-title: "What Survives the Transform"
+title: "Asset Management, Security and AI"
 description: "A media manager's pipeline: what a re-encode destroys and what it protects, metadata and provenance, raster and mesh compression including Draco and KTX2, programmatic resize from UIkit to the edge, Webflow and Shopify's media models, Cloudinary and OpenText and filesystem handling compared against an R2-backed DAM, and the ImageMagick precautions for WordPress, Drupal, Magento and AEM."
 canonical: https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html
 category: "Specs"
@@ -33,7 +33,7 @@ citation:
     url: https://c2pa.org/
 ---
 
-# What Survives the Transform
+# Asset Management, Security and AI
 
 **For media managers, DAM owners, front-end leads and the person who has to answer why the
 product page is four megabytes.**
