@@ -602,6 +602,73 @@ converts "a hostile file reaches every viewer" into "a hostile file reaches my d
 is a large improvement and not an escape. The decode happens on your infrastructure either way,
 which is why the envelope above is the control and the funnel is the benefit.
 
+### Enforcing the four types at the edge
+
+The four types above are a modelling distinction. Two of them can be enforced in configuration,
+on origins you do not control — which is where most estates need it.
+
+**Inbound — refuse on the detected type, not the declared one.** A WAF custom rule can match
+`http.request.body.mime`, the type Cloudflare detects from the bytes of a multipart upload:
+
+```
+(http.request.uri.path contains "/upload"
+ and not http.request.body.mime in {"image/jpeg" "image/png" "image/webp" "application/pdf"})
+```
+
+Allow-list, so a format invented after the rule was written is refused rather than admitted by
+omission. The disagreement itself is worth a rule of its own, because **declared ≠ detected is
+the signal**, not the nuisance:
+
+```
+(http.request.headers["content-type"][0] contains "image/"
+ and not http.request.body.mime in {"image/jpeg" "image/png" "image/webp"})
+```
+
+**Outbound — decide the handling, since you cannot inspect the body.** A response header
+transform rule on a media prefix sets what the browser is permitted to do with whatever arrives:
+`X-Content-Type-Options: nosniff`, `Content-Disposition: attachment`, and on paths that must
+never render inline, `Content-Type: application/octet-stream`. That is the **served type** from
+the table above, imposed on an origin that never asked your opinion.
+
+**Three limits, stated before anyone leans on this.** Body inspection is plan-gated and bounded
+— it sees the bodies Cloudflare parses, up to a size, so a large or streamed upload may pass
+uninspected and the rule is not a guarantee. Matching is not sanitising: a file whose detected
+type is genuinely `image/png` can still be a hostile PNG, and nothing here touches the parser.
+And it remains a layer rather than the boundary — **edge rules constrain what a served response
+may do; the serve path decides whether it is served at all.**
+
+Where this earns its place is precisely where code cannot go: a hosted storefront, a CMS you do
+not run, a vendor's app. There it is the only place the policy can exist.
+
+### Permissions gating on shapes that are not yours
+
+Two identifier classes turn up in asset metadata and they behave in opposite ways. Confusing
+them is how a gate ends up keyed on something that moves.
+
+| | Vendor identifiers | ISO codes |
+|---|---|---|
+| Examples | Webflow item id, Shopify GID, storage key | `ko` (639-1), `KR` (3166-1), `KRW` (4217), 8601 timestamps |
+| Scope of meaning | One system | **Every system** |
+| Stability | Stable, opaque, meaningless elsewhere | Standardised, shared, externally defined |
+| Safe as a gate key? | Yes, within its system | **Yes, across systems** |
+| Safe as a display value? | No | No — render the name, store the code |
+
+**ISO codes are the only identifiers in the estate that nobody owns**, which is what makes them
+the one dimension a permission can be scoped on across systems without a mapping table. A rule
+reading *this subject may receive assets for `KR` in `ko`* means the same thing in the DAM, the
+worker, the warehouse and the feed. Nothing else in the metadata has that property.
+
+Three gating strategies follow, in increasing order of what they protect:
+
+1. **Scope the entitlement on the ISO pair, not on a market name.** `market=KR` survives a rename, a translation and a re-org. "Korea Store" survives none of them, and a gate keyed on it fails open the day someone edits a label.
+2. **Validate the code at the boundary, on write.** A country that is not in ISO 3166 is refused at ingest rather than discovered in a rejected feed. An entitlement scoped to a code that does not exist matches nothing and refuses silently — which looks exactly like a permissions bug and is really a data bug.
+3. **Never let a display name reach a comparison.** Display names are translated, and a translated key fragments the very dimension it exists to unify — `KR`, "Korea" and "한국" become three scopes where there is one market.
+
+**And the class distinction is the point.** A vendor identifier gates *within* a system; an ISO
+code gates *across* them. Asset permissions usually need both — the storage key says which
+object, the ISO pair says which market and language it may serve — and mixing them up produces a
+rule that is correct in one system and meaningless in the next.
+
 ### What no funnel covers
 
 Worth listing, because these are the things people assume a sanitiser handled:
