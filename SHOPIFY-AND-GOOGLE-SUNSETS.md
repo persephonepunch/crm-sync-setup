@@ -83,7 +83,7 @@ In words: the difference that decides where a rule belongs is who can call it. O
 
 | Date | Change | Exposure | Status |
 |---|---|---|---|
-| 1 Oct 2026 | Script tags: apps can no longer create or update them, in GraphQL or REST. They stop running on storefronts on 1 March 2027. | None; CRM Sync uses no script tags. | Clear |
+| 1 Oct 2026 | Script tags: apps can no longer create or update them, in GraphQL or REST. They stop running on storefronts on 1 March 2027. | None for CRM Sync, which uses no script tags. **The store is a separate question** — see step 3 in what to do next. | Clear for this app |
 | 1 Oct 2026 | Checkout and customer-account extensions must finish moving to Polaris web components. | None; no checkout or customer-account extensions. | Clear |
 | 1 Oct 2026 | Shopify API version 2026-10 released. | No change required. | Clear |
 | 7 Oct 2026 | Google Ads API v22 shut off; v22 requests fail. | None; audiences use the Data Manager API. | Clear |
@@ -179,9 +179,14 @@ In words: the most expensive item is a shop left on a non-expiring token, becaus
 
 1. **Bump both Flow extensions off 2025-01** to a supported API version and deploy the app. Owner: platform engineer.
 2. **Confirm every installed shop holds an expiring token** during October. Owner: platform engineer.
-3. **Match the Google Ads personalization setting** to the `ad_personalization` signal when Google dates the change. Owner: Revenue BA with the Google Ads account owner.
-4. **Replace the last REST call** with the GraphQL `shop` query. Owner: platform engineer. Optional.
-5. **Review again on 1 January 2027**, when 2027-01 releases and three months before 2026-04 retires. Owner: platform engineer.
+3. **Scan the storefront for script tags that are not yours.** The table above says CRM Sync uses none, and that answers whether *this app* breaks — not whether the *store* does. A shop can carry script tags installed by apps years ago, including apps since uninstalled, and **every one of them stops running on 1 March 2027**. Two steps, because they answer different questions:
+   - **Capture a HAR** on a live product page and a cart page, and list every third-party script that actually loads. See [How to capture a HAR](https://www.crm-sync.dev/pages/knowledge-base#how-to-capture-a-har). This tells you *what is running*.
+   - **Query the shop's script tags** through the Admin API and compare the two lists. This tells you *how each one is delivered* — the same reviews, loyalty or upsell widget may arrive via a script tag, a theme app embed, or a line someone pasted into the theme years ago. Only the first has a death date; only the last is invisible to both the app list and the vendor.
+
+   Anything appearing in both lists needs the vendor asked a direct question: have you moved to a theme app embed, and by when. A vendor that has already migrated will say so immediately. A vendor that has not is a dated outage on someone else's schedule. Owner: platform engineer with the merchant's app owner.
+4. **Match the Google Ads personalization setting** to the `ad_personalization` signal when Google dates the change. Owner: Revenue BA with the Google Ads account owner.
+5. **Replace the last REST call** with the GraphQL `shop` query. Owner: platform engineer. Optional.
+6. **Review again on 1 January 2027**, when 2027-01 releases and three months before 2026-04 retires. Owner: platform engineer.
 
 ---
 
