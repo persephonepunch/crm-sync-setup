@@ -131,6 +131,60 @@ calls. And it makes the second unnecessary — the session-joined record
 QA on earth while its consent tool is broken; only a register knows the
 difference between quiet and silence.
 
+## The React case, which is the one most teams are shipping now
+
+The theme argument reads as a Liquid and PHP problem, and it is not. A server-rendered React
+app makes the same mistake with worse mechanics, and it is currently the default choice for new
+builds.
+
+**Hydration has a structural requirement.** For the browser to rebuild the tree the server
+rendered, the server must ship the data it rendered from. Props passed from a server component
+to a client component are **serialised into the page** — in Next.js, the RSC payload carried in
+`self.__next_f.push(...)`. It is in view-source.
+
+So the failure has a shape:
+
+```
+const user = await db.user.findUnique({ where: { id } })   // email, phone, billing id, flags
+return <ProfileCard user={user} />                          // renders the name
+```
+
+The card shows a name. **The whole record is in the HTML**, including fields no component read.
+The filtering happened during render; the serialisation decision happened before it.
+
+**`"use client"` is a transport boundary, not a permissions boundary.** That misreading is what
+does the damage. The directive looks like architecture — *this part is interactive*. What it
+declares is **this data crosses to the browser**: a disclosure decision wearing a
+code-organisation costume. Which makes a check inside a client component decoration, for the
+same reason a Liquid conditional is:
+
+```
+"use client"
+if (!user.isAdmin) return null   // the data already shipped; this runs in the reader's runtime
+```
+
+Liquid at least discards what it does not print. React serialises it verbatim and sends it.
+
+**And the reverse direction catches people too.** A Server Action is not protected by being
+server code — `"use server"` compiles to **an HTTP endpoint callable by anyone holding the
+action id**, which is in that same payload. It does not inherit the authorisation of the page
+that rendered the button. Every action resolves its own subject and checks its own permission,
+exactly as a route handler does, because that is what it is.
+
+Two smaller edges worth knowing. A hydration mismatch makes React patch the DOM, and anywhere
+`dangerouslySetInnerHTML` appears that patching is an injection surface — mismatches are
+frequently caused by precisely the user-controlled content most likely to be hostile. And an
+environment variable referenced from a client component is **inlined at build time**, so a
+server-only secret touched on the wrong side of the boundary is compiled into the bundle.
+
+**The habits that close it** are the same rule as everywhere else, expressed in this stack:
+
+- **Project in the query, not in JSX.** `select: { name: true }` rather than fetching a record and rendering one field of it. Highest-value change, and it is a one-line habit.
+- **Treat every client boundary crossing as publishing.** The question is not *is this component interactive* but *am I willing for this to be public*.
+- **Authorise in the server component, before the fetch** — not in the component that displays the result.
+- **Authorise inside every Server Action, independently.**
+- **Read your own payload.** Open view-source on an authenticated page and search it for an email address or an internal id. It takes a minute, and it is usually instructive.
+
 ## The rule that makes it safe
 
 UI may be added to any theme — AI-generated, red/green test-driven,
