@@ -95,7 +95,16 @@ In words: on 1 October Shopify refuses new or updated script tags and requires P
 
 ## 1. React Native to Swift and Kotlin
 
-On 10 September 2026 Shopify said it is rebuilding its own mobile apps natively, in Swift for iOS and Kotlin for Android; the Shop app was first, rebuilt in 12 weeks. This is an engineering decision about Shopify's apps, not a deprecation. No end date for React Native tooling that outside developers use was found, and CRM Sync has no React Native code. **Status: Watch** — whether Shopify's mobile SDKs follow its apps.
+On 10 September 2026 Shopify said it is rebuilding Shopify, Shop, Point of Sale and Inbox natively, in Swift for iOS and Kotlin for Android, six years after going all-in on React Native in 2020. The Shop app was first, rebuilt in 12 weeks: Android cold start roughly halved (4,433 ms to 2,233 ms), iOS down about 23%, and the Android binary 109 MB smaller — a 37% cut. CRM Sync has no React Native code.
+
+**The stated reason is the one worth reading.** Shopify's head of mobile reassessed the trade after model quality jumped: coding agents became good enough to implement a feature on Android using the iOS version as the reference, and back again, so the duplicate-work cost that justified a single shared codebase in 2020 largely evaporated. **AI did not make the abstraction layer better — it made the reason for the abstraction layer smaller.** That is a different kind of platform change from the rest of this page, and it is likely to recur: any abstraction whose value was *avoiding writing the same thing twice* is now competing with something that writes it twice for nothing.
+
+**Status: Watch** for Shopify's mobile SDKs following its apps. But two items are no longer a watch, and they are dependency decisions rather than platform ones:
+
+- **React Native Skia** — sponsored by Shopify through 2026. After that the maintainer intends to continue it as a fork under a new package name, with the original repository archived. A dependency on the current package name needs a migration plan.
+- **Restyle** — repository to be archived, kept working through 2026, then maintenance ends.
+
+**Action:** grep the estate for `@shopify/react-native-skia` and `@shopify/restyle`. If either is present in a shipped surface, it has an end-of-maintenance date inside the next year.
 
 ## 2. Short-lived tokens
 
@@ -191,6 +200,8 @@ Platform pages are primary; agency and news articles are secondary and were used
 - Shopify Updates August 2026 (Fudge) — https://www.fudge.ai/blog/shopify-updates-august-2026/
 - Shopify breaking changes 2026 (Weaverse) — https://weaverse.io/blogs/shopify-developer-breaking-changes-april-2026
 - Shopify drops React Native for Swift and Kotlin (InfoQ) — https://www.infoq.com/news/2026/09/shopify-drops-react-native/
+- Native is now the future of mobile at Shopify — https://shopify.engineering/back-to-native
+- Shopify spent years on React Native, then rebuilt in 12 weeks (The New Stack) — https://thenewstack.io/shopify-native-ai-agents/
 - Shopify's REST API deprecation and GraphQL migration (Lazer) — https://www.lazertechnologies.com/insights/shopifys-rest-api-deprecation-and-graphql-migration-guide
 - What customer data Shopify redacts from web pixel events (WeltPixel) — https://weltpixel.com/blogs/news/what-customer-data-is-available-in-shopify-web-pixel-events-and-what-shopify-redacts
 - GA4 and Google Ads data controls: what changes June 15, 2026 (Dataslayer) — https://www.dataslayer.ai/blog/ga4-google-ads-data-controls-june-15-2026

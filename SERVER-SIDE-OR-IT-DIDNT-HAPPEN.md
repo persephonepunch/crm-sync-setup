@@ -223,7 +223,7 @@ in one.
 
 | Shell | May reach | The hazard |
 |---|---|---|
-| **React Native** | Device APIs, local storage, whatever the JS bundle is given | The bundle ships to the device. **A key inside it is a published key** — the firmware problem in a different wrapper. Over-the-air bundle updates are a distribution channel and need the integrity controls of one |
+| **React Native** | Device APIs, local storage, whatever the JS bundle is given | The bundle ships to the device. **A key inside it is a published key** — the firmware problem in a different wrapper. Over-the-air bundle updates are a distribution channel and need the integrity controls of one. Note the platform weather: Shopify [moved its own apps off it on 10 September 2026](https://www.crm-sync.dev/pages/knowledge-base#shopify-and-google-sunsets), citing coding agents removing the duplicate-work cost that justified the abstraction |
 | **PWA** | Only what the browser grants the origin | The most constrained and the most honest. It cannot hold a secret at rest, which is a feature — it stops anyone trying |
 | **Desktop shell (Tauri or similar)** | Filesystem, local network, OS keychain, under a declared capability list | Full native privilege unless the capability list is actually narrowed. The keychain makes real credential custody possible, which is the one genuine advantage over a PWA |
 
