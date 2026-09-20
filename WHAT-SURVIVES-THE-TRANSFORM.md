@@ -145,17 +145,30 @@ anything above the fold, which is the one setting that is routinely wrong on her
 Interaction state is a separate layer, and the trap there is loading-state work that assumes an
 image has already arrived.
 
-**Both platforms are, in our view, heavy-handed with media — and in opposite ways that produce
-the same result.** Webflow decides your breakpoints and formats at upload and hands back markup
-you did not write. Shopify bans formats outright, most visibly SVG, and routes everything through
-its own CDN and URL grammar. Each is defensible on its own terms: Webflow's defaults are better
-than most hand-rolled ones, and Shopify's refusal is a genuine security position rather than a
-limitation. The cost is the same in both cases — the decision is made for you, at upload, and it
-is not revisable per surface later.
+**Both platforms are heavy-handed with media, and that is what makes them safe to use.**
+Webflow decides your breakpoints and formats at upload and hands back markup you did not write.
+Shopify bans formats outright — most visibly SVG — and routes everything through its own CDN and
+URL grammar. Read as restrictions, those look like limitations. Read as policy, they are the
+bargain the Shopify Functions section already described, applied to media instead of code:
+**you cannot misconfigure what you are not permitted to configure.**
 
-The counterweight, stated plainly: for most teams this is the right trade. A platform that
-generates competent `srcset` automatically beats a bespoke pipeline that nobody maintains. This
-document is for the estate that has outgrown that, not for the one still served well by it.
+Look back at the failures in the previous sections. Every one is a decision somebody made
+wrongly — a Content-Type echoed back from an upload, a parser left on its shipped defaults, a
+file served inline from an origin that also serves checkout. Webflow and Shopify remove most of
+those decisions from the person least equipped to make them. A merchant with no security team
+gets competent `srcset`, a re-encoded raster whose bytes the platform authored, and no SVG
+executing on their own origin — without knowing any of those words. That is a genuinely good
+outcome and it deserves to be said plainly rather than treated as an obstacle to route around.
+
+**So the honest summary is: heavy-handed, secure, and usable without risk by people who should
+not have to think about any of this.** For most teams that is the correct trade, and a platform
+generating competent markup automatically beats a bespoke pipeline nobody maintains.
+
+The cost is narrow and specific. The decision is made at upload, and it is not revisable per
+surface later — you take their breakpoints, their formats and their grammar wherever that asset
+subsequently appears. That only becomes a problem at a scale and a variety most estates never
+reach. This document is written for the estate that has reached it, not for the one still served
+well by the defaults.
 
 Where you have outgrown it, the recovery is not migration — it is
 [Cloudflare Rules](https://developers.cloudflare.com/rules/) in front. Response header transforms
