@@ -43,6 +43,51 @@ page — login, consent, popups, forms — comes from the worker's own embeds.
 That is why the same fragment works everywhere: there is nothing
 platform-specific inside it.
 
+### The precondition, stated before the mechanics
+
+"Markup travels, behavior never does" reads as an engineering convenience. It is not. It is the
+**condition on which the portability depends**, and it is worth separating the claim from what
+makes it true.
+
+The claim is that one fragment mounts on AEM, WordPress, Astro, Next, Eleventy or a Shopify
+theme. The reason it can is that **nothing security-relevant is inside it.** A fragment carries
+no permission check, no entitlement, no identity, no key — so there is nothing in it that could
+be evaluated differently, weakly, or not at all by a host that renders it.
+
+Turn that around and the dependency becomes obvious: **if any part of the decision travelled in
+the fragment, the fragment would not be portable** — it would be portable-looking, and its
+guarantees would vary by host. Liquid cannot enforce. A PHP theme can, and can also do far more
+than you intended. A Next.js client component can be made to look like it enforces while
+serialising the answer into the page. Six hosts, six different failure modes, one fragment that
+assumed a boundary existed somewhere.
+
+So the rule is not *markup travels and behavior stays behind because that is tidier*. It is:
+
+> **The renderer is interchangeable precisely because it was never trusted with anything.**
+
+### What the substrate actually is
+
+Two named components carry the parts the fragment deliberately does not:
+
+**Cloudflare — the rails and the boundary.** The fragment proxy and the stylesheet resolver run
+at the edge, and so does the thing that matters more than either: the **server-side check that
+resolves a consuming origin to a tenant and refuses a fragment that tenant is not entitled to.**
+That refusal happens before any host renders anything. Edge rules carry the rest — response
+headers, origin routing, rate limits on the extraction path.
+
+**Xano — the system of record.** Who is entitled to what, versioned and revocable, queried by
+the boundary and never by the page. It is not in the render path. A fragment never asks it a
+question; the rail does, before the fragment exists.
+
+**And the AI binding sits in the same place, for the same reason.** An agent assembling or
+requesting a fragment is a caller like any other: it resolves to a subject, carries a mandate or
+does not, and is refused or served by the same code that handles a browser. Nothing about the
+consuming front end changes that, because the front end was never where the answer came from.
+
+Which is why this architecture extends to callers nobody had in mind when it was built. **A
+renderer that holds no authority cannot be surprised by a new kind of caller** — it renders what
+it is given, and what it is given was already decided.
+
 ---
 
 ## 2. The two rails

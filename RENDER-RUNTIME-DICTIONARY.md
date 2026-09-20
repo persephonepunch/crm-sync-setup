@@ -319,6 +319,22 @@ hash beside it — and it says nothing about whether the file was safe when you 
 
 ---
 
+## The consequence, once every entry above is read together
+
+Astro, Eleventy, HTMX, Next.js, Liquid in two runtimes, a PHP theme, a Jekyll build. Each entry
+describes a different way to turn data into a document, and **not one of them is where a
+permission can be enforced.**
+
+Which is the useful conclusion rather than a disappointing one: if the boundary is server-side,
+holding the entitlement in a system of record and refusing at an edge the renderer never sees,
+then **the renderer becomes a choice about authoring, performance and taste — not about
+security.** Any of them can front the same data binding, including one nobody has written yet,
+and including a caller that is an agent rather than a browser.
+
+Worked through in [Fragments for Any Front End](https://www.crm-sync.dev/pages/knowledge-base#fragments-any-frontend),
+which shows one fragment mounting on six platforms — and is explicit that it only works because
+nothing security-relevant is inside it.
+
 ## Supplementing a standard operating procedure
 
 These terms are useful in a procedure when each appears as a **decision with an owner**, not as a
