@@ -3,7 +3,7 @@ title: "Asset Management, Security and AI"
 description: "A media manager's pipeline: what a re-encode destroys and what it protects, metadata and provenance, raster and mesh compression including Draco and KTX2, programmatic resize from UIkit to the edge, Webflow and Shopify's media models, Cloudinary and OpenText and filesystem handling compared against an R2-backed DAM, and the ImageMagick precautions for WordPress, Drupal, Magento and AEM."
 canonical: https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html
 category: "Specs"
-date: 2026-09-19
+date: 2026-09-20
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WHAT-SURVIVES-THE-TRANSFORM.md
 licence: CC-BY-4.0
 tags:
