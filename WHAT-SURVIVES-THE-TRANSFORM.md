@@ -485,12 +485,31 @@ permitted work, not permitting work. It belongs behind a permissions boundary wi
 system-of-record answering for it, and moving a compile step to a model without that is a change
 of implementation dressed as a change of posture.
 
+### CORS is not the thing protecting it
+
+Worth saying because the assumption is near-universal: **CORS is a browser-enforced restriction
+on reading responses, not an access control.** It stops one site's JavaScript from reading
+another site's response using the visitor's ambient credentials. It does not stop the request —
+a non-browser client ignores it completely — and it does not protect data an endpoint would
+return anyway.
+
+What protects an asset is the code that decides whether to serve it: no public bucket origin, so
+every read passes something that can refuse; tenancy in the object key rather than a parameter;
+filenames normalised so a crafted name cannot traverse; and an allow-list deciding what may
+render inline at all. The cross-origin rules narrow what a browser may then *do* with the
+response, which is a real and useful second layer and is not the boundary.
+
+The practical consequence for the table above: the serve path is cheap to harden, because header
+discipline, origin routing and rate limiting are configuration. The expensive half is everything
+CORS was never going to answer — who is entitled to this asset, which variants exist, and who
+may change that.
+
 ## What it costs
 
 | Cost | What it means | Severity |
 |---|---|---|
 | Descriptors are a discipline | A file without one is invisible to agents, and nothing enforces their existence but review | High — it degrades quietly |
-| An R2-backed DAM is assembled | Ingest, transform orchestration and rights UI are yours to build and maintain | High |
+| An R2-backed DAM is assembled | **Ingest, variant management, entitlement and rights UI** are yours to build. Serve-path hardening is not — header discipline, origin routing, rate limiting and the managed ruleset are Cloudflare configuration rather than code | High for the DAM functions, low for the serve path |
 | Edge transformation moves the dependency | You have removed a parser from your origin by depending on a vendor's | Medium — stated honestly, this is a trade and not a win |
 | Stripping metadata loses provenance | C2PA credentials do not survive an unaware transform | Medium, rising as AI provenance expectations harden |
 | Mesh compression is lossy | Draco quantizes; the rendition is not the asset | Low if originals are kept, total if they are not |
