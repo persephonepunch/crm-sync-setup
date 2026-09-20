@@ -546,10 +546,36 @@ may change that.
 | Cost | What it means | Severity |
 |---|---|---|
 | Descriptors are a discipline | A file without one is invisible to agents, and nothing enforces their existence but review | High — it degrades quietly |
-| An R2-backed DAM is assembled | **Ingest, variant management, entitlement and rights UI** are yours to build. Serve-path hardening is not — header discipline, origin routing, rate limiting and the managed ruleset are Cloudflare configuration rather than code | High for the DAM functions, low for the serve path |
+| An R2-backed DAM is assembled | **Only what you do not already run.** Serve-path hardening is configuration, not code. Entitlement, ingest and a rights surface are expensive to build and free to reuse — an estate that already operates a permissions boundary is binding assets to it, not building one. Variant management is the piece nobody has for free | **High from nothing, low from an existing boundary** |
 | Edge transformation moves the dependency | You have removed a parser from your origin by depending on a vendor's | Medium — stated honestly, this is a trade and not a win |
 | Stripping metadata loses provenance | C2PA credentials do not survive an unaware transform | Medium, rising as AI provenance expectations harden |
 | Mesh compression is lossy | Draco quantizes; the rendition is not the asset | Low if originals are kept, total if they are not |
+
+### Why the build cost is not what it looks like
+
+The objection to an assembled DAM is that you inherit ingest, entitlement, a rights surface and
+variant management. Stated flat, that is a large bill and a fair reason to buy instead.
+
+It is also the wrong unit of account, because **almost none of it is asset-specific.**
+
+An entitlement record does not know it is describing an image. A permissions boundary that
+refuses a request does not care whether the resource is a row, a route or a rendition. If an
+estate already operates those — and any estate doing commerce, consent or agent access already
+does — then adding assets is **binding a new resource type to a boundary that exists**, not
+standing one up. In this estate the same `hasCap`-style check guards media, documents, vault
+assets and API routes alike; the media path was not given its own authorisation model, which is
+precisely why it did not get its own authorisation bugs.
+
+That reverses the usual build-versus-buy reasoning. A dedicated DAM gives you asset features
+quickly and brings **its own** permissions model, which then has to be reconciled with the one
+you already run — and reconciliation between two authorisation systems is where the real defects
+live, not in either system alone.
+
+So the honest bill is short. Serve-path hardening is configuration. Entitlement, ingest and
+rights are reuse if you have them and genuinely expensive if you do not. **Variant management is
+the one item nobody gets for free** — though edge image transformation supplies the raster half,
+leaving the question of which variant a surface may serve, which is a query against the record
+you already keep.
 
 ## What to do next
 
