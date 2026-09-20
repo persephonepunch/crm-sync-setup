@@ -436,6 +436,76 @@ descriptor beside it does not need to open the binary to find out what it may do
 avoided is an attack surface that was never presented** — which is the whole of this document,
 stated once more at the point where assets stop being published and start being consumed.
 
+## Best practice: the container is the control
+
+The isolation this document keeps prescribing needs a shape, because "sandbox it" is advice
+nobody can act on. What follows is the envelope, then what changes per artifact class, then
+where the platform layers sit.
+
+### The envelope
+
+One parse, one container, and the container holds nothing worth taking.
+
+| Property | Setting | Why |
+|---|---|---|
+| **Credentials** | none injected — no API key, no database URL, no cloud role | The parse cannot leak what it was never given |
+| **Egress** | denied by default | Kills SSRF, external entity fetches and exfiltration in one rule |
+| **Filesystem** | read-only, with one `tmpfs` scratch | Nothing written survives, and nothing on disk is worth reading |
+| **Identity** | non-root, all capabilities dropped | A container escape has nowhere to escalate to |
+| **Limits** | hard CPU, memory and wall-clock caps | Decompression and rendering bombs need no vulnerability |
+| **Lifetime** | one-shot, never reused across tenants | No residue between jobs |
+| **Interface** | bytes in, **typed** result out, size-capped | The Functions bargain, in a container |
+
+A worker isolate reaches the same contract by a different route — no filesystem, no ambient
+network, bindings granted explicitly — which is why the same discipline can run at the edge for
+small inputs and in a container for large ones.
+
+### Per artifact class
+
+| Class | What opens it | Where it goes wrong | Practice |
+|---|---|---|---|
+| **PDF** | Ghostscript for raster; poppler or a library for text | PostScript is a language, so rendering is executing. The delegate chain is reached by content sniffing, not extension | Extract text with a **library** and never shell out. Rasterise only inside the envelope. Disable the `PDF`, `EPS`, `PS` and `XPS` delegates. Uninstall Ghostscript where nothing needs PostScript |
+| **SVG** | An XML parser, then a renderer | It **is** XML — external entities. Inlining promotes it from the image sandbox to a DOM node | Never inline untrusted SVG. Rebuild from an allow-list, or serve as `<img>` so the browser sandboxes it. Keep it off the inline-render list on the serve path |
+| **3D — glTF / GLB** | JSON plus binary buffers, then a decoder | External URIs in `buffers` and `images` pull remote content at load. Draco and KTX2 decoders are native code on untrusted input | Reject any external URI reference at ingest — self-contained or refused. Decode inside the envelope |
+| **3D — STEP / IFC / USD** | CAD kernels, and `ifcXML` for the XML flavour | No transform pipeline exists, so these are pass-through bytes. `ifcXML` is XML, with the same entity problem. Models are large enough that memory limits matter | Store and serve without parsing. If you must parse, the envelope is not optional. Entitlement carries what the bytes cannot |
+| **Firmware** | Nothing should open it | The risk is **distribution**, not parsing. An image that is never parsed can still be installed by the wrong device | Content-address it, sign it, and gate the download on entitlement. Verify the signature on the device, not on the server that served it |
+
+### Where XML throughput meets the Ghostscript problem
+
+They are the same bug wearing different clothes, and it is worth naming because the control is
+one line rather than an architecture.
+
+Ghostscript's danger is that a PostScript document **instructs the interpreter**. XML's
+equivalent is the external entity: a document that instructs the parser to fetch a local file or
+a URL and inline the result. Both turn "read this file" into "do what this file says."
+
+That matters here because **XML is underneath more of this estate than it looks**. SVG is XML.
+XMP — the metadata this document spends a section on — is RDF/XML, and it rides inside PDFs,
+JPEGs and TIFFs. `ifcXML` is XML. So an XMP read on an uploaded image is an XML parse, and an
+XML parse with default settings resolves entities.
+
+**Disable DTD processing and external entity resolution in every XML parser you configure.** One
+setting, and it covers SVG, XMP and ifcXML together. It is the `-dSAFER` of the XML world, with
+the same caveat: it is a policy inside the parser, not a boundary around it, so the envelope
+still does the real work.
+
+### Where the platform layers sit
+
+**The system of record** holds entitlement and the descriptor — who may have which rendition, and
+what the artifact is. It is never in the parse path. A record that parsed the file it describes
+would be a parser with a database attached, which is the arrangement the whole section exists to
+prevent.
+
+**Edge rules** carry the serve-path discipline that needs no code: response headers forcing
+`nosniff` and `Content-Disposition` on media paths, origin routing that moves an upload prefix
+off the application origin, rate limiting on the ingest endpoint so a parse cannot be minted on
+demand, and managed rules as a detection layer — not a boundary, since format is decided by
+content.
+
+Neither replaces the envelope. **Rules constrain what a served response may do; the container
+constrains what opening the file may do.** Different questions, and only the second one is about
+the parser.
+
 ## Moving the compile to AI is not a permissions change
 
 There is a move being made across a lot of estates right now: take the step that used to parse,
