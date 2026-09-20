@@ -82,6 +82,59 @@ Six exposures, and only the first is the one people plan for:
 party to every one of those, and risk grows with the number of *places data lives*, not the
 number of features you bought.
 
+### The worked example, because the sunset row usually gets waved through
+
+Vendor retirement reads as a hypothetical until it has a name.
+
+**Adobe Business Catalyst.** Acquired in 2009, the same year Adobe acquired **Omniture**, and it
+became close to the complete article: CMS, ecommerce, CRM, email marketing and Adobe's own
+analytics, in one hosted platform. It rendered server-side against Adobe's database, and — the
+detail that makes the architecture legible — it used **Liquid** for dynamic content, for the same
+reason Shopify does: a template language that cannot execute arbitrary code is the only kind you
+can safely hand to thousands of tenants.
+
+It worked. Agencies built practices on it.
+
+Adobe announced end-of-life in 2018 and the service ended on **26 September 2021**. Every site had
+to be rebuilt somewhere else, because the runtime was never portable and the content was shaped
+like Adobe's model rather than like anyone's business.
+
+**The pattern is not a one-off.** Adobe has repeatedly bundled a publishing and packaging layer
+into the Creative Suite — Digital Publishing Suite being the clearest case, carrying document
+packaging and the image metadata handling that came with it — and those layers have been folded,
+renamed or retired on Adobe's schedule rather than the customer's.
+
+**The point is not that Adobe is a risky vendor.** It plainly is not, and that is precisely what
+makes the example useful. Business Catalyst did not fail, get breached, or price itself out. It
+stopped being strategic. **No amount of diligence on a vendor's security posture detects a
+strategy change**, and the supply-chain row above is the only one where the vendor doing
+everything right is fully compatible with you losing the platform.
+
+The exposure is therefore not *reliability*. It is **portability** — whether what you hold is
+shaped like your business or like their product.
+
+### Adobe's current direction helps, and does not close three gaps
+
+Adobe's move toward **AEM with edge delivery and server-side functions** is the right shape, and
+by the argument elsewhere in this estate it is the same bargain we make: push processing off the
+authoring runtime into constrained, isolated compute. Credit where it is due — that is a
+structural improvement, not a feature.
+
+It does not, by itself, answer three questions that are **needed now** rather than on a roadmap,
+and no SaaS compliance posture answers them either, because they sit outside what that posture
+is scoped to assert.
+
+| Gap | What the standard SaaS answer covers | What it leaves open |
+|---|---|---|
+| **Cross-border** | A region setting, a DPA, an attestation | Where a *specific record* physically sits today, and which sub-processor moved it there. Jurisdiction follows **the subject**; a tenant region setting follows **the account** |
+| **AI and agent access** | Human users, sessions, roles | *Who may an agent act for, within what bounds, until when.* Most permission models have no field for it, so an agent either gets a human's seat and a human's reach, or it gets nothing |
+| **Boundary penetration testing** | The vendor's own perimeter, tested on the vendor's scope | Whether **your** boundary holds *through* their product — can a caller holding tenant A's token reach tenant B's asset via their API. That is your risk, and it is outside their test scope by definition |
+
+The common thread: a vendor tests **their** system against **their** threat model. None of the
+three above is a claim they are refusing to make — it is a claim that is not theirs to make. Each
+one is answerable only where the entitlement lives, which is the argument this document has been
+making from the first section.
+
 ### Solution
 
 Reduce the number of systems that **hold** data, not the number that **use** it.
