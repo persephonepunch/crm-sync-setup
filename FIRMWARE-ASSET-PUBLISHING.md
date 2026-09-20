@@ -15,6 +15,8 @@ tags:
 
 # Security Reinforcement: Firmware Asset Publishing
 
+![The firmware channel in four bands. Build, sign with a non-exportable key, and publish sit inside your control; a dashed boundary marks origin, CDN, mirror and proxy as outside it; verify and flash sit on the device side. Below, two coverage bars: TLS spans only the connection and ends at the socket, while the signature runs from the key to the device. A third band opens the bundle into manifest, payload and installer with five attack routes; a fourth gives the device's check order, any failure meaning refuse rather than warn.](https://crm-sync.dev/kb/media/docs/firmware-trust-boundary.png)
+
 **For release engineers, firmware teams, and whoever signs off that an update channel is safe.**
 
 > Every other asset class fails inside a process you control. Firmware executes on a device,
