@@ -15,6 +15,8 @@ licence: CC-BY-4.0
 
 # Render and Runtime: A Working Dictionary
 
+![Five bands. Sources — GraphQL, streaming, system of record and object store — converge on a heavy-stroked boundary containing four numbered gates: subject, entitlement, consent, shape, with a refusal exit marked by a cross. One arrow labelled ALLOWED leaves it and fans to five renderers: React and Next.js serialising state, Astro islands, Eleventy, Shopify Liquid, WordPress PHP. A wrapper band compares PWA, iOS and Android native, Tauri, Electron and Unity by reach rather than authority. A final band contrasts a decision made inside the renderer against one made below it.](https://crm-sync.dev/kb/media/docs/render-boundary-map.png)
+
 **For the business analyst and the designer sitting in an architecture review.**
 
 > Every term below is defined by **the decision it changes**. A definition that does not change a
