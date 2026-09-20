@@ -434,6 +434,57 @@ descriptor beside it does not need to open the binary to find out what it may do
 avoided is an attack surface that was never presented** — which is the whole of this document,
 stated once more at the point where assets stop being published and start being consumed.
 
+## Moving the compile to AI is not a permissions change
+
+There is a move being made across a lot of estates right now: take the step that used to parse,
+extract, transform or classify an asset, and hand it to a model instead. It is usually framed as
+modernisation, and often it is. It is not a security control, and it is being treated as one.
+
+**Four things stay exactly where they were.**
+
+**The parser did not go away.** Something still decoded those bytes before the model saw
+anything — a PDF was rasterised, an image was demuxed, a document was extracted. Handing the
+*result* to a model changes who consumes the output. It does not remove the process that opened
+the file, and that process is the one this document has been about.
+
+**The model's runtime holds the privilege.** Inference needs an API key, usually network access,
+often the document store and the vector index. The model has no permissions of its own; it
+inherits whatever the process around it was given. An LLM reading a contract is a process with
+credentials reading a contract.
+
+**The output is now untrusted too.** Model output is generated from attacker-reachable input,
+so anything downstream that acts on it — a query, a file write, a tool call, a rendered page —
+is consuming content an outsider influenced. The transformation added a second untrusted surface
+rather than removing the first.
+
+**And nothing was permitted or refused.** No subject was identified, no permission was checked,
+no refusal was possible. A processing step changed. That is all that happened.
+
+### What is actually required
+
+The permissions boundary stays where it was, and it stays the same shape: **one place, on the
+server, that every path calls, which can refuse.** The model sits *inside* that boundary as
+another thing a subject may be permitted to invoke — never as a substitute for it, and never as
+the thing deciding.
+
+The discipline to copy is the one this document already named twice: **typed in, typed out, no
+ambient authority.** The [Shopify Functions](https://shopify.dev/docs/apps/build/functions)
+bargain works because the runtime denies by default and the host grants specific, declared
+inputs. Apply the same contract to an inference step and it becomes safe in the same way — it
+receives exactly what it was handed, returns a typed result, and reaches nothing else. Apply it
+to a model with a database connection and an outbound route and you have not applied it at all.
+
+The half that a boundary cannot supply by itself is the record of who may do what, versioned and
+revocable. That is a system-of-record question, and in this estate it is
+[Xano](https://docs.xano.com/xano-features/metadata-api) holding the entitlement and the
+permissions beside the asset metadata — one row per subject, checked by the same server-side
+call regardless of which surface or which model made the request.
+
+**Stated plainly, because it is now the requirement rather than a preference:** an AI step is
+permitted work, not permitting work. It belongs behind a permissions boundary with a
+system-of-record answering for it, and moving a compile step to a model without that is a change
+of implementation dressed as a change of posture.
+
 ## What it costs
 
 | Cost | What it means | Severity |
