@@ -541,17 +541,30 @@ discipline, origin routing and rate limiting are configuration. The expensive ha
 CORS was never going to answer — who is entitled to this asset, which variants exist, and who
 may change that.
 
-## What it costs
+## AI Scoped Remediation
 
-| Cost | What it means | Severity |
-|---|---|---|
-| Descriptors are a discipline | A file without one is invisible to agents, and nothing enforces their existence but review | High — it degrades quietly |
-| An R2-backed DAM is assembled | **Only what you do not already run.** Serve-path hardening is configuration, not code. Entitlement, ingest and a rights surface are expensive to build and free to reuse — an estate that already operates a permissions boundary is binding assets to it, not building one. Variant management is the piece nobody has for free | **High from nothing, low from an existing boundary** |
-| Edge transformation moves the dependency | You have removed a parser from your origin by depending on a vendor's | Medium — stated honestly, this is a trade and not a win |
-| Stripping metadata loses provenance | C2PA credentials do not survive an unaware transform | Medium, rising as AI provenance expectations harden |
-| Mesh compression is lossy | Draco quantizes; the rendition is not the asset | Low if originals are kept, total if they are not |
+Ordered by how much introducing AI changes the exposure, not by generic severity — because that
+is the question an estate is actually asking. Everything here is drawn from the sections above;
+this is where it becomes a list someone can work through.
 
-### Why the build cost is not what it looks like
+| Exposure | What AI changes about it | Remediation | Residual cost |
+|---|---|---|---|
+| **Ingestion parser privilege** | Transforms it. The worker receiving hostile documents holds the embedding key, the vector store and a route inward — more privilege than the model everyone is guarding | Parse in an isolated sandbox with **no credentials and no network**. Hand it bytes, take back text. Prefer library extraction over shelling to a rasteriser | An extra hop, and an ingestion path that is slower and harder to debug |
+| **File disclosure into the index** | Creates it. A construct that reads a server file into rendered output becomes a retrievable chunk — the exfiltration channel is the assistant's own answer, so no egress control sees it | The isolation above removes the primitive. Additionally, never index the output of a rendering step that ran with filesystem access | Some OCR-dependent pipelines need rework |
+| **An AI step mistaken for a permission** | Creates it. Moving a compile step to a model changes implementation, not posture — nothing was identified, checked or refused | Keep the permissions boundary server-side and unchanged; the model sits **inside** it as permitted work. Entitlement stays in the system of record | Discipline, permanently. The shortcut is always available |
+| **Model output treated as trusted** | Creates it. Output is generated from attacker-reachable input, so anything acting on it consumes influenced content | Treat model output as untrusted input to the next stage — typed, validated, and never executed or interpolated unescaped | Extra validation at every seam |
+| **Rights invisible to an agent** | Sharpens it. A human opens the file and looks; an agent cannot, and `model/gltf-binary` carries neither meaning nor rights | Descriptor beside the asset — rights, variants, provenance — in version control so the pairing survives a copy | Discipline. Nothing enforces a descriptor's existence but review |
+| **Provenance lost in transform** | Sharpens it. C2PA credentials do not survive an unaware re-encode, and AI-generated content makes that lineage matter more each year | Carry provenance in the descriptor rather than only inside the file. Preserve C2PA where the pipeline is provenance-aware | Provenance is only as good as the weakest transform in the chain |
+| **Variant chosen at upload** | Unchanged by AI, but it is what blocks per-surface serving | Query the system of record at request time instead of baking a decision at ingest | The one genuinely unbuilt item — see the build-cost note below |
+| **Edge transformation dependency** | Unchanged | Accept it deliberately: a parser removed from your origin by depending on a vendor's | A trade, not a win. Say so out loud |
+| **Lossy mesh compression** | Unchanged | Keep originals. The rendition is not the asset — and a model compressed for viewing is deliberately a poor basis for manufacture | Low if originals are kept, total if they are not |
+
+**The ordering is the argument.** The first four rows did not exist as concerns before an
+estate put AI on its documents. The last three are ordinary media-pipeline trades that AI leaves
+exactly as it found them. Anyone remediating top-down is fixing the things their AI programme
+actually introduced, in the order it introduced them.
+
+## Why the build cost is not what it looks like
 
 The objection to an assembled DAM is that you inherit ingest, entitlement, a rights surface and
 variant management. Stated flat, that is a large bill and a fair reason to buy instead.
