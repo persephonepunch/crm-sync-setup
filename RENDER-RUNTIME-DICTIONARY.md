@@ -257,6 +257,53 @@ variables. Deny by default, declared before the code runs, **enforced by the run
 
 ---
 
+## Models, and where a language decision belongs
+
+**Ladder tree.** A routing structure for model work. The **tree** branches first — on direction,
+content class, and whether protected terms are present — and each branch ends in a **ladder**
+whose rungs escalate from cheapest and most deterministic to most expensive: a cache, then a
+termbase substitution, then a specialised model, then a general one, then a person.
+
+> **The decision it changes:** each rung is a **gate, not a score.** Work climbs because a rung
+> *declined* — the segment contained a glossary term, the direction was register-sensitive, the
+> content class was legal — never because a confidence number was low. A model's self-reported
+> confidence is precisely the thing that must not do the routing, since it is produced by the
+> component being evaluated.
+
+**Frontier model.** The largest current models, available as a hosted API — you send text, you
+receive text, the weights are not yours and the version moves when the vendor moves it.
+
+**Open-weight model.** Weights you can download and run: Qwen, Llama, and translation-specific
+models like **m2m100**. Quality typically trails the frontier and the gap has been narrowing.
+
+| | Frontier | Open weight |
+|---|---|---|
+| Where the text is processed | **Their infrastructure** | **Yours** |
+| Version | Moves when they move it | Pinned by you |
+| Cost shape | Per token, scales with use | GPU capacity, scales with peak |
+| Quality ceiling | Highest available | Behind, and closing |
+| What leaves your boundary | **The text** | Nothing |
+
+> **The decision it changes:** this reads as a quality-versus-cost question and is usually a
+> **data-residency** question wearing a quality costume. Sending a customer's message to a hosted
+> API is a cross-border transfer of whatever that message contains. Running open weights in your
+> own runtime means the text never leaves. For low-stakes content the frontier is the obvious
+> choice; for anything carrying personal data the question is not *which is better* but *may this
+> text be there at all.*
+
+**Translation boundary design.** Deciding **where** translation happens and **what crosses** to
+get it done — as distinct from choosing a model.
+
+Three properties decide it:
+
+- **Direction is asymmetric.** KO→EN and EN→KO are different problems with different failure modes. m2m100's distinguishing feature is translating **directly between pairs rather than pivoting through English**, which matters most for CJK↔CJK, where a pivot loses honorifics and register twice.
+- **A translation is a derived work, and it inherits the classification of its source.** Translated personal data is still personal data. Translated medical text is still medical text. The output does not become lower-risk by changing language, and pipelines routinely treat it as though it does.
+- **A specialised translation model cannot be instructed.** m2m100 will not respect a glossary or preserve a product name, because it has no instruction channel. That is a routing fact: any segment containing a protected term must skip that rung entirely, not be corrected afterwards.
+
+> **The decision it changes:** the boundary is not where the best output comes from — it is where
+> the source text is allowed to be at the moment it is processed. Design that first; choose the
+> model inside it.
+
 ## Secrets and sessions
 
 **Cookie.** A value the browser stores and presents on subsequent requests. It is an
