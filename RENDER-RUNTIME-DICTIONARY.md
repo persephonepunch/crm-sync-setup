@@ -629,6 +629,38 @@ the asset it was supposed to describe, an allow-list widened because something l
 blocked and nobody asked whether it should have been. Each is a small convenience, and together
 they end with a system that validates itself against its own output and reports full compliance.
 
+### What none of this depends on
+
+Read back through the controls in this document and notice what is absent from every one of
+them: **any claim about how capable a model is.**
+
+A container with no credentials and no network route is a container with no credentials and no
+network route, whatever is running inside it. A boundary that refuses an unentitled request does
+not weigh how persuasive the request was. An allow-list excludes what it does not name, including
+things invented after it was written. A mandate expires at its expiry. A runtime that was never
+granted filesystem access cannot be talked into having it.
+
+**None of these degrade as models improve**, because none of them is an opinion about the model.
+They are properties of the arrangement around it.
+
+That matters because the other kind of control does degrade. Prompt filtering, output
+classification, refusal heuristics, guardrails tuned against last year's behaviour — those are
+predictions about how a model will act, and every one is a race that has to be re-run each
+release. They are worth having and they are worth having **second**, because a prediction is
+something you maintain while a property is something you hold.
+
+So the practical order is the reassuring one:
+
+1. **Build the model-independent layer first** — the boundary, the envelope, the allow-lists, the record. It is the part that keeps working while everything above it changes.
+2. **Then add the behavioural controls**, knowing they are maintenance rather than architecture.
+3. **Assume the model is more capable than you planned for**, and check whether that assumption breaks anything. If the answer is *no, because it was never given anything*, the design is right.
+
+> **Whatever arrives next — a better model, a stranger one, an agent nobody scoped for — it
+> still cannot use a credential it was not given, reach a network it was not granted, or be
+> served an asset the record says it may not have.** Those are not predictions about AI. They
+> are facts about the system, and they are available to anyone willing to decide where the
+> boundary goes before deciding which model to use.
+
 **Related:** [QA and Release Gating for Agents, Mandates and Robots](https://www.crm-sync.dev/pages/knowledge-base#qa-release-gating)
 · [Server-Side, Or It Didn't Happen](https://www.crm-sync.dev/pages/knowledge-base#server-side-or-it-didnt-happen)
 · [Permissions for AI — capability, not perimeter](https://www.crm-sync.dev/pages/knowledge-base#capability-not-perimeter)
