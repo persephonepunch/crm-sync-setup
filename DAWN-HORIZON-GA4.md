@@ -91,6 +91,11 @@ Compliance and permissions are not a cost center or a checkbox. Enforced at the 
 
 **The reframe:** permissions enforcement converts compliance from risk and cost into revenue enablement and a trust asset. The governance is the reason the data is *safe to open* — which is the core offer: accessibility, made safe by construction.
 
+> The general form of this argument — the same move across AEM, WordPress and Drupal, with
+> payload encryption through a tier you do not trust and a publish path an agent can be given —
+> is [A Template Is Not a Permissions Boundary](https://www.crm-sync.dev/pages/knowledge-base#template-is-not-a-boundary).
+> This page is the Shopify instance, with dates.
+
 ## 1 · Why Horizon fits
 
 Horizon is **blocks-first**: a `blocks/` directory, nested blocks via `{% content_for 'blocks' %}`, per-component `{% stylesheet %}` / `{% javascript %}`, no framework runtime. That posture — *thin presentation, logic pushed out* — is the native Shopify endpoint for a server-resolved stack, not a fight against it.

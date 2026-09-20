@@ -22,6 +22,12 @@ tags:
 > rendered. **Hiding a control is presentation. Refusing a request is enforcement.** Only one of
 > those survives someone opening the network tab.
 
+**Scope.** This is the general argument, across four presentation tiers. The Shopify-specific
+instance of it — Dawn's client-side logic re-homed to Horizon with cart, pricing and checkout in
+server-side Functions, against dated deprecations — is
+[Dawn to Horizon](https://www.crm-sync.dev/pages/knowledge-base#dawn-horizon-ga4). Read that one
+if the estate is a Shopify theme; read this one if it is four platforms and a principle.
+
 ---
 
 ## Summary — challenge, solution, opportunity, risk
