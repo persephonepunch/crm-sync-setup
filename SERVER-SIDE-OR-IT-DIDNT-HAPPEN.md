@@ -107,7 +107,7 @@ not recorded after she declined,"* a client-side stack has nothing to
 produce. The absence of the record **is** the case. Statutory damages run
 $5,000 per violation — arguably per session — with no regulator required.
 
-### The forty days nobody noticed
+### Todd Snyder: the forty days nobody noticed
 
 The regulator has now said it directly. In May 2025, California's privacy
 agency fined **Todd Snyder, Inc.** — a Shopify Plus menswear retailer —
@@ -130,6 +130,36 @@ calls. And it makes the second unnecessary — the session-joined record
 *is* the verification, no photo ID required. A theme can pass every visual
 QA on earth while its consent tool is broken; only a register knows the
 difference between quiet and silence.
+
+### Honda: the platform was there, connected to nothing
+
+Two months earlier the same regulator made the point from the other side. In
+March 2025 the CPPA settled with **American Honda Motor Co.** for **$632,500**
+— its first enforcement decision. Honda was not missing a consent platform. It
+had one. What it lacked was that platform wired to anything that recorded or
+enforced what a visitor chose.
+
+Three findings, and they are one failure in different clothes:
+
+- The rights webform demanded **eight data elements** for requests that need no
+  verification at all. Opting out cost more than being tracked did.
+- The platform failed **symmetry in choice** — accepting was easy, refusing was
+  a longer path. A preference the interface discourages is not a preference the
+  business collected.
+- Honda **could not produce its contracts** with ad tech recipients carrying the
+  required CCPA terms. The data had gone somewhere the paperwork could not
+  follow.
+
+The remedies confirm the reading: rebuild the request process, bring in a **UX
+designer** to evaluate it, retrain staff, and change how contracts are formed
+with everyone receiving personal information.
+
+**The pairing is the lesson.** Todd Snyder had a consent platform that broke and
+no way to notice. Honda had one that worked — asymmetrically — and no record of
+what it produced or where the data went. Buying the tool satisfied neither
+obligation, because in both cases **the obligation was the record, and the tool
+was never connected to one.** A consent management platform reports what it
+showed a visitor. Only a register knows what the business then did.
 
 ## The React case, which is the one most teams are shipping now
 
