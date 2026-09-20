@@ -1,0 +1,19 @@
+/* safe-svg — monochrome. Ink on ground, paint from the page and never from the asset. */
+:root { --ink: #0a0a0a; --ground: #ffffff; }
+
+[data-safe-svg], safe-svg { display: inline-block; line-height: 0; color: var(--ink); }
+
+/* Injected paths follow the text colour. `.preserve` opts an asset out and keeps its own paint. */
+[data-safe-svg] svg, safe-svg svg { display: block; width: 100%; height: auto; }
+[data-safe-svg]:not(.preserve) svg [fill]:not([fill="none"]),
+safe-svg:not(.preserve) svg [fill]:not([fill="none"]) { fill: currentColor; }
+[data-safe-svg]:not(.preserve) svg [stroke]:not([stroke="none"]),
+safe-svg:not(.preserve) svg [stroke]:not([stroke="none"]) { stroke: currentColor; }
+
+/* Reserve the box before hydration so async injection does not shift layout. */
+[data-safe-svg-state="pending"] { min-height: 1em; min-width: 1em; }
+[data-safe-svg-state="failed"] { display: none; }
+
+/* Inverse blocks: set the colour once and the mark follows. */
+.on-ink { background: var(--ink); color: var(--ground); }
+.on-ground { background: var(--ground); color: var(--ink); }
