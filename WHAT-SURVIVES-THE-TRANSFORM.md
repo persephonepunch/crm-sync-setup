@@ -35,6 +35,8 @@ citation:
 
 # Asset Management, Security and AI
 
+![The media pipeline in four bands. An asset passes ingest, an isolated parse holding no credentials and no network, transform, store, and serve. Below it two parallel lines: embedded metadata — XMP, IPTC, EXIF, GPS, C2PA — terminates at a cross on the transform, while the descriptor beside the file runs the full width and reaches the agent. A third band shows 3D passed through untransformed; a fourth defines asset, rendition, descriptor and entitlement.](https://crm-sync.dev/kb/media/docs/media-pipeline-dam.png)
+
 **For media managers, DAM owners, front-end leads and the person who has to answer why the
 product page is four megabytes.**
 
