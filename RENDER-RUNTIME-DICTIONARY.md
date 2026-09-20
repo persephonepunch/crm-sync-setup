@@ -579,6 +579,56 @@ description. Three worked examples:
 - *"Untrusted transformations run under a deny-by-default runtime with network and filesystem withheld."* — a runtime rule naming what is withheld rather than what is used.
 - *"SRI is applied to third-party libraries at fixed versions only, and a pipeline check asserts every published hash against the file currently served."* — a control plus the test that keeps it true.
 
+### Best practice: author the intent once, generate the volume
+
+The terms above describe a division of labour that is worth stating outright, because it is the
+practical payoff of the whole arrangement.
+
+**People author intent. Machines produce volume.** Nothing in an estate is expensive because it
+is hard to think of — it is expensive because there is so much of it. The rule is one sentence;
+the four hundred tests that prove it holds are the cost. The entitlement is one row; the
+thirty-one surfaces that must honour it are the cost. That asymmetry is what AI data binding and
+self-improving generation actually address.
+
+**What counts as intent, and stays human:**
+
+| Artifact | Why a person writes it |
+|---|---|
+| The **entitlement record** | It is the decision. One row per subject, versioned, revocable |
+| The **descriptor** | What an asset is, its rights and provenance — a claim someone is accountable for |
+| The **specification of expected refusals** | The fixed target generation aims at. If a machine writes this, there is nothing to aim at |
+| The **allow-lists** | Each names what may cross a boundary. Naming is the judgement |
+
+**What counts as volume, and should be generated:**
+
+- Adversarial test cases against that specification — every malformed input, escalated scope, replayed token and expired mandate the spec implies.
+- Renditions and variants from one stored asset.
+- Translations routed down the ladder tree, aimed at a termbase somebody maintains.
+- Bindings for each surface, from one answer the boundary already gave.
+- Regression cases synthesised from incidents.
+
+**Where the heavy lifting actually happens.** The binding layer removes the *repetition*: one
+permission check answers a browser, an agent, an export and a feed, so a surface is a
+presentation rather than a re-implementation. Generation removes the *enumeration*: proving a
+boundary refuses stops being a sampling exercise and becomes exhaustive, because exhaustive
+finally costs less than arguing about coverage.
+
+Between them they move the work from *producing* to *deciding* — which is the only part that
+needed a person in the first place.
+
+**Four rules, and the arrangement fails without any of them:**
+
+1. **Intent is version-controlled and reviewed.** A generated artifact is disposable; the spec it was generated from is not.
+2. **The generator never judges.** Separation of duties, the control you already run for releases. A suite a generator authored and scored proves only that it agrees with itself.
+3. **The binding never decides.** It serves an answer the boundary produced. An AI step is permitted work, not permitting work.
+4. **Refusals are recorded.** Generated volume is only evidence if the refusals it produces are written down. Otherwise you have run a lot of tests and kept none of them.
+
+**The failure mode to watch for**, because it is quiet: intent drifting into the generated
+layer. A spec that gets "updated" to match what the tests now do, a descriptor regenerated from
+the asset it was supposed to describe, an allow-list widened because something legitimate was
+blocked and nobody asked whether it should have been. Each is a small convenience, and together
+they end with a system that validates itself against its own output and reports full compliance.
+
 **Related:** [QA and Release Gating for Agents, Mandates and Robots](https://www.crm-sync.dev/pages/knowledge-base#qa-release-gating)
 · [Server-Side, Or It Didn't Happen](https://www.crm-sync.dev/pages/knowledge-base#server-side-or-it-didnt-happen)
 · [Permissions for AI — capability, not perimeter](https://www.crm-sync.dev/pages/knowledge-base#capability-not-perimeter)
