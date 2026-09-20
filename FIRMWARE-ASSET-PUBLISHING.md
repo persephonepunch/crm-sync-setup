@@ -28,6 +28,59 @@ publishing, and what it costs to leave the codebase unguarded.
 
 ---
 
+## Summary — challenge, solution, opportunity, risk
+
+For the reader who signs the release rather than builds it.
+
+### Challenge
+
+An update channel is the only route by which an organisation can change hardware it no longer
+possesses. In most estates that channel's entire integrity claim is **transport**: the file was
+fetched over HTTPS, therefore it is the right file. That does not follow. A valid certificate
+proves the connection reached a server, not that the bytes are the ones the business approved —
+and the routes to changing those bytes (a compromised build agent, an over-permissive storage
+bucket, a stolen deploy token, a CDN rule) do not touch the certificate at all.
+
+Two conditions make the consequence disproportionate. A device executes what it is given,
+outside every control the organisation operates. And code that ships is code that can be read,
+so any credential inside it is disclosed to anyone who buys the product.
+
+### Solution
+
+Move the integrity claim from the transport to the artifact, and move verification from the
+server to the device.
+
+- The payload is signed with a key the organisation cannot export and an attacker cannot copy.
+- The device verifies that signature **before flashing**, offline, using a public key in hardware.
+- The bundle's digest is published somewhere the download host does not control, so a third party can check what was received against what was released.
+- The download is gated on entitlement, and the device refuses an older image even when correctly signed.
+- The codebase and the **compiled artifact** are both scanned, and a finding blocks the build.
+
+### Opportunity
+
+- **Market access.** Regulatory regimes now require a bill of materials, a vulnerability-handling process and update integrity for connected products. Building the evidence into the release process is materially cheaper than assembling it under audit.
+- **A claim competitors cannot easily match.** "You can verify independently what we shipped" is checkable, and most vendors cannot say it.
+- **Incident response becomes answerable.** *What was in the build that shipped two years ago* changes from an investigation into a query.
+- **Channel and resale.** Provenance that travels with the artifact lets partners distribute without becoming a trust dependency.
+- **Lower recall cost.** Staged rollout with a health gate turns a fleet-wide event into a cohort-sized one.
+
+### Risk of inaction
+
+| Risk | Exposure | Severity | Recoverable? |
+|---|---|---|---|
+| Signing key disclosed or absent | Any party can produce firmware the fleet accepts | **Catastrophic** | Only if the fleet can receive a key rotation — which a compromised channel may prevent |
+| Substituted bytes at the download origin | Fleet-wide compromise, with no on-device check to stop it | **Critical** | Recall, and reputational cost beyond it |
+| Credentials shipped inside the image | Disclosed to every purchaser; fleet-wide, permanent | **Critical** | Requires a firmware update the device may never take |
+| No bill of materials | Cannot answer what shipped; regulatory and commercial exposure | **High** | Reconstructable only at significant cost |
+| No anti-downgrade control | A known-vulnerable signed image can be replayed indefinitely | **High** | Fixed forward, but the window stays open |
+| No entitlement on download | Distribution to unknown parties; analysis fuel for an attacker | **Medium** | Closeable at any time |
+
+**The decision this document supports:** the controls below cost engineering time measured in
+weeks. The first row of that table costs the product line. That asymmetry, rather than any
+technical argument, is why this is a release-gate item and not a backlog item.
+
+---
+
 ## 1. Configuration tooling
 
 Named tools, grouped by the job. Substitutes are fine; the **job** is not optional.
