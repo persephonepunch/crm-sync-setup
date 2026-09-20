@@ -82,6 +82,43 @@ Six exposures, and only the first is the one people plan for:
 party to every one of those, and risk grows with the number of *places data lives*, not the
 number of features you bought.
 
+### The exposure with no counterparty
+
+Every row in that table assumes somebody to ask. A vendor to notify you, a contract to produce, a
+support queue, an escalation path, a renewal at which leverage exists.
+
+Some of the largest exposures in an estate have **none of that**, and they are the ones a
+procurement process cannot see, because nothing was procured.
+
+The parser sitting under the media pipeline is the clearest case. Nobody sold it to you. It
+arrived inside a base image, or underneath a CMS, or as a transitive dependency of something that
+generates a preview. There is no account manager, no SLA, no severity-one queue, and no renewal
+conversation in which to raise it. **"Without recourse" is not rhetoric here — there is no ticket
+to file.** The maintainers owe you nothing and are in most cases volunteers.
+
+Worse, the remediation is not a patch. Pinning a newer version does not change the fact that the
+design hands files to an interpreter; the fix is **architectural** — move the parse into an
+isolated envelope holding no credentials and no network. That is a change to the ingest path, not
+a dependency bump.
+
+**And it arrives at the worst possible moment.** The deprecation window is already forcing the
+estate to touch this code. Teams are mid-migration — wings off the plane, in flight, past the
+dates they committed to — and the exposure surfaces as a fourth priority behind three that have
+regulator-published deadlines attached.
+
+So it presents as an enterprise decision with two unattractive options: ship the forced migration
+on schedule and carry a parser exposure nobody has yet asked about, or delay a dated commitment
+for a risk with no incident behind it.
+
+**The way out is that the framing is slightly wrong.** The remediation does not depend on the
+migration finishing, on a vendor's cooperation, or on a roadmap. Isolating the parse is a
+**scoped, local change to one path** — bytes in, typed result out, credentials and network
+withheld — and it is the one item on the list that **requires nobody's permission.** Which makes
+it, unusually, the thing that can be done *during* the migration rather than after it.
+
+The decision to actually make is narrower than it looks: not *fix everything or ship*, but
+**which single path receives untrusted files, and what does that process currently hold.**
+
 ### The worked example, because the sunset row usually gets waved through
 
 Vendor retirement reads as a hypothetical until it has a name.
