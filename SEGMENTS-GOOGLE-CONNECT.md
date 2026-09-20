@@ -228,6 +228,36 @@ Which has three consequences worth holding:
 - **Each consumer flattens differently**, and none of them carries the relationships. Whoever performs the flattening decides what survives.
 - **Generate it from the system of record.** Hand-authoring structured data in a CMS field means the object and the row have different parents, and reconciling them later is archaeology rather than a schema question.
 
+### The ISO codes are the join, and there is no substitution
+
+Everything in 4d flattens an object into a row. The row's keys are not negotiable, and this is
+the one place in the estate where the identifier is **not yours to choose**.
+
+| Field | Standard | Example |
+|---|---|---|
+| Language | **ISO 639-1** | `en`, `ko`, `ja` |
+| Country / market | **ISO 3166-1 alpha-2** | `US`, `KR`, `JP` |
+| Currency | **ISO 4217** | `USD`, `KRW` |
+| Timestamps | **ISO 8601**, with offset | `2026-09-20T16:08:48Z` |
+
+Google will not accept a local taxonomy in these positions. Not a display name, not an internal
+market key, not a tidier abbreviation. **A feed carrying "Korea" where `KR` belongs is not
+partially correct; it is rejected or silently mis-targeted.** The same codes scope the review
+surface — sentiment is partitioned by language and country — and they scope model applicability,
+because a score fitted on one locale's behaviour does not transfer to another by translation.
+
+**And that turns out to be a gift rather than a constraint.** Every other identifier in the
+estate is somebody's private key: a Webflow item ID is Webflow's, a Shopify GID is Shopify's, a
+row id is the warehouse's, and none of them means anything one system over. The ISO codes are
+**the only identifiers that mean the same thing in every system you run** — which makes them the
+one join that needs no mapping table and cannot drift.
+
+So the rule is short and worth enforcing at ingest rather than at the feed:
+
+- **Store the code, render the name.** `KR` is the value; "Korea" and "한국" are presentations of it.
+- **Never key on a display name**, because display names are translated and translations are per-locale — the join would fragment by the very dimension it is supposed to unify.
+- **Validate at the boundary.** A two-letter country that is not in ISO 3166 should be refused on write, not discovered in a rejected feed three days later.
+
 ## 5. The warehouse feed
 
 Deltas come off a **sync queue**, not a timestamp watermark — the queue gives idempotency, retry, and dead-lettering, and keeps the feed inside the audit chain (watermarks silently miss hard-deletes).
