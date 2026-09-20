@@ -531,6 +531,49 @@ would stop a device from installing them? If the answer is "the certificate," th
 unprotected. If the answer is "the device would refuse the signature, and the published digest
 would not match," it is a channel.
 
+### MIME types a DAM has to hold — and there are four of them per file
+
+The commonest bug in asset handling is treating "the MIME type" as one value. It is four, they
+disagree, and every disagreement is where something goes wrong.
+
+| Which type | Where it comes from | Trust it? |
+|---|---|---|
+| **Declared** | The uploader's `Content-Type` or the file extension | **No.** Attacker-supplied, and most parsers ignore it anyway |
+| **Detected** | Magic bytes, read in your own code | Mostly. This is what a parser will actually act on |
+| **Stored** | What the DAM records against the object | Only if you set it from **detected**, never from declared |
+| **Served** | The `Content-Type` on the response, plus the inline-or-attachment decision | This one is a **decision**, not a property |
+
+A DAM must record all four and reconcile them. Declared ≠ detected is itself a signal worth
+logging — it is occasionally a misconfigured client and occasionally someone testing you.
+
+### The protection funnels, and what each one does not do
+
+"Sanitised" means different things per family, and the differences are not details.
+
+| Family | The funnel | What comes out | What it does **not** fix |
+|---|---|---|---|
+| **PNG · JPEG · WebP · AVIF · GIF** | **Re-encode** — decode and emit fresh | Bytes your pipeline authored. Any embedded payload is gone because it was never re-emitted | Metadata is destroyed with it — rights, credit, C2PA. And the **decode still happened on your infrastructure** |
+| **SVG** | **Allow-list rebuild** — parse, walk, reconstruct | A document containing only what you permitted | Not a re-encode. You are trusting your allow-list rather than a codec. A construct you did not anticipate is dropped, which is the right default but not a proof |
+| **Video** | **Transcode** | New bytes, same as raster | Expensive, and the demuxer surface on ingest is larger than an image decoder's |
+| **PDF** | **None that sanitises** | — | Extract text with a library, or render in the envelope. There is no "clean PDF" step |
+| **Fonts — WOFF2 · TTF** | **None practical** | — | Parsed by the browser's text engine, historically a rich target. Serve from a separate origin; do not accept them from uploaders |
+| **3D — STEP · IFC · USD · USDZ** | **None exists** | — | Pass-through bytes. Custody and entitlement carry what the format cannot |
+| **Archives — ZIP · USDZ · STEP+ZIP** | **None** | — | Container rules: traversal, symlinks, entry caps, ratio caps |
+
+**The sentence the table is really making: re-encoding protects the consumer, not you.** It
+converts "a hostile file reaches every viewer" into "a hostile file reaches my decoder" — which
+is a large improvement and not an escape. The decode happens on your infrastructure either way,
+which is why the envelope above is the control and the funnel is the benefit.
+
+### What no funnel covers
+
+Worth listing, because these are the things people assume a sanitiser handled:
+
+- **Rights and provenance.** Destroyed by the very step that made the file safe. This is the descriptor's job, and the reason it exists.
+- **The filename.** Attacker-supplied, and it reaches a filesystem. Normalise it; never trust it.
+- **Whether the person may have it.** A sanitised asset served to the wrong subject is a clean file and a breach.
+- **What the asset depicts.** No pipeline knows whether an image is a product shot or a customer's passport. That is a classification problem and it stays with people and policy.
+
 ### Where XML throughput meets the Ghostscript problem
 
 They are the same bug wearing different clothes, and it is worth naming because the control is
