@@ -108,12 +108,45 @@ Both can produce the same interaction. They differ in **what crosses to the brow
 
 ## Template languages, and a distinction people get backwards
 
-**Liquid.** Shopify's template language, rendered server-side on Shopify's infrastructure. It is
-**deliberately sandboxed**: no arbitrary code, no network calls, no filesystem.
+**Liquid.** A template language created at Shopify and **open-sourced**, which is why it is not
+only Shopify's. Jekyll uses it. **Eleventy supports it** as a first-class template language, via
+the `liquidjs` implementation. The same `{% raw %}{% for %}{% endraw %}` and
+`{% raw %}{{ }}{% endraw %}` syntax you write in a Shopify theme runs in a static build.
 
-> **The decision it changes:** Liquid's limits are a security feature — and they cut both ways.
+It is **deliberately sandboxed** wherever it runs: no arbitrary code, no network calls, no
+filesystem. That constraint is the reason it was adopted for multi-tenant themes in the first
+place — a language that cannot execute arbitrary code is the only kind you can safely hand to
+thousands of strangers.
+
+> **The decision it changes:** Liquid's limits are a security feature, and they cut both ways.
 > It cannot be made to do harm, and it cannot be made to *enforce*. Logic placed in Liquid is
 > presentation wearing the costume of a rule.
+
+### The same language, twice — and the difference is everything
+
+**11ty's Liquid and Shopify's Liquid are the same language.** A template can be genuinely
+portable between them. What differs is not syntax:
+
+| | Liquid in Eleventy | Liquid in Shopify |
+|---|---|---|
+| **Implementation** | `liquidjs` (JavaScript) | Shopify's original Ruby implementation |
+| **When it runs** | **Build time**, once, on your machine | **Every request**, on Shopify's infrastructure |
+| **What is in scope** | Your data files | Shopify's commerce objects — `product`, `cart`, `customer` |
+| **Output** | Files on disk | A response, assembled per visitor |
+| **At request time** | Nothing of Liquid exists | The renderer, the object model, the customer's session |
+
+The implementations are close but not identical — Shopify's commerce **objects and filters are
+Shopify's, not the language's**, and a theme that leans on them will not run in Eleventy without
+data standing in for them.
+
+**Why this matters more than the PHP comparison below.** With WordPress and Eleventy someone can
+argue the difference lies in the languages. Here the language is **held constant**. Same syntax,
+same sandbox, same mental model — and one produces a static file while the other runs a renderer
+against a live session on every request.
+
+Which isolates the variable exactly: **the security posture of a page is a property of its
+runtime, not of the language that wrote it.** Nothing about Liquid tells you whether a decision
+made in it is enforceable. Only *where and when it runs* does.
 
 **PHP passthrough (WordPress, Drupal).** PHP executes on the server and emits HTML. The browser
 receives a document.
