@@ -19,6 +19,10 @@ tags:
 
 **For release engineers, firmware teams, and whoever signs off that an update channel is safe.**
 
+> **Unfamiliar terms?** [Render and Runtime: A Working Dictionary](https://www.crm-sync.dev/pages/knowledge-base#render-runtime-dictionary)
+> defines the vocabulary used across these documents — hydration and ISR, Deno against Node, keys
+> against cookies, UAT, adversarial testing and SRI — each by the decision it changes.
+
 > Every other asset class fails inside a process you control. Firmware executes on a device,
 > outside your containers, your allow-lists and your monitoring — and persists through a
 > reinstall of everything above it. The controls therefore have to hold on the device, not on
