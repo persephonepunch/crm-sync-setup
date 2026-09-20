@@ -245,6 +245,60 @@ alongside the asset — Markdown with YAML front matter, the same shape the know
 uses — carrying what the asset is, its variants and their intended surfaces, its rights and
 provenance, and the entitlement required to obtain the unwatermarked or manufacturable form.
 
+### This is not a new idea — photography got here first
+
+**XMP is not an Adobe format.** Adobe created it in 2001, published the specification, and it
+was standardised as **ISO 16684-1**; the reference toolkit ships under a BSD licence. IPTC Photo
+Metadata — the news and stock industry's standard — is *expressed in* XMP. PDF/A **requires** it
+for document metadata. darktable, RawTherapee, digiKam and Capture One all write it, and C2PA
+uses it to reference a provenance manifest.
+
+Open Adobe Bridge's File Info dialog and the tabs are a catalogue of what a single image can
+carry: Description, IPTC Core, IPTC Extension, Camera Data, GPS, Video Data, Audio Data,
+Categories, Origin, DICOM, History, Advanced — and **Raw Data, which displays the XMP packet
+itself**. Rights statements, contributor contacts, capture coordinates, an editing history, and
+in the DICOM case patient and study identifiers. All of it real, all of it structured, and
+**all of it discarded by a default re-encode**, as the table at the top of this document says.
+
+Which is why photographers solved this twenty years ago, and solved it the same way. Camera RAW
+formats — CR3, NEF, ARW, RAF — are proprietary and largely undocumented, so writing metadata
+into them risks corrupting a file whose structure the vendor can change in the next firmware.
+The industry's answer was the **XMP sidecar**: `IMG_1234.xmp` beside `IMG_1234.NEF`. The RAW
+stays byte-identical forever; the ratings, edits, rights and captions live next to it. Adobe's
+own DNG is the exception that proves it — an *open* raw format, and therefore one XMP can safely
+be embedded in.
+
+The descriptor argued for here is that pattern, reached from a different constraint. Photography
+put metadata beside the asset because the container was not safely writable. We put it beside
+the asset because the container will be re-encoded and because an agent needs to read rights
+without opening a binary. Same shape, same reason it holds.
+
+**And the same weakness, which is worth naming before someone else does: sidecars get
+separated.** Copy the RAW without the `.xmp` and the rights statement is gone, silently, with
+the asset looking perfectly intact. That is the failure mode this model inherits, and it is the
+argument for keeping descriptors in version control — where the pairing is enforced by a commit
+rather than by whoever dragged the folder — and for a system of record that holds the same
+fields independently.
+
+### The system of record is the other half
+
+A descriptor beside the file answers *what is this*. It does not answer *which variants exist
+right now, and which may this surface serve*. That is a query, and queries need a database.
+
+Xano's [Metadata API](https://docs.xano.com/xano-features/metadata-api) is the shape of that
+half: programmatic access to schema, content and a distinct **Files** scope for file storage,
+under the same RBAC that governs everything else — and the documentation is careful to note that
+effective permission is the narrower of the token's scope and the role's, which is the correct
+default for anything touching assets.
+
+Pairing them is what makes optimisation dynamic rather than baked. The descriptor travels with
+the asset and states its rights and provenance. The system of record holds the variant set, the
+surface bindings and the entitlement, and it can be queried at request time — so a page asks for
+the variant appropriate to *this* surface and *this* viewer instead of receiving whatever format
+was decided at upload. That is precisely the limitation the Webflow and Shopify section names:
+their decision is made at upload and is not revisable per surface. A descriptor plus a queryable
+record is how you get it back, without leaving either platform.
+
 Three properties make that work where an embedded field does not. It **survives the transform**,
 because it was never inside the file. It is **diffable**, so a rights change is a reviewable
 commit rather than a silent metadata write. And it is **readable by both**, which means the
