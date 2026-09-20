@@ -380,6 +380,110 @@ should ever hold for data it is not entitled to.
 
 ---
 
+## Allow-lists, and where each one belongs
+
+**Allow-list.** A named set of permitted things, where everything unnamed is excluded. Its
+opposite is a **deny-list**, which names the forbidden and permits the rest.
+
+> **The decision it changes:** a deny-list has to anticipate. An allow-list does not — anything
+> invented after the code was written is excluded by default, because nobody added it. That is
+> the entire argument, and it is why the estate uses allow-lists at every crossing.
+
+**Construct, don't filter.** The stronger form. Rather than taking the incoming thing and
+removing what is bad, **build a new one and copy across only what is named.**
+
+> **The decision it changes:** a filter that misses something passes it. A construction that
+> misses something simply does not carry it. Removing a `<script>` tag from an SVG requires you
+> to have thought of `<script>`; rebuilding the SVG from a list of permitted elements drops
+> `<script>` without ever having heard of it.
+
+**Where they belong.** Not one place. An allow-list sits at **every boundary crossing**, on the
+side that bears the consequence:
+
+| Moment | What is listed | Protects |
+|---|---|---|
+| Before a request reaches the origin | Accepted upload types, at the edge | The origin from ever seeing the file |
+| On ingest | Accepted formats | The parser from formats nobody declared |
+| On write | Declared schema fields | The record from junk |
+| Before publishing | Artifact classes that may be made public | Irreversibility — a published address cannot be recalled |
+| On read | Fields a response may contain | The subject from over-disclosure |
+| On serve | Types that may render inline | The browser from executing an upload |
+| Before DOM injection | Permitted elements and attributes | The document from script inside an asset |
+
+**The caveat:** seven allow-lists do not add up to a boundary. Each protects one crossing; none
+answers *may this subject have this thing.* That remains the permissions check in front of them.
+
+**The test when adding one:** ask who suffers if the wrong thing gets through, and put the list
+on their side of the line.
+
+## Shopify Functions and the WASM bargain
+
+**WebAssembly (WASM).** A portable binary instruction format executed in a sandbox. Its defining
+property is what it **lacks**: no filesystem, no network, no ambient anything, unless the host
+explicitly grants it.
+
+**Shopify Functions.** Server-side customisation of Shopify's own logic — discounts, shipping
+rules, payment customisation, cart transforms — compiled to WASM and run by Shopify at the point
+the decision is made. You write Rust, JavaScript or anything that targets WASM; Shopify runs it.
+
+The contract is narrow on purpose:
+
+| | Shopify Functions |
+|---|---|
+| Input | A typed payload Shopify constructs |
+| Output | A typed result Shopify validates |
+| Network | **None** |
+| Filesystem | **None** |
+| Time | A hard limit, measured in milliseconds |
+| Where it runs | Shopify's infrastructure, inside checkout's own decision path |
+
+> **The decision it changes:** the limitations are the product. A Function **cannot** call your
+> API mid-checkout, cannot read a file, cannot wait. That sounds like a constraint list and is
+> actually a guarantee: **a Function cannot do anything it was not handed**, so a compromised or
+> simply wrong Function produces a bad discount, not a breach. This is the exception that proves
+> the rule the rest of this dictionary makes — it is the one place in a commerce stack where
+> customisation runs *inside* the decision rather than beside it, and it is safe precisely
+> because the runtime denies by default.
+
+The corollary is the honest one: **anything your Function needs must be in the input.** If a
+decision depends on live data, it belongs in the payload Shopify builds, not in a call the
+Function makes — because the Function cannot make one.
+
+## Why this arrangement is secure, in plain terms
+
+For the reader who does not write code and has to sign something.
+
+The estate runs on three vendors and one rule. The rule is that **the decision about who may
+have what is made in one place, on a server, before anything is sent** — and the three vendors
+are chosen so that none of them can overrule it.
+
+**Shopify is secure here because it refuses.** It will not run your arbitrary code on its
+servers. Its template language cannot make network calls. Its customisation points are sandboxed
+Functions that cannot reach outside their input. It bans file types it considers unsafe — SVG
+most visibly. Every one of those is Shopify declining to do something a merchant might want,
+and every one removes a way to be attacked. **The limitations are the security.**
+
+**Webflow is secure here because it is somewhere else.** Content is authored there and served
+from Webflow's own domain, so a problem with a Webflow asset is a problem on Webflow's origin —
+not on the origin that takes payments. It re-encodes uploaded images, which quietly destroys
+anything hidden inside them. And it generates the technical markup rather than letting an
+author hand-write it, which removes a whole class of mistake. **Separation is the security.**
+
+**Cloudflare is secure here because it is in front and it can refuse.** Every request passes it
+before reaching anything else. It enforces rules that need no code — what may be uploaded, how a
+file must be handled, how often anyone may ask. And the small programs it runs at the edge start
+with **no access to anything** and receive only what they are explicitly given. **Refusal before
+arrival is the security.**
+
+**What none of them does is decide who you are and what you are allowed.** That is the system of
+record, and it is deliberately not a vendor feature — because a permission that lives inside one
+vendor's product cannot be asked by the other two, and would have to be rebuilt, differently and
+slightly wrongly, in each.
+
+> **The short version, for a signature:** three suppliers that each refuse a different thing,
+> and one record that decides. No supplier can grant access. The record cannot execute code. And
+> the parts that handle files never hold the credentials that would make a mistake expensive.
+
 ## Testing and release control
 
 **UAT — User Acceptance Testing.** Verification that a system does what its users need, usually
