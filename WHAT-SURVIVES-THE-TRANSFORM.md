@@ -295,11 +295,30 @@ A standard is a better moat than an invention, because nobody needs permission t
 everybody needs your software to author it well.
 
 **Second, and less comfortably: the formats with the worst parser histories are the same ones.**
-The delegate chain that turns a thumbnail request into a second interpreter — PDF, EPS,
-PostScript handed to Ghostscript — is Adobe lineage end to end. That is not hypocrisy on
-anyone's part. It is arithmetic. **Ubiquity is what makes a parser worth attacking**, and a
-format that every system must read is a format every attacker studies. The price of winning the
-standard is that your format becomes the one worth breaking.
+The delegate chain that turns a thumbnail request into a second interpreter — PDF, EPS and
+PostScript handed to Ghostscript — is Adobe *formats* end to end.
+
+But **Ghostscript is not Adobe's**, and the distinction is the whole point. It was written by
+L. Peter Deutsch in 1986, developed by Aladdin Enterprises, and is maintained today by Artifex
+Software under a dual AGPL and commercial licence. It is an independent implementation of
+Adobe's languages, and it is the one that actually runs — on Linux servers, in container
+images, behind ImageMagick's PDF delegate, in most places a thumbnail gets generated.
+
+So the burden splits. **Adobe owns the specifications; a third party Adobe does not fund
+carries the security consequences of everyone adopting them.** That is what winning a standard
+actually looks like from the outside: the format becomes universal, implementations get written
+by people with no relationship to its author, and the risk lands on whoever wrote the parser
+that shipped in the base image.
+
+It is worse here than the general case, because PostScript is not a document format. It is a
+Turing-complete programming language, which is why Ghostscript needs a `-dSAFER` sandbox at all
+— and why that sandbox has had to be repaired more than once. A "generate a PDF preview"
+feature is an offer to execute a submitted program.
+
+None of which is hypocrisy on anyone's part. It is arithmetic. **Ubiquity is what makes a parser
+worth attacking**, and a format every system must read is a format every attacker studies. The
+price of winning the standard is that your format becomes the one worth breaking, whoever ends
+up maintaining the code that reads it.
 
 ### Where the pattern breaks, and what it explains
 
