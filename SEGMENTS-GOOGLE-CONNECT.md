@@ -188,6 +188,46 @@ traffic inside surfaces you own instead of leaking it to a generic result.
 
 ---
 
+## 4d. JSON-LD: an object at the edge, a row everywhere it is used
+
+The crawl door in 4c depends on structured data actually reaching the crawler. Two things go
+wrong, and the first is a publishing mistake that produces no error anywhere.
+
+### It cannot live in a Rich Text field
+
+Webflow Rich Text stores **sanitised HTML**. Paste JSON-LD into one and it is escaped and wrapped
+in block elements — a `<script type="application/ld+json">` does not survive. What ships is the
+JSON **as visible paragraph text**.
+
+The symptom is quiet in every direction. The CMS shows the JSON. The page renders. Nothing logs a
+failure. And the crawler reads prose, so the product never appears — **not rejected, just never
+seen.** A reader can also read your markup, which is its own small indignity.
+
+Structured data has to arrive inside a script tag, which means one of three places: an **HTML
+Embed element**, **page settings custom code**, or **injection at the edge**. The PDP JSON-LD
+push takes the third route deliberately — generated from the record, not authored in a field,
+so it cannot drift from the product it describes and cannot be sanitised away by a rich text
+editor.
+
+### What it turns into downstream
+
+Delivered correctly, JSON-LD is a **JSON object** syntactically and an **RDF graph** semantically
+— `@id` makes nodes referenceable, `@graph` lets several coexist. That form exists for transport
+and discovery. Both consumers convert it immediately, and in the same direction:
+
+| Consumer | What it receives | What it becomes |
+|---|---|---|
+| **Merchant Center** (crawl / autofeed) | One `Product` object per PDP | **One row** — `offers.price` becomes the price column, `offers.availability` becomes availability, `gtin`/`mpn`/`brand` become the identifier columns |
+| **BQML** | Nothing directly. BigQuery can store and query JSON, but a model trains on a **table** | **Feature columns**, extracted and flattened before `CREATE MODEL`, exactly as the pLTV feature SQL does |
+
+> **JSON-LD is an object at the edge and a row everywhere it is actually used.**
+
+Which has three consequences worth holding:
+
+- **A missing attribute in the object is a missing column in the row.** There is no partial credit and no error — the offer simply lacks a field Merchant needed.
+- **Each consumer flattens differently**, and none of them carries the relationships. Whoever performs the flattening decides what survives.
+- **Generate it from the system of record.** Hand-authoring structured data in a CMS field means the object and the row have different parents, and reconciling them later is archaeology rather than a schema question.
+
 ## 5. The warehouse feed
 
 Deltas come off a **sync queue**, not a timestamp watermark — the queue gives idempotency, retry, and dead-lettering, and keeps the feed inside the audit chain (watermarks silently miss hard-deletes).
