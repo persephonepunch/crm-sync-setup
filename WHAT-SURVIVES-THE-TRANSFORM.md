@@ -485,10 +485,47 @@ permitted work, not permitting work. It belongs behind a permissions boundary wi
 system-of-record answering for it, and moving a compile step to a model without that is a change
 of implementation dressed as a change of posture.
 
-### CORS is not the thing protecting it
+### Four questions, four layers — CORS, Rules and a system of record
 
-Worth saying because the assumption is near-universal: **CORS is a browser-enforced restriction
-on reading responses, not an access control.** It stops one site's JavaScript from reading
+CORS judged alone looks like a broken access control. Rules judged alone look like a partial
+security product. A system of record judged alone looks like it never touches the serve path.
+Each reads as a gap, and the reading is the mistake: **these are not three partial solutions.
+They are four different questions, and each layer answers exactly one of them.**
+
+| Question | Answered by |
+|---|---|
+| Who is entitled to this asset, and which variants exist? | **The system of record** — the entitlement, versioned and revocable |
+| Do we serve it, or refuse? | **The worker** — the permissions boundary, server-side, called by every path |
+| How may it be handled once served? | **Rules and response headers** — `nosniff`, disposition, caching, rate limiting |
+| Who may read it cross-origin in a browser? | **CORS** — narrowing what another site's script may do with the response |
+
+A request passes all four in order. Edge rules apply first — rate limit, managed ruleset, origin
+routing. The worker resolves the subject and asks the system of record whether that subject is
+entitled. **The worker refuses or serves; this is the only place a decision is made.** If it
+serves, it reads from object storage by tenant-prefixed key, normalises the filename, and sets
+the content type from a render allow-list with `nosniff`. Then the cross-origin headers decide
+who may read the result in a browser, with credentials on a strictly narrower allow-list than
+reflection.
+
+Five refusals, five different reasons, nothing redundant. **Defence in depth means layers
+answering different questions** — layers answering the same question are duplicated code with
+two places to get it wrong.
+
+Which is why the usual complaint dissolves. CORS "fails" as an access control because it was
+never asked to be one, and in this arrangement it is not asked to be: entitlement is answered
+before the response exists, so the cross-origin rules are free to do the narrow job they are
+actually good at. **Paired, they resolve the access question completely.**
+
+Two things sit outside that, and both have their own answers earlier in this document: the
+**parser**, which is contained by isolation rather than by permission, and **provenance**, which
+travels in a descriptor beside the asset. Those are not gaps in this arrangement. They are
+different problems, and conflating them is how estates end up with four mechanisms that all
+answer "who" and none that answer "what is this" or "what may it execute".
+
+### What CORS is, precisely
+
+Worth stating exactly, because the assumption is near-universal: **CORS is a browser-enforced
+restriction on reading responses, not an access control.** It stops one site's JavaScript from reading
 another site's response using the visitor's ambient credentials. It does not stop the request —
 a non-browser client ignores it completely — and it does not protect data an endpoint would
 return anyway.
