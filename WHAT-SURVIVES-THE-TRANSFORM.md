@@ -369,6 +369,71 @@ allow-list of what may render inline. That is a safety control. The descriptor i
 control. Conflating them is why so many DAMs can tell you a file is a PNG and not tell you
 whether you are allowed to publish it.
 
+## The parser your AI pipeline did not know it had
+
+Everything above concerns assets you publish. This section concerns assets you *ingest*, and it
+is where the two halves of this document meet — because a retrieval system is a media pipeline
+that happens to produce answers instead of pictures.
+
+PDFs are the dominant enterprise document format, so any system indexing internal documents is
+parsing them. The common routes — document loaders, OCR pipelines that rasterise a PDF before
+reading it, a thumbnail step using ImageMagick's PDF delegate — end at a PostScript interpreter
+for at least some inputs. Most teams do not know it is in the path. It arrived with a base
+image.
+
+### The privilege is inverted
+
+This is the part that matters, and it is almost universal.
+
+Enormous care goes into sandboxing the **model**: restricted tools, filtered outputs, guardrails,
+evaluation. Meanwhile the **ingestion worker** — the component that actually receives
+attacker-supplied documents — runs as an ordinary process holding the embedding API key, the
+vector store credentials, database access and a route into the private network.
+
+**The component receiving hostile input has more privilege than the component everyone is
+protecting.**
+
+### What that exposes
+
+| Exposure | Why it matters here |
+|---|---|
+| **Credentials and corpus** | Compromise the ingestion worker and you hold the embedding key, the vector store, and every document already indexed. A retrieval corpus is a deliberately concentrated collection of an organisation's internal documents — a better target than model weights |
+| **SSRF from inside the perimeter** | These parsers fetch URLs. An ingestion worker sits within reach of internal APIs and the cloud instance-metadata endpoint, which vends credentials. A document that triggers an outbound request from in there is a pivot |
+| **File disclosure into the index** | Constructs like `label:@/path` read a local file into the *rendered output*. If that output is then OCR'd and embedded, **a server-side file becomes an ordinary chunk in the vector store** — retrievable later by asking the assistant a plausible question |
+| **Ingestion denial of service** | Decompression and rendering bombs stall the pipeline. Needs no vulnerability; a timeout is the only thing that stops it |
+
+The third row deserves reading twice. **The exfiltration channel is the assistant's own answer.**
+No outbound connection is required at any point, so egress monitoring sees nothing and a network
+policy prevents nothing. The data leaves by being retrieved.
+
+### This is not prompt injection, and the difference is the point
+
+Two attacks arrive in the same uploaded document. Only one of them gets discussed.
+
+**Prompt injection** is content manipulating the *model*. It makes the assistant misbehave, it is
+what the industry threat-models, and there is a growing literature on it.
+
+**Parser compromise** is content executing on the *host*, and it runs before the model is ever
+invoked. It does not make the assistant misbehave — it makes your infrastructure misbehave. It is
+strictly the worse of the two, and it receives a fraction of the attention, because the parser
+is not the part anybody thinks of as AI.
+
+### The same bargain, one layer earlier
+
+The fix is the one this document keeps arriving at: **parse where a compromise costs nothing.**
+
+- Run ingestion in an isolated sandbox with **no credentials and no network**. No embedding key,
+  no database, no route inward. Hand it bytes; take back text.
+- Prefer pure-library extraction over shelling out to a rasteriser — fewer processes, and no
+  delegate system to configure wrongly.
+- Harden `policy.xml`, and remove Ghostscript where nothing genuinely needs PostScript rendering.
+- Treat the ingestion worker as untrusted infrastructure, because that is exactly what it is.
+
+And it connects back to the descriptor argument. An agent that can read an asset's rights from a
+descriptor beside it does not need to open the binary to find out what it may do. **Every parse
+avoided is an attack surface that was never presented** — which is the whole of this document,
+stated once more at the point where assets stop being published and start being consumed.
+
 ## What it costs
 
 | Cost | What it means | Severity |
