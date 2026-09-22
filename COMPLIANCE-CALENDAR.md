@@ -92,6 +92,34 @@ It is also the sharpest way to state the difference between a consent management
 
 Two entries below make that concrete rather than theoretical. Feed labels do not carry over automatically when the Content API shuts down, so the record of what was published under which release is the only way to reconstruct what a feed actually contained. And fields deprecated in the 2026-10 release are removed in 2027-01 — a nine-month overlap, every release, during which both shapes are live and only the release stamp distinguishes them.
 
+## The lag is the point
+
+The rows below are not a to-do list with deadlines. Most of them are **decisions about
+conduct that had already happened**, and the gap between the two is the part worth planning
+around.
+
+| Decision | Conduct it judged | Gap |
+|---|---|---|
+| Google, €403M, Sept 2026 | May 2018 – Feb 2020 | **6.5 years** |
+| Todd Snyder, May 2025 | a 40-day window in 2023 | ~2 years |
+| Honda, March 2025 | consent tooling as configured, years prior | — |
+
+Two things follow, and the second is the one that costs money.
+
+**A record you cannot produce later is a defence you do not have.** GDPR Art. 7 has required
+controllers to *demonstrate* consent since 2018. Demonstrating it in 2032 means holding what
+the subject was shown in 2026 — the wording, the jurisdiction that applied, the purposes
+offered — frozen at capture. Re-deriving it later judges a past grant under a law the
+subject was not standing in.
+
+**Fixing it forward does not clear the back catalogue.** Google's response to the €403M was
+that the case concerned historical settings, since updated. That is true and it did not
+reduce the fine. A remediation closes the exposure from the day it ships; everything behind
+it is already written.
+
+So the operative question is not *"are we compliant today"*. It is *"if a regulator opens an
+investigation in 2031 into what we did this week, what can we produce?"*
+
 ## The calendar
 
 | Date | Authority | What changed |
@@ -122,6 +150,7 @@ Two entries below make that concrete rather than theoretical. Feed labels do not
 | **2026-06-15** | Google | **Google Signals retired as a control.** Consent Mode `ad_storage` becomes the *sole* control over what GA4 sends to Google Ads. |
 | **2026-06-30** | Shopify | **Script Editor removed.** Surviving payment, shipping, and discount Scripts stop — silently. |
 | **2026-08-02** | EU | **AI Act Article 50 transparency obligations apply.** |
+| **2026-09-21** | EU (Irish DPC) | **Google fined €403M over location data** — Web & App Activity, Location History, Location Accuracy judged not sufficiently lawful, fair or transparent, with six months to bring processing into compliance. **The conduct reviewed ran 25 May 2018 to 4 February 2020.** Six and a half years from act to decision, on an investigation opened in 2020. Google's answer — that the case concerned *historical settings* since updated — did not reduce it. The holding that travels: *available in a settings screen* is not the same as understandable, lawfully based, proportionately retained, and demonstrable. Every one of those duties sits on the controller sending the data, not on the recipient. |
 | **2026-08-18** | Google | **Content API for Shopping shuts down.** Product feeds ride the Merchant API only — regions, ISO time, `amountMicros`. Feed labels do not carry over automatically. |
 | 2026-09 | EU | **Cyber Resilience Act vulnerability-reporting obligations begin.** |
 | **2026-10** | Shopify | **Customer Account API removes `Customer.lastIncompleteCheckout`** and the Checkout Classic types. |
