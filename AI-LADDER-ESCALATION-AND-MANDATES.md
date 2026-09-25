@@ -1,6 +1,6 @@
 ---
 title: "The AI ladder: retrieval, adapters, humans, and who holds the keys"
-description: "Challenge and solution for putting AI into commerce without letting it decide what it may not. Definitions of RAG, CRAG, LoRA and human-in-the-loop escalation; when data justifies each rung; and why ADK, Kubernetes/Helm and a Cloudflare higher-order 'helmet' are three different layers — with the mandate as the only way an agent is allowed to act."
+description: "Challenge and solution for putting AI into commerce without letting it decide what it may not. Definitions of RAG, CRAG, LoRA and human-in-the-loop escalation; when data justifies each rung; and why ADK, Kubernetes/Helm and a Cloudflare higher-order 'helmet' are three different layers — with the mandate as the only way an agent is allowed to act; and what a SOC 2 review — a procedural assessment of how an organisation operates, not a certification — asks of AI transport."
 canonical: https://persephonepunch.github.io/crm-sync-setup/ai-ladder-escalation-and-mandates.html
 category: "Specs"
 date: 2026-09-25
@@ -13,6 +13,7 @@ tags:
   - entitlement
   - consent
   - security
+  - compliance
 keywords:
   - CRAG
   - corrective retrieval-augmented generation
@@ -27,6 +28,8 @@ keywords:
   - higher-order function
   - agent mandate
   - AP2
+  - SOC 2
+  - Trust Services Criteria
 ---
 
 # The AI ladder: retrieval, adapters, humans, and who holds the keys
@@ -55,6 +58,8 @@ designer — and several of them are used loosely elsewhere. This document uses 
 | **Mandate** | What an *agent* may do **on someone's behalf**: signed, capped, scoped, time-boxed, revocable | A stored password or API key |
 | **ADK** — Google Agent Development Kit | A runtime for LLM **agents**: sub-agents, tools, sessions, memory | Infrastructure. It decides what to *try*, not what is *allowed* |
 | **Kubernetes / Helm** | Kubernetes runs containers; **Helm** packages them: a *chart* (templates) + a *values* file per deployment | A security boundary for data. It places workloads |
+| **SOC 2 review** | A **procedural assessment**: an independent CPA firm examines how an organisation runs a service — people, process and technology, end to end — against the AICPA **Trust Services Criteria**, and issues a **report** with its opinion and any exceptions. **Type I** tests whether controls are *designed* properly at one date; **Type II** tests whether they *operated* effectively over a period (commonly 3–12 months) | A certification, a certificate, a badge on a product, a database, a tool you install, or a law. There is no "SOC 2 certified" object — there is a report about an organisation's methods, for a period, with a scope |
+| **Trust Services Criteria** | The five categories a SOC 2 report can cover: **Security** (always), **Availability**, **Processing Integrity**, **Confidentiality**, **Privacy** | A checklist of products. The organisation chooses which categories are in scope and designs its own controls against them |
 | **Helmet** | This estate's name for a **higher-order function** at the Cloudflare edge: it takes the page's behaviour (or an agent's tool call) and returns a wrapped version that loads consent first and checks the mandate before anything acts | Helm. The name is borrowed on purpose — chart ≈ loader, values ≈ per-tenant config — but it runs on every request, not once at deploy |
 
 ---
@@ -191,7 +196,52 @@ a standing API key, or the shopper's login beyond the single step it was handed 
 
 ---
 
-## 7. What this costs
+## 7. SOC 2: what AI transport puts in scope
+
+**What a SOC 2 review is, precisely.** It is a *360° procedural assessment*: not of a product,
+a server or a database, but of **how an organisation operates a system** — who can reach data,
+how changes are approved and tested, how vendors are chosen and watched, how incidents are
+detected and answered, how data is kept and destroyed. An independent CPA firm tests those
+methods against the Trust Services Criteria and writes a report. The report describes a
+**scope** (which system, which criteria) and a **period**; it can carry **exceptions** where a
+control did not work as described.
+
+| Misreading | Why it is wrong | What to say instead |
+|---|---|---|
+| "Our product is SOC 2 certified" | SOC 2 is an attestation **report**, not a certification of an object | "Our operation of *system X* has a SOC 2 Type II report for *period Y*" |
+| "The database is SOC 2" | A database is a component; the review covers the organisation's methods around it | "The provider of our database has its own SOC 2 report; we rely on it and cover our side" |
+| "We use a SOC 2 vendor, so we are covered" | A vendor's report covers the vendor. Your controls over what you send it are yours — the report calls these **complementary user entity controls** | "We reviewed the vendor's report and operate the controls it assigns to us" |
+| "Passed once, done" | Type II describes a period that ends; the next period is tested again | "Current report covers *dates*; the next period is in progress" |
+
+**Where the fines actually come from.** A SOC 2 report does not fine anyone. Penalties come from
+the **laws and contracts** the controls exist to satisfy — US state privacy law (for example
+California's CCPA/CPRA, assessed per violation), the GDPR in Europe, Korea's PIPA — and from
+customer contracts that require the controls. A report with exceptions is usually where that
+scrutiny starts: it is the document a customer, an auditor or a regulator reads first.
+
+**Why AI transport changes the scope.** The moment an organisation's DevOps sends data to a model
+— a hosted LLM, an embedding service, an agent runtime, possibly in another country — new
+methods have to exist, and a reviewer will ask for evidence of each:
+
+| What AI transport adds | Criteria it falls under | The evidence a reviewer asks for |
+|---|---|---|
+| A **new subprocessor** (the model provider) and possibly a new country | Security (vendor risk), Privacy (disclosure to third parties) | The subprocessor list, the provider's own report, where inference runs, whether it trains on your data |
+| **Personal data leaving the organisation** in prompts, retrieval and memory | Confidentiality, Privacy | Minimisation (what is removed before sending), encryption in transit and at rest, consent for the purpose |
+| **Retention inside AI stores** — vector indexes, agent memory, prompt logs | Confidentiality (disposal), Privacy (retention and deletion) | A retention period per store, and proof that an erasure request reaches each one |
+| **Changes to models, prompts and adapters** | Security (change management) | Versioning, review, a test gate before release — a prompt change is a production change |
+| **An agent that can act** (buy, refund, send) | Security (logical access), Processing Integrity | What authorises each action — here, a signed, capped, revocable mandate checked server-side — and a log of every grant and refusal |
+| **Answers customers rely on** | Processing Integrity | How wrong answers are caught (§3), escalated (§4) and corrected |
+
+**In this estate, the honest status:** most of the evidence above exists as running code and
+records — field-level encryption before storage, a consent log per grant, mandates checked on
+every action, retention and erasure jobs, a release gate. Two gaps are stated rather than
+hidden: agent-runtime sessions and memory are **not yet** in the erasure sweep, and the edge
+model used for public questions does **not** pin inference to one country. Mapping controls to
+the criteria is preparation for a review; it is not a SOC 2 report, and nothing here claims one.
+
+---
+
+## 8. What this costs
 
 | Choice | Cost | Stated plainly |
 |---|---|---|
@@ -204,7 +254,7 @@ a standing API key, or the shopper's login beyond the single step it was handed 
 
 ---
 
-## 8. Summary
+## 9. Summary
 
 | Question | Answer |
 |---|---|
@@ -213,4 +263,5 @@ a standing API key, or the shopper's login beyond the single step it was handed 
 | What happens when neither is good enough? | A tiered escalation to a person, whose answer becomes the next training pair |
 | Is ADK required? | No. It is one possible agent layer; permission does not live in it |
 | What do Kubernetes/Helm do here? | Place workloads per deployment; the values file is where residency is declared |
+| Is SOC 2 a certification? | No — a procedural assessment of how an organisation operates a system, reported for a scope and a period. AI transport adds subprocessors, retention stores, model changes and acting agents to what it must evidence |
 | What stops an agent overreaching? | A signed, capped, scoped, time-boxed, revocable mandate — checked by the helmet on every action |
