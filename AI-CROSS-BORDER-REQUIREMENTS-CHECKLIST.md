@@ -38,6 +38,9 @@ keywords:
   - ISO 4217
   - units of measure
   - state management
+  - cross-channel data
+  - point of sale
+  - household
 ---
 
 # AI cross-border requirements: a scannable checklist
@@ -142,7 +145,33 @@ trade is that every rule has exactly one home, and it is not the page.
 
 ---
 
-## 6. US integration-platform (ERP/CRM middleware) fees
+## 6. Cross-channel: the same rules on every channel
+
+Mobile, browser, household, point of sale and desktop each capture data differently, but a
+channel is **not** a permission. Every channel sends inputs to the same server, which applies
+the same consent, capability and mandate rules — so what an AI can see or do never depends on
+which door the data came through.
+
+| Channel | Identity and consent captured | Where state lives | Transport to the server | What an AI may see or do | Security mandate |
+|---|---|---|---|---|---|
+| **Mobile** (installable web app, native shell) | Signed-in subject; consent asked by jurisdiction on first use | Server; the device caches only the app shell, never consent or orders | HTTPS; offline actions queued and replayed idempotently | Only what the subject's claims allow; nothing cached on the device is authoritative | No secrets in the app; no cached consent answers |
+| **Browser** | Same as mobile; bot check on every submission | Server; cookies hold a session reference, not decisions | HTTPS; field-level encryption before storage | Same as mobile | Consent decided before any tag loads; no permission logic in page code |
+| **Household** (shared device, shared account, family members) | **Per person**, not per device — each member's consent and claims are their own | Server, keyed to the person, with the household as a relationship | Same as browser | Recommendations may use household context only where **each** member's consent allows | One member's grant never covers another; erasure is per person |
+| **Point of sale** (store terminal) | Staff identity for the terminal; customer identity only when the customer offers it | Server; the terminal holds a scoped key, not customer data | Scoped event keys — e.g. a terminal may **read** consent, not **write** product data | May read whether a customer consented to a purpose; may not export or enrich | Keys scoped per terminal and revocable on the next request |
+| **Desktop** (installed app) | Same as browser — the app shows the hosted page | Server; the app stores nothing sensitive | HTTPS to the same endpoints | Same as browser | Signed installer; no native access granted to remote content |
+| **Agent** (AI acting for a subject) | The subject's claims, passed for one step, never stored by the agent | Server | Tool calls to the same endpoints, each checked | Only under a **signed, capped, scoped, time-boxed, revocable mandate** | Every grant and refusal logged; no standing credential |
+
+| Rule that holds across channels | Why |
+|---|---|
+| Consent follows the **person and their location**, not the device or channel | A household tablet and a store terminal must not widen what one person agreed to |
+| The server is the only place a decision is made | A channel that decides for itself becomes the weakest channel |
+| Every channel's data carries the same codes (ISO country, language, currency, units) | Otherwise the same customer is a different record per channel |
+| AI visibility is granted per purpose, not per channel | "The agent can see POS data" is not a rule; "the agent may read consent status for purpose X" is |
+| Erasure reaches every channel's copies | Including terminal logs, device caches, agent memory and ad platforms |
+
+---
+
+## 7. US integration-platform (ERP/CRM middleware) fees
 
 Only MuleSoft's entry price and Boomi's pay-as-you-go are published by the vendors; every other
 figure is a third-party estimate. **Get a quote.**
@@ -153,12 +182,12 @@ figure is a third-party estimate. **Get a quote.**
 | **Boomi** | Pay-as-you-go **$99/month + $0.05 per message** ([official](https://boomi.com/pricing/)); committed editions quote-only, reported **$50k–$190k+/year**, total cost often **2–3× licence** ([Automation Atlas](https://automationatlas.io/answers/boomi-pricing-explained-2026/)) | Per message, or annual contract |
 | **Celigo** | No list price; reported **~$1,000–$1,500/month** small, **$5,000+/month** enterprise (~$12.8k–$73k/year by company size) ([Vendr](https://www.vendr.com/marketplace/celigo), [Integrate.io](https://www.integrate.io/blog/celigo-pricing/)) | Quote, by flows and endpoints |
 
-**What the fee does not include:** the controls in §1–§5. A middleware platform moves data; the
+**What the fee does not include:** the controls in §1–§6. A middleware platform moves data; the
 consent, retention, erasure and residency evidence is still the organisation's to produce.
 
 ---
 
-## 7. Retention and consent gaps that become penalties (US)
+## 8. Retention and consent gaps that become penalties (US)
 
 | System | What to check | Why it matters |
 |---|---|---|
@@ -171,7 +200,7 @@ consent, retention, erasure and residency evidence is still the organisation's t
 
 ---
 
-## 8. The one-line summary per section
+## 9. The one-line summary per section
 
 | Section | If you remember one thing |
 |---|---|
@@ -180,5 +209,6 @@ consent, retention, erasure and residency evidence is still the organisation's t
 | Scaling | A second answer path and idempotent retries, or availability is a hope |
 | AI-specific | The agent never decides what it may do |
 | Rules vs theme | Decide on the server from rules and ISO codes; the theme only displays |
+| Cross-channel | A channel is not a permission; every channel meets the same server rules |
 | Middleware fees | The fee moves data; it does not produce the compliance evidence |
 | Penalties | Retargeting without honouring opt-out is priced per consumer |
