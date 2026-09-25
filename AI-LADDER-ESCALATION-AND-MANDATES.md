@@ -34,13 +34,6 @@ keywords:
 
 # The AI ladder: retrieval, adapters, humans, and who holds the keys
 
-**The one-line version:** knowledge goes in retrieval, behaviour goes in adapters, what neither
-can answer goes to a person, and no model — at any rung — decides what it is allowed to do.
-That decision lives in one place, before every action, and an agent reaches it only through a
-mandate.
-
----
-
 ## 0. Vocabulary
 
 Four readers use these words — a business analyst, a developer, a compliance reviewer and a
