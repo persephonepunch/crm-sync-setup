@@ -30,6 +30,14 @@ keywords:
   - CCPA penalties
   - Global Privacy Control
   - retargeting
+  - rules-based permissions
+  - capability claims
+  - hreflang
+  - ISO 3166
+  - ISO 639
+  - ISO 4217
+  - units of measure
+  - state management
 ---
 
 # AI cross-border requirements: a scannable checklist
@@ -89,7 +97,52 @@ definition, and why AI transport widens its scope, is in
 
 ---
 
-## 5. US integration-platform (ERP/CRM middleware) fees
+## 5. Rules on the server vs rules in the theme
+
+An AI agent has no browser. Anything decided in theme code — a Liquid condition, a script, a
+hard-coded attribute — is invisible to an agent, a scheduled job and a webhook, and editable by
+anyone who can reach the page. So permissions, data updates and every value an agent or a
+feed will read must be **decided server-side from rules and data**, and only **displayed** by
+the theme.
+
+**Permissions and data updates**
+
+| Concern | Rules-based, server-side (capabilities · claims · extras) | Hard-coded in the front-end theme | What goes wrong with hard code | SOC 2 criterion |
+|---|---|---|---|---|
+| Who may do what | Resolved **per request** from the subject's claims and capability rows | `if` conditions in theme scripts or templates | Visible in the page source and bypassed by calling the API directly | CC6.1 |
+| An agent updating data | The agent calls an endpoint that checks the **capability and a signed mandate**, then the server writes | The agent fills in forms or replays page requests | No check applies to a caller without a browser; nothing records who acted | CC6.1 · PI1.2 |
+| Revoking access | One row changes; effective on the **next** request | A theme redeploy, plus cached pages that keep the old rule | Access outlives the decision to remove it | CC6.2 |
+| Preferences and extras (language, market, consent flags) | Stored as claims/extras; read by every caller the same way | Held in theme variables or cookies | The page, the agent and the batch job each see a different answer | P2 · CC6.1 |
+| Consent | Decided at the edge from where the visitor **is**, before anything loads | A banner that hides and shows elements | Tags already fired; no evidence of what was granted | P2–P3 |
+| Change control | Rules are data with a version and a test gate | Edits to theme files, often outside review | A rule change ships without a record | CC8.1 |
+| Audit | Every grant and refusal logged with its reason | Nothing | "Who allowed this?" has no answer | CC7.2 |
+
+**Values that must be codes, not text**
+
+| Value | Server-side (declared, coded) | Hard-coded theme text | What goes wrong |
+|---|---|---|---|
+| Language and region (`hreflang`) | Generated from the market registry as **ISO 639-1 language + ISO 3166-1 country** (`ko-KR`, `en-US`) plus `x-default` | Hand-written values such as `korean`, `en` alone, or one list pasted into every theme | Search engines ignore invalid values; adding a market means editing every theme; pages point at each other inconsistently |
+| Country and jurisdiction | ISO 3166-1 / 3166-2 (`KR`, `US-CA`) resolved from **location**, never from language | Inferred from the page language or a dropdown | A Korean speaker in California gets Korean consent rules — the wrong law |
+| Currency | ISO 4217 (`KRW`, `USD`); one canonical currency stored, display converted | A currency symbol typed into the theme | "₩" and "$" rendered from the wrong base; rounding and tax on the wrong amount |
+| Weights and measurements | Value **with a declared unit** (e.g. `1.5 kg`, `60 mm`), from one product record | A bare number in a template (`1.5`) | Carriers rate the wrong parcel; feeds reject or misread it; net content is a legal declaration |
+| Area and regional units | Canonical unit stored (m²); regional units (평, ft²) **derived** for display | Each market's page with its own typed number | The same floor priced three ways |
+
+**State management**
+
+| State | Server-side | Front-end only | What goes wrong |
+|---|---|---|---|
+| Cart, order, payment status | Server records keyed by a server id; the page only displays them | `localStorage` or theme variables | Lost on another device; forgeable; invisible to agents and support |
+| Consent and preferences | An append-only log plus current claims | A cookie the theme reads | No evidence; cleared cookies silently reset a legal choice |
+| Loyalty points and tier | Derived from a ledger on read | A number stored in the page or a customer tag | Balances drift; a tier outlives the points that earned it |
+| Rate limits and retries | Server keys and idempotency | Disabled buttons | Double orders when the button is re-enabled or bypassed |
+
+**What server-side costs:** a service that must be running, a network round trip per decision,
+and rules someone has to maintain as data. The theme stays fast because it only displays; the
+trade is that every rule has exactly one home, and it is not the page.
+
+---
+
+## 6. US integration-platform (ERP/CRM middleware) fees
 
 Only MuleSoft's entry price and Boomi's pay-as-you-go are published by the vendors; every other
 figure is a third-party estimate. **Get a quote.**
@@ -100,12 +153,12 @@ figure is a third-party estimate. **Get a quote.**
 | **Boomi** | Pay-as-you-go **$99/month + $0.05 per message** ([official](https://boomi.com/pricing/)); committed editions quote-only, reported **$50k–$190k+/year**, total cost often **2–3× licence** ([Automation Atlas](https://automationatlas.io/answers/boomi-pricing-explained-2026/)) | Per message, or annual contract |
 | **Celigo** | No list price; reported **~$1,000–$1,500/month** small, **$5,000+/month** enterprise (~$12.8k–$73k/year by company size) ([Vendr](https://www.vendr.com/marketplace/celigo), [Integrate.io](https://www.integrate.io/blog/celigo-pricing/)) | Quote, by flows and endpoints |
 
-**What the fee does not include:** the controls in §1–§4. A middleware platform moves data; the
+**What the fee does not include:** the controls in §1–§5. A middleware platform moves data; the
 consent, retention, erasure and residency evidence is still the organisation's to produce.
 
 ---
 
-## 6. Retention and consent gaps that become penalties (US)
+## 7. Retention and consent gaps that become penalties (US)
 
 | System | What to check | Why it matters |
 |---|---|---|
@@ -118,7 +171,7 @@ consent, retention, erasure and residency evidence is still the organisation's t
 
 ---
 
-## 7. The one-line summary per section
+## 8. The one-line summary per section
 
 | Section | If you remember one thing |
 |---|---|
@@ -126,5 +179,6 @@ consent, retention, erasure and residency evidence is still the organisation's t
 | Transport | Where data lives is a deployment setting, and it decides who must consent |
 | Scaling | A second answer path and idempotent retries, or availability is a hope |
 | AI-specific | The agent never decides what it may do |
+| Rules vs theme | Decide on the server from rules and ISO codes; the theme only displays |
 | Middleware fees | The fee moves data; it does not produce the compliance evidence |
 | Penalties | Retargeting without honouring opt-out is priced per consumer |
