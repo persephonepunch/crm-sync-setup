@@ -62,7 +62,7 @@
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
     <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a></p>
   </header>
 
   <section id="people">
@@ -737,6 +737,112 @@
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section id="supply" style="display:grid;gap:14px">
+    <h2>6 · Supply chain: the lock file, and who may publish</h2>
+    <p>What runs in production should be exactly what was reviewed. The lock file fixes which code goes in; the publishing rule fixes who can put it live. An outside team can write, test and stage everything, but it never holds a credential that publishes to production.</p>
+
+    <h2 style="margin-top:6px">The lock file</h2>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 260" role="img" aria-label="pyproject.toml declares dependencies; uv.lock pins every package to an exact version with a hash. From the lock file, a Python Worker is bundled by pywrangler and snapshotted in Pyodide at deploy, or a container image is built with uv sync --frozen. The same lock file produces the SBOM. The local .venv is never uploaded.">
+        <defs>
+          <marker id="ah8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <rect x="20" y="92" width="150" height="56" fill="none" stroke="currentColor"/>
+          <text x="95" y="116" font-size="13" text-anchor="middle" font-weight="600">pyproject.toml</text>
+          <text x="95" y="134" font-size="11" text-anchor="middle">what you depend on</text>
+          <line x1="170" y1="120" x2="208" y2="120" stroke="currentColor" marker-end="url(#ah8)"/>
+          <rect x="210" y="80" width="180" height="80" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="300" y="104" font-size="13" text-anchor="middle" font-weight="600">uv.lock</text>
+          <text x="300" y="122" font-size="11" text-anchor="middle">every package, exact version</text>
+          <text x="300" y="138" font-size="11" text-anchor="middle">and a hash of each file</text>
+          <text x="300" y="152" font-size="11" text-anchor="middle">changed only through review</text>
+
+          <line x1="390" y1="100" x2="468" y2="52" stroke="currentColor" marker-end="url(#ah8)"/>
+          <line x1="390" y1="120" x2="468" y2="128" stroke="currentColor" marker-end="url(#ah8)"/>
+          <line x1="390" y1="142" x2="468" y2="206" stroke="currentColor" marker-end="url(#ah8)"/>
+
+          <rect x="470" y="24" width="250" height="56" fill="none" stroke="currentColor"/>
+          <text x="595" y="46" font-size="13" text-anchor="middle" font-weight="600">Python Worker</text>
+          <text x="595" y="64" font-size="11" text-anchor="middle">pywrangler bundles the locked packages</text>
+          <rect x="470" y="100" width="250" height="56" fill="none" stroke="currentColor"/>
+          <text x="595" y="122" font-size="13" text-anchor="middle" font-weight="600">Container image</text>
+          <text x="595" y="140" font-size="11" text-anchor="middle">uv sync --frozen: exact, or the build fails</text>
+          <rect x="470" y="178" width="250" height="56" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="595" y="200" font-size="13" text-anchor="middle" font-weight="600">SBOM</text>
+          <text x="595" y="218" font-size="11" text-anchor="middle">every part listed, built from the lock</text>
+
+          <line x1="720" y1="52" x2="758" y2="52" stroke="currentColor" marker-end="url(#ah8)"/>
+          <rect x="760" y="24" width="180" height="56" fill="none" stroke="currentColor"/>
+          <text x="850" y="46" font-size="12" text-anchor="middle">Pyodide in a V8 isolate</text>
+          <text x="850" y="64" font-size="11" text-anchor="middle">snapshot taken at deploy</text>
+          <line x1="720" y1="128" x2="758" y2="128" stroke="currentColor" marker-end="url(#ah8)"/>
+          <rect x="760" y="100" width="180" height="56" fill="none" stroke="currentColor"/>
+          <text x="850" y="122" font-size="12" text-anchor="middle">Container runtime</text>
+          <text x="850" y="140" font-size="11" text-anchor="middle">Cloudflare, Xano or Vertex</text>
+          <line x1="720" y1="206" x2="758" y2="206" stroke="currentColor" marker-end="url(#ah8)"/>
+          <rect x="760" y="178" width="180" height="56" fill="none" stroke="currentColor"/>
+          <text x="850" y="200" font-size="12" text-anchor="middle">Auditor</text>
+          <text x="850" y="218" font-size="11" text-anchor="middle">the receipt for the release</text>
+
+          <rect x="20" y="190" width="370" height="44" fill="none" stroke="currentColor" stroke-dasharray="4 3"/>
+          <text x="205" y="210" font-size="12" text-anchor="middle">.venv on a laptop</text>
+          <text x="205" y="226" font-size="11" text-anchor="middle">never uploaded; rebuilt from the lock at any time</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>Python Workers accept pure-Python packages and packages built for Pyodide; code with native libraries, such as Google's ADK and its gRPC dependency, runs as a container built from the same lock file. A package swapped upstream fails its hash and does not install.</figcaption>
+    </figure>
+
+    <h2 id="publish" style="margin-top:6px">Interactive publishing: no external team holds live credentials</h2>
+    <p>External developers work in their own development account or the staging environment, with a token that can reach staging and nothing else. Production is published by the owner's own person, signed in to Wrangler interactively in a browser, from the reviewed commit. The sign-in belongs to a named person, can be revoked with their account, and is never handed over as a token.</p>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 250" role="img" aria-label="Two lanes separated by a line no live credential crosses. External team: writes code and lock-file changes, opens a pull request, and deploys to staging with a staging-only token. The owner reviews the diff including the lock file, runs the test gate and builds the SBOM, then signs in to Wrangler interactively and deploys the reviewed commit to production, tagged with that commit.">
+        <defs>
+          <marker id="ah9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <text x="20" y="24" font-size="12" letter-spacing="1.5" font-weight="600">EXTERNAL TEAM</text>
+          <rect x="20" y="36" width="190" height="52" fill="none" stroke="currentColor"/>
+          <text x="115" y="58" font-size="13" text-anchor="middle">Code + lock changes</text>
+          <text x="115" y="75" font-size="11" text-anchor="middle">pull request</text>
+          <line x1="210" y1="62" x2="248" y2="62" stroke="currentColor" marker-end="url(#ah9)"/>
+          <rect x="250" y="36" width="230" height="52" fill="none" stroke="currentColor"/>
+          <text x="365" y="58" font-size="13" text-anchor="middle">Staging deploy</text>
+          <text x="365" y="75" font-size="11" text-anchor="middle">token scoped to staging only</text>
+
+          <line x1="20" y1="118" x2="940" y2="118" stroke="currentColor" stroke-width="3" stroke-dasharray="10 6"/>
+          <text x="500" y="110" font-size="11" font-weight="600">no live publish credential crosses this line</text>
+
+          <text x="140" y="146" font-size="12" letter-spacing="1.5" font-weight="600">OWNER'S OWN PERSON</text>
+          <line x1="115" y1="88" x2="115" y2="156" stroke="currentColor" marker-end="url(#ah9)"/>
+          <rect x="20" y="158" width="250" height="70" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="145" y="180" font-size="13" text-anchor="middle" font-weight="600">Review</text>
+          <text x="145" y="198" font-size="11" text-anchor="middle">the diff, including uv.lock</text>
+          <text x="145" y="214" font-size="11" text-anchor="middle">test gate passes · SBOM built</text>
+          <line x1="270" y1="193" x2="318" y2="193" stroke="currentColor" marker-end="url(#ah9)"/>
+          <rect x="320" y="158" width="280" height="70" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="460" y="180" font-size="13" text-anchor="middle" font-weight="600">wrangler login, then deploy</text>
+          <text x="460" y="198" font-size="11" text-anchor="middle">interactive browser sign-in,</text>
+          <text x="460" y="214" font-size="11" text-anchor="middle">a named person, revocable</text>
+          <line x1="600" y1="193" x2="648" y2="193" stroke="currentColor" marker-end="url(#ah9)"/>
+          <rect x="650" y="158" width="290" height="70" fill="none" stroke="currentColor"/>
+          <text x="795" y="180" font-size="13" text-anchor="middle" font-weight="600">Production</text>
+          <text x="795" y="198" font-size="11" text-anchor="middle">version tagged with the commit,</text>
+          <text x="795" y="214" font-size="11" text-anchor="middle">so live code maps to a review</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>If an agency's laptop or CI is compromised, the attacker reaches staging, not customers. Built today: the test gate that blocks a deploy, commit-tagged versions, the SBOM from the lock, and the handover rule that production keys are entered by the owner, not the developer. The staging-only token and interactive-only production publishing are the rule to set for each client.</figcaption>
+    </figure>
   </section>
 
   <p class="line">A VPN trusts the network, and middleware trusts the record. Under the Cloudflare umbrella nothing is trusted by default: the person, the device, the agent and the sync are each checked on every request, against one system of record.</p>
