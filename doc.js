@@ -6,6 +6,8 @@
      data-sub     : curated lede (HTML allowed via **bold**); falls back to meta
      data-source  : GitHub "view source" URL
      data-pdf     : path to the generated PDF for the download button
+     data-extra   : more download buttons, 'path|label' pairs separated by ';'
+                    (e.g. a companion checklist), shown after Markdown
    The first H1 in the markdown becomes the 100-weight hero headline.
    Bold **spans** inside that H1 render heavy — thin headline, bold emphasis.
    ========================================================================== */
@@ -25,6 +27,9 @@
     sub: body.dataset.sub || '',
     source: body.dataset.source || '',
     pdf: body.dataset.pdf || '',
+    extra: (body.dataset.extra || '').split(';').map(function (x) {
+      var p = x.split('|'); return { href: (p[0] || '').trim(), label: (p[1] || '').trim() };
+    }).filter(function (x) { return x.href && x.label; }),
     title: body.dataset.title || ''
   };
 
@@ -79,6 +84,9 @@
       '<span class="spacer"></span>'];
     if (cfg.pdf)    parts.push('<a class="dl" href="' + cfg.pdf + '" download>' + ICON.pdf + 'PDF</a>');
     if (cfg.md)     parts.push('<a class="dl" href="' + cfg.md + '" download>' + ICON.md + 'Markdown</a>');
+    cfg.extra.forEach(function (x) {
+      parts.push('<a class="dl" href="' + x.href + '" download>' + ICON.md + x.label + '</a>');
+    });
     // GitHub sends X-Frame-Options: deny — when this page is shown inside the
     // store/site modal iframe the Source link must escape the frame.
     if (cfg.source) parts.push('<a href="' + cfg.source + '" target="_blank" rel="noopener">' + ICON.git + 'Source</a>');
