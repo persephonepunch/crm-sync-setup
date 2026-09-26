@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Under the Cloudflare Umbrella · Yoonsun Lee</title>
-<meta name="description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, and edge ISR with Xano Auth Me permissions.">
+<meta name="description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, edge ISR with Xano Auth Me, and runtime separation from isolates to containers.">
 <meta name="author" content="Yoonsun Lee">
 <link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/cloudflare-umbrella.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="CRM Sync">
 <meta property="og:title" content="Under the Cloudflare Umbrella">
-<meta property="og:description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, and edge ISR with Xano Auth Me permissions.">
+<meta property="og:description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, edge ISR with Xano Auth Me, and runtime separation from isolates to containers.">
 <meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/cloudflare-umbrella.html">
 <meta property="og:image" content="https://persephonepunch.github.io/crm-sync-setup/assets/og-cloudflare-umbrella.png">
 <meta property="og:image:width" content="1200">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="Diagram: callers pass the Cloudflare edge, where the Worker checks consent, capabilities and mandates against Xano Auth before Shopify or payments act.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Under the Cloudflare Umbrella">
-<meta name="twitter:description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, and edge ISR with Xano Auth Me permissions.">
+<meta name="twitter:description" content="How staff, shoppers, AI agents and data syncs each pass one Cloudflare edge: Cloudflare One instead of a VPN, AI agents that ask rather than decide, the gaps closed-fee middleware leaves, edge ISR with Xano Auth Me, and runtime separation from isolates to containers.">
 <meta name="twitter:image" content="https://persephonepunch.github.io/crm-sync-setup/assets/og-cloudflare-umbrella.png">
 <meta name="twitter:image:alt" content="Diagram: the AI agent asks, the Cloudflare Worker decides with Xano Auth.">
 <style>
@@ -61,8 +61,8 @@
     <div class="eyebrow">People · agents · integrations</div>
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
-    <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="./cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a></p>
+    <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a></p>
   </header>
 
   <section id="people">
@@ -540,6 +540,204 @@
     </div>
   </section>
 
+
+  <section id="runtimes" style="display:grid;gap:14px">
+    <h2>5 · Isolates, containers, VMs: separation as a control</h2>
+    <p>Each layer runs code with less reach than the one below it, and nothing moves down a layer unless the job needs more control. Separation is the security benefit: a fault or a compromise stays inside the layer where it happened.</p>
+    <div class="scroll" style="padding:0">
+      <table>
+        <thead><tr><th>Layer</th><th>Where it runs</th><th>Starts</th><th>What it can reach</th><th>If it is compromised</th></tr></thead>
+        <tbody>
+          <tr><td>Cloudflare Worker<br><span class="mono">V8 isolate</span></td><td>Cloudflare edge, near the caller</td><td>Milliseconds, per request</td><td>Only its declared bindings (KV, R2, D1, secrets) and outbound fetch</td><td>One request's memory. No operating system, no disk</td></tr>
+          <tr><td>XanoScript<br><span class="mono">managed runtime</span></td><td>The Xano instance</td><td>Per request</td><td>Xano's database and cache, through the language only</td><td>No process or operating-system access to abuse</td></tr>
+          <tr><td>Xano Lambda<br><span class="mono">Deno sandbox</span></td><td>Inside a function stack</td><td>Per call, with a timeout</td><td>What the stack passes in, including <span class="mono">$env</span></td><td>Ends at the timeout, but can read environment values: keep secrets out of any Lambda that handles untrusted input</td></tr>
+          <tr><td>Xano Microservice<br><span class="mono">Docker container</span></td><td>Xano's Kubernetes, in the instance's region</td><td>On demand</td><td>What its image and credentials allow; Xano data only through the Xano API</td><td>The container and its credentials. Not the database: there is no direct database connection to steal</td></tr>
+          <tr><td>Cloud VM</td><td>A cloud provider</td><td>Minutes</td><td>A full operating system and network</td><td>The whole machine, which you patch and monitor yourself</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="connectors" style="margin-top:10px">On-demand connectors to SAP, Azure and AWS, after human review</h2>
+    <p>A connector to an enterprise system runs as a container that does not exist until a person has approved exactly what it may read and write. It starts with short-lived credentials scoped to that approval, reaches Xano only through the API, and stops when the job is done.</p>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 330" role="img" aria-label="A request for enterprise data goes to human review, where the data owner and security approve fields, direction, retention and region. The approval is granted as capabilities with a direction and an expiry. Only then does a Docker container start on demand with short-lived scoped credentials; it reaches SAP, Azure Blob Storage or AWS, reads and writes Xano only through the API for the granted fields, records every run in the ledger, and stops when done.">
+        <defs>
+          <marker id="ah6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <rect x="20" y="40" width="150" height="76" fill="none" stroke="currentColor"/>
+          <text x="95" y="64" font-size="13" text-anchor="middle" font-weight="600">Request</text>
+          <text x="95" y="83" font-size="11" text-anchor="middle">a team needs data</text>
+          <text x="95" y="99" font-size="11" text-anchor="middle">from SAP, Azure or AWS</text>
+          <line x1="170" y1="78" x2="208" y2="78" stroke="currentColor" marker-end="url(#ah6)"/>
+
+          <rect x="210" y="30" width="190" height="96" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="305" y="54" font-size="13" text-anchor="middle" font-weight="600">Human review</text>
+          <text x="305" y="73" font-size="11" text-anchor="middle">data owner + security approve:</text>
+          <text x="305" y="89" font-size="11" text-anchor="middle">fields · direction · retention</text>
+          <text x="305" y="105" font-size="11" text-anchor="middle">region · how long</text>
+          <line x1="400" y1="78" x2="438" y2="78" stroke="currentColor" marker-end="url(#ah6)"/>
+          <text x="419" y="70" font-size="10" text-anchor="middle">yes</text>
+
+          <rect x="440" y="40" width="170" height="76" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="525" y="64" font-size="13" text-anchor="middle" font-weight="600">Grant</text>
+          <text x="525" y="83" font-size="11" text-anchor="middle">POST /entitlement</text>
+          <text x="525" y="99" font-size="11" text-anchor="middle">sync caps, direction, expiry</text>
+          <line x1="610" y1="78" x2="648" y2="78" stroke="currentColor" marker-end="url(#ah6)"/>
+
+          <rect x="650" y="30" width="170" height="96" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="735" y="54" font-size="13" text-anchor="middle" font-weight="600">Container</text>
+          <text x="735" y="73" font-size="11" text-anchor="middle">Xano Microservice (Docker)</text>
+          <text x="735" y="89" font-size="11" text-anchor="middle">starts on demand with</text>
+          <text x="735" y="105" font-size="11" text-anchor="middle">short-lived, scoped credentials</text>
+
+          <rect x="850" y="26" width="90" height="30" fill="none" stroke="currentColor"/>
+          <text x="895" y="46" font-size="12" text-anchor="middle">SAP</text>
+          <rect x="850" y="63" width="90" height="30" fill="none" stroke="currentColor"/>
+          <text x="895" y="83" font-size="12" text-anchor="middle">Azure Blob</text>
+          <rect x="850" y="100" width="90" height="30" fill="none" stroke="currentColor"/>
+          <text x="895" y="120" font-size="12" text-anchor="middle">AWS S3 · ECS</text>
+          <line x1="820" y1="60" x2="848" y2="44" stroke="currentColor" marker-end="url(#ah6)"/>
+          <line x1="820" y1="78" x2="848" y2="78" stroke="currentColor" marker-end="url(#ah6)"/>
+          <line x1="820" y1="96" x2="848" y2="113" stroke="currentColor" marker-end="url(#ah6)"/>
+
+          <line x1="735" y1="126" x2="735" y2="178" stroke="currentColor" marker-end="url(#ah6)"/>
+          <text x="745" y="156" font-size="11">granted fields only</text>
+          <rect x="640" y="180" width="190" height="50" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="735" y="201" font-size="13" text-anchor="middle" font-weight="600">Xano API</text>
+          <text x="735" y="219" font-size="11" text-anchor="middle">no direct database connection</text>
+
+          <line x1="640" y1="205" x2="532" y2="205" stroke="currentColor" marker-end="url(#ah6)"/>
+          <rect x="340" y="180" width="190" height="50" fill="none" stroke="currentColor"/>
+          <text x="435" y="201" font-size="13" text-anchor="middle" font-weight="600">Ledger</text>
+          <text x="435" y="219" font-size="11" text-anchor="middle">every grant, run and refusal</text>
+
+          <rect x="20" y="180" width="280" height="50" fill="none" stroke="currentColor" stroke-dasharray="4 3"/>
+          <text x="160" y="201" font-size="12" text-anchor="middle">When the job ends</text>
+          <text x="160" y="219" font-size="11" text-anchor="middle">container stops · credentials expire</text>
+
+          <text x="20" y="272" font-size="12" font-weight="600">Status</text>
+          <text x="20" y="292" font-size="11">Built today: the grant endpoint, sync capabilities with a direction, and the ledger of grants and refusals.</text>
+          <text x="20" y="310" font-size="11">Design, not built: the review screen for connectors, and the SAP, Azure Blob and AWS connector containers.</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>No standing access to the enterprise system exists between jobs. The approval, not the container, holds the authority, and it expires. A compromised connector can reach only the fields it was granted, and only until its credentials run out.</figcaption>
+    </figure>
+  
+    <h2 id="ladder" style="margin-top:10px">Human stakeholders: the least-privilege ladder to on-premises systems</h2>
+    <p>Each person holds only the rung their job needs. The same request needs three different people: one asks, the data owner approves, security issues the credentials. No one can do all three, so no single account, stolen or misused, can open an on-premises system on its own.</p>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 420" role="img" aria-label="A six-rung ladder of human roles from least to most privilege: requester, data and audit, QA and compliance, release manager, data owner, and security. Each rung lists what the role can do and what it cannot. Security issues a short-lived service token; the connector container uses it at Cloudflare Access and reaches the on-premises SAP system through an outbound-only Cloudflare Tunnel, so the site's firewall accepts no inbound connection.">
+        <defs>
+          <marker id="ah7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <text x="52" y="28" font-size="12" letter-spacing="1.5" font-weight="600">ROLE · MOST AT TOP</text>
+          <text x="232" y="28" font-size="12" letter-spacing="1.5" font-weight="600">CAN</text>
+          <text x="430" y="28" font-size="12" letter-spacing="1.5" font-weight="600">CANNOT</text>
+          <rect x="20" y="40" width="600" height="50" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="32" y="60" font-size="11" font-family="ui-monospace,Menlo,monospace">6</text>
+          <text x="52" y="60" font-size="13" font-weight="600">Security</text>
+          <text x="52" y="78" font-size="11">CISO / DPO</text>
+          <text x="232" y="60" font-size="11">issues short-lived credentials</text>
+          <text x="232" y="76" font-size="11">and service tokens; rotates keys</text>
+          <text x="430" y="60" font-size="11">cannot approve its own</text>
+          <text x="430" y="76" font-size="11">request: the data owner must</text>
+          <rect x="20" y="96" width="600" height="50" fill="none" stroke="currentColor"/>
+          <text x="32" y="116" font-size="11" font-family="ui-monospace,Menlo,monospace">5</text>
+          <text x="52" y="116" font-size="13" font-weight="600">Data owner</text>
+          <text x="52" y="134" font-size="11">owner of the on-prem system</text>
+          <text x="232" y="116" font-size="11">approves fields, direction and</text>
+          <text x="232" y="132" font-size="11">retention, for their system only</text>
+          <text x="430" y="116" font-size="11">cannot issue credentials</text>
+          <text x="430" y="132" font-size="11">or run the connector</text>
+          <rect x="20" y="152" width="600" height="50" fill="none" stroke="currentColor"/>
+          <text x="32" y="172" font-size="11" font-family="ui-monospace,Menlo,monospace">4</text>
+          <text x="52" y="172" font-size="13" font-weight="600">Release manager</text>
+          <text x="52" y="190" font-size="11"></text>
+          <text x="232" y="172" font-size="11">promotes an approved, tested</text>
+          <text x="232" y="188" font-size="11">connector to production</text>
+          <text x="430" y="172" font-size="11">cannot change what the</text>
+          <text x="430" y="188" font-size="11">connector may read or write</text>
+          <rect x="20" y="208" width="600" height="50" fill="none" stroke="currentColor"/>
+          <text x="32" y="228" font-size="11" font-family="ui-monospace,Menlo,monospace">3</text>
+          <text x="52" y="228" font-size="13" font-weight="600">QA / compliance</text>
+          <text x="52" y="246" font-size="11"></text>
+          <text x="232" y="228" font-size="11">runs the connector against a</text>
+          <text x="232" y="244" font-size="11">sandbox copy; can revoke it</text>
+          <text x="430" y="228" font-size="11">cannot run it against</text>
+          <text x="430" y="244" font-size="11">production data</text>
+          <rect x="20" y="264" width="600" height="50" fill="none" stroke="currentColor"/>
+          <text x="32" y="284" font-size="11" font-family="ui-monospace,Menlo,monospace">2</text>
+          <text x="52" y="284" font-size="13" font-weight="600">Data and audit</text>
+          <text x="52" y="302" font-size="11"></text>
+          <text x="232" y="284" font-size="11">reads the ledger and</text>
+          <text x="232" y="300" font-size="11">every run's history</text>
+          <text x="430" y="284" font-size="11">cannot change or</text>
+          <text x="430" y="300" font-size="11">run anything</text>
+          <rect x="20" y="320" width="600" height="50" fill="none" stroke="currentColor"/>
+          <text x="32" y="340" font-size="11" font-family="ui-monospace,Menlo,monospace">1</text>
+          <text x="52" y="340" font-size="13" font-weight="600">Requester</text>
+          <text x="52" y="358" font-size="11">content, strategy, revenue BA</text>
+          <text x="232" y="340" font-size="11">asks for a connector; reads</text>
+          <text x="232" y="356" font-size="11">results already approved</text>
+          <text x="430" y="340" font-size="11">cannot see raw on-prem data</text>
+          <text x="430" y="356" font-size="11">or approve anything</text>
+
+          <text x="660" y="28" font-size="12" letter-spacing="1.5" font-weight="600">PATH TO ON-PREMISES</text>
+          <rect x="660" y="40" width="280" height="44" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="800" y="59" font-size="13" text-anchor="middle" font-weight="600">Connector container</text>
+          <text x="800" y="75" font-size="11" text-anchor="middle">starts only after rungs 5 and 6</text>
+          <line x1="800" y1="84" x2="800" y2="118" stroke="currentColor" marker-end="url(#ah7)"/>
+          <text x="810" y="105" font-size="11">service token, expires</text>
+          <rect x="660" y="120" width="280" height="44" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="800" y="139" font-size="13" text-anchor="middle" font-weight="600">Cloudflare Access</text>
+          <text x="800" y="155" font-size="11" text-anchor="middle">checks the token on every request</text>
+          <line x1="620" y1="65" x2="658" y2="142" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#ah7)"/>
+          <text x="626" y="56" font-size="10">issues</text>
+          <rect x="650" y="190" width="300" height="200" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <text x="664" y="384" font-size="11">On-premises data centre · no inbound ports</text>
+          <rect x="680" y="226" width="240" height="44" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="800" y="245" font-size="13" text-anchor="middle" font-weight="600">Cloudflare Tunnel</text>
+          <text x="800" y="261" font-size="11" text-anchor="middle">cloudflared, connects outward</text>
+          <line x1="800" y1="226" x2="800" y2="166" stroke="currentColor" stroke-width="2" marker-end="url(#ah7)"/>
+          <text x="810" y="186" font-size="11">outbound only</text>
+          <line x1="800" y1="270" x2="800" y2="306" stroke="currentColor" marker-end="url(#ah7)"/>
+          <rect x="680" y="308" width="240" height="60" fill="none" stroke="currentColor"/>
+          <text x="800" y="330" font-size="13" text-anchor="middle" font-weight="600">SAP on premises</text>
+          <text x="800" y="348" font-size="11" text-anchor="middle">only the approved fields,</text>
+          <text x="800" y="362" font-size="11" text-anchor="middle">only in the approved direction</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>Least privilege for people, not only for code. Rungs 2, 3 and 6 map to capabilities that exist today (reading agents and the ledger, testing and revoking, key ceremonies); the connector rungs and the on-premises path are design. The on-premises site opens no firewall port: the Tunnel connects out to Cloudflare, and Access checks the connector's token on every request, exactly as it does for staff in section 1.</figcaption>
+    </figure>
+  
+    <h2 id="secrets" style="margin-top:10px">Secrets along the escalation</h2>
+    <p>The ladder decides who may act; these rules decide where a secret may exist while they do. A secret only ever lives in a secret store, reaches a process at the moment it starts, and expires with the job. Plain-text files on a laptop are the weakest link, so they hold configuration and nothing else.</p>
+    <div class="scroll" style="padding:0">
+      <table>
+        <thead><tr><th>Where a secret could sit</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">.env</span> and other text files</td><td>Configuration only: URLs, project and region names, IDs. Never a key or token. Owner-only permissions (600), never committed.</td></tr>
+          <tr><td><span class="mono">.venv</span> (Python packages)</td><td>Dependencies only. Never holds a secret, never committed, and rebuilt from the lock file rather than copied.</td></tr>
+          <tr><td>Developer sign-in files</td><td>Cloud sign-in tokens on a laptop are real credentials: owner-only, short sessions, and revoked when the person leaves the ladder.</td></tr>
+          <tr><td>Container images</td><td>No secret is ever baked into an image. The connector's credentials are injected when it starts, from the secret store, and expire when it stops.</td></tr>
+          <tr><td>Cloudflare Workers</td><td>Encrypted secrets, typed straight into the platform at a prompt. Never pasted into chat, email or a ticket.</td></tr>
+          <tr><td>Xano</td><td>Environment variables in the workspace; functions read them, people do not copy them out.</td></tr>
+          <tr><td>The key register and the ledger</td><td>Record each key by fingerprint (the first characters of its hash), who rotated it and when. Never the value.</td></tr>
+          <tr><td>Each rung of the ladder</td><td>Only Security (rung 6) handles secret values, and only to put them into a store. Every other rung sees a fingerprint, a status or nothing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   <p class="line">A VPN trusts the network, and middleware trusts the record. Under the Cloudflare umbrella nothing is trusted by default: the person, the device, the agent and the sync are each checked on every request, against one system of record.</p>
 
