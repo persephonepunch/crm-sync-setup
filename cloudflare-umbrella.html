@@ -62,7 +62,7 @@
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
     <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a></p>
   </header>
 
   <section id="people">
@@ -797,6 +797,67 @@
       </svg>
       </div>
       <figcaption>Python Workers accept pure-Python packages and packages built for Pyodide; code with native libraries, such as Google's ADK and its gRPC dependency, runs as a container built from the same lock file. A package swapped upstream fails its hash and does not install.</figcaption>
+    </figure>
+
+    <h2 id="xanoimage" style="margin-top:6px">Build once in the US, run in Korea: the Xano image flow</h2>
+    <p>Xano does not build containers; it runs a finished image pulled from a registry. The Dockerfile and lock file live in your repository, the image is built once in your reviewed pipeline, and each Xano instance pulls that exact image by digest. The image holds code only, so it can be built and stored in the US while Korean personal data never leaves the Seoul instance.</p>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 330" role="img" aria-label="In the United States: the repository holds the Dockerfile and uv.lock; the reviewed build runs uv sync --locked --no-dev and pushes an image to a registry, identified by its digest. A US Xano instance and the client's Seoul Xano instance each pull the same digest. Only code crosses the border. In Seoul, secrets come from the Seoul instance's own environment and Korean personal data is processed there only.">
+        <defs>
+          <marker id="ah10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <rect x="20" y="30" width="540" height="240" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <text x="34" y="50" font-size="12" letter-spacing="1.5" font-weight="600">UNITED STATES · BUILD</text>
+          <rect x="34" y="68" width="150" height="64" fill="none" stroke="currentColor"/>
+          <text x="109" y="90" font-size="13" text-anchor="middle" font-weight="600">Repository</text>
+          <text x="109" y="107" font-size="11" text-anchor="middle">Dockerfile</text>
+          <text x="109" y="122" font-size="11" text-anchor="middle">pyproject.toml · uv.lock</text>
+          <line x1="184" y1="100" x2="212" y2="100" stroke="currentColor" marker-end="url(#ah10)"/>
+          <rect x="214" y="68" width="170" height="64" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="299" y="90" font-size="13" text-anchor="middle" font-weight="600">Reviewed build</text>
+          <text x="299" y="107" font-size="11" text-anchor="middle">uv sync --locked --no-dev</text>
+          <text x="299" y="122" font-size="11" text-anchor="middle">base pinned · non-root</text>
+          <line x1="384" y1="100" x2="408" y2="100" stroke="currentColor" marker-end="url(#ah10)"/>
+          <rect x="410" y="68" width="136" height="64" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="478" y="90" font-size="13" text-anchor="middle" font-weight="600">Registry</text>
+          <text x="478" y="107" font-size="11" text-anchor="middle">image by digest</text>
+          <text x="478" y="122" font-size="11" text-anchor="middle">sha256:…</text>
+
+          <line x1="478" y1="132" x2="478" y2="178" stroke="currentColor" marker-end="url(#ah10)"/>
+          <text x="488" y="160" font-size="11">pull by digest</text>
+          <rect x="380" y="180" width="166" height="70" fill="none" stroke="currentColor"/>
+          <text x="463" y="202" font-size="13" text-anchor="middle" font-weight="600">Xano, US instance</text>
+          <text x="463" y="220" font-size="11" text-anchor="middle">US data, US secrets</text>
+          <text x="463" y="236" font-size="11" text-anchor="middle">Microservice</text>
+          <text x="34" y="200" font-size="11">The image and the SBOM come from</text>
+          <text x="34" y="216" font-size="11">the same uv.lock, so the parts list</text>
+          <text x="34" y="232" font-size="11">matches what both regions run.</text>
+
+          <rect x="600" y="30" width="340" height="240" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <text x="614" y="50" font-size="12" letter-spacing="1.5" font-weight="600">KOREA · RUN</text>
+          <line x1="546" y1="100" x2="618" y2="100" stroke="currentColor" stroke-width="2" marker-end="url(#ah10)"/>
+          <text x="580" y="92" font-size="10" text-anchor="middle">digest</text>
+          <rect x="620" y="68" width="300" height="64" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="770" y="90" font-size="13" text-anchor="middle" font-weight="600">Xano, Seoul instance</text>
+          <text x="770" y="107" font-size="11" text-anchor="middle">owned by the Korean client</text>
+          <text x="770" y="122" font-size="11" text-anchor="middle">runs the image as a Microservice</text>
+          <line x1="770" y1="132" x2="770" y2="162" stroke="currentColor" marker-end="url(#ah10)"/>
+          <rect x="620" y="164" width="300" height="86" fill="none" stroke="currentColor"/>
+          <text x="636" y="186" font-size="11">secrets injected from the Seoul</text>
+          <text x="636" y="202" font-size="11">instance's own environment at start</text>
+          <text x="636" y="224" font-size="11">Korean personal data processed</text>
+          <text x="636" y="240" font-size="11">here only, never sent back to the US</text>
+
+          <text x="20" y="298" font-size="11" font-weight="600">Only code crosses the border: an image holds no personal data and no secrets, so building it in the US moves nothing PIPA governs.</text>
+          <text x="20" y="316" font-size="11">Status: design. No Microservices run yet; the Seoul instance is the client's own, created in the Seoul region (developer spec 2.5).</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>One reviewed build, two regions, identical code, proven by the digest. Xano pulls only from well-known registries, and private-registry credentials carry an expiry: give each instance its own short-lived pull credential. Pin the digest in Xano, never a tag such as :latest, so a re-pushed tag cannot change what Korea runs.</figcaption>
     </figure>
 
     <h2 id="publish" style="margin-top:6px">Interactive publishing: no external team holds live credentials</h2>
