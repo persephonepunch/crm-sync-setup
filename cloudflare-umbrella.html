@@ -62,7 +62,7 @@
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
     <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a> &nbsp;·&nbsp; <a href="#shape">7 · Shape as code</a></p>
   </header>
 
   <section id="people">
@@ -903,6 +903,63 @@
       </svg>
       </div>
       <figcaption>If an agency's laptop or CI is compromised, the attacker reaches staging, not customers. Built today: the test gate that blocks a deploy, commit-tagged versions, the SBOM from the lock, and the handover rule that production keys are entered by the owner, not the developer. The staging-only token and interactive-only production publishing are the rule to set for each client.</figcaption>
+    </figure>
+  </section>
+
+  <section id="shape" style="display:grid;gap:14px">
+    <h2>7 · Shape: designed in the US, shipped as code, no design-tool dependency at run time</h2>
+    <p>A shape is the data model a design surface authors and the runtime renders: fields, where each value came from, and a version. It is designed once (model, view and controller agreed), then compiled into a versioned file that ships in the release like the lock file. From then on the data design is code: day-to-day compute and transport read the compiled shape, and nothing at run time calls Webflow or reaches back to the US.</p>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 960 320" role="img" aria-label="Design time in the US: developers commit the base shape to git and authors publish the design layer in Webflow; the two merge with per-field provenance and compile into a versioned, hashed shape file reviewed with the release. Run time, business as usual in any region including Korea: the Worker and Xano read the compiled shape from the release, apply per-tenant overrides, and render and transport data. Webflow is not called at run time.">
+        <defs>
+          <marker id="ah11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" fill="currentColor">
+          <rect x="20" y="30" width="430" height="220" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <text x="34" y="50" font-size="12" letter-spacing="1.5" font-weight="600">DESIGN TIME · US</text>
+          <rect x="34" y="66" width="170" height="54" fill="none" stroke="currentColor"/>
+          <text x="119" y="88" font-size="13" text-anchor="middle" font-weight="600">Base shape</text>
+          <text x="119" y="106" font-size="11" text-anchor="middle">JSON in git · developers</text>
+          <rect x="34" y="140" width="170" height="54" fill="none" stroke="currentColor"/>
+          <text x="119" y="162" font-size="13" text-anchor="middle" font-weight="600">Webflow CMS</text>
+          <text x="119" y="180" font-size="11" text-anchor="middle">design layer · authors publish</text>
+          <line x1="204" y1="93" x2="238" y2="120" stroke="currentColor" marker-end="url(#ah11)"/>
+          <line x1="204" y1="167" x2="238" y2="140" stroke="currentColor" marker-end="url(#ah11)"/>
+          <rect x="240" y="100" width="196" height="60" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="338" y="122" font-size="13" text-anchor="middle" font-weight="600">Merge and compile</text>
+          <text x="338" y="140" font-size="11" text-anchor="middle">provenance per field</text>
+          <text x="338" y="154" font-size="11" text-anchor="middle">shape vN · sha256:…</text>
+          <text x="34" y="222" font-size="11">Reviewed with the release, like uv.lock:</text>
+          <text x="34" y="238" font-size="11">a change to the model is a change to the code.</text>
+
+          <line x1="436" y1="130" x2="518" y2="130" stroke="currentColor" stroke-width="2" marker-end="url(#ah11)"/>
+          <text x="477" y="122" font-size="11" text-anchor="middle">ships in</text>
+          <text x="477" y="148" font-size="11" text-anchor="middle">the release</text>
+
+          <rect x="520" y="30" width="420" height="220" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+          <text x="534" y="50" font-size="12" letter-spacing="1.5" font-weight="600">RUN TIME · ANY REGION, INCLUDING KOREA</text>
+          <rect x="534" y="100" width="190" height="60" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="629" y="122" font-size="13" text-anchor="middle" font-weight="600">Worker and Xano</text>
+          <text x="629" y="140" font-size="11" text-anchor="middle">read the compiled shape</text>
+          <text x="629" y="154" font-size="11" text-anchor="middle">+ per-tenant override</text>
+          <line x1="724" y1="130" x2="758" y2="130" stroke="currentColor" marker-end="url(#ah11)"/>
+          <rect x="760" y="100" width="166" height="60" fill="none" stroke="currentColor"/>
+          <text x="843" y="122" font-size="13" text-anchor="middle" font-weight="600">Render + transport</text>
+          <text x="843" y="140" font-size="11" text-anchor="middle">pages, feeds, APIs,</text>
+          <text x="843" y="154" font-size="11" text-anchor="middle">agents, syncs</text>
+          <rect x="534" y="186" width="392" height="44" fill="none" stroke="currentColor" stroke-dasharray="3 3"/>
+          <text x="730" y="205" font-size="12" text-anchor="middle">No call to Webflow or the US at run time</text>
+          <text x="730" y="221" font-size="11" text-anchor="middle">a design-tool outage cannot stop the store</text>
+
+          <text x="20" y="280" font-size="11" font-weight="600">Status: the three-layer merge with per-field provenance is built; its reference reads Webflow live (60-second cache).</text>
+          <text x="20" y="298" font-size="11">Design: compile the merged shape at release so run time has no Webflow dependency, as the Korean deployment needs.</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>Model, view and controller are settled at design time, once. After that the shape travels with the code: reviewed, hashed, versioned and rolled back like any release. Authors keep using Webflow to change the design; their change reaches customers at the next release, not the next request.</figcaption>
     </figure>
   </section>
 
