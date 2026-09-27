@@ -62,7 +62,7 @@
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
     <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a> &nbsp;·&nbsp; <a href="#shape">7 · Shape as code</a> &nbsp;·&nbsp; <a href="#where">8 · ADK vs Xano</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a> &nbsp;·&nbsp; <a href="#shape">7 · Shape as code</a> &nbsp;·&nbsp; <a href="#where">8 · ADK vs Xano</a> &nbsp;·&nbsp; <a href="#both">9 · Permissions and lock file</a></p>
   </header>
 
   <section id="people">
@@ -983,6 +983,33 @@
       </table>
     </div>
     <p style="color:var(--mut);font-size:14px">The rule for Korea is the same for both: the model, the state and the data layer all have to be in Korea before Korean personal data is served. Running <span class="mono">adk web</span> against the Seoul model is not enough, because its tools still reach a data layer in the United States.</p>
+  </section>
+
+  <section id="both" style="display:grid;gap:14px">
+    <h2>9 · Row permissions and the lock file: both, not either</h2>
+    <p>Permissions stored as rows scale with every user, agent and tenant, and the lock file covers the whole build at once. Neither is more secure than the other: they stop different attacks, and each fails without the other. Row permissions are enforced by your code; the lock file is what makes that code trustworthy.</p>
+    <div class="scroll" style="padding:0">
+      <table>
+        <thead><tr><th></th><th>Row-based permissions (entitlements)</th><th>The lock file (<span class="mono">uv.lock</span>)</th></tr></thead>
+        <tbody>
+          <tr><td>Question it answers</td><td>Who may do what, to which data?</td><td>Is the code running what we reviewed?</td></tr>
+          <tr><td>Kind of control</td><td>Authorisation, checked at run time</td><td>Supply-chain integrity, fixed at build time</td></tr>
+          <tr><td>Granularity</td><td>Per subject (user, agent, tenant), per capability, per scope, on every request</td><td>One rule for the whole build: exact versions and file hashes</td></tr>
+          <tr><td>Scales with</td><td>People, agents and tenants: add a row, not code</td><td>Dependencies: every package pinned</td></tr>
+          <tr><td>Stops</td><td>A caller doing more than it was granted: another tenant's data, a purchase without a mandate</td><td>A tampered or silently upgraded package reaching production</td></tr>
+          <tr><td>Does not stop</td><td>Malicious code inside your own process</td><td>A person or agent misusing access it legitimately holds</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><b>Why both are needed.</b> A compromised package runs as your code, with your code's access: it can read environment secrets, call the data layer with the service's own credentials, and skip the permission check entirely. And a perfect lock file does nothing about a person who was granted too much. Blanket coverage is right for the lock file, because one bad package anywhere compromises the whole process; fine-grained control is right for permissions, because that is where people and agents differ.</p>
+    <p><b>How the layers stack on this page.</b></p>
+    <ol style="margin:0;padding-left:1.3em;display:grid;gap:6px;max-width:72ch">
+      <li>The lock file and the review gate: the right code is running (section 6).</li>
+      <li>Runtime separation: if code is compromised anyway, the damage stays in its layer (section 5).</li>
+      <li>Row permissions, mandates and the ledger: the right code lets each caller do only what it was granted, and records it (section 2).</li>
+      <li>The human ladder and interactive publishing: the right people control changes to layers 1 and 3 (sections 5 and 6).</li>
+    </ol>
+    <p>The lock file makes sure the code is honest; the permissions make sure the callers are.</p>
   </section>
 
   <p class="line">A VPN trusts the network, and middleware trusts the record. Under the Cloudflare umbrella nothing is trusted by default: the person, the device, the agent and the sync are each checked on every request, against one system of record.</p>
