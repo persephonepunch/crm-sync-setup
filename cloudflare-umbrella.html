@@ -62,7 +62,7 @@
     <h1>Under the Cloudflare Umbrella</h1>
     <p class="lead">One edge decides who may do what. Staff reach private apps through Cloudflare One instead of a VPN. Shoppers and AI agents reach commerce through a Worker that checks consent, capabilities and mandates against Xano before anything acts. Closed-fee middleware moves data between systems; it does not carry consent, erasure or authority with it.</p>
     <p class="byline"><b>Yoonsun Lee</b> · Solutions architecture · September 2026 · <a href="https://crm-sync.dev">crm-sync.dev</a> · <a href="https://www.linkedin.com/in/yoonsunlee">LinkedIn</a> · <a href="https://crm-sync.dev/kb/media/docs/cloudflare-umbrella.pdf">Download the PDF</a></p>
-    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a> &nbsp;·&nbsp; <a href="#shape">7 · Shape as code</a></p>
+    <p style="margin-top:12px"><a href="#people">1 · Staff: VPN to Zero Trust</a> &nbsp;·&nbsp; <a href="#agents">2 · Xano Auth and Google ADK</a> &nbsp;·&nbsp; <a href="#gaps">3 · Middleware and CRM gaps</a> &nbsp;·&nbsp; <a href="#render">4 · Permissions and rendering</a> &nbsp;·&nbsp; <a href="#runtimes">5 · Isolates, containers, VMs</a> &nbsp;·&nbsp; <a href="#ladder">Least-privilege ladder</a> &nbsp;·&nbsp; <a href="#secrets">Secrets</a> &nbsp;·&nbsp; <a href="#supply">6 · Supply chain</a> &nbsp;·&nbsp; <a href="#xanoimage">US build, Korea run</a> &nbsp;·&nbsp; <a href="#shape">7 · Shape as code</a> &nbsp;·&nbsp; <a href="#where">8 · ADK vs Xano</a></p>
   </header>
 
   <section id="people">
@@ -961,6 +961,28 @@
       </div>
       <figcaption>Model, view and controller are settled at design time, once. After that the shape travels with the code: reviewed, hashed, versioned and rolled back like any release. Authors keep using Webflow to change the design; their change reaches customers at the next release, not the next request.</figcaption>
     </figure>
+  </section>
+
+  <section id="where" style="display:grid;gap:14px">
+    <h2>8 · Where it runs: Google ADK compared with the Xano function stack</h2>
+    <p>Both tools let you build logic in a visual or local environment and run it somewhere else. The difference is how visible and how fixed the location is. In Xano the region belongs to the instance and is shown in the editor; in ADK it is a setting you choose at each step, and the local development server runs wherever you start it.</p>
+    <div class="scroll" style="padding:0">
+      <table>
+        <thead><tr><th></th><th>Google ADK · <span class="mono">adk web</span> and Agent Engine</th><th>Xano function stack · canvas, stack, XanoScript</th></tr></thead>
+        <tbody>
+          <tr><td>What it is</td><td>A Python agent framework. <span class="mono">adk web</span> is its local development server and test UI</td><td>A hosted backend. Canvas, stack and XanoScript are three views of the same function</td></tr>
+          <tr><td>Where the builder runs</td><td>On the machine that starts it, for example a laptop in New York</td><td>Hosted, on the instance; the editor's status bar shows its region (for example United States)</td></tr>
+          <tr><td>Where production runs</td><td>Agent Engine, in the region chosen at deploy: <span class="mono">asia-northeast3</span> for Seoul</td><td>The instance's region. Korea needs a Seoul instance, owned by the client</td></tr>
+          <tr><td>Where the model runs</td><td>The Vertex AI region in <span class="mono">GOOGLE_CLOUD_LOCATION</span>. Seoul runs gemini-2.5-flash; its shared capacity rejected multi-call turns in testing</td><td>Only where a function calls a model; the provider it calls decides the location</td></tr>
+          <tr><td>Where state lives</td><td><span class="mono">adk web</span>: in memory on the laptop. Agent Engine: sessions and Memory Bank in the deploy region</td><td>The instance's database and cache, in its region</td></tr>
+          <tr><td>Where secrets live</td><td>Local <span class="mono">.env</span> holds configuration only; sign-in comes from the developer's Google login. Production uses the Agent Engine configuration</td><td>Keys and Variables, read inside the function as <span class="mono">$env</span>, never returned in a response</td></tr>
+          <tr><td>How a request is refused</td><td>The agent cannot refuse on authority: it asks the Worker, and the Worker checks capabilities and mandates</td><td>A precondition step stops the request with a real HTTP error. (A <span class="mono">throw</span> answers 200, so use a precondition for refusals)</td></tr>
+          <tr><td>Versions</td><td>Git and <span class="mono">uv.lock</span>; a new version is a redeploy</td><td>Branch (for example v1) and data source (live or test), switched in the editor</td></tr>
+          <tr><td>Serves Korean shoppers today</td><td>No. It refuses market KR and hands Korean shoppers to the Worker's chatbot on Workers AI</td><td>Only from the client's Seoul instance; today's instance is in the United States</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--mut);font-size:14px">The rule for Korea is the same for both: the model, the state and the data layer all have to be in Korea before Korean personal data is served. Running <span class="mono">adk web</span> against the Seoul model is not enough, because its tools still reach a data layer in the United States.</p>
   </section>
 
   <p class="line">A VPN trusts the network, and middleware trusts the record. Under the Cloudflare umbrella nothing is trusted by default: the person, the device, the agent and the sync are each checked on every request, against one system of record.</p>
