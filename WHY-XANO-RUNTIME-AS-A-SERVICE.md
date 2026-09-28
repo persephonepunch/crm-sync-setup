@@ -609,6 +609,10 @@ A web pixel runs in a sandbox rather than in the storefront itself. None of the 
 arbitrary network call from inside Shopify, which is why a consent decision or a third-party
 destination still belongs in a server function the operator runs.
 
+Shopify now publishes breaking changes in its [developer changelog](https://shopify.dev/changelog),
+filtered by API version, rather than as release notes; the 2027-01 row above is one this document
+has confirmed, not the whole list.
+
 **What stops is app-injected code, not theme code.** One Liquid filter shares the name, which is
 where most of the confusion starts.
 
@@ -655,10 +659,6 @@ storefront block is already an app embed. None of this estate's own apps registe
 Option D's Google leg for product ratings is blocked on Google's side — the reviews API is in
 early access and needs an allowlist — so reporting runs through analytics and BigQuery, not
 Merchant Center.
-
-Shopify now publishes breaking changes in its [developer changelog](https://shopify.dev/changelog),
-filtered by API version, rather than as release notes; the 2027-01 row above is one this document
-has confirmed, not the whole list.
 
 **What survived is the same in both.** Whatever was plain HTTP on the operator's own server.
 Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
