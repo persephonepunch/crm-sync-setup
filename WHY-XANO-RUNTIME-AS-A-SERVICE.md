@@ -37,6 +37,7 @@ keywords:
   - front matter
   - Kubernetes
   - 11ty data cascade
+  - LiquidJS
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -639,6 +640,15 @@ natural Ruby path of the years after 2012: configuration kept as YAML, keyed by 
 overridden by the more specific layer, with the deploy reading the result rather than anyone
 editing output by hand. The same instinct that reads an overlay in a deployment reads a directory
 data file in 11ty — and 11ty keeps it in plain files the author owns.
+
+**11ty and Liquid share syntax**, which is why this path is open to a theme developer without a
+new language. 11ty renders markdown and HTML with Liquid by default, through LiquidJS, a JavaScript
+port of Shopify's Liquid: the same `{{ }}` output, `{% if %}` and `{% for %}` tags, and `|` filters.
+What does not carry over is Shopify's own vocabulary — `product`, `cart`, the `money` filter,
+`{% section %}` and `{% schema %}` exist only inside a Shopify theme — and 11ty adds its own
+shortcodes and filters in their place. The syntax a Liquid developer already has is the syntax
+11ty reads; what changes is that the data now comes from YAML files they own rather than from
+Shopify's render.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
