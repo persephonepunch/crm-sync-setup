@@ -33,6 +33,7 @@ keywords:
   - Smooth Streaming
   - HBO GO
   - Shopify Scripts
+  - script tags
   - YAML
   - front matter
   - Kubernetes
@@ -586,6 +587,29 @@ The logic did not get harder. **It moved out of the frontend** — out of the pl
 could see and change it — and into a runtime with a declared contract. Silverlight developers made
 the same move a decade earlier, from a plugin they controlled end to end to standard browser APIs
 they did not, and for the same reason: the vendor-hosted runtime was never theirs to keep.
+
+**Scripts were the first of several doors to close.** Shopify is not reinforcing server-side code by
+adding to Functions so much as by removing every other way to run code on a store:
+
+| Date | Change | Where the logic has to go |
+|---|---|---|
+| 15 April 2026 | Shopify Scripts can no longer be edited or published | Functions |
+| 30 June 2026 | Shopify Scripts stop running; published Scripts deactivated | Functions |
+| 1 October 2026 | [`scriptTagCreate` and `scriptTagUpdate` return an error](https://shopify.dev/changelog/online-store-script-tags-deprecation); existing script tags keep running | No new injected storefront scripts |
+| January 2027, API version 2027-01 | Setting [`includeRestOfWorld` to true returns an error](https://shopify.dev/changelog/setting-includerestofworld-to-true-returns-an-error-in-api-version-2027-01); the "Rest of World" zone gives way to explicit countries | Shipping-discount logic names its countries |
+| 1 March 2027 | [Shopify stops injecting script tags into storefronts](https://shopify.dev/changelog/online-store-script-tags-deprecation) | App embed blocks in a theme app extension; analytics in web pixels |
+
+What remains after the last row is all declared. A Function states its input as a GraphQL query and
+compiles to WebAssembly — and [JavaScript is now a first-class language for
+them](https://shopify.dev/changelog/write-shopify-functions-in-javascript), alongside Rust. A theme
+app extension is a block the merchant can see and switch off, not a script injected into the page.
+A web pixel runs in a sandbox rather than in the storefront itself. None of the three can make an
+arbitrary network call from inside Shopify, which is why a consent decision or a third-party
+destination still belongs in a server function the operator runs.
+
+Shopify now publishes breaking changes in its [developer changelog](https://shopify.dev/changelog),
+filtered by API version, rather than as release notes; the 2027-01 row above is the one this
+document has confirmed, not necessarily the only one.
 
 **What survived is the same in both.** Whatever was plain HTTP on the operator's own server.
 Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
