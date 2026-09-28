@@ -39,6 +39,7 @@ keywords:
   - 11ty data cascade
   - LiquidJS
   - markdown in GitHub
+  - TLS
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -660,6 +661,37 @@ estate runs on. Documents and posts are markdown files in a public repository; a
 published collection through a webhook in seconds, and the retrieval index is rebuilt from the same
 file. Nothing about it asks a Liquid developer to learn a database first — the database arrives
 later, as a projection of files they already know how to review.
+
+### Same frontend, AI-secure backend
+
+The consequence is the practical one. **Keep the frontend — an 11ty static site or a Shopify Liquid
+theme — and put the backend behind it as JSON over TLS to a Cloudflare Worker and Xano.** Nothing a
+theme developer ships changes shape: templates, YAML, markdown, files in git. What changes is that
+every decision that must hold when no page is rendered leaves the template and goes to a server
+that can say no.
+
+| Layer | 11ty static site | Shopify Liquid theme | What it may never hold |
+|---|---|---|---|
+| Frontend | Liquid templates, YAML data, markdown — built to static files | Liquid templates, sections, theme settings — rendered by Shopify | Secrets, consent decisions, entitlement, anything a model may act on |
+| Transport | `fetch` from the page: JSON over HTTPS (TLS) | The same, from theme JavaScript or an app proxy | Credentials in the URL; a token that outlives the session |
+| Edge | Cloudflare Worker: verifies the caller, resolves consent and entitlement from the record, applies the rule, calls the model with declared tools | The same Worker — the theme cannot tell whether the site behind it is static | Personal data at rest; a decision it cannot log |
+| Data | Xano: identity, consent, entitlement, orders, the ledger — encrypted where personal | The same Xano, alongside Shopify's own records | Anything the browser can read directly |
+
+The frontend is interchangeable because the backend never depended on it. The same Worker answers
+an 11ty page and a Shopify theme alike; the browser sees only JSON it is entitled to, and the model
+sees only the tools the Worker grants it.
+
+**What TLS does and does not do.** TLS protects the request between the page and the Worker, and
+between the Worker and Xano. It ends at each socket. It says nothing about whether the caller was
+allowed to ask, whether the subject consented, or whether a field should have been returned —
+those are the Worker's decisions, made per request against the record, and the reason personal
+fields are encrypted in the data layer rather than trusted to the transport. TLS is the pipe; the
+Worker is the gate.
+
+**What it costs.** Two more services to run and pay for, and a network hop on every dynamic call
+that a pure static page never made. A static page that calls the Worker is no longer purely static:
+when the Worker is unreachable, the page must degrade to what it can show without a decision — which
+is exactly the discipline Liquid always enforced, now applied on purpose.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
