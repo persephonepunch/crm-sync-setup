@@ -38,6 +38,7 @@ keywords:
   - Kubernetes
   - 11ty data cascade
   - LiquidJS
+  - markdown in GitHub
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -649,6 +650,16 @@ What does not carry over is Shopify's own vocabulary — `product`, `cart`, the 
 shortcodes and filters in their place. The syntax a Liquid developer already has is the syntax
 11ty reads; what changes is that the data now comes from YAML files they own rather than from
 Shopify's render.
+
+**The markdown-in-GitHub data shape is familiar for the same reason.** A Shopify theme already lives
+in a repository — Shopify's GitHub integration keeps a theme in step with a branch — so files in
+git, reviewed and merged, are how a theme developer already ships. Markdown with YAML front matter
+in the same kind of repository is that habit applied to content and data: the file is the record,
+the history is the provenance, and a pull request is the change control. It is also the shape this
+estate runs on. Documents and posts are markdown files in a public repository; a push reaches the
+published collection through a webhook in seconds, and the retrieval index is rebuilt from the same
+file. Nothing about it asks a Liquid developer to learn a database first — the database arrives
+later, as a projection of files they already know how to review.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
