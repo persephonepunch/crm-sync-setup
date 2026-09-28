@@ -28,6 +28,10 @@ keywords:
   - agentic commerce
   - Deno
   - Node
+  - AWS Lambda
+  - Klaviyo flows
+  - Shopify Functions
+  - Shopify Flow
   - Liquid
   - row level security
   - entitlement
@@ -483,6 +487,19 @@ not the whole platform, whose own language is XanoScript — and Supabase's edge
 there too. The two backends compared in §6 disagree about where enforcement lives and agree,
 without discussing it, about the runtime underneath.
 
+**A Xano Lambda is not an AWS Lambda,** and the shared word hides the difference that matters here.
+
+| | Xano Lambda step | AWS Lambda function |
+|---|---|---|
+| What it is | One JavaScript step inside a function stack | A whole deployed function |
+| Runtime | Deno | A managed runtime chosen per function — Node.js most often; Python, Java, .NET, Ruby and custom runtimes too |
+| Who says no | The runtime, inside the process: reach is declared before the code runs | The IAM execution role, outside the process: inside it, the code may do anything the role allows |
+| What a mistake costs | An undeclared call fails in that step | An over-broad role is available to every line of the function |
+
+Both are legitimate boundaries. They sit at different layers: **with Deno the runtime says no; with
+Lambda on Node the cloud account says no.** Which permissions Xano grants a Lambda step is not
+documented in anything this estate has read, so this document does not claim them.
+
 ### Dynamic loading is the feature, and the dates rule out hindsight
 
 Lambda steps landed well before the agentic wave. Nobody added a JavaScript escape hatch to a
@@ -614,6 +631,63 @@ built for a caller that no longer exclusively exists.
 What replaces it has the same shape everywhere, whatever it is written in: **functions that run
 server-side and declare their reach before they run.** Privacy as a call, permission as a
 declaration, and writes that carry a key so the second attempt resolves to the first outcome.
+
+### Marketing flows: from the browser tag to a gated server function
+
+The clearest place to watch this happen is the marketing flow. A Shopify store running Klaviyo
+typically starts a flow from two places: Klaviyo's own Shopify integration, which syncs customers
+and orders, and Klaviyo's onsite script, which records browsing in the visitor's browser. Neither
+asks, at the moment the flow starts, whether this subject's consent permits it. The flow is a
+consequence of data having arrived, not of a decision having been made.
+
+The elevated version moves the trigger server-side and puts a decision in front of it. A function
+on the edge — here a Cloudflare Worker — does four things in order, and the order is the design:
+
+| Step | What the function does | Why it cannot be left to the tag |
+|---|---|---|
+| 1. Resolve consent | Reads the subject's consent at this instant, from the record rather than a cookie, and asks whether this destination is permitted. A Klaviyo profile carrying identifiers is a CDP projection, which requires `ad_user_data`. | A tag decides per visit, in one browser. A flow fires for a subject who may have withdrawn since, on another device, or never visited at all. |
+| 2. Shape the data | Queries the Shopify Admin GraphQL API for exactly the fields the flow needs — customer, order, line items, variant, product — in one typed, nested request. | A flat REST payload carries no relationship between an order and its variants; the flow then reconstructs one from string conventions. |
+| 3. Send once | Sends the event with a unique id, so a retry resolves to the first delivery rather than a second email. | A browser does not retry; a server does, routinely. |
+| 4. Record | Appends the decision and the outcome to the consent ledger, including refusals. | "The email was not sent" must be provable, not merely true. |
+
+**In a theme, logic is show or hide.** Liquid's `if` / `unless` / `case` decide what a page
+*displays*: the data has already been fetched for the render, and the condition chooses which of
+it reaches the markup. Hiding a price, a badge or a field is a display decision — the value still
+exists in the render, and nothing about the order, the discount or the customer has changed. That
+model is complete for presentation and has no vocabulary for a decision that must hold when no
+page is rendered.
+
+**Shopify Functions are the other half, and the harder one for a Liquid developer.**
+[Shopify Functions](https://shopify.dev/docs/apps/build/functions) run Shopify-side, inside
+checkout, cart, discounts and delivery: custom logic that Liquid cannot express and a theme cannot
+host. Each one is shipped as an app extension, declares its input as a GraphQL query, compiles to
+WebAssembly from Rust or JavaScript, and returns a decision as JSON. For a developer whose career is
+templates, all four of those are new at once — an app, a toolchain, a GraphQL input shape and a
+compiled artefact — which is why Functions, not GraphQL alone, are the real barrier out of Liquid.
+The shift underneath is from *what to show* to *what happens*: a Liquid condition hides a
+delivery option on the page; a Function removes it from checkout, so it cannot be chosen at all.
+
+The two layers split cleanly. A Shopify Function decides *inside* checkout, with the input Shopify
+hands it and no network call of its own. The edge function decides *outside* it — consent, a
+third-party destination such as Klaviyo, erasure — where a network call is the whole job. Both
+declare their input before they run. Neither is a template.
+
+**What it costs.** Klaviyo's native integration is maintained by Klaviyo; a server-side trigger is
+code the merchant now owns. Behavioural events for an anonymous visitor — browse abandonment is the
+common one — exist only in the browser until the visitor is identified, so moving them server-side
+loses them rather than gating them. And a GraphQL query is a contract: when the flow needs a field,
+the query changes with it.
+
+**Where this estate stands.**
+
+| Piece | Status |
+|---|---|
+| Consent resolution per destination, with Klaviyo as a CDP projection | Built |
+| Shopify Flow action runtime, signature-verified against the app secret, idempotent write | Built |
+| Klaviyo erasure: deletion job instructed, intent and outcome both ledgered | Built |
+| Shopify Admin API on GraphQL | Built |
+| Klaviyo import into the consent register (connect, sync, segments, features) | Built; not yet run against a production account |
+| Server-side event that starts a Klaviyo flow, behind the consent gate | Not built |
 
 ### Tools and rules — Deno-grade permission, at the business layer
 
