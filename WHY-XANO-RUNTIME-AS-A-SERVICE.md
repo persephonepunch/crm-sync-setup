@@ -40,6 +40,7 @@ keywords:
   - LiquidJS
   - markdown in GitHub
   - TLS
+  - JSON as a service
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -692,6 +693,14 @@ Worker is the gate.
 that a pure static page never made. A static page that calls the Worker is no longer purely static:
 when the Worker is unreachable, the page must degrade to what it can show without a decision — which
 is exactly the discipline Liquid always enforced, now applied on purpose.
+
+> **JSON as a service. Choose your tools.**
+
+That is the whole offer in one line. The backend answers in JSON to whatever asks, within what the
+caller is entitled to; everything in front of it is the team's choice. 11ty, a Shopify theme,
+Webflow, Astro or Next.js on the page; Liquid, markdown and YAML for the content; a model with
+declared tools where a model helps. None of those choices is load-bearing for the decisions, because
+none of them holds one — so any of them can be swapped without re-deciding who may see what.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
