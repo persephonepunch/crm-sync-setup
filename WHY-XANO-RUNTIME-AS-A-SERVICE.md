@@ -32,6 +32,7 @@ keywords:
   - Silverlight
   - Smooth Streaming
   - HBO GO
+  - Shopify Scripts
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -544,6 +545,44 @@ The lesson is the one this architecture already follows: **put the runtime that 
 the operator controls it, and ship the client only what any engine can run.** The parts of
 Silverlight that were plain HTTP are still carrying video. The part that asked the visitor's
 machine to host the runtime is gone.
+
+### What Silverlight was missing is the Ruby-on-Shopify gap
+
+Silverlight and Ruby on Shopify were missing the same thing: **a place for logic the vendor did not
+own, running on open interfaces, that outlives the vendor's next platform decision.** In both, the
+code lived inside a vendor's runtime, so when the vendor moved, the code was rewritten rather than
+moved.
+
+| What was missing | Silverlight | Ruby on Shopify (Liquid themes, Shopify Scripts) | What fills it now |
+|---|---|---|---|
+| An open interface to run on | Media, rights management and code all ran through Microsoft's plugin; browsers had no built-in media pipeline yet | Theme logic is Liquid inside Shopify's Ruby render; checkout logic was Shopify Scripts, a Ruby subset Shopify ran | Browser: Media Source and Encrypted Media Extensions, DASH and HLS. Shopify: Functions — WebAssembly with a declared GraphQL input |
+| Portability | C# in the plugin could not follow viewers to iOS, to televisions, or to browsers without plugins | Liquid runs only in a Shopify theme; Scripts ran only in Shopify checkout | Code written against standard web APIs — fetch, Request, Web Crypto — at an edge any operator can host |
+| A decision layer outside the render | The player could play or refuse; whether a viewer was entitled was a server's answer | Liquid can show or hide; it cannot hold a decision when no page is rendered — a marketing flow, an erasure, an agent's purchase | An operator-owned server function with declared reach, deciding consent and entitlement from the record |
+| A declared contract | Elevated trust asked of the visitor once, at install; nothing recorded per call | Scripts could do whatever the runtime allowed; the merchant declared nothing | Tools with declared reach, rules evaluated per call, decisions signed and recorded |
+| What ended it | Browsers removed plugin support; support ended 12 October 2021 | Scripts stopped running on 30 June 2026; REST gave way to GraphQL | — |
+
+**Scripts are the exact parallel, and they are the hard one to accept.** A Script was a Ruby file
+edited in the admin's Script Editor and live the moment it was published: no app, no deploy, no
+toolchain. To a developer who works in themes, it felt like part of the storefront — logic you
+could reach from the same place you edit Liquid. That is what went away. Shopify
+[stopped Scripts being edited or published on 15 April 2026 and stopped them running on
+30 June 2026](https://changelog.shopify.com/posts/shopify-scripts-can-no-longer-be-edited-or-published),
+after extending the original 28 August 2025 date; published Scripts were deactivated. The
+replacement is [Shopify Functions](https://shopify.dev/docs/apps/build/functions), distributed
+through apps.
+
+The resistance is not about the language. It is about where the logic now lives. A Script was
+edited where the storefront was edited; a Function is an app extension with a CLI, a build to
+WebAssembly, a GraphQL input query, a deploy, instruction limits and no network call of its own.
+The logic did not get harder. **It moved out of the frontend** — out of the place a theme developer
+could see and change it — and into a runtime with a declared contract. Silverlight developers made
+the same move a decade earlier, from a plugin they controlled end to end to standard browser APIs
+they did not, and for the same reason: the vendor-hosted runtime was never theirs to keep.
+
+**What survived is the same in both.** Whatever was plain HTTP on the operator's own server.
+Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
+never moved. On Shopify the equivalent is the Admin GraphQL API and a server function the operator
+runs — which outlast any theme and outlasted every Script.
 
 ### Dynamic loading is the feature, and the dates rule out hindsight
 
