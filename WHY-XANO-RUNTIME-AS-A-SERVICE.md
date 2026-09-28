@@ -29,6 +29,8 @@ keywords:
   - Deno
   - Node
   - AWS Lambda
+  - Silverlight
+  - Smooth Streaming
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -500,6 +502,40 @@ Both are legitimate boundaries. They sit at different layers: **with Deno the ru
 Lambda on Node the cloud account says no.** Which permissions Xano grants a Lambda step is not
 documented in anything this estate has read, so this document does not claim them.
 
+### The branch that ended: Silverlight
+
+The lineage has a branch that did not survive, and it is worth reading for what died and what did
+not. **Microsoft Silverlight (2007–2021)** put a runtime in the visitor's browser: a plugin carrying
+a cut-down .NET, so a page could run C# and XAML where JavaScript would otherwise have been. It
+carried the web's real-time media for a while — NBC's 2008 Olympics, Netflix until it moved to
+HTML5 video — and support ended on 12 October 2021.
+
+It even had the declaration this document argues for. An application installed outside the
+browser could ask for **elevated trust** in its manifest, and the visitor was shown the request
+before it ran. The idea was right. The place was wrong: the runtime lived on a device nobody on
+the server side controls, owned by one vendor, delivered through a plugin interface the browsers
+then removed. When the plugin went, everything that depended on it went with it.
+
+What survived is the half that never needed the plugin. **Smooth Streaming** delivered video as
+short fragmented-MP4 chunks over plain HTTP, each one an ordinary cacheable request, with the
+player choosing the bitrate chunk by chunk. No streaming server had to sit at the edge and no
+connection had to stay open. That delivery design outlived its player and became the model for
+MPEG-DASH and, through CMAF, for HLS; its protected file format fed Common Encryption, and its
+PlayReady licensing now runs through the browser's own media extensions.
+
+| | Silverlight (2007–2021) | What replaced it |
+|---|---|---|
+| Where the code ran | A vendor plugin in the visitor's browser | The browser's own engine; logic that must hold, on a server |
+| Permission | Elevated trust requested in a manifest, granted by the visitor | Declared reach enforced by the runtime (Deno), or by the account (IAM) |
+| Media delivery | Smooth Streaming: fragmented MP4 over HTTP | DASH and HLS over HTTP — the same design, without the plugin |
+| Rights management | PlayReady inside the plugin | PlayReady and others through Encrypted Media Extensions |
+| What ended it | iOS never ran it; browsers removed plugin support | — |
+
+The lesson is the one this architecture already follows: **put the runtime that must hold where
+the operator controls it, and ship the client only what any engine can run.** The parts of
+Silverlight that were plain HTTP are still carrying video. The part that asked the visitor's
+machine to host the runtime is gone.
+
 ### Dynamic loading is the feature, and the dates rule out hindsight
 
 Lambda steps landed well before the agentic wave. Nobody added a JavaScript escape hatch to a
@@ -539,8 +575,8 @@ made at the door and becomes a property of the artifact: not "may this caller re
 "can this caller open it at all."
 
 That is the runtime's permission model moved one layer down and made cryptographic. Liquid
-decides what may run before anything runs; Node frees the work from the request; Deno makes the
-work declare its reach in advance; the entitlement makes that declaration checkable by a stranger
+decides what may run before anything runs; Silverlight shows where a runtime must not live; Node
+frees the work from the request; Deno makes the work declare its reach in advance; the entitlement makes that declaration checkable by a stranger
 and the data unreadable without it. An agent mandate — scoped, spend-capped, revocable, signed —
 is the same object again, pointed at money instead of memory.
 
