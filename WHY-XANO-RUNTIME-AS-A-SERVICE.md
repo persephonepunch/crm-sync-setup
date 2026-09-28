@@ -702,6 +702,24 @@ Webflow, Astro or Next.js on the page; Liquid, markdown and YAML for the content
 declared tools where a model helps. None of those choices is load-bearing for the decisions, because
 none of them holds one — so any of them can be swapped without re-deciding who may see what.
 
+**Concept design can start free.** Every piece of this stack has a no-cost way in: 11ty and
+markdown in a public repository, GitHub Pages to serve it, Cloudflare Workers on the free plan, a
+Xano free workspace, a Shopify development store. None of that needs a purchase order, a vendor
+review or a per-seat agreement with a service-level commitment attached. A designer or developer
+can put a working concept — real pages, a real Worker, a real schema, a model behind declared
+tools — in front of stakeholders before anyone signs anything.
+
+That changes what procurement is asked. Not "may we try an idea," which is slow to answer and
+usually answered no, but "this concept works; may it carry real data," which comes with the
+working system attached.
+
+**Where free stops.** Free tiers carry limits and no service-level commitment, and they are not
+where personal data or payments belong. The moment a concept holds real customers' data, takes
+money or calls a model with anything personal, the preconditions return and they are not
+optional: a data processing agreement, the vendor's security report, a written answer on retention
+and training, the region the data sits in, and a paid plan whose terms say what happens when it
+fails. Free is how the concept starts; it is not how production runs.
+
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
 `NO` stays the text `NO`. And the vocabulary is **closed**: a tag that is not one of the 27 joins
