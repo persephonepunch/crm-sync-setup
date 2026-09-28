@@ -631,6 +631,11 @@ script fetches them on every view — and then shows none. The data is not lost;
 audit a store, view the source of any page and search for `asyncLoad`: every URL in its list stops
 loading on 1 March 2027, and a page with no `asyncLoad` block has nothing to migrate.
 
+**What survived is the same in both.** Whatever was plain HTTP on the operator's own server.
+Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
+never moved. On Shopify the equivalent is the Admin GraphQL API and a server function the operator
+runs — which outlast any theme and outlasted every Script.
+
 ### Migrating off script tags
 
 **Steps, in order.**
@@ -659,11 +664,6 @@ storefront block is already an app embed. None of this estate's own apps registe
 Option D's Google leg for product ratings is blocked on Google's side — the reviews API is in
 early access and needs an allowlist — so reporting runs through analytics and BigQuery, not
 Merchant Center.
-
-**What survived is the same in both.** Whatever was plain HTTP on the operator's own server.
-Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
-never moved. On Shopify the equivalent is the Admin GraphQL API and a server function the operator
-runs — which outlast any theme and outlasted every Script.
 
 ### YAML: the same syntax, from data that runs to data that declares
 
