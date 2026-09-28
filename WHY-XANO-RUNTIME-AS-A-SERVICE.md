@@ -33,6 +33,9 @@ keywords:
   - Smooth Streaming
   - HBO GO
   - Shopify Scripts
+  - YAML
+  - front matter
+  - Kubernetes
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -583,6 +586,62 @@ they did not, and for the same reason: the vendor-hosted runtime was never their
 Smooth Streaming's chunks became DASH and HLS; HBO GO's entitlement check, in Ruby on the server,
 never moved. On Shopify the equivalent is the Admin GraphQL API and a server function the operator
 runs — which outlast any theme and outlasted every Script.
+
+### YAML: the same syntax, from data that runs to data that declares
+
+The lineage shows up in a file format too. YAML in Ruby and YAML in Kubernetes look identical and
+do opposite jobs. In Ruby it is serialization — objects written out and read back, sometimes as
+live objects. In Kubernetes it is a declaration — desired state, checked against a schema and
+carried out by something that is not your code.
+
+| | YAML in Ruby | YAML in Kubernetes |
+|---|---|---|
+| What it is | Serialized Ruby objects (Psych, on libyaml) | A manifest: an API object with `apiVersion`, `kind`, `metadata`, `spec` |
+| How it is read | Parsed into objects inside your process | Converted to JSON and decoded into typed structures; YAML is only the input format |
+| Can it run code | Historically, yes: tags such as `!ruby/object` constructed arbitrary objects, the root of Rails' 2013 remote-code-execution flaw (CVE-2013-0156). Since Psych 4 (Ruby 3.1), `YAML.load` is safe by default; arbitrary objects need `unsafe_load` or an allowlist | No: no custom tags, no object construction |
+| Templating | Often inside the file: Rails passes `database.yml` through ERB before parsing, so Ruby runs first | Outside the file: Helm or Kustomize render it; the API server sees only the result |
+| Validation | Whatever your code checks afterwards | The API server validates every object against its schema; unknown fields warn by default, or fail under strict validation |
+| What happens next | Your program does what it likes with the data | Controllers reconcile the cluster towards the declaration, continuously |
+
+Both inherit YAML 1.1's traps — an unquoted `no` or `NO` can arrive as a boolean, and `1.10` as the
+number `1.1` — so anything that must stay a string is quoted.
+
+Read against this document: **Ruby's YAML is Liquid-era trust** — data read inside the process
+that could become behaviour. **Kubernetes' YAML is declared reach** — a contract against a schema,
+enforced by a controller the author does not write. Helm stands where Liquid and ERB stand:
+templates rendered to text before the real consumer sees it.
+
+### YAML in markdown: the front matter is the AI data layer's declaration
+
+This estate uses YAML in the Kubernetes sense, inside markdown. Every document opens with a
+front-matter block — `title`, `description`, `canonical`, `category`, `date`, `source`, `tags`,
+`keywords`, `about` — and that block, not a database row, is what the automation reads. This
+document is one.
+
+| Front-matter field | What the automation does with it |
+|---|---|
+| `title`, `description`, `category` | Compared on every index rebuild with the published CMS row; any disagreement is reported as drift, field by field |
+| `tags` | A controlled vocabulary of 27 terms, capped at 12 per document, read from the markdown on every rebuild — the terms that join documents to each other |
+| `keywords` | The search long tail; kept separate from `tags` and fed to structured data (JSON-LD) |
+| `canonical`, `source` | Which address is authoritative, and where the source of record lives — the ownership check before anything is ingested |
+| The body under it | Chunked, embedded and indexed for retrieval; the answers cite the document the chunk came from |
+
+A push to the repository reaches the published collection through a webhook in seconds, and the
+retrieval index is rebuilt from the same file. **One file is the source; every surface is a
+projection of it** — the same arrangement as a manifest and the controllers that act on it.
+
+Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
+takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
+`NO` stays the text `NO`. And the vocabulary is **closed**: a tag that is not one of the 27 joins
+nothing, which is visible, rather than inventing a category nobody else uses. For an AI data layer
+that matters more than anywhere else, because the reader is a model and the automation runs with
+no one watching: the header has to declare, not execute.
+
+**What it costs.** Front matter is aligned with the CMS by convention, not by construction, which is
+why the drift report exists. A long document can outgrow its retrieval chunking, so a section that
+shares a chunk with an unrelated table answers less well than one that stands alone. And a missing
+`# H1` below the header has blanked a rendered document before without any error — the header was
+valid, and the page was empty.
 
 ### Dynamic loading is the feature, and the dates rule out hindsight
 
