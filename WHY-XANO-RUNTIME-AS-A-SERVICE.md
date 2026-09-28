@@ -37,7 +37,6 @@ keywords:
   - front matter
   - Kubernetes
   - 11ty data cascade
-  - Adobe Business Catalyst
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -635,15 +634,11 @@ projection of it** — the same arrangement as a manifest and the controllers th
 The author leans on 11ty for this, and the reason is DevOps rather than templating. 11ty resolves
 YAML through a **data cascade**: front matter in the page, a data file beside the template, a data
 file for the directory, then global data — the more specific layer wins. That is configuration as
-layered data, and it is the closest match to the DevOps setup the author ran for HBO GO on
-**Adobe Business Catalyst**: site-wide settings, overridden per section and per page, with the
-platform assembling the result rather than anyone editing output by hand. The same instinct that
-reads an overlay in a deployment reads a directory data file in 11ty.
-
-Business Catalyst belongs in this lineage for a second reason. It was a hosted, all-in-one runtime
-— content, commerce, customer records and email in one vendor's platform — and Adobe shut it down
-in 2021. Everything built inside it had to be moved out. The layered-configuration habit survived;
-the platform it was learned on did not. 11ty keeps the habit in plain files the author owns.
+layered data, and it is the closest match to the DevOps setup behind HBO GO, which followed the
+natural Ruby path of the years after 2012: configuration kept as YAML, keyed by environment,
+overridden by the more specific layer, with the deploy reading the result rather than anyone
+editing output by hand. The same instinct that reads an overlay in a deployment reads a directory
+data file in 11ty — and 11ty keeps it in plain files the author owns.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
