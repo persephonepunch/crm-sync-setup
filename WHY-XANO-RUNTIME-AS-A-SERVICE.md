@@ -31,6 +31,7 @@ keywords:
   - AWS Lambda
   - Silverlight
   - Smooth Streaming
+  - HBO GO
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -515,6 +516,14 @@ browser could ask for **elevated trust** in its manifest, and the visitor was sh
 before it ran. The idea was right. The place was wrong: the runtime lived on a device nobody on
 the server side controls, owned by one vendor, delivered through a plugin interface the browsers
 then removed. When the plugin went, everything that depended on it went with it.
+
+The author saw the split first-hand. **HBO GO's original web player**, which the author worked on,
+ran Silverlight in the browser for playback, with a **Ruby application runtime** behind it — the
+same language Liquid is written in, and the same room Node came out of. The two halves had
+different jobs and met different ends. Whether a viewer was entitled to watch — a subscription
+held through a TV provider — was a server-side answer the Ruby side owned. The protected stream
+was the plugin's. When plugins ended, the playback half had to be rebuilt; the entitlement
+question had never lived in the browser, so it never had to move.
 
 What survived is the half that never needed the plugin. **Smooth Streaming** delivered video as
 short fragmented-MP4 chunks over plain HTTP, each one an ordinary cacheable request, with the
