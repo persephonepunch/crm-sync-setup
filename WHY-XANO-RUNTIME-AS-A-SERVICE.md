@@ -36,6 +36,7 @@ keywords:
   - YAML
   - front matter
   - Kubernetes
+  - 11ty data cascade
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
@@ -629,6 +630,14 @@ document is one.
 A push to the repository reaches the published collection through a webhook in seconds, and the
 retrieval index is rebuilt from the same file. **One file is the source; every surface is a
 projection of it** — the same arrangement as a manifest and the controllers that act on it.
+
+The author leans on 11ty for this, and the reason is DevOps rather than templating. 11ty resolves
+YAML through a **data cascade**: front matter in the page, a data file beside the template, a data
+file for the directory, then global data — the more specific layer wins. That is configuration as
+layered data, which is how the HBO GO delivery setup the author worked on was run: declarations per
+environment, overridden by the more specific layer, with the build reading the result rather than
+anyone editing output by hand. The same instinct that reads an overlay in a deployment reads a
+directory data file in 11ty.
 
 Two properties make this safe to automate, and both are Kubernetes' rather than Ruby's. The reader
 takes **strings and lists only**: no tags, no object construction, no type coercion — an unquoted
