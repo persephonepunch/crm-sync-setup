@@ -609,6 +609,53 @@ A web pixel runs in a sandbox rather than in the storefront itself. None of the 
 arbitrary network call from inside Shopify, which is why a consent decision or a third-party
 destination still belongs in a server function the operator runs.
 
+**What stops is app-injected code, not theme code.** One Liquid filter shares the name, which is
+where most of the confusion starts.
+
+| Mechanism | Who uses it | Affected |
+|---|---|---|
+| ScriptTag API — apps register script URLs; Shopify loads them through `asyncLoad` in `content_for_header` | Apps: review widgets, loyalty panels, trackers, on older installs | **Yes.** From 1 October 2026 the app cannot create or change them; from 1 March 2027 they stop loading |
+| `{{ 'cart.js' \| asset_url \| script_tag }}` — the Liquid *filter* | The theme developer | No — it writes a `<script>` tag for a theme asset; same name, unrelated |
+| A hand-written `<script src="…" defer>` or `type="module"` | The theme developer | No |
+| `{% javascript %}` in a section, block or snippet | The theme developer | No |
+| The `/cart.js` Ajax Cart endpoint | Anyone | No — a JSON route, not a script |
+| App embed blocks in a theme app extension | Apps | No — this is where apps are meant to go |
+
+The failure is all at once, not gradual. A review widget still loaded by a script tag keeps showing
+old and new reviews alike until 1 March 2027 — the reviews live on the vendor's servers and the
+script fetches them on every view — and then shows none. The data is not lost; the display is. To
+audit a store, view the source of any page and search for `asyncLoad`: every URL in its list stops
+loading on 1 March 2027, and a page with no `asyncLoad` block has nothing to migrate.
+
+### Migrating off script tags
+
+**Steps, in order.**
+
+1. **Audit.** List every URL in each store's `asyncLoad` block.
+2. **Classify.** For each URL, decide whether it draws a widget, tracks events, or displays vendor
+   data the business wants to own — reviews, ratings, loyalty balances.
+3. **Choose a destination** for each, from the options below.
+4. **Run both side by side** before 1 March 2027: the new surface live, the old script still loading,
+   compared on a development store or a hidden template.
+5. **Cut over** by switching the app embed on or the old app's script off, then confirm `asyncLoad` no
+   longer lists the URL.
+
+**Options.**
+
+| Option | What it is | Fits when | What it costs |
+|---|---|---|---|
+| A. The vendor's app embed | The vendor ships an app embed block; the merchant switches it on | The widget is only display and the vendor has migrated | Nothing to build; the data and the widget stay the vendor's |
+| B. Web pixel, or a server-side send | Trackers move to a Shopify web pixel, or to the Worker behind the consent check | The script only measures | A pixel sees what Shopify passes it; a server send needs the consent record |
+| C. App built in Webflow and Xano | Vendor data is pulled server-side into Xano; the Worker serves it; the storefront renders it through a theme app extension or metaobjects in Liquid, and Webflow reads the same records through its CMS | The business wants the data under its own identity and consent, shown on more than one site | A server-side sync to run; the vendor's interactive features — submission forms, photo upload, moderation — kept through their embed or rebuilt |
+| D. A bundled app on Cloudflare, with Google as the reporting leg | One Shopify app carrying a theme app extension, a web pixel and, where checkout logic is needed, a Function — served by a Cloudflare Worker, with Google Analytics and BigQuery receiving consented events | Several stores need the same surface, and reporting belongs in the business's own analytics | An app to maintain and list; Google is optional and needs consent, and for Korean subjects it is not used at all |
+
+**Where this estate stands.** Option C's server-side pull exists: the reviews app imports a
+Yotpo store's reviews through Yotpo's REST API, as a sync that writes only what changed, and its
+storefront block is already an app embed. None of this estate's own apps registers a script tag.
+Option D's Google leg for product ratings is blocked on Google's side — the reviews API is in
+early access and needs an allowlist — so reporting runs through analytics and BigQuery, not
+Merchant Center.
+
 Shopify now publishes breaking changes in its [developer changelog](https://shopify.dev/changelog),
 filtered by API version, rather than as release notes; the 2027-01 row above is one this document
 has confirmed, not the whole list.
