@@ -32,6 +32,7 @@ keywords:
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
+  - Consent Mode v2
   - Liquid
   - row level security
   - entitlement
@@ -649,6 +650,23 @@ on the edge — here a Cloudflare Worker — does four things in order, and the 
 | 2. Shape the data | Queries the Shopify Admin GraphQL API for exactly the fields the flow needs — customer, order, line items, variant, product — in one typed, nested request. | A flat REST payload carries no relationship between an order and its variants; the flow then reconstructs one from string conventions. |
 | 3. Send once | Sends the event with a unique id, so a retry resolves to the first delivery rather than a second email. | A browser does not retry; a server does, routinely. |
 | 4. Record | Appends the decision and the outcome to the consent ledger, including refusals. | "The email was not sent" must be provable, not merely true. |
+
+**Google's Consent Mode v2 is the vocabulary both sides share.** Its four signals —
+`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization` — are not only what a
+Google tag reads in the browser. They are the names the server-side decision uses too, so one
+grant means the same thing on the page and in the function. The global consent steps, in order:
+
+| Step | Where | What happens with the four signals |
+|---|---|---|
+| 1. Default | Browser, first script in the head | All four set to `denied`, synchronously, before any tag exists. Not region-conditional: a region lookup resolves after the moment the default must already be set. |
+| 2. Replay | Browser, same script | The visitor's stored choice is sent as an `update` — never a second `default` — so a returning visitor who granted is not measured as denied. |
+| 3. Regime | Edge | The visitor's jurisdiction decides whether a banner is required first (opt-in) or defaults may be granted (opt-out), and whether a cross-border transfer needs its own grant, as Korea's PIPA does. |
+| 4. Decision | Browser banner | The choice updates the signals live and is written to the consent record — the record first, so it survives even when no tag loads. |
+| 5. Tags | Browser | Measurement loads only after steps 1–2, and only where step 3 and step 4 allow it. |
+| 6. Destination | Server function | Each server-side send asks the record, not the cookie: GA4 revenue needs `analytics_storage`; audience properties need `analytics_storage` and `ad_personalization`; a CDP profile such as Klaviyo needs `ad_user_data`. Erasure overrides every grant. |
+
+Steps 1–5 are the page; step 6 is the part a page cannot do, because the flow fires when no page
+is open. The same four words carry the decision across that gap.
 
 **In a theme, logic is show or hide.** Liquid's `if` / `unless` / `case` decide what a page
 *displays*: the data has already been fetched for the render, and the condition chooses which of
