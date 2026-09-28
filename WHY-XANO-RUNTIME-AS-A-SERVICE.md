@@ -32,7 +32,6 @@ keywords:
   - Klaviyo flows
   - Shopify Functions
   - Shopify Flow
-  - Consent Mode v2
   - Liquid
   - row level security
   - entitlement
