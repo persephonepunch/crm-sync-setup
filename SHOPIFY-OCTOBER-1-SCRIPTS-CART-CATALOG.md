@@ -225,6 +225,12 @@ the first key in the global namespace, and it should resolve to a market before 
   warns not to adapt *content* by IP address. That fits the rule above: the prefix fixes what a page
   says, so crawlers see a stable page per market; the visitor's location changes only the consent
   defaults, never the content.
+- **The same top-level-down naming, behind the hostname.** Cloudflare's *Artifacts* product uses
+  namespaces as the top-level containers for repositories, split by environment (`prod`, `staging`,
+  `dev`) or by tenant, with names that stay stable across Workers, API clients and Git. It names
+  repositories, not URLs — but it is the same convention one layer down: the market prefix a visitor
+  sees and the namespace that holds that market's configuration should be named once, top-level down,
+  and never renamed in only one place. See https://developers.cloudflare.com/artifacts/concepts/namespaces/
 
 **Why the middleware keeps coming back.** When a CRM is fed only through middleware, removing the
 middleware stops the CRM — so developers put it back, and the lag returns with it. Removing it is the
@@ -982,6 +988,7 @@ briefly here so the list stands on its own.
   https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites ;
   localized versions (hreflang) — https://developers.google.com/search/docs/specialty/international/localized-versions
 - Cloudflare Rules — https://developers.cloudflare.com/rules/
+- Cloudflare Artifacts: namespaces — https://developers.cloudflare.com/artifacts/concepts/namespaces/
 - SPF (RFC 7208) — https://www.rfc-editor.org/rfc/rfc7208
 - Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
   https://ads-developers.googleblog.com/2026/03/changes-to-customer-match-support-in.html
