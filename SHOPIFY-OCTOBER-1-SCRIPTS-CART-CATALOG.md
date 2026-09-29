@@ -137,7 +137,45 @@ consent answers "may we now?"; the session log answers "did they agree when they
 | Upload gates (audiences, pLTV seed lists) read the person's **current** consent | **Built** |
 | Upload gates **require the session record** of the purchase before any identifier leaves | **Not built** — the next step (§10) |
 
-### E. Checklist for global Shopify stores: retire from the critical path, then adopt
+### E. Business-as-usual data handling vs API reinforcement with a global namespace
+
+Most stores run on **business-as-usual (BAU) data handling**: one data state, shaped for one country
+(usually the US), kept separately inside each app. It works until the same customer, order or
+consent has to mean the same thing in a second market, a second language or a second ad platform.
+
+**API reinforcement** moves the rules into the API that every system calls — the edge Worker and
+Xano's function stacks — so a record missing its market, language or consent is refused at the call,
+not discovered in a report. A **global namespace** is the shared set of keys that makes a record mean
+the same thing everywhere: `market:<iso2>`, BCP 47 language tags, ISO 4217 currencies, Shopify GIDs,
+`$app:` metafield namespaces, and one name per consent purpose.
+
+| | BAU: single US data state | API-reinforced, global namespace |
+|---|---|---|
+| **Consent** | One status per channel inside each app | Per purpose (the four Consent Mode v2 signals, plus release of data abroad), per market, per session, with the notice version |
+| **History** | The latest state; earlier ones are overwritten or scattered across app event logs | An append-only timeline the server can replay: who agreed to what, when, in which session |
+| **Market** | Implied by the domain and the currency | An ISO 3166-1 key on every record, named top-level down (F) |
+| **Language** | One | A BCP 47 tag on every record and chunk of content |
+| **Identity** | Email address as the key, in every tool | A pseudonymous ID and platform GIDs; contact details encrypted, held once |
+| **Where the rule runs** | In each app, often in the browser | In the API, on every call — the same check for a person, a script or an agent |
+| **Erasure** | One app at a time | One request, fanned out to every system and confirmed |
+| **Timing** | Middleware copies changes on a schedule — minutes to hours behind | Consent is read at the moment of each call; there is no copy to fall behind |
+
+**The time-lapse risk.** A withdrawal that takes hours to reach every system is a withdrawal
+ignored for hours. In that window a person who opted out is still emailed, still tracked, still in an
+uploaded audience — and that gap, repeated across millions of records, is where complaints,
+regulator inquiries and lawsuits come from. It is not a vendor defect; it is what any scheduled copy
+does. The fix is structural: the systems that act (send, track, upload) ask the consent record at
+the moment they act, instead of trusting a copy.
+
+**Klaviyo as the worked example.** Klaviyo records, per profile, **one marketing status per channel**
+— `SUBSCRIBED`, `UNSUBSCRIBED` or `NEVER_SUBSCRIBED` — with the time and method of the last change,
+and logs subscribe and unsubscribe events. That answers one question well: *may we email or text this
+person?* It is not a per-purpose (`ad_user_data`, `ad_personalization`), per-market, per-session
+record, and it holds no release consent for moving data abroad — so on its own it cannot be the gate
+in D. Keep Klaviyo for messaging; let the API-reinforced consent record decide what may reach Google
+and Meta, and send Klaviyo the result.
+
+### F. Checklist for global Shopify stores: retire from the critical path, then adopt
 
 The dates in A retire **mechanisms, not companies**. Every tool named below can stay in your stack;
 what has to go is the pattern it may be carrying. Run the check against each tool you use — the
@@ -147,11 +185,11 @@ examples are tools commonly installed in each category, not a verdict on any of 
 
 | Pattern to retire | Commonly installed examples | The check to run | What carries the critical path instead |
 |---|---|---|---|
-| A CRM built around one storefront domain (one TLD) | Your CRM | Does every customer record carry its market (ISO 3166-1), and does the tool serve every market domain? | A market key on every record, named top-level down (below) |
+| A CRM built around one storefront domain (one TLD) | Your CRM | Does every customer record carry its market (ISO 3166-1), and does the tool serve every market domain? | A market key on every record, named top-level down (below), enforced by the API (E) |
 | Reviews, loyalty, service and subscription apps that assume one domain | Yotpo, Klaviyo, Attentive, Braze, Salesforce, Recharge, Loop, Gorgias, Sprinklr | Does it load through a script tag? Does it read consent and market per record, from the server? Does it serve every market domain? | App embeds and server-side APIs, with consent and market read per record |
 | A consent banner as the only record of consent | Cookiebot, OneTrust | Can your server read the consent event for a purchase's session (D)? | Keep the banner to collect the choice; keep the session event server-side |
 | Product data round-tripped through spreadsheets | `product.csv`, Matrixify | Is a spreadsheet the source of truth for a pipeline? | Admin API bulk operations (JSONL, `productSet`) for pipelines; spreadsheets for human edits only |
-| Middleware that moves records without consent or language | Boomi, Celigo, MuleSoft | Does each record carry its consent state and BCP 47 language through every hop? | Keep the integration platform and add the fields — or a Worker or Xano step that refuses records without them |
+| Middleware that moves records without consent or language, on a delay | Boomi, Celigo, MuleSoft | Does each record carry its consent state and BCP 47 language through every hop? **How long between a withdrawal and the last downstream system honouring it?** | Keep the integration platform and add the fields — or a Worker or Xano step that refuses records without them |
 | Google product data as a scheduled CSV file or through the Content API for Shopping | Google product feed file, Content API | The **Content API sunsets 18 Aug 2026**, with progressive errors from 1 Sep 2026; a file updates on a schedule, not when the product changes | The Merchant API |
 
 **Naming convention, top-level down.** Every lower level is derived from the one above it; no system
@@ -178,9 +216,9 @@ invents its own name for a market ("korea", "asia") where an ISO code exists.
 | **Rust and Wasm** | The language and format for Functions that see large carts | **Recommended**; not yet used here |
 | **A test harness with compliance gating** | Every deploy runs the suites; a failing consent, permission or residency test blocks the release | **Built** — the deploy gate |
 
-### F. What the rest of this document covers
+### G. What the rest of this document covers
 
-The machinery that makes A to E true: where JavaScript is allowed to run after 1 October (§1–§4),
+The machinery that makes A to F true: where JavaScript is allowed to run after 1 October (§1–§4),
 what is reserved in cart and checkout (§5), the ISO standards a global catalog uses (§6), and — for
 Korea — the routes, the rules and the consent that must come before any retargeting (§8).
 
@@ -801,6 +839,9 @@ briefly here so the list stands on its own.
 | **Function input query** | The GraphQL query a Function declares for the data it needs; can take variables from a JSON metafield |
 | **Consent Mode v2** | Google's four consent signals: `ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization` |
 | **CMP** — consent management platform | The banner tool that collects a visitor's choices |
+| **BAU data handling** | Business-as-usual: one data state per app, shaped for one country |
+| **API reinforcement** | Rules enforced by the API every system calls, so a bad record is refused at the call |
+| **Global namespace** | The shared keys that make a record mean the same everywhere: `market:<iso2>`, BCP 47, ISO 4217, GIDs, `$app:`, consent purpose names |
 | **Data Manager API** | Google's single upload API for audiences (Customer Match) and conversion events, with consent per request |
 | **Customer Match** | Retargeting Google users from your own customer list |
 | **Merchant API** | Google's product data API; replaces the Content API for Shopping |
@@ -863,6 +904,8 @@ briefly here so the list stands on its own.
 - Google Data Manager API — https://developers.google.com/data-manager
 - Meta Conversions API — https://developers.facebook.com/docs/marketing-api/conversions-api
 - Meta Customer List Custom Audiences Terms — https://www.facebook.com/legal/terms/customaudience
+- Klaviyo: understanding consent in profiles — https://help.klaviyo.com/hc/en-us/articles/360037101072
+- Klaviyo: collect email and SMS consent via API — https://developers.klaviyo.com/en/docs/collect_email_and_sms_consent_via_api
 - Google Customer Match policy — https://support.google.com/adspolicy/answer/6299717
 - Google Lookalike segments (Demand Gen) — https://support.google.com/google-ads/answer/13541369
 - Meta value-based Lookalike Audiences — https://www.facebook.com/business/help/917879191754763
