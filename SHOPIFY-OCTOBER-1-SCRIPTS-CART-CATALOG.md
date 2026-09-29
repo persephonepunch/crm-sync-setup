@@ -616,7 +616,9 @@ Ordered by exposure — the first item fails in two days.
    conversion pixel sends first. *Owner: data layer developer; reviewed by Korean counsel.*
 8. **Call NICEPAY and Coupang from a fixed IP** (Xano), with a TLS 1.2 client, and allowlist
    NICEPAY's webhook addresses. *Owner: integration developer.*
-9. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
+9. **Connect NICEPAY to the worker's Korean payment slot**, replacing the KG Inicis placeholder,
+   so Samsung Pay can settle in Korea alongside Kakao Pay. *Owner: integration developer.*
+10. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
    developer.*
 
 ---
