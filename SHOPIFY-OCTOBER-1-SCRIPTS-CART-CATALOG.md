@@ -346,6 +346,35 @@ references, extras cleared on withdrawal). The Azure store, private endpoint and
 client's closed side and are set up at handover; today, in the demo estate, those identifiers sit in
 the prep layer's extras table, released only with consent.
 
+**How OpenShift connects to off-prem Docker and Kubernetes — and the gap every SaaS-to-on-prem
+integration leaves.** Four layers cross the boundary, and Red Hat has a documented answer for each:
+
+| Layer | What crosses | How, on the OpenShift side |
+|---|---|---|
+| **1. The image** | A container built with Docker off-prem runs on OpenShift unchanged: both use the open OCI image format | Pulled from an outside registry with a pull secret, or mirrored into an internal registry so nothing is pulled from the internet at run time. OpenShift's default restricted policy runs containers as an **arbitrary non-root user ID**, so an image that assumes root fails here even though it runs in Docker — check this before handover |
+| **2. The definition** | Kubernetes YAML and Helm charts in Git | **OpenShift GitOps** installs Argo CD, which syncs the same repository; OpenShift adds its own Routes, Projects and security context constraints |
+| **3. Cluster management** | Policy and observability across clusters | **Red Hat Advanced Cluster Management** imports EKS, AKS, GKE and other conformant Kubernetes clusters, with limited lifecycle support compared with OpenShift clusters |
+| **4. The network** | A running service calling another | **Red Hat Service Interconnect** (built on the open-source Skupper project) links services across clusters and clouds without a VPN, over mutual TLS; **Cloudflare Tunnel** dials out from inside so no inbound port opens. Closed estates block outbound traffic by default, so every outside endpoint needs an egress rule, and identity comes from the enterprise provider (Entra ID), never the off-prem account |
+
+Xano's managed service and Cloudflare are services, not clusters to join: OpenShift reaches them over
+HTTPS like any API. At handover, what moves inside is the images and the Git repository — and, if the
+work was done right, the contract.
+
+**The fifth layer is the one that is missing.** SaaS-to-on-prem data integrations — scheduled syncs,
+middleware and EDI exchanges alike — move **copies of records**. The schema, the gate rules and the
+consent state that made those records valid stay behind on the SaaS side. Each side then keeps its
+own history, and every difference is found later, by hand, in a reconciliation report: an order that
+exists on one side only, a price that changed between runs, a withdrawal that the copy never heard
+about. Nothing in layers one to four fixes that, because they move software, not agreement.
+
+What closes it is the same rule as the rest of this document: the **contract crosses with the images
+and Git** — schema, gate rules, harness tests, eval set — the same tests pass on both sides, and one
+ordered, in-region log records each change once, so both sides replay the same history instead of
+comparing two. Drift then shows up as a failing test at handover, not as a reconciliation meeting a
+month later.
+
+![How OpenShift connects to off-prem Docker and Kubernetes in four layers — image, definition, cluster management, network — and the missing fifth layer, reconciliation, closed by moving the contract and one ordered log](https://crm-sync.dev/kb/media/docs/openshift-off-prem-bridge-reconciliation-gap.png)
+
 ![Validate outside, run inside: the Cloudflare and Xano prep layer hands a tested contract, not data, to the closed Kubernetes and Red Hat OpenShift pair](https://crm-sync.dev/kb/media/docs/prep-layer-vs-closed-kubernetes-red-hat-v2.png)
 
 ### F. Checklist for global Shopify stores: retire from the critical path, then adopt
@@ -1090,6 +1119,14 @@ briefly here so the list stands on its own.
 - Azure Private Link: what is a private endpoint — https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview
 - Microsoft Entra ID: OAuth 2.0 client credentials flow — https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow
 - Cloudflare Tunnel — https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
+- Red Hat Developer: adapting Docker and Kubernetes containers to run on OpenShift (arbitrary user IDs) —
+  https://developers.redhat.com/blog/2020/10/26/adapting-docker-and-kubernetes-containers-to-run-on-red-hat-openshift-container-platform
+- Red Hat OpenShift GitOps: setting up an Argo CD instance —
+  https://docs.redhat.com/en/documentation/red_hat_openshift_gitops/1.16/html-single/argo_cd_instance/index
+- Red Hat Advanced Cluster Management datasheet (EKS, AKS, GKE and conformant Kubernetes) —
+  https://www.redhat.com/en/resources/advanced-cluster-management-kubernetes-datasheet
+- Red Hat Service Interconnect (Skupper) —
+  https://docs.redhat.com/en/documentation/red_hat_service_interconnect/2.1/html/using_service_interconnect/skupper-overview
 - California Civil Code §1798.140 (CCPA definitions, "consumer or household") —
   https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.140
 - CCPA regulations §7026(f)(2): notify third parties who received the data before the opt-out was honoured —
