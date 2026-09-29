@@ -137,9 +137,50 @@ consent answers "may we now?"; the session log answers "did they agree when they
 | Upload gates (audiences, pLTV seed lists) read the person's **current** consent | **Built** |
 | Upload gates **require the session record** of the purchase before any identifier leaves | **Not built** — the next step (§10) |
 
-### E. What the rest of this document covers
+### E. Checklist for global Shopify stores: retire from the critical path, then adopt
 
-The machinery that makes A to D true: where JavaScript is allowed to run after 1 October (§1–§4),
+The dates in A retire **mechanisms, not companies**. Every tool named below can stay in your stack;
+what has to go is the pattern it may be carrying. Run the check against each tool you use — the
+examples are tools commonly installed in each category, not a verdict on any of them.
+
+**Retire from the critical path**
+
+| Pattern to retire | Commonly installed examples | The check to run | What carries the critical path instead |
+|---|---|---|---|
+| A CRM built around one storefront domain (one TLD) | Your CRM | Does every customer record carry its market (ISO 3166-1), and does the tool serve every market domain? | A market key on every record, named top-level down (below) |
+| Reviews, loyalty, service and subscription apps that assume one domain | Yotpo, Klaviyo, Attentive, Braze, Salesforce, Recharge, Loop, Gorgias, Sprinklr | Does it load through a script tag? Does it read consent and market per record, from the server? Does it serve every market domain? | App embeds and server-side APIs, with consent and market read per record |
+| A consent banner as the only record of consent | Cookiebot, OneTrust | Can your server read the consent event for a purchase's session (D)? | Keep the banner to collect the choice; keep the session event server-side |
+| Product data round-tripped through spreadsheets | `product.csv`, Matrixify | Is a spreadsheet the source of truth for a pipeline? | Admin API bulk operations (JSONL, `productSet`) for pipelines; spreadsheets for human edits only |
+| Middleware that moves records without consent or language | Boomi, Celigo, MuleSoft | Does each record carry its consent state and BCP 47 language through every hop? | Keep the integration platform and add the fields — or a Worker or Xano step that refuses records without them |
+| Google product data as a scheduled CSV file or through the Content API for Shopping | Google product feed file, Content API | The **Content API sunsets 18 Aug 2026**, with progressive errors from 1 Sep 2026; a file updates on a schedule, not when the product changes | The Merchant API |
+
+**Naming convention, top-level down.** Every lower level is derived from the one above it; no system
+invents its own name for a market ("korea", "asia") where an ISO code exists.
+
+| Level | Convention | Example |
+|---|---|---|
+| Brand | One registrable domain for the global root | `brand.com` |
+| Market | One country-code domain or market subdomain per market | `brand.co.kr`, `brand.jp`, or `kr.brand.com` |
+| Language | A BCP 47 subfolder under the market | `brand.com/en-us/`, `brand.co.kr/ko/` |
+| Market key in every system (CRM, tags, metafields, feeds) | ISO 3166-1 alpha-2 — uppercase in data, lowercase in URLs and handles | `KR` in a record, `kr` in a URL |
+| Currency | ISO 4217 | `KRW` |
+| Tag namespace | `market:<iso2>` | `market:kr` |
+
+**Adopt**
+
+| Adopt | Its job in this model | Status here |
+|---|---|---|
+| **Cloudflare Workers** | The edge: consent-first page loading, server-rendered pages, and the permission check on every tool call | **Built** |
+| **Xano functions** | The data plane: typed tables and function stacks with preconditions, on Xano's managed container (Kubernetes and Docker) infrastructure; an `auth/me` endpoint resolves the signed-in person from their token; every call over TLS | **Built** |
+| **AI data-binding runners (Claude)** | An AI agent maps and moves data between systems inside the test harness — it prepares and verifies; a person approves anything that touches keys or money | **Built** — how this estate is operated |
+| **Google Merchant API** | Product data, statuses and reports; replaces the Content API | **Built** — the catalog mirrors its shape (AIP-122) |
+| **Shopify Functions** | Pricing, discount, delivery and validation logic inside checkout | **Designed** (§3 example); none deployed here yet |
+| **Rust and Wasm** | The language and format for Functions that see large carts | **Recommended**; not yet used here |
+| **A test harness with compliance gating** | Every deploy runs the suites; a failing consent, permission or residency test blocks the release | **Built** — the deploy gate |
+
+### F. What the rest of this document covers
+
+The machinery that makes A to E true: where JavaScript is allowed to run after 1 October (§1–§4),
 what is reserved in cart and checkout (§5), the ISO standards a global catalog uses (§6), and — for
 Korea — the routes, the rules and the consent that must come before any retargeting (§8).
 
@@ -717,6 +758,66 @@ Ordered by exposure — the first item fails in two days.
 
 ---
 
+## Dictionary: AI and API terms
+
+One line each, in the sense this document uses them. Terms defined at length in §0 are repeated
+briefly here so the list stands on its own.
+
+| Term | Means |
+|---|---|
+| **Agent** | Software that decides which tool to call next toward a goal. It decides what to *try*, never what is *allowed* |
+| **Tool** (function call) | One operation an agent may request, such as "search the catalog"; the server checks permission on every call |
+| **MCP** — Model Context Protocol | The open protocol agents use to discover and call tools on a server |
+| **A2A** — Agent2Agent | A protocol for one agent to hand a task to another |
+| **AP2** — Agent Payments Protocol | A protocol for an agent to pay under a mandate the person signed |
+| **UCP** — Universal Commerce Protocol | The open protocol agents use to search catalogs and check out (§6) |
+| **ADK** — Agent Development Kit | Google's framework for building agents that call tools |
+| **Mandate** | What an agent may do on someone's behalf: signed, capped, scoped, time-boxed, revocable |
+| **Consent mandate** | The server-side record of what one person allowed, per purpose and market (§0) |
+| **RAG** — retrieval-augmented generation | The model answers from passages retrieved at question time |
+| **CRAG** — corrective RAG | RAG with a grader: weak passages are refused and the next source is tried |
+| **Grounded answer** | An answer written only from retrieved passages; "not in the documents" when they do not answer |
+| **Embedding** | A list of numbers that places a piece of text by meaning, so similar texts sit close together |
+| **Vector index** (Cloudflare Vectorize) | A store of embeddings searched by nearest meaning |
+| **bge-m3** | The multilingual embedding model used here (English, Korean and more in one index) |
+| **LoRA** — low-rank adaptation | A small trained adapter that changes how a model writes; never used to store facts |
+| **Eval set** | Real questions with accepted answers, run before and after every change |
+| **Workers AI** | Models run on Cloudflare's network; used here for public questions, including Korea's |
+| **Vertex AI** | Google Cloud's AI platform; optional here, and never for Korean personal data |
+| **AI data-binding runner** | An AI agent that maps and moves data between systems inside a test harness, with a person approving keys and money |
+| **REST** | An API style built on URLs and HTTP verbs, one resource per call |
+| **GraphQL** | An API style where the caller asks for exactly the fields it needs in one query; Shopify's Admin API is GraphQL |
+| **GID** | Shopify's global ID, such as `gid://shopify/Product/123` |
+| **AIP** — API Improvement Proposals | Google's API design rules: resource names, standard methods, paging, errors |
+| **Page token** | An opaque marker for "the next page" of a list, bound to the query that produced it (AIP-158) |
+| **JSONL bulk operation** | A file with one JSON object per line, run by Shopify as one bulk job |
+| **Webhook** | A call a platform makes to your server when something changes |
+| **Idempotent** | Safe to repeat: the second identical request changes nothing |
+| **Metafield / metaobject** | Shopify's custom fields and custom records |
+| **`$app:` namespace** | A metafield namespace reserved to the app that owns it |
+| **App embed block** | App code a merchant switches on in the theme editor; the replacement for script tags |
+| **Web pixel** | A sandboxed script that receives customer events, for measurement only |
+| **Shopify Function / Wasm / Javy** | Server-side checkout logic compiled to WebAssembly; Javy compiles JavaScript to Wasm (§3) |
+| **Function input query** | The GraphQL query a Function declares for the data it needs; can take variables from a JSON metafield |
+| **Consent Mode v2** | Google's four consent signals: `ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization` |
+| **CMP** — consent management platform | The banner tool that collects a visitor's choices |
+| **Data Manager API** | Google's single upload API for audiences (Customer Match) and conversion events, with consent per request |
+| **Customer Match** | Retargeting Google users from your own customer list |
+| **Merchant API** | Google's product data API; replaces the Content API for Shopping |
+| **Conversions API** (Meta) | Meta's server-side API for conversion events |
+| **pLTV** — predicted lifetime value | A model's estimate of what a customer will spend; used as the value for Smart Bidding and value-based lookalikes |
+| **Smart Bidding** | Google's automated bidding toward conversions or conversion value |
+| **Lookalike** | An audience of people similar to a seed list (Google Demand Gen; Meta value-based lookalikes) |
+| **TLS** | The encryption on every HTTPS connection; NICEPAY requires TLS 1.2 or later |
+| **JWT / JWE** | A signed token (JWT) or an encrypted one (JWE) carrying identity or permissions |
+| **OAuth** | The standard way to grant an app access to an account without sharing its password |
+| **`auth/me`** | The endpoint that returns who the current token belongs to |
+| **BCP 47** | Language tags such as `ko`, `fr-CA`, `zh-Hans` |
+| **ISO 3166-1** | Country codes such as `KR`, `US` |
+| **ISO 4217** | Currency codes such as `KRW`, `USD`, and each currency's minor unit |
+
+---
+
 ## Sources
 
 - Shopify changelog, 24 Aug 2026: *Script tags are deprecated and will stop running on
@@ -742,6 +843,8 @@ Ordered by exposure — the first item fails in two days.
 - UCP Catalog specification (2026-04-08) — https://ucp.dev/2026-04-08/specification/catalog/
 - Bulk operation imports — https://shopify.dev/docs/apps/build/apis/graphql-admin/bulk-operations/imports
 - Google API design rules used on the merchant surface — https://google.aip.dev/general
+- Migrate from Content API for Shopping to Merchant API (sunset 18 Aug 2026) —
+  https://developers.google.com/merchant/api/guides/compatibility/overview
 - NICEPAY developer manual, integration preparations (TLS 1.2, hosts, IPs, Basic auth) —
   https://github.com/nicepayments/nicepay-manual/blob/main/common/preparations.md
 - PIPA 2023 amendment, overseas transfer grounds — Lexology,
