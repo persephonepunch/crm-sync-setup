@@ -102,6 +102,20 @@ States and abroad: reach where it is permitted, hold where it is not, and prove 
    for US audiences; the Meta upload is not built; Korean buyers stay out of every seed list until
    release consent exists (§8.3).
 
+**The rule this estate applies: no session-level Consent Mode v2 log, no retargeting.** A buyer
+enters a YouTube (Google) or Meta audience — or is sent as a purchase conversion with identifiers —
+only when a consent event for **that session** is on record: the session ID, the four Consent Mode v2
+signals (`ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization`), the time, and
+the version of the notice that was shown. Google and Meta ask the advertiser to *warrant* consent;
+this log is what turns the warranty into evidence for a specific purchase. A person's current
+consent answers "may we now?"; the session log answers "did they agree when they bought?".
+
+| Piece | Status |
+|---|---|
+| Consent events recorded per session, keyed by session ID (effective state = latest event in the session; reset and withdrawal recorded) | **Built** |
+| Upload gates (audiences, pLTV seed lists) read the person's **current** consent | **Built** |
+| Upload gates **require the session record** of the purchase before any identifier leaves | **Not built** — the next step (§10) |
+
 The rest of this document is the machinery that makes those lines true: where JavaScript is
 allowed to run after 1 October, what is reserved in cart and checkout, the ISO standards a global
 catalog uses, and — for Korea — the consent that must come before any retargeting.
@@ -668,9 +682,12 @@ Ordered by exposure — the first item fails in two days.
    conversion pixel sends first. *Owner: data layer developer; reviewed by Korean counsel.*
 8. **Call NICEPAY and Coupang from a fixed IP** (Xano), with a TLS 1.2 client, and allowlist
    NICEPAY's webhook addresses. *Owner: integration developer.*
-9. **Connect NICEPAY to the worker's Korean payment slot**, replacing the KG Inicis placeholder,
+9. **Require a session-level Consent Mode v2 record before any retargeting upload**: a purchase's
+   identifiers go to Google or Meta only when the consent event for that purchase's session is on
+   record. *Owner: data layer developer; reviewed by compliance.*
+10. **Connect NICEPAY to the worker's Korean payment slot**, replacing the KG Inicis placeholder,
    so Samsung Pay can settle in Korea alongside Kakao Pay. *Owner: integration developer.*
-10. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
+11. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
    developer.*
 
 ---
