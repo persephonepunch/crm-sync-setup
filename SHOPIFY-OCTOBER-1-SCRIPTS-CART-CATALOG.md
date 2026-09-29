@@ -1,6 +1,6 @@
 ---
 title: "October 1: script tags, Functions, the cart, and the catalog agents read"
-description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend, which names are reserved in the cart and checkout, and the ISO standards the Universal Commerce Protocol catalog uses — and why that catalog is not a replacement for product CSV import."
+description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend and how a backend feeds it, which names are reserved in the cart and checkout, the ISO standards the Universal Commerce Protocol catalog uses, and for Korea: where restricted APIs route, NICEPAY TLS and login rules, and the release-data consent that must precede retargeting a Korean buyer from a US ad platform."
 canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-october-1-scripts-cart-catalog.html
 category: "Specs"
 date: 2026-09-29
@@ -31,6 +31,11 @@ keywords:
   - ISO 3166-1
   - ISO 4217
   - BCP 47
+  - NICEPAY
+  - PIPA
+  - cross-border transfer consent
+  - conversions API
+  - retargeting
 ---
 
 # October 1: script tags, Functions, the cart, and the catalog agents read
@@ -319,7 +324,89 @@ them.
 
 ---
 
-## 8. What it costs
+## 8. Korea: where the restricted APIs route, and the consent that gates retargeting
+
+A US company selling into Korea meets the same October deadline, plus a set of services that do
+not work there or only work from a fixed address. None of this blocks selling; each row has a
+route.
+
+### 8.1 The map
+
+| Need | The US default | In Korea | Route used here | Status |
+|---|---|---|---|---|
+| Take payment | Shopify Payments | **Not offered** to merchants based in South Korea | Shopify stays the system of record (draft order); a Korean PG settles; the draft is marked paid and becomes the order | Built for Kakao Pay (sandbox) |
+| Korean cards and wallets | Google Pay, Google Wallet | **Not launched** for Korean-issued cards | Kakao Pay; Samsung Pay and cards through **NICEPAY** (Samsung Pay is a separate NICEPAY contract) | NICEPAY endpoints built in Xano; not live |
+| Marketplace (Coupang) | — | Open API **enforces an IP allowlist** | A Cloudflare Worker has no fixed outbound IP, so calls go Worker → Xano (fixed IP) → Coupang | Design; keys are ceremony secrets in Xano |
+| NICEPAY REST API | — | See §8.2 | Called from Xano, not the Worker; every money step checks the signature **and** the amount | Built, refusal paths tested |
+| Sell on YouTube | Shopify's Google & YouTube app | Own-store connection only through **Cafe24** or **Marpple**; embedded checkout only with Cafe24; affiliate through **Coupang**; **no public API** to tag products | The store's own checkout sits beside YouTube, not inside it | Not built; a direction |
+| AI on personal data | Any hosted model | Korean personal data must not reach a non-Korean endpoint | Public questions: Workers AI. Personal data: a Korean-hosted model, or refuse | Rule enforced before the call |
+| Staff and operator access | Shared admin key | Staff logins are personal data under PIPA | `/ops/*` behind Cloudflare Access; the Worker verifies the Access token itself and fails closed | Live on the POC; each client creates its own organisation |
+
+### 8.2 TLS and login requirements
+
+| Who is logging in, or connecting | Requirement | Source |
+|---|---|---|
+| Our server calling NICEPAY | HTTP client must support **TLS 1.2**; **Basic** authentication with the client key and secret key; sandbox and production keys differ | NICEPAY developer manual, *preparations* |
+| Our firewall | Outbound to `api.nicepay.co.kr` and `pay.nicepay.co.kr` (sandbox hosts separate); **inbound webhooks from 121.133.126.86 and .87** | NICEPAY developer manual |
+| NICEPAY calling our server | Optional **IP security**: restrict which IPs may call the API (CIDR). A Worker cannot be allowlisted by IP; Xano can | NICEPAY developer manual |
+| A buyer paying with Kakao Pay | A payer account without Korean identity verification (본인인증) is refused ("restricted Kakao Pay usage") — observed on 25 Sep 2026 with a US account, even for a test payment | **Observed**, not a documented rule |
+| A Kakao developer key | A Kakao **Login** REST key is a different product from the Kakao **Pay** key; swapping them fails with a well-formed but rejected request | Our payments runbook |
+| Staff opening refunds or customer records | Cloudflare Access (Zero Trust) login; the Worker checks the token's signature, audience, issuer and expiry, and refuses when Access is half-configured | Our Korea/US governance reference |
+
+### 8.3 Automated checkout and global conversions: NICEPAY to Google, YouTube and Meta
+
+The path a US company wants is simple to draw: a Korean buyer pays through NICEPAY, the order is
+confirmed server-side, and the conversion is sent to Google Ads (YouTube campaigns) and Meta so
+they can measure and retarget. **The step that decides whether that is lawful is not in the
+payment flow. It is the buyer's consent to release their data abroad.**
+
+```
+NICEPAY approval ──▶ signature + amount checked ──▶ Shopify order (system of record)
+                                                          │
+                                        ┌─ release consent on record? ─┐
+                                        │ no                           │ yes
+                                        ▼                              ▼
+                          aggregate count and value only     conversion with identifiers
+                          (no identifier leaves Korea)       to Google Ads / Meta, and
+                                                             eligibility for retargeting
+```
+
+**Why consent, specifically.** Since 15 September 2023, PIPA Article 28-8 allows a transfer of
+personal information abroad on one of five grounds: separate consent, law or treaty, processing
+necessary to perform a contract with the person, a PIPC certification, or a PIPC adequacy
+decision. Sending a buyer's details to an ad platform so they can be **retargeted** is not needed
+to deliver their order, so for most US companies **separate consent** is the ground that applies.
+The consent has to tell the buyer what is transferred, to which country, when and how, to whom,
+for what purpose and for how long, and that they may refuse.
+
+| What would be sent | Personal information? | Without release consent | With release consent |
+|---|---|---|---|
+| Order count and total value, no identifiers | No | Allowed | Allowed |
+| Ad click ID (`gclid`, `fbclid`) with the order | Treat as **yes**: it links an order to a person's ad activity | Hold | Send |
+| Hashed email or phone (Google enhanced conversions, Meta Conversions API) | **Yes** — hashing is pseudonymisation, not anonymisation | Hold | Send |
+| The buyer in a retargeting list (Customer Match, Custom Audiences) | **Yes** | Hold | Send, and remove on withdrawal |
+
+**This is the feature a US company needs from its data layer:** a **release-data consent**,
+itemised the way PIPA requires, recorded with evidence, and **checked server-side before any
+conversion or audience upload** — with "aggregate only" as the default when it is absent. A
+browser tag cannot enforce that: it fires before the server knows whether consent exists.
+
+**This estate's honest status:**
+
+| Piece | Status |
+|---|---|
+| Consent regime for Korean visitors | Opt-in banner (Korea resolves to `opt_in`) — **Built** |
+| Consent evidence | Running log in Xano plus a keyed evidence store — **Built** |
+| Consent signal for ad conversions | `google_ads_conversion` mapped to `ad_user_data` in the conversion-consent module — **Built**, not yet called by any conversion upload |
+| **Itemised cross-border release consent (PIPA 28-8)** | **Gap.** The banner decides which notice is shown; it is not the separate, itemised transfer consent |
+| Server-side conversion upload (Google Ads, Meta) | **Not built** |
+| The store's existing conversion tag | A **custom web pixel** in Shopify Customer events with Analytics, Marketing and Sale-of-data purposes. Its code was not read for this document — confirm what it sends before it runs for Korean buyers |
+
+*PIPA points here are a map for a conversation with Korean counsel, not legal advice.*
+
+---
+
+## 9. What it costs
 
 | Choice | Cost | Stated plainly |
 |---|---|---|
@@ -328,10 +415,11 @@ them.
 | Functions in Rust | A second language in the codebase | JavaScript Functions are cheaper to write and more likely to fail on large carts |
 | Double-underscore attributes | Invisible to the theme as well as the buyer | Correct for system data; wrong for anything a template must display |
 | Catalog read literally by agents | Data quality becomes visible to shoppers | Fix identifiers and currencies before an agent quotes them |
+| Release consent before retargeting Korean buyers | Smaller retargeting lists and fewer matched conversions from Korea | Every list that is built can be shown to a regulator; the alternative is a PIPC suspension order on the transfer |
 
 ---
 
-## 9. What to do next
+## 10. What to do next
 
 Ordered by exposure — the first item fails in two days.
 
@@ -348,7 +436,13 @@ Ordered by exposure — the first item fails in two days.
    tests, before any pipeline copies between them. *Owner: integration developer.*
 6. **Check product records for what agents will read**: GTIN or MPN, currency on every price,
    description language. *Owner: catalog owner.*
-7. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
+7. **For Korean buyers, hold every identifier until release consent exists**: build the
+   itemised PIPA 28-8 consent, record it with evidence, and gate conversion and audience uploads
+   on it server-side; send aggregate counts only until then. Review what the store's custom
+   conversion pixel sends first. *Owner: data layer developer; reviewed by Korean counsel.*
+8. **Call NICEPAY and Coupang from a fixed IP** (Xano), with a TLS 1.2 client, and allowlist
+   NICEPAY's webhook addresses. *Owner: integration developer.*
+9. **Remove what is left by 1 March 2027**, when script tags stop loading. *Owner: app
    developer.*
 
 ---
@@ -376,6 +470,15 @@ Ordered by exposure — the first item fails in two days.
 - UCP Catalog specification (2026-04-08) — https://ucp.dev/2026-04-08/specification/catalog/
 - Bulk operation imports — https://shopify.dev/docs/apps/build/apis/graphql-admin/bulk-operations/imports
 - Google API design rules used on the merchant surface — https://google.aip.dev/general
+- NICEPAY developer manual, integration preparations (TLS 1.2, hosts, IPs, Basic auth) —
+  https://github.com/nicepayments/nicepay-manual/blob/main/common/preparations.md
+- PIPA 2023 amendment, overseas transfer grounds — Lexology,
+  https://www.lexology.com/library/detail.aspx?g=4e246fbb-9f7a-48dc-9435-410a577d6ff8 ; Shin & Kim,
+  https://www.shinkim.com/eng/media/newsletter/2048
+- Items a Korean overseas-transfer notice must state — DLA Piper, Data Protection Laws of the World,
+  https://www.dlapiperdataprotection.com/?t=transfer&c=KR
+- YouTube Shopping in Korea (store platforms, affiliate program) — YouTube Help,
+  https://support.google.com/youtube/answer/13376398
 
 *Status: draft. Not legal advice and not a certification. Dates and limits are Shopify's and
 may change; check the linked pages before acting.*
