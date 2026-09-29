@@ -36,6 +36,8 @@ keywords:
   - conversions API
   - retargeting
   - Consent Mode v2
+  - Smart Bidding
+  - consent mandate
   - predicted lifetime value
   - Lookalike segments
   - value-based Lookalike Audiences
@@ -60,7 +62,10 @@ keywords:
 
 # October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements
 
-## What server-side consent buys: a global media and shopping strategy
+## What Consent Mode v2 buys you globally
+
+**Google and Meta ads, lookalike audiences and Smart Bidding — managed by a server-side consent
+mandate.**
 
 Every channel that sells or retargets across borders — YouTube Shopping, Google Customer Match,
 Meta Custom Audiences, Shopify Audiences — ends at the same sentence: **the advertiser confirms it
@@ -85,7 +90,8 @@ States and abroad: reach where it is permitted, hold where it is not, and prove 
    is the evidence behind that warranty.
 4. **Consent Mode v2 buys value-based growth.** With `ad_user_data` and `ad_personalization`
    granted, one consented customer list — each customer carrying a **predicted lifetime value
-   (pLTV)** — seeds three things: Google value-based bidding, Google
+   (pLTV)** — seeds three things: Google **Smart Bidding** on value (target ROAS, maximise
+   conversion value), Google
    [Lookalike segments](https://support.google.com/google-ads/answer/13541369) in Demand Gen
    campaigns (seeded from Customer Match, at least 100 matched people), and Meta
    [value-based Lookalike Audiences](https://www.facebook.com/business/help/917879191754763)
@@ -132,6 +138,7 @@ Several of these words mean two different things, and the deadline only applies 
 | **WebAssembly (Wasm)** | The compact binary format every Shopify Function is shipped as. Shopify runs the module inside checkout and counts its instructions | A language. Rust, Zig, TinyGo and JavaScript all compile *to* it |
 | **Rust** (for Functions) | The language Shopify strongly recommends for Functions: it compiles directly to Wasm, using Shopify's `shopify_function` crate and the `#[shopify_function]` macro | Required. It is the recommended path, not the only one |
 | **Javy** | Shopify's JavaScript-to-Wasm toolchain. A JavaScript Function ships a JavaScript engine inside its Wasm module, which is why it spends instructions faster | A different runtime. The result is still Wasm |
+| **Consent mandate** | The server-side record of what one person allowed, per purpose and market — analytics, `ad_user_data`, `ad_personalization`, release of data abroad — written with evidence and checked before every upload, audience or bid signal | A cookie-banner state in one browser. A banner collects the choice; the mandate is what the server enforces |
 | **Keyword** | One word matched as written (`fuel`, `연료전지`) | Meaning. A keyword does not match a synonym |
 | **Key phrase** | Several words matched as one unit (`heat pipe heater`, `household heating`) | A bag of the same words in any order |
 | **Topic-driven category** | A category assigned by **meaning**: the text is embedded and placed in the category whose description it is nearest to, so "hydrogen power plant" lands in *Clean energy* with neither word present | A keyword rule. Keywords and phrases feed it; they do not decide it |
