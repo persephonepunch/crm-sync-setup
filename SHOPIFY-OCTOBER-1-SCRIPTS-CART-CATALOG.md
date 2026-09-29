@@ -324,7 +324,28 @@ definitions — not the data. The closed side runs the same contract (on OpenShi
 in the client's own cluster), Terraform adopts the pieces, keys are minted fresh, and the same tests
 must pass there. If one fails inside, the handover stops.
 
-![Validate outside, run inside: the Cloudflare and Xano prep layer hands a tested contract, not data, to the closed Kubernetes and Red Hat OpenShift pair](https://crm-sync.dev/kb/media/docs/prep-layer-vs-closed-kubernetes-red-hat.png)
+**Circana, Nielsen and Adobe IDs live on the closed side, behind a protected endpoint.** These are the
+identifiers that turn a customer into a household, a panel match or an Adobe profile, so they are the
+last thing that should sit in a shared layer. In the closed pair — an Azure estate, for example — they
+are held in one store reached only through an **Azure private endpoint**: a network interface with a
+private IP address in the company's own virtual network. Microsoft notes that a private endpoint does
+not by itself switch off public access, so **public network access is disabled on the store as a
+separate step**. Callers authenticate with a **Microsoft Entra ID** token issued to a service
+(client credentials), and the Cloudflare side reaches in only through **Cloudflare Tunnel**, an
+outbound connection from inside, so no inbound port is opened.
+
+The endpoint answers questions, not lists: *is this person included in the match* (include or
+exclude, from the clean-room consent) or *how many and how much* (totals). It never returns the
+identifier itself. The prep layer carries hashed references in its place, and a withdrawal clears
+them on both sides — the prep layer's extras in the same step, the closed store through the
+suppression feed.
+
+*Status here:* the prep-layer half is built (consent-gated clean-room include and exclude, hashed
+references, extras cleared on withdrawal). The Azure store, private endpoint and Tunnel are the
+client's closed side and are set up at handover; today, in the demo estate, those identifiers sit in
+the prep layer's extras table, released only with consent.
+
+![Validate outside, run inside: the Cloudflare and Xano prep layer hands a tested contract, not data, to the closed Kubernetes and Red Hat OpenShift pair](https://crm-sync.dev/kb/media/docs/prep-layer-vs-closed-kubernetes-red-hat-v2.png)
 
 ### F. Checklist for global Shopify stores: retire from the critical path, then adopt
 
@@ -1065,6 +1086,9 @@ briefly here so the list stands on its own.
 - Cloudflare Rules — https://developers.cloudflare.com/rules/
 - Xano: User Auth & Data (auth/me, JWE tokens, extras) — https://docs.xano.com/building-backend-features/user-authentication-and-user-data
 - Red Hat OpenShift — https://www.redhat.com/en/technologies/cloud-computing/openshift
+- Azure Private Link: what is a private endpoint — https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview
+- Microsoft Entra ID: OAuth 2.0 client credentials flow — https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow
+- Cloudflare Tunnel — https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
 - California Civil Code §1798.140 (CCPA definitions, "consumer or household") —
   https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.140
 - CCPA regulations §7026(f)(2): notify third parties who received the data before the opt-out was honoured —
