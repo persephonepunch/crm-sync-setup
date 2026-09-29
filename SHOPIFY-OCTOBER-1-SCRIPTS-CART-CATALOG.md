@@ -67,6 +67,26 @@ keywords:
 **Google and Meta ads, lookalike audiences and Smart Bidding — managed by a server-side consent
 mandate.**
 
+### A. The three-year conversion: from browser tags to server-side consent
+
+Nine dated changes, from three rulebooks, between September 2023 and March 2027. Read top to bottom
+they are one conversion: measurement, audiences and checkout logic move out of the browser and
+behind a consent record the server keeps.
+
+| Date | What changes | Who | What it forces |
+|---|---|---|---|
+| 15 Sep 2023 | Korea's amended PIPA: five legal grounds for moving personal data abroad; for retargeting, that means **separate consent** | Korea (PIPC) | An itemised release consent before any Korean buyer's data reaches a US ad platform |
+| Nov 2023 | Consent Mode v2 adds `ad_user_data` and `ad_personalization` | Google | Two new consent signals on every tag and upload |
+| Early Mar 2024 | EEA users are left out of Google audiences unless those signals are sent | Google | Consent becomes a condition of reach, not a banner |
+| 13 Aug 2024 | `checkout.liquid` unsupported on Information, Shipping and Payment | Shopify | Checkout code moves to Checkout Extensibility |
+| 28 Aug 2025 | `checkout.liquid` and additional scripts end on Thank you and Order status; script tags leave the Order status page on Plus | Shopify | Post-purchase tracking moves to web pixels and extensions |
+| 1 Apr 2026 | New Customer Match integrations must use the **Data Manager API**; the Google Ads API refuses new adopters | Google | Audience uploads move to a server-side API with a consent field |
+| 26 Aug 2026 | Script tags leave the Order status page on every other store | Shopify | — |
+| **1 Oct 2026** | Script tags can no longer be created or updated, on any API version | Shopify | Installs and settings flows that write a script tag fail |
+| 1 Mar 2027 | Script tags stop loading on storefronts | Shopify | Anything still injected this way goes dark |
+
+### B. What each platform requires of you
+
 Every channel that sells or retargets across borders — YouTube Shopping, Google Customer Match,
 Meta Custom Audiences, Shopify Audiences — ends at the same sentence: **the advertiser confirms it
 has the consent the law requires. None of them collects that consent for you.** A consent record
@@ -80,7 +100,7 @@ States and abroad: reach where it is permitted, hold where it is not, and prove 
 | [Meta Custom Audiences](https://www.facebook.com/legal/terms/customaudience) (customer list) | Retargeting on Facebook and Instagram | Global | You warrant **"all necessary rights and permissions and a lawful basis"**; remove anyone who opts out; Meta deletes the list after matching |
 | [Shopify Audiences](https://help.shopify.com/en/manual/promoting-marketing/shopify-audiences/setting-up-shopify-audiences) | Retargeting and prospecting lists exported to Meta and Google | Stores **based in the US or Canada** only | Shopify Plus, Shopify Payments and Shopify Network Intelligence — so **not available to a Korea-based store** |
 
-**What that buys:**
+### C. What that buys
 
 1. **Reach US audiences from global markets, with consent.** A buyer who granted release consent
    can be measured and retargeted on every platform above, whatever market they bought in.
@@ -102,8 +122,9 @@ States and abroad: reach where it is permitted, hold where it is not, and prove 
    for US audiences; the Meta upload is not built; Korean buyers stay out of every seed list until
    release consent exists (§8.3).
 
-**The rule this estate applies: no session-level Consent Mode v2 log, no retargeting.** A buyer
-enters a YouTube (Google) or Meta audience — or is sent as a purchase conversion with identifiers —
+### D. The rule: no session-level Consent Mode v2 log, no retargeting
+
+A buyer enters a YouTube (Google) or Meta audience — or is sent as a purchase conversion with identifiers —
 only when a consent event for **that session** is on record: the session ID, the four Consent Mode v2
 signals (`ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization`), the time, and
 the version of the notice that was shown. Google and Meta ask the advertiser to *warrant* consent;
@@ -116,9 +137,13 @@ consent answers "may we now?"; the session log answers "did they agree when they
 | Upload gates (audiences, pLTV seed lists) read the person's **current** consent | **Built** |
 | Upload gates **require the session record** of the purchase before any identifier leaves | **Not built** — the next step (§10) |
 
-The rest of this document is the machinery that makes those lines true: where JavaScript is
-allowed to run after 1 October, what is reserved in cart and checkout, the ISO standards a global
-catalog uses, and — for Korea — the consent that must come before any retargeting.
+### E. What the rest of this document covers
+
+The machinery that makes A to D true: where JavaScript is allowed to run after 1 October (§1–§4),
+what is reserved in cart and checkout (§5), the ISO standards a global catalog uses (§6), and — for
+Korea — the routes, the rules and the consent that must come before any retargeting (§8).
+
+---
 
 
 > On 1 October 2026 a Shopify app can no longer create or update a script tag, on any API
@@ -729,6 +754,9 @@ Ordered by exposure — the first item fails in two days.
 - NICEPAY payment window (server approval), methods and signatures —
   https://github.com/nicepayments/nicepay-manual/blob/main/api/payment-window-server.md
 - Google consent mode (ad_user_data, ad_personalization) — https://developers.google.com/tag-platform/security/guides/consent
+- Google: updates to consent mode for EEA traffic (March 2024) — https://support.google.com/google-ads/answer/13695607
+- Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
+  https://ads-developers.googleblog.com/2026/03/changes-to-customer-match-support-in.html
 - Google Data Manager API — https://developers.google.com/data-manager
 - Meta Conversions API — https://developers.facebook.com/docs/marketing-api/conversions-api
 - Meta Customer List Custom Audiences Terms — https://www.facebook.com/legal/terms/customaudience
