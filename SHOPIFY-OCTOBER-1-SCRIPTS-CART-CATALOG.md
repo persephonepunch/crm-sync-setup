@@ -539,6 +539,45 @@ methods, paging and errors. The tools an agent calls here follow the same rules,
 built on ADK or UCP reads them the way it reads Google's own APIs. The rules name things; they do
 not grant anything — every tool still checks permission and consent itself.
 
+### 8.6 One path, segmented by region: Shopify UCP → Google audience → NICEPAY
+
+The same shopper journey runs in every market. What changes by region is the payment rail and
+what may be sent to Google — and one router, keyed by the buyer's ISO 3166-1 country, decides both.
+
+```
+                    Agent or shopper
+                           │
+        Shopify UCP catalog (search_catalog / lookup_catalog)
+        address_country · language · currency  (ISO 3166-1 · BCP 47 · ISO 4217)
+                           │
+             market router (by ISO 3166-1 country)
+          ┌────────────────┼──────────────────────┐
+          US               KR                     KP · IR · SY
+   Google Pay (live)   Kakao Pay (default)        refused: blocked markets
+   Samsung Pay         Samsung Pay                never settle
+   Web Checkout        through a Korean PG
+                       (NICEPAY: kakaopay, samsungpayCard)
+          │                │
+          └──── Shopify order (system of record) ────┘
+          │                │
+   Google audience     Google audience held until release consent;
+   (consent-gated)     topic and placement targeting only
+```
+
+| Step | United States | South Korea | Status |
+|---|---|---|---|
+| Discovery | UCP catalog, `address_country=US`, `currency=USD` | UCP catalog, `address_country=KR`, `language=ko`, `currency=KRW` | **Built** — Shopify's catalog; our merchant catalog mirrors Merchant API |
+| Router | Home market: settles locally | Market module: rails Kakao Pay and Samsung Pay, default Kakao Pay, domestic PG, settles in KRW | **Built** — only a *ratified* market may settle; everything else fails closed |
+| Payment | Google Pay; Samsung Pay Web Checkout | Kakao Pay direct, or Kakao Pay and Samsung Pay through NICEPAY (each a separate NICEPAY contract). Shopify Payments is not offered in Korea, so the payment leaves Shopify checkout and the order is settled on the Korean rail | US: Google Pay **live**, Samsung **built**. KR: Kakao Pay direct **built** (sandbox); NICEPAY **built in Xano, not live** |
+| Order | Shopify order | Shopify draft order, marked paid once the Korean rail confirms | **Built** |
+| Google audience | Data Manager, gated on marketing consent and `ad_user_data` / `ad_personalization` | **Held** until the itemised release consent of §8.3; topic and placement targeting need no personal data | US: **Partial** (behind a flag). KR: **Held by design** |
+| Other markets | — | Taiwan: Samsung Pay through a domestic PG — **incubating**, cannot settle. North Korea, Iran, Syria — **blocked** | Built as refusals |
+
+**A gap stated rather than hidden:** the worker's slot for a Korean payment gateway is a
+placeholder named for another PG (KG Inicis) and reports itself unavailable. NICEPAY is built as
+Xano endpoints, but not yet connected to that slot. Until it is, Samsung Pay in Korea cannot settle
+through the worker; Kakao Pay can, through its own direct connection.
+
 ---
 
 ## 9. What it costs
