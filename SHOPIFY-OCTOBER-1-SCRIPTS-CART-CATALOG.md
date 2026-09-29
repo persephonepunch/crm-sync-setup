@@ -1,5 +1,5 @@
 ---
-title: "October 1: script tags, Functions, the cart, the catalog agents read — and Korea"
+title: "October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements"
 description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend and how a backend feeds it, which names are reserved in the cart and checkout, the ISO standards the Universal Commerce Protocol catalog uses, and for Korea: where restricted APIs route, NICEPAY TLS and login rules, the consent permissions for automating NICEPAY and Kakao Pay orders into Google (YouTube) and Meta targeting, and where Kakao Pay, Samsung Pay, Google Pay, Google Wallet, UCP and ADK each work."
 canonical: https://crm-sync.dev/docs/shopify-october-1-scripts-cart-catalog
 category: "Specs"
@@ -42,12 +42,19 @@ keywords:
   - Agent Development Kit
   - Google Data Manager API
   - Meta Conversions API
+  - WebAssembly
+  - Rust
+  - Javy
+  - Vertex AI
+  - topic-driven category
+  - key phrase
+  - language ISO requirements
   - ad_user_data
   - ad_personalization
   - API Improvement Proposals
 ---
 
-# October 1: script tags, Functions, the cart, the catalog agents read — and Korea
+# October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements
 
 > On 1 October 2026 a Shopify app can no longer create or update a script tag, on any API
 > version. On 1 March 2027 the ones already installed stop loading. The replacement is not a
@@ -77,6 +84,12 @@ Several of these words mean two different things, and the deadline only applies 
 | **App embed block** | Code an app ships in a **theme app extension**; the merchant turns it on in the theme editor | A script tag. It is visible to, and switchable by, the merchant |
 | **Web pixel** | A sandboxed script that subscribes to Shopify's customer-event bus (page viewed, product added to cart, checkout completed) for analytics and marketing | A way to change the page. It observes; it does not render |
 | **Shopify Function** | Server-side logic compiled to WebAssembly that Shopify runs inside cart and checkout (discounts, delivery, payment, validation) | Storefront JavaScript. It never runs in the browser |
+| **WebAssembly (Wasm)** | The compact binary format every Shopify Function is shipped as. Shopify runs the module inside checkout and counts its instructions | A language. Rust, Zig, TinyGo and JavaScript all compile *to* it |
+| **Rust** (for Functions) | The language Shopify strongly recommends for Functions: it compiles directly to Wasm, using Shopify's `shopify_function` crate and the `#[shopify_function]` macro | Required. It is the recommended path, not the only one |
+| **Javy** | Shopify's JavaScript-to-Wasm toolchain. A JavaScript Function ships a JavaScript engine inside its Wasm module, which is why it spends instructions faster | A different runtime. The result is still Wasm |
+| **Keyword** | One word matched as written (`fuel`, `연료전지`) | Meaning. A keyword does not match a synonym |
+| **Key phrase** | Several words matched as one unit (`heat pipe heater`, `household heating`) | A bag of the same words in any order |
+| **Topic-driven category** | A category assigned by **meaning**: the text is embedded and placed in the category whose description it is nearest to, so "hydrogen power plant" lands in *Clean energy* with neither word present | A keyword rule. Keywords and phrases feed it; they do not decide it |
 | **`cart.js`** (theme asset) | An ordinary file in a theme's `assets/` folder, written and owned by the theme developer | The endpoint below |
 | **`/cart.js`** (Ajax Cart API) | A route every storefront serves, returning the current cart as JSON; part of the family `/cart/add.js`, `/cart/change.js`, `/cart/update.js`, `/cart/clear.js` | A file. It cannot be edited, and the `.js` suffix is historical |
 | **UCP Catalog** | The Universal Commerce Protocol capability that AI agents use to **search and look up** products. Shopify offers it as the **Global Catalog** (all merchants) and the **Storefront Catalog** (one store) | An import format. Nothing is uploaded through it |
@@ -150,6 +163,12 @@ Functions run inside cart and checkout, so Shopify enforces a hard budget. For c
 | Execution instructions | **11 million** | Scales proportionally above 200 line items |
 | Function input | **128 kB** | 1 kB = 1000 bytes in Shopify's limits |
 | Function output | **20 kB** | Not enough for bulk price changes across every line; use discount functions, B2B catalogs, or targeted products |
+
+**Why the language matters: everything becomes WebAssembly.** Shopify accepts a Function in any
+language that compiles to Wasm and meets its Wasm API: Rust, Zig or TinyGo compile directly;
+JavaScript is compiled by **Javy**, which packages a JavaScript engine into the module. The
+budget below is counted in Wasm instructions, so the engine inside a JavaScript Function spends
+part of the budget before your logic runs.
 
 **JavaScript or Rust.** Functions can be written in JavaScript or TypeScript, but Shopify's
 documentation is explicit: JavaScript reaches the instruction limit sooner than a language that
@@ -312,6 +331,46 @@ What does change for anyone moving off CSV: the fields agents read are the ones 
 record holds — title, description, price, identifiers, availability — so a catalog that was
 "good enough in a spreadsheet" is now read literally by software. Missing GTINs, prices without
 a currency, and descriptions in the wrong language become wrong answers to a shopper.
+
+### 6.1 Products, users, tags and categories: the dataset pipeline behind the funnels
+
+The catalog is what agents read. The **funnels** are what the business measures: which topics,
+phrases and categories bring a person from a video or a search to a purchase. They share four
+datasets, and the language rule of §6 applies to every one of them: text is tagged with a BCP 47
+language and routed by it, never blended across languages.
+
+| Dataset | Holds | Where it lives | Personal data? | Status |
+|---|---|---|---|---|
+| **Products** | Title, type, vendor, tags, short description, price in ISO 4217 minor units | Vectorize product index (multilingual `bge-m3`); Merchant-shaped catalog; BigQuery corpus per store | No | **Built** |
+| **Users** | A pseudonymous ID and consent state only — never a name, email or phone | BigQuery identity map, written only for marketing-consented users | Pseudonymous | **Built**, empty until consented users exist |
+| **Tags** | Controlled vocabulary: `content:kb/<slug>`, audience and campaign tags, each with a key | Channel tables; Webflow tag collection with weights | No | **Built** |
+| **Categories** | Topic-driven categories with descriptions and weights (for example *Korea Clean Energy*) | Webflow category collection; topic subjects in the funnel wizard | No | **Built**; topic subjects added 29 Sep 2026 |
+
+**How the funnel is keyed** — three signals, from exact to broad, each with its own job:
+
+| Signal | Matched by | Good for | Example |
+|---|---|---|---|
+| Keyword | Exact word, per language | Search terms, placement lists, blocking | `연료전지`, `fuel cell` |
+| Key phrase | Exact phrase, per language | Intent that one word misreads | `heat pipe heater` vs `heater` |
+| Topic-driven category | Embedding nearest to the category description (Vectorize `bge-m3` at the edge; optionally Vertex AI embeddings in Google Cloud) | Content and questions that use neither the keyword nor the phrase | A question about hydrogen power scored into *Clean energy* |
+
+**The Vertex step, and why it is optional.** Where a business already runs Google Cloud, a
+**Python** job (or BigQuery SQL) can call Vertex AI through a BigQuery connection to embed or
+score text **where the data already is**, and write the result back as a column — the pattern in
+the estate's sentiment-funnel specification: score in BigQuery, not in the worker. What the job
+may read is fixed:
+
+| Rule | Why |
+|---|---|
+| Products, tags and categories may be embedded and scored | They contain no personal data |
+| Users enter only as pseudonymous IDs with consent state; the job produces **aggregates** (per category, per phrase), never a ranking of named people | An analytics store may inform a decision; it must never grant access or identify a person |
+| Korean personal data never reaches Vertex; Korea's funnel runs on the edge model and Vectorize | Korean personal data stays in Korea (§8) |
+| The core product needs no Google Cloud at all | Vertex, BigQuery ML and predicted lifetime value are add-ons for businesses that already use them |
+
+**Status: the Python Vertex pipeline is a design, not built.** The four datasets, the Vectorize
+indexes and the topic subjects exist; the Vertex embedding and scoring job does not. Topic
+subjects are defined by their keywords and phrases today, and nothing yet places content into
+them by meaning. Topic-driven assignment by embedding is the next step.
 
 ---
 
@@ -518,6 +577,8 @@ Ordered by exposure — the first item fails in two days.
   https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation
 - Shopify Functions limitations and resource limits — https://shopify.dev/docs/api/functions
 - JavaScript for Functions — https://shopify.dev/docs/apps/build/functions/programming-languages/javascript-for-functions
+- Rust for Functions — https://shopify.dev/docs/apps/build/functions/programming-languages/rust-for-functions
+- WebAssembly for Functions — https://shopify.dev/docs/apps/build/functions/programming-languages/webassembly-for-functions
 - Network access for Functions — https://shopify.dev/docs/apps/build/functions/network-access
 - Input query variables from metafields — https://shopify.dev/docs/apps/build/functions/input-queries/use-variables-input-queries
 - JavaScript and stylesheet tags in themes —
