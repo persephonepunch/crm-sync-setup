@@ -326,8 +326,9 @@ must pass there. If one fails inside, the handover stops.
 
 **Circana, Nielsen and Adobe IDs live on the closed side, behind a protected endpoint.** These are the
 identifiers that turn a customer into a household, a panel match or an Adobe profile, so they are the
-last thing that should sit in a shared layer. In the closed pair — an Azure estate, for example — they
-are held in one store reached only through an **Azure private endpoint**: a network interface with a
+last thing that should sit in a shared layer. In the closed pair — an Azure estate, for example — the
+Circana household IDs, Nielsen IDs and Adobe IDs are held in one store reached only through an
+**Azure private endpoint**: a network interface with a
 private IP address in the company's own virtual network. Microsoft notes that a private endpoint does
 not by itself switch off public access, so **public network access is disabled on the store as a
 separate step**. Callers authenticate with a **Microsoft Entra ID** token issued to a service
