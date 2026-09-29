@@ -137,6 +137,24 @@ consent answers "may we now?"; the session log answers "did they agree when they
 | Upload gates (audiences, pLTV seed lists) read the person's **current** consent | **Built** |
 | Upload gates **require the session record** of the purchase before any identifier leaves | **Not built** — the next step (§10) |
 
+**What Google, Meta and the law add up to: a consent log kept in real time.** No single rule says
+"real-time consent log" in those words. Read together, they leave no other way to comply:
+
+| Source | What it asks | What that means for the log |
+|---|---|---|
+| Google — Consent Mode v2 | The consent signals travel **with each tag event and each upload**; since March 2024, EEA users without them are left out of audiences | Consent is recorded per event, at the moment it happens |
+| Google — Customer Match policy | Obtain consent where the law or Google's policies require it; first-party data only | You must be able to show consent for each person you upload |
+| Meta — Custom Audiences terms | You warrant a lawful basis, and **remove anyone who opts out** after you uploaded them | A withdrawal has to reach the audience, not just the banner |
+| GDPR, Art. 7 | The controller "shall be able to **demonstrate** that the data subject has consented"; withdrawing must be as easy as consenting | Proof per person, and a withdrawal that takes effect as easily as the consent did |
+| California — CCPA regulations §7026 | Honour an opt-out of sale or sharing, including the Global Privacy Control signal, as soon as feasibly possible and **within 15 business days** at most | A clock starts when the opt-out arrives; a scheduled copy can run past it |
+| Korea — PIPA Art. 28-8 | Separate, itemised consent before personal data leaves Korea | The release consent must exist before the upload, not after |
+
+**Put plainly, and kindly:** none of these platforms will keep this log for you, and every one of
+them — and every regulator behind them — will ask for it the day something goes wrong. A consent log
+written in the moment, per session, is the one document that ends that conversation early. Without
+it, the only answer to "show us they agreed" is a spreadsheet exported after the fact, and that is
+where the expensive part of a dispute begins.
+
 ### E. Business-as-usual data handling vs API reinforcement with a global namespace
 
 Most stores run on **business-as-usual (BAU) data handling**: one data state, shaped for one country
@@ -910,6 +928,9 @@ briefly here so the list stands on its own.
   https://github.com/nicepayments/nicepay-manual/blob/main/api/payment-window-server.md
 - Google consent mode (ad_user_data, ad_personalization) — https://developers.google.com/tag-platform/security/guides/consent
 - Google: updates to consent mode for EEA traffic (March 2024) — https://support.google.com/google-ads/answer/13695607
+- GDPR Article 7, conditions for consent — https://gdpr-info.eu/art-7-gdpr/
+- California: CCPA and Global Privacy Control (opt-out within 15 business days) — https://oag.ca.gov/privacy/ccpa/gpc ;
+  California Privacy Protection Agency FAQ — https://cppa.ca.gov/faq.html
 - Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
   https://ads-developers.googleblog.com/2026/03/changes-to-customer-match-support-in.html
 - Google Data Manager API — https://developers.google.com/data-manager
