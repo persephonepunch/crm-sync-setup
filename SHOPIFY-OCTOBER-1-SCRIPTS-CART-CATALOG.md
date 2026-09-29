@@ -251,6 +251,81 @@ record, and it holds no release consent for moving data abroad — so on its own
 in D. Keep Klaviyo for messaging; let the API-reinforced consent record decide what may reach Google
 and Meta, and send Klaviyo the result.
 
+**Household panels and clean rooms: whose consent covers what.** Household purchase panels (Circana,
+and NielsenIQ's Homescan) hold consent from their own panel households. That consent covers the
+panelists' data; it does not cover a store's customers. The moment a store sends its own customer or
+loyalty list to be matched, enriched or measured, the permission is the store's, and it goes through
+the same consent record as any Google or Meta upload.
+
+| Use | Whose consent covers it | What the consent record needs |
+|---|---|---|
+| Panel reports, or segments built only from the panel | The panelists', given to the panel company | Nothing per person on the store's side |
+| Sending the store's list for matching, enrichment or lift measurement | The store's | A purpose of its own. In California, a contract that keeps the partner a service provider decides whether it is a "sale"; if the partner may reuse the data, treat it as sale or sharing and honour opt-outs, including the browser signal |
+| Activating matched households as Google or Meta audiences | The store's | `ad_user_data` and `ad_personalization` per person, as in D |
+| A clean room that returns totals only | Lower risk | The default in D: counts and values leave, identifiers do not |
+
+Four things bite on household data. **A household is personal information** under the CCPA, whose
+definition covers information linked to "a particular consumer or household". **Purchase segments
+can be health data**: a segment built on over-the-counter or allergy purchases can fall under
+Washington's My Health My Data Act, where sharing needs consent and a sale needs the person's signed
+authorisation. **The time-lapse risk becomes a file**: a match file sent on a schedule keeps an
+opted-out person in the partner's copy, and the CCPA regulations require passing opt-outs on to the
+third parties who received the data in that gap — a suppression feed, not just a banner update.
+**Korea is stricter**: handing personal data to a panel or measurement partner is a provision to a
+third party under PIPA, and abroad it also needs the separate consent in §8.
+
+**How this estate applies it: sign-in claims, extras and the invitation to view, edit or share.**
+The global namespace gives each of these its own key, so one never stands in for another:
+
+- **Sign-in (`/auth/me`)** returns four separate things: the *user*, the *claims* (one consent
+  flag per purpose, with its version), the *extras* (third-party identifiers — Adobe ECID, Nielsen
+  ID, Circana household ID, segments) and the *entitlement* (what the account may use). Claims
+  decide; extras are only ever keys that claims unlock.
+  Xano's own `auth/me` works the same way: it checks the authentication token — an encrypted JWE —
+  and returns the user, and a token can carry *extras*, such as a role, stored inside it
+  (https://docs.xano.com/building-backend-features/user-authentication-and-user-data). Keep the two
+  meanings of "extras" apart: **token extras** travel with every request, so they hold only small,
+  non-identifying facts like a role; the **extras table** holds third-party identifiers, and a
+  household ID never goes into a token.
+- **Clean room** is its own consent purpose, not a feature someone buys. Every subject is excluded by
+  default; a match job receives an explicit *include* or *exclude* for each person at each consent
+  change, the latest decision wins, and the match list carries hashed references, never an email
+  address. Withdrawing it removes the person from the next match.
+- **Withdrawing marketing consent clears the extras** — the Adobe, Nielsen and Circana identifiers
+  and the segments are emptied, and audience memberships are ended in the same step. Flipping a flag
+  while the household ID stays in place would leave the retargeting running.
+- **An invitation grants a place, never a person.** Teams invitations are single-use, expire after
+  14 days and store only a hash of the link. They carry role tags — admin, design, content edit, QA,
+  security, agent; no tag means view only — so separation of duties is set at the invitation. Stacks
+  separate who may **view** (visibility: public, group, named people, private) from who may **edit or
+  delete** (protection: owner, admin, group). Shared assets name the reason for every decision
+  (public, named people, invitation, purchase, group) in a ledger.
+- **Sharing a person's data asks the person's record, not the inviter's role.** The share gate
+  refuses if the subject opted out of sale or sharing or has not granted ad personalisation, then
+  checks the actor: the subject themselves, a peer with a delegated grant, or an agent under a live
+  mandate bound to that subject. Anything missing is a refusal.
+
+*Status here, stated plainly:* the claims, extras, clean-room include/exclude, suppression on
+withdrawal, invitations and view/edit axes are built. Three gaps remain. The share gate is written and
+tested but **not yet called by any route**, so today sharing is governed by the invitation layer
+alone. Ad personalisation is **derived from the marketing flag** rather than held as a purpose of its
+own. And the session view releases the Nielsen and Circana identifiers when **analytics** alone is
+granted, where a measurement-match purpose should be required. Closing those three is the next step
+before any household match file leaves the estate.
+
+**Where this is proved: outside the closed Kubernetes and Red Hat pair.** Xano runs on managed
+Kubernetes and Docker. Large companies often run their own Kubernetes too — on Red Hat OpenShift in an
+internal cloud or on-premises — but that side needs a subscription, a cluster and a platform team
+before the first test can run. The advantage of validating outside is timing: the data shape, the
+`auth/me` claims, the consent purposes (clean room included) and the invitation rules are built and
+proved by tests on public, synthetic or consented data, before anyone buys a cluster. What crosses
+into the closed side is the **contract** — schema, gate rules, harness tests, AI eval set and MCP tool
+definitions — not the data. The closed side runs the same contract (on OpenShift, or as Xano Standalone
+in the client's own cluster), Terraform adopts the pieces, keys are minted fresh, and the same tests
+must pass there. If one fails inside, the handover stops.
+
+![Validate outside, run inside: the Cloudflare and Xano prep layer hands a tested contract, not data, to the closed Kubernetes and Red Hat OpenShift pair](https://crm-sync.dev/kb/media/docs/prep-layer-vs-closed-kubernetes-red-hat.png)
+
 ### F. Checklist for global Shopify stores: retire from the critical path, then adopt
 
 The dates in A retire **mechanisms, not companies**. Every tool named below can stay in your stack;
@@ -988,6 +1063,13 @@ briefly here so the list stands on its own.
   https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites ;
   localized versions (hreflang) — https://developers.google.com/search/docs/specialty/international/localized-versions
 - Cloudflare Rules — https://developers.cloudflare.com/rules/
+- Xano: User Auth & Data (auth/me, JWE tokens, extras) — https://docs.xano.com/building-backend-features/user-authentication-and-user-data
+- Red Hat OpenShift — https://www.redhat.com/en/technologies/cloud-computing/openshift
+- California Civil Code §1798.140 (CCPA definitions, "consumer or household") —
+  https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.140
+- CCPA regulations §7026(f)(2): notify third parties who received the data before the opt-out was honoured —
+  https://www.law.cornell.edu/regulations/california/11-CCR-7026
+- Washington My Health My Data Act, RCW 19.373 — https://app.leg.wa.gov/RCW/default.aspx?cite=19.373
 - Cloudflare Artifacts: namespaces — https://developers.cloudflare.com/artifacts/concepts/namespaces/
 - SPF (RFC 7208) — https://www.rfc-editor.org/rfc/rfc7208
 - Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
