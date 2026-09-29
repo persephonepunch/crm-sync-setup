@@ -1,6 +1,6 @@
 ---
 title: "October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements"
-description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend and how a backend feeds it, which names are reserved in the cart and checkout, the ISO standards the Universal Commerce Protocol catalog uses, and for Korea: where restricted APIs route, NICEPAY TLS and login rules, the consent permissions for automating NICEPAY and Kakao Pay orders into Google (YouTube) and Meta targeting, and where Kakao Pay, Samsung Pay, Google Pay, Google Wallet, UCP and ADK each work."
+description: "What server-side consent buys globally: the three-year conversion from browser tags to Consent Mode v2 (September 2023 to March 2027), what Google, Meta and the law require, and why no session-level consent log means no YouTube or Meta retargeting; a real-time consent log, California's Honda and Todd Snyder fines, and the browser opt-out signal from 1 January 2027; business-as-usual data vs an API-reinforced global namespace, from market-prefixed domains to Cloudflare Rules; a retire and adopt checklist; then Shopify's 1 October 2026 script tag deadline, Functions, what is reserved in cart and checkout, the ISO standards of the UCP catalog, and Korea's NICEPAY and consent path."
 canonical: https://crm-sync.dev/docs/shopify-october-1-scripts-cart-catalog
 category: "Specs"
 date: 2026-09-29
