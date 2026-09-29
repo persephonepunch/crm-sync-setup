@@ -398,6 +398,13 @@ A US company selling into Korea meets the same October deadline, plus a set of s
 not work there or only work from a fixed address. None of this blocks selling; each row has a
 route.
 
+#### YouTube to lead funnel · consent to e-commerce funnel
+
+**Search terms:** Clean Energy · Korea · API · Audience
+
+YouTube video (topic signal, no viewer data) → video page → lead form, with processing and
+cross-border consent → Kakao Pay deposit → order → retargeting only with release consent (§8.3).
+
 <a class="doc-button" href="https://ondol-intake.yoonsunlee150.workers.dev/v/korea-clean-energy-fuel-cell-example" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Watch the Korea Clean Energy video, then try the Ondol Life lead form →</a>
 
 *Example only: the video page and the lead form are demonstrations. Prices are illustrative, not a
