@@ -167,6 +167,17 @@ regulator inquiries and lawsuits come from. It is not a vendor defect; it is wha
 does. The fix is structural: the systems that act (send, track, upload) ask the consent record at
 the moment they act, instead of trusting a copy.
 
+**Why the middleware keeps coming back.** When a CRM is fed only through middleware, removing the
+middleware stops the CRM — so developers put it back, and the lag returns with it. Removing it is the
+wrong goal. Keep the middleware for what it does well, moving records into the CRM on a schedule, and
+take **consent out of the copy**: the CRM reads consent from the consent record through the API, and
+anything that acts on a person — a send, a tag, an upload — checks that record at the moment it acts.
+The CRM keeps running; the schedule no longer decides who may be contacted.
+
+*Status here:* inbound Salesforce record events are received by the edge Worker, and Salesforce
+pulls erasures from an outbox this estate keeps, so no platform credential for Salesforce is held.
+Moving every consent read in a merchant's CRM onto the API is per-merchant work.
+
 **Klaviyo as the worked example.** Klaviyo records, per profile, **one marketing status per channel**
 — `SUBSCRIBED`, `UNSUBSCRIBED` or `NEVER_SUBSCRIBED` — with the time and method of the last change,
 and logs subscribe and unsubscribe events. That answers one question well: *may we email or text this
