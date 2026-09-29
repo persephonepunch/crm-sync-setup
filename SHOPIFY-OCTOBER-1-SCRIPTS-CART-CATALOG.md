@@ -35,6 +35,10 @@ keywords:
   - cross-border transfer consent
   - conversions API
   - retargeting
+  - Consent Mode v2
+  - predicted lifetime value
+  - Lookalike segments
+  - value-based Lookalike Audiences
   - Kakao Pay
   - Samsung Pay
   - Google Pay
@@ -55,6 +59,47 @@ keywords:
 ---
 
 # October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements
+
+## What server-side consent buys: a global media and shopping strategy
+
+Every channel that sells or retargets across borders — YouTube Shopping, Google Customer Match,
+Meta Custom Audiences, Shopify Audiences — ends at the same sentence: **the advertiser confirms it
+has the consent the law requires. None of them collects that consent for you.** A consent record
+kept on the server, itemised per market, is what lets one company run one media plan in the United
+States and abroad: reach where it is permitted, hold where it is not, and prove which was which.
+
+| Platform | What it offers | Where | What it requires of you |
+|---|---|---|---|
+| [YouTube Shopping](https://support.google.com/youtube/answer/13376398) (affiliate program) | Products tagged in videos | 14 regions, including **South Korea** and the **United States** | Channel in the YouTube Partner Program, not made for kids. In Korea a store connects only through Cafe24 or Marpple (§8.1) |
+| [Google Customer Match](https://support.google.com/adspolicy/answer/6299717) (sent through the Data Manager API) | Retargeting on Search, YouTube, Gmail and Display | Global | Disclose the sharing in your privacy policy; **obtain consent where the law or Google's policies require it**; first-party data only |
+| [Meta Custom Audiences](https://www.facebook.com/legal/terms/customaudience) (customer list) | Retargeting on Facebook and Instagram | Global | You warrant **"all necessary rights and permissions and a lawful basis"**; remove anyone who opts out; Meta deletes the list after matching |
+| [Shopify Audiences](https://help.shopify.com/en/manual/promoting-marketing/shopify-audiences/setting-up-shopify-audiences) | Retargeting and prospecting lists exported to Meta and Google | Stores **based in the US or Canada** only | Shopify Plus, Shopify Payments and Shopify Network Intelligence — so **not available to a Korea-based store** |
+
+**What that buys:**
+
+1. **Reach US audiences from global markets, with consent.** A buyer who granted release consent
+   can be measured and retargeted on every platform above, whatever market they bought in.
+2. **Hold where consent is absent.** The same order still counts — as an aggregate, with no
+   identifier leaving the buyer's country (§8.3).
+3. **Prove which was which.** Each platform makes *you* warrant the consent; the server-side record
+   is the evidence behind that warranty.
+4. **Consent Mode v2 buys value-based growth.** With `ad_user_data` and `ad_personalization`
+   granted, one consented customer list — each customer carrying a **predicted lifetime value
+   (pLTV)** — seeds three things: Google value-based bidding, Google
+   [Lookalike segments](https://support.google.com/google-ads/answer/13541369) in Demand Gen
+   campaigns (seeded from Customer Match, at least 100 matched people), and Meta
+   [value-based Lookalike Audiences](https://www.facebook.com/business/help/917879191754763)
+   (seeded from a customer list with a value column). Without consent, none of the three may use
+   that customer.
+
+   *Status here:* the pLTV model is trained in BigQuery ML; the Google upload is built behind a flag
+   for US audiences; the Meta upload is not built; Korean buyers stay out of every seed list until
+   release consent exists (§8.3).
+
+The rest of this document is the machinery that makes those lines true: where JavaScript is
+allowed to run after 1 October, what is reserved in cart and checkout, the ISO standards a global
+catalog uses, and — for Korea — the consent that must come before any retargeting.
+
 
 > On 1 October 2026 a Shopify app can no longer create or update a script tag, on any API
 > version. On 1 March 2027 the ones already installed stop loading. The replacement is not a
@@ -434,7 +479,7 @@ Korean.*
 | A Kakao developer key | A Kakao **Login** REST key is a different product from the Kakao **Pay** key; swapping them fails with a well-formed but rejected request | Our payments runbook |
 | Staff opening refunds or customer records | Cloudflare Access (Zero Trust) login; the Worker checks the token's signature, audience, issuer and expiry, and refuses when Access is half-configured | Our Korea/US governance reference |
 
-### 8.3 Automated checkout and global conversions: NICEPAY to Google, YouTube and Meta
+### 8.3 Automated checkout and global conversions: NICEPAY to Google, YouTube and Meta — reaching US audiences from global markets, with consent
 
 The path a US company wants is simple to draw: a Korean buyer pays through NICEPAY, the order is
 confirmed server-side, and the conversion is sent to Google Ads (YouTube campaigns) and Meta so
@@ -655,13 +700,18 @@ Ordered by exposure — the first item fails in two days.
   https://www.shinkim.com/eng/media/newsletter/2048
 - Items a Korean overseas-transfer notice must state — DLA Piper, Data Protection Laws of the World,
   https://www.dlapiperdataprotection.com/?t=transfer&c=KR
-- YouTube Shopping in Korea (store platforms, affiliate program) — YouTube Help,
+- YouTube Shopping affiliate program, overview and eligibility (14 regions) — YouTube Help,
   https://support.google.com/youtube/answer/13376398
 - NICEPAY payment window (server approval), methods and signatures —
   https://github.com/nicepayments/nicepay-manual/blob/main/api/payment-window-server.md
 - Google consent mode (ad_user_data, ad_personalization) — https://developers.google.com/tag-platform/security/guides/consent
 - Google Data Manager API — https://developers.google.com/data-manager
 - Meta Conversions API — https://developers.facebook.com/docs/marketing-api/conversions-api
+- Meta Customer List Custom Audiences Terms — https://www.facebook.com/legal/terms/customaudience
+- Google Customer Match policy — https://support.google.com/adspolicy/answer/6299717
+- Google Lookalike segments (Demand Gen) — https://support.google.com/google-ads/answer/13541369
+- Meta value-based Lookalike Audiences — https://www.facebook.com/business/help/917879191754763
+- Shopify Audiences setup and eligibility — https://help.shopify.com/en/manual/promoting-marketing/shopify-audiences/setting-up-shopify-audiences
 - Kakao Pay developers — https://developers.kakaopay.com/
 - Samsung Pay developers — https://developer.samsung.com/pay
 - Google Pay API — https://developers.google.com/pay/api
