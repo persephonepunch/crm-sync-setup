@@ -1,10 +1,9 @@
 ---
-title: "October 1: script tags, Functions, the cart, and the catalog agents read"
-description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend and how a backend feeds it, which names are reserved in the cart and checkout, the ISO standards the Universal Commerce Protocol catalog uses, and for Korea: where restricted APIs route, NICEPAY TLS and login rules, and the release-data consent that must precede retargeting a Korean buyer from a US ad platform."
-canonical: https://persephonepunch.github.io/crm-sync-setup/shopify-october-1-scripts-cart-catalog.html
+title: "October 1: script tags, Functions, the cart, the catalog agents read — and Korea"
+description: "What changes on Shopify on 1 October 2026 and 1 March 2027, where storefront JavaScript goes instead of a script tag, what a Shopify Function may spend and how a backend feeds it, which names are reserved in the cart and checkout, the ISO standards the Universal Commerce Protocol catalog uses, and for Korea: where restricted APIs route, NICEPAY TLS and login rules, the consent permissions for automating NICEPAY and Kakao Pay orders into Google (YouTube) and Meta targeting, and where Kakao Pay, Samsung Pay, Google Pay, Google Wallet, UCP and ADK each work."
+canonical: https://crm-sync.dev/docs/shopify-october-1-scripts-cart-catalog
 category: "Specs"
 date: 2026-09-29
-status: draft
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SHOPIFY-OCTOBER-1-SCRIPTS-CART-CATALOG.md
 licence: CC-BY-4.0
 tags:
@@ -36,9 +35,19 @@ keywords:
   - cross-border transfer consent
   - conversions API
   - retargeting
+  - Kakao Pay
+  - Samsung Pay
+  - Google Pay
+  - Google Wallet
+  - Agent Development Kit
+  - Google Data Manager API
+  - Meta Conversions API
+  - ad_user_data
+  - ad_personalization
+  - API Improvement Proposals
 ---
 
-# October 1: script tags, Functions, the cart, and the catalog agents read
+# October 1: script tags, Functions, the cart, the catalog agents read — and Korea
 
 > On 1 October 2026 a Shopify app can no longer create or update a script tag, on any API
 > version. On 1 March 2027 the ones already installed stop loading. The replacement is not a
@@ -398,11 +407,65 @@ browser tag cannot enforce that: it fires before the server knows whether consen
 | Consent regime for Korean visitors | Opt-in banner (Korea resolves to `opt_in`) — **Built** |
 | Consent evidence | Running log in Xano plus a keyed evidence store — **Built** |
 | Consent signal for ad conversions | `google_ads_conversion` mapped to `ad_user_data` in the conversion-consent module — **Built**, not yet called by any conversion upload |
-| **Itemised cross-border release consent (PIPA 28-8)** | **Gap.** The banner decides which notice is shown; it is not the separate, itemised transfer consent |
-| Server-side conversion upload (Google Ads, Meta) | **Not built** |
+| Itemised consent to collect and to move data to our own US database (Korean deployment template) | **Built.** A Korean visitor must tick processing and cross-border transfer separately before a lead or membership is stored |
+| **Itemised release consent to an ad platform (Google, Meta)** | **Partial.** The Korean template records a separate, optional, unticked "share with Google" choice, itemised (recipient, country, items, purpose, retention). Nothing is sent on it yet, and the crm-sync store has no equivalent |
+| Server-side upload to Google (Data Manager) | **Partial.** Built behind a flag for US audiences, gated on marketing consent; not enabled for Korean buyers |
+| Server-side upload to Meta (Conversions API) | **Not built** |
 | The store's existing conversion tag | A **custom web pixel** in Shopify Customer events with Analytics, Marketing and Sale-of-data purposes. Its code was not read for this document — confirm what it sends before it runs for Korean buyers |
 
 *PIPA points here are a map for a conversation with Korean counsel, not legal advice.*
+
+### 8.4 NICEPAY for Kakao Pay into Google channel automation: the consent permissions
+
+**The payment.** NICEPAY offers Kakao Pay inside its own payment window — `method` values
+`kakaopay`, `kakaopayCard` and `kakaopayMoney` (Samsung Pay is `samsungpayCard`; each easy-pay
+method needs its own contract). The page opens the window; our server confirms with
+`POST /v1/payments/{tid}` and the amount, and checks NICEPAY's signature,
+`hex(sha256(tid + amount + ediDate + SecretKey))`, before anything is recorded. Kakao Pay can
+also be taken directly through Kakao Pay's own API; either way the result is the same confirmed,
+server-side order.
+
+**The automation.** From that order, three things can be automated toward Google and Meta:
+reporting the conversion, adding the buyer to an audience, and targeting by topic. Each needs a
+different permission, and two different rulebooks apply at once — Google's and Meta's consent
+signals, and Korean law.
+
+| Automated action | Google / Meta mechanism | Google consent signal | Korean buyer: PIPA permission | Without it |
+|---|---|---|---|---|
+| Report that a sale happened (count, value, no identifier) | Aggregate conversion reporting | none beyond measurement | none: no personal information leaves | **Allowed** |
+| Report the sale **with** a click ID or hashed email/phone | Google Data Manager conversion events (enhanced conversions); Meta Conversions API | `ad_user_data` granted | Consent to provide to a third party for marketing **and** separate overseas-transfer consent (Art. 28-8) | **Hold** — send the aggregate only |
+| Add the buyer to a retargeting audience (YouTube, Search, Display) | Google Data Manager Customer Match; Meta Custom Audiences | `ad_user_data` **and** `ad_personalization` granted | As above, for the marketing purpose, with the right to withdraw — and removal on withdrawal | **Hold** |
+| Show ads beside Korean clean-energy videos and searches | YouTube placement and topic targeting | none: no data about the buyer | none | **Allowed** |
+
+**Two rulebooks, stated separately.** Google defines `ad_user_data` as consent "for sending user
+data related to advertising to Google" and `ad_personalization` as consent "for personalized
+advertising", and enforces them for EEA traffic under its EU user consent policy. For a Korean
+buyer the obligation comes from PIPA, not from Google — but sending the two signals anyway puts
+the buyer's choice into every record Google receives, and the Data Manager API carries a consent
+object on each request for exactly that.
+
+**The order of operations that makes it lawful:** payment confirmed → release consent looked up
+server-side → only then an upload, with the consent signals set from that record. A tag in the
+browser cannot follow this order: it fires on the thank-you page, before the server has checked
+anything.
+
+### 8.5 Wallets and agent protocols: the APIs, and where each works
+
+| API | What it is | Korea | US | This estate | Documentation |
+|---|---|---|---|---|---|
+| **Kakao Pay** | Korean wallet; direct API or through NICEPAY (`kakaopay`) | Yes | — | Direct: built, sandbox. Through NICEPAY: endpoints built in Xano, not live | https://developers.kakaopay.com/ |
+| **Samsung Pay** | Wallet; Web Checkout in the US, through a Korean PG (NICEPAY `samsungpayCard`) in Korea | Through NICEPAY, separate contract | Web Checkout | Built, not live | https://developer.samsung.com/pay |
+| **Google Pay** | Card wallet for web and Android checkout | **No** — not launched for Korean-issued cards | Yes | **Live** (US) | https://developers.google.com/pay/api |
+| **Google Wallet** | Passes: loyalty cards, offers, tickets | Not a realistic channel | Yes | Planned, for loyalty | https://developers.google.com/wallet |
+| **Universal Commerce Protocol** | The open protocol agents use to search catalogs and check out (UCP 2026-08-25) | Protocol is global; payment rails are local | Yes | Catalog discovery live; merchant catalog mirrors Merchant API | https://ucp.dev/ |
+| **Agent Development Kit (ADK)** | Google's framework for building agents that call tools | Refused for Korean shoppers; Korea uses an edge model | Optional | Concierge built; calls our tools, never decides permissions | https://google.github.io/adk-docs/ |
+
+**One naming rule across all of them.** Google publishes its API design rules as
+[API Improvement Proposals](https://google.aip.dev/general) — resource names such as
+`accounts/{account}/products/{product}` ([AIP-122](https://google.aip.dev/122)), standard
+methods, paging and errors. The tools an agent calls here follow the same rules, so an agent
+built on ADK or UCP reads them the way it reads Google's own APIs. The rules name things; they do
+not grant anything — every tool still checks permission and consent itself.
 
 ---
 
@@ -479,6 +542,18 @@ Ordered by exposure — the first item fails in two days.
   https://www.dlapiperdataprotection.com/?t=transfer&c=KR
 - YouTube Shopping in Korea (store platforms, affiliate program) — YouTube Help,
   https://support.google.com/youtube/answer/13376398
+- NICEPAY payment window (server approval), methods and signatures —
+  https://github.com/nicepayments/nicepay-manual/blob/main/api/payment-window-server.md
+- Google consent mode (ad_user_data, ad_personalization) — https://developers.google.com/tag-platform/security/guides/consent
+- Google Data Manager API — https://developers.google.com/data-manager
+- Meta Conversions API — https://developers.facebook.com/docs/marketing-api/conversions-api
+- Kakao Pay developers — https://developers.kakaopay.com/
+- Samsung Pay developers — https://developer.samsung.com/pay
+- Google Pay API — https://developers.google.com/pay/api
+- Google Wallet API — https://developers.google.com/wallet
+- Universal Commerce Protocol — https://ucp.dev/
+- Agent Development Kit — https://google.github.io/adk-docs/
+- AIP-122 resource names — https://google.aip.dev/122
 
-*Status: draft. Not legal advice and not a certification. Dates and limits are Shopify's and
+*Not legal advice and not a certification. Dates and limits are Shopify's and
 may change; check the linked pages before acting.*
