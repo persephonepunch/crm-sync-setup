@@ -219,6 +219,12 @@ the first key in the global namespace, and it should resolve to a market before 
 - **The prefix declares the market; the visitor decides the law.** A UK visitor on `www` is still
   owed UK consent. Route on both — hostname for market, visitor location and signals (such as Global
   Privacy Control) for the consent rules — and record both in the log.
+- **Google's reference for the hostname choice** is *Managing multi-regional and multilingual
+  sites*: country domain (`example.de`), subdomain (`de.example.com`), subdirectory
+  (`example.com/de/`) or URL parameter (not recommended), each paired with `hreflang`. Google also
+  warns not to adapt *content* by IP address. That fits the rule above: the prefix fixes what a page
+  says, so crawlers see a stable page per market; the visitor's location changes only the consent
+  defaults, never the content.
 
 **Why the middleware keeps coming back.** When a CRM is fed only through middleware, removing the
 middleware stops the CRM — so developers put it back, and the lag returns with it. Removing it is the
@@ -972,6 +978,9 @@ briefly here so the list stands on its own.
   https://cppa.ca.gov/announcements/2025/20250506.html
 - California Opt Me Out Act (AB 566), browser opt-out preference signal from 1 January 2027 —
   https://privacy.ca.gov/2026/01/californias-opt-me-out-act-your-privacy-just-got-easier
+- Google Search Central: managing multi-regional and multilingual sites —
+  https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites ;
+  localized versions (hreflang) — https://developers.google.com/search/docs/specialty/international/localized-versions
 - Cloudflare Rules — https://developers.cloudflare.com/rules/
 - SPF (RFC 7208) — https://www.rfc-editor.org/rfc/rfc7208
 - Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
