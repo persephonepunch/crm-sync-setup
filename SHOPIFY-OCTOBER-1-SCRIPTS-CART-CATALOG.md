@@ -155,6 +155,25 @@ written in the moment, per session, is the one document that ends that conversat
 it, the only answer to "show us they agreed" is a spreadsheet exported after the fact, and that is
 where the expensive part of a dispute begins.
 
+**The public record already shows the pattern.** California's privacy regulator has fined two
+well-known brands for exactly this gap between the banner and the systems behind it:
+
+| Case (California Privacy Protection Agency) | What the regulator found | Result |
+|---|---|---|
+| American Honda Motor Co., March 2025 | Asked for more information than needed to opt out; the cookie tool did not offer choices symmetrically (allowing was easier than refusing); authorised agents were made hard to use | $632,500 fine and changed practices |
+| Todd Snyder (clothing retailer), May 2025 | The privacy portal's technical setup was not overseen or configured properly, so opt-outs of sale or sharing **went unprocessed for 40 days**; it also asked for identity verification before an opt-out | $345,178 fine, reconfigured opt-out mechanisms, staff training |
+
+The second case is the time-lapse risk in E made concrete: the banner said "opted out", and the
+systems behind it did not hear for forty days. Neither case needed a data breach.
+
+**Why January 2027 raises the stakes.** California's Opt Me Out Act (AB 566, signed 8 October 2025)
+requires, from **1 January 2027**, that browsers serving Californians include a built-in setting to
+send an opt-out preference signal. Today, few visitors send one, because it takes an extension or a
+privacy-focused browser. From that date it is a setting in the browser people already use — so the
+number of opt-outs arriving as a signal, on every page view, rises sharply. A store whose opt-outs
+travel by scheduled copy will be missing far more of them, far more often. A store that reads the
+signal at the edge and writes it to the consent log in the same request is unaffected by the volume.
+
 ### E. Business-as-usual data handling vs API reinforcement with a global namespace
 
 Most stores run on **business-as-usual (BAU) data handling**: one data state, shaped for one country
@@ -184,6 +203,22 @@ uploaded audience — and that gap, repeated across millions of records, is wher
 regulator inquiries and lawsuits come from. It is not a vendor defect; it is what any scheduled copy
 does. The fix is structural: the systems that act (send, track, upload) ask the consent record at
 the moment they act, instead of trusting a copy.
+
+**The namespace starts at the hostname.** Stores that run one market per prefixed domain —
+`uk.example.com`, `ca.example.com`, `www.example.com` — often find every market showing the US
+consent banner. The usual cause: the consent platform's script and geolocation rules were set up once,
+for the parent domain, and each prefix inherits that US template instead of its own. The hostname is
+the first key in the global namespace, and it should resolve to a market before anything else loads:
+
+- **Cloudflare Rules** match on the hostname (`http.host`) and the visitor's country, and set the
+  market and consent defaults at the edge — a UK prefix gets UK defaults whether or not a script ever
+  runs. See https://developers.cloudflare.com/rules/
+- **Each prefix that sends email needs its own SPF record.** SPF does not inherit from the parent
+  domain, so `uk.example.com` mail fails SPF unless that name publishes one; DMARC can fall back to the
+  parent's policy, SPF cannot.
+- **The prefix declares the market; the visitor decides the law.** A UK visitor on `www` is still
+  owed UK consent. Route on both — hostname for market, visitor location and signals (such as Global
+  Privacy Control) for the consent rules — and record both in the log.
 
 **Why the middleware keeps coming back.** When a CRM is fed only through middleware, removing the
 middleware stops the CRM — so developers put it back, and the lag returns with it. Removing it is the
@@ -931,6 +966,14 @@ briefly here so the list stands on its own.
 - GDPR Article 7, conditions for consent — https://gdpr-info.eu/art-7-gdpr/
 - California: CCPA and Global Privacy Control (opt-out within 15 business days) — https://oag.ca.gov/privacy/ccpa/gpc ;
   California Privacy Protection Agency FAQ — https://cppa.ca.gov/faq.html
+- California Privacy Protection Agency: Honda settles over privacy violations (12 March 2025) —
+  https://cppa.ca.gov/announcements/2025/20250312.html
+- California Privacy Protection Agency: Todd Snyder ordered to pay fine (6 May 2025) —
+  https://cppa.ca.gov/announcements/2025/20250506.html
+- California Opt Me Out Act (AB 566), browser opt-out preference signal from 1 January 2027 —
+  https://privacy.ca.gov/2026/01/californias-opt-me-out-act-your-privacy-just-got-easier
+- Cloudflare Rules — https://developers.cloudflare.com/rules/
+- SPF (RFC 7208) — https://www.rfc-editor.org/rfc/rfc7208
 - Google Ads Developer Blog: changes to Customer Match support in the Google Ads API (April 2026) —
   https://ads-developers.googleblog.com/2026/03/changes-to-customer-match-support-in.html
 - Google Data Manager API — https://developers.google.com/data-manager
