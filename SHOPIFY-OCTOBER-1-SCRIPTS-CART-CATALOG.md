@@ -143,6 +143,76 @@ compiles directly to WebAssembly, and **Shopify strongly recommends Rust**. Java
 for a prototype; a Function that sees large carts should be written in Rust from the start,
 because a Function that runs out of instructions fails at checkout.
 
+### A Function with a backend: decide before checkout, read at checkout
+
+A Function **cannot call your backend while the buyer checks out**. Network access (the
+`fetch` target) is limited to custom apps on Enterprise stores and has to be requested. So the
+work splits in two: the backend decides ahead of time and stores the decision on Shopify, and
+the Function reads that decision as part of its input.
+
+| Step | Where it runs | What it does | Rule it follows |
+|---|---|---|---|
+| 1. Decide | Your backend (here, a Xano function stack) | Works out which collections get the VIP rate and which are excluded | Any logic, any data — no checkout budget applies |
+| 2. Store | Admin API `metafieldsSet` | Writes the decision as **one JSON metafield** in the app's reserved namespace **on the Function's owner** (for a discount Function, the discount) | Only JSON metafields; never on the shop or the app installation |
+| 3. Read | The Function's input query | Each JSON key becomes a query **variable**; the query asks Shopify which cart lines fall in those collections | A list variable over **100 elements** returns an error |
+| 4. Apply | The Function (Rust or JavaScript) | Returns the discount for the matching lines | 11 million instructions, 128 kB in, 20 kB out |
+
+**Xano view — the function stack, top to bottom.** In Xano's editor each step below is one card
+in the stack; in XanoScript it reads as follows (illustrative, generic names, shortened):
+
+```
+query "demo/discount-rules" verb=POST {
+  input  { text token { sensitive = true }   text discount_id
+           text[] vip_collection_ids?        text[] excluded_collection_ids? }
+  stack {
+    redis.ratelimit { key = "demo_discount_rules:" ~ $env.$remote_ip  max = 10  ttl = 60 }
+    precondition (token matches)                 { error_type = "accessdenied" }   // 403
+    precondition (discount_id is a discount gid) { error_type = "inputerror" }     // 400
+    var $rules { vipCollectionIds, excludedCollectionIds }
+    precondition (each list has at most 100 IDs) { error_type = "inputerror" }     // refuse here, not at checkout
+    api.request { POST https://{shop}/admin/api/2026-07/graphql.json
+                  metafieldsSet(ownerId: discount_id, namespace: "$app:discount-rules",
+                                key: "config", type: "json", value: $rules|json_encode) }
+  }
+  response = { saved, metafield, userErrors, rules }   // never the admin token
+  history = false                                      // the request is not logged
+}
+```
+
+**On the Shopify side**, the Function declares where its variables come from, and uses them in
+its input query:
+
+```toml
+# shopify.extension.toml
+[extensions.input.variables]
+namespace = "$app:discount-rules"
+key = "config"
+```
+
+```graphql
+query Input($excludedCollectionIds: [ID!], $vipCollectionIds: [ID!]) {
+  cart {
+    lines {
+      id
+      merchandise {
+        ... on ProductVariant {
+          product {
+            inExcludedCollection: inAnyCollection(ids: $excludedCollectionIds)
+            inVIPCollection: inAnyCollection(ids: $vipCollectionIds)
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Why this shape:** the Function never searches, fetches or computes membership itself — Shopify
+answers `inAnyCollection` before the Function runs — so the instruction budget is spent only on
+applying the rule. The backend can take as long as it needs, and the checkout pays nothing for it.
+**What it costs:** the decision is only as fresh as the last write. A collection change reaches
+checkout when the backend writes the metafield again, not before.
+
 ---
 
 ## 4. Server-side data: what storefront JavaScript may assume
@@ -291,6 +361,8 @@ Ordered by exposure — the first item fails in two days.
   https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation
 - Shopify Functions limitations and resource limits — https://shopify.dev/docs/api/functions
 - JavaScript for Functions — https://shopify.dev/docs/apps/build/functions/programming-languages/javascript-for-functions
+- Network access for Functions — https://shopify.dev/docs/apps/build/functions/network-access
+- Input query variables from metafields — https://shopify.dev/docs/apps/build/functions/input-queries/use-variables-input-queries
 - JavaScript and stylesheet tags in themes —
   https://shopify.dev/docs/storefronts/themes/best-practices/javascript-and-stylesheet-tags
 - `content_for_header` — https://shopify.dev/docs/api/liquid/objects/content_for_header
