@@ -100,13 +100,21 @@ weights is wrong the day it changes and cannot be cited when a customer disputes
 
 ## 3. CRAG as it is actually built
 
-The corrective gate is not new here; it is three thresholds that already refuse weak answers.
+The corrective gate is not new here; each surface already refuses weak answers before it
+writes one.
 
 | Surface | Grader | Below the bar |
 |---|---|---|
-| Commerce FAQ answer | Weighted FAQ match score ≥ **0.5** | Falls through to the next source (web search → vector index of articles → manuals) |
-| Ask-the-Docs | Vector similarity ≥ **0.45** | Answers "the documentation does not mention this" — never a guess |
+| Commerce FAQ answer: curated FAQs | Word match ≥ **0.8**, and the FAQ's question or keywords must hold at least **60 %** of the question's content words, in the question's language | Falls through to the next source |
+| Commerce FAQ answer: knowledge base | The model writes the answer **only** from the retrieved passages, and replies `NOT_IN_DOCS` when they do not answer | Steps aside for the next source (a web lookup of the brand's own blog, then the store's data where the caller is entitled), then a person (§4) |
+| Ask-the-Docs | Vector similarity ≥ **0.45**, and the same `NOT_IN_DOCS` check on the written answer | Returns links to the nearest documents, never a written guess |
 | Bilingual product FAQ (floor heating) | Retrieval score ≥ **0.5** | Escalates to a person (§4) |
+
+**Language is a route, not a weight.** A question in Korean, Japanese or Chinese is matched
+against content in its own language first. Only when nothing clears the bar does it fall back
+to English, and the answer then says so in the asker's language. Scores are never blended
+across languages: a strong English match must not outrank a weaker Korean one that answers in
+the shopper's language.
 
 **What it costs:** a strict gate says "I don't know" more often. That is the correct trade in
 commerce, and it is also the input the next section depends on.
