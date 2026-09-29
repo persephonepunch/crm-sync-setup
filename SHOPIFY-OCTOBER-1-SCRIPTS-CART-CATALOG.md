@@ -398,6 +398,12 @@ A US company selling into Korea meets the same October deadline, plus a set of s
 not work there or only work from a fixed address. None of this blocks selling; each row has a
 route.
 
+<a class="doc-button" href="https://ondol-intake.yoonsunlee150.workers.dev/v/korea-clean-energy-fuel-cell-example" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Watch the Korea Clean Energy video, then try the Ondol Life lead form →</a>
+
+*Example only: the video page and the lead form are demonstrations. Prices are illustrative, not a
+quote, and the 10% Kakao Pay deposit is a test payment — no money is charged. The page is also in
+Korean.*
+
 ### 8.1 The map
 
 | Need | The US default | In Korea | Route used here | Status |
