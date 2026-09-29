@@ -22,6 +22,8 @@ keywords:
   - human in the loop
   - escalation
   - Google ADK
+  - API Improvement Proposals
+  - resource names
   - Kubernetes
   - Helm
   - Cloudflare Workers
@@ -156,6 +158,14 @@ ADK **tool** with a guard — not an ADK **agent**. The agent is the layer that 
 tools to call. Because the permission lives in the endpoint, the agent is swappable: ADK, an
 edge model, or a database vendor's own agent can sit on top, and none of them can do more than
 the endpoint allows.
+
+**Names are part of the contract.** A swappable agent only helps if the tools it calls are named
+and shaped the way agents already expect. Google publishes its API design rules as
+[API Improvement Proposals](https://google.aip.dev/general): resources addressed by hierarchical
+names (`accounts/{account}/products/{product}`, AIP-122), a small set of standard methods, and
+standard paging and errors. The merchant catalog tools here copy the names and shapes of Google's
+Merchant API, so an agent built against Google's own tools reads this catalog without remapping.
+Following the naming rules does not grant anything: the endpoint still decides.
 
 **Helm and the helmet share a shape, not a job.** Both are *one template, different values per
 tenant*. Helm places a model server in Seoul or Iowa; the helmet decides, on the request, that
