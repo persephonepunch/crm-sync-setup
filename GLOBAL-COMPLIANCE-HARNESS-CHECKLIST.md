@@ -1,7 +1,8 @@
 ---
 title: "Global compliance harness checklist: test-driven, AI-assisted"
 description: "A checklist for a test harness that blocks a release when a consent, privacy, payment, residency or catalog rule fails. Each item is a test to write before the code: the rule, the kind of test, and the tool — static check, unit, integration, or end to end with Playwright or Selenium."
-canonical: https://crm-sync.dev/docs/shopify-october-1-scripts-cart-catalog
+canonical: https://crm-sync.dev/docs/global-compliance-harness-checklist
+category: "Global"
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md
 date: 2026-09-30
 licence: CC-BY-4.0
