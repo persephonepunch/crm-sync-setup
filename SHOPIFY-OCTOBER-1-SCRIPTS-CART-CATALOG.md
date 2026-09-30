@@ -67,6 +67,8 @@ keywords:
 
 # October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements
 
+**Companion checklist:** [Global compliance harness checklist: test-driven, AI-assisted](https://crm-sync.dev/docs/global-compliance-harness-checklist) — the tests to write before the code, for consent, privacy, payments, residency and the catalog ([download the Markdown](https://crm-sync.dev/docs/raw?f=GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md&download=1)).
+
 ## What Consent Mode v2 buys you globally
 
 **Google and Meta ads, lookalike audiences and Smart Bidding — managed by a server-side consent
