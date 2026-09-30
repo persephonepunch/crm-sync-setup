@@ -428,7 +428,7 @@ invents its own name for a market ("korea", "asia") where an ISO code exists.
 The last row of F — a test harness with compliance gating — is what keeps A to F true after the day
 they are written. This section says what that means in practice and gives the checklist.
 
-<a class="doc-button" href="https://crm-sync.dev/docs/raw?f=GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md&download=1">Download the global compliance harness checklist (Markdown) →</a>
+<a class="doc-button" href="https://crm-sync.dev/docs/raw?f=GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md&download=1" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Download the global compliance harness checklist (Markdown) →</a>
 
 **TDD and unit testing are not the same thing.** A *unit test* is a kind of test: it runs one
 function on its own, with everything around it faked. *Test-driven development* (TDD) is an order of
