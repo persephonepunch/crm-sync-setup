@@ -58,6 +58,11 @@ keywords:
   - ad_user_data
   - ad_personalization
   - API Improvement Proposals
+  - test-driven development
+  - compliance test harness
+  - Playwright
+  - Selenium
+  - Bogus Gateway
 ---
 
 # October 1: script tags, Functions, the cart, the catalog agents read — Globalized Language ISO requirements
@@ -418,9 +423,128 @@ invents its own name for a market ("korea", "asia") where an ISO code exists.
 | **Rust and Wasm** | The language and format for Functions that see large carts | **Recommended**; not yet used here |
 | **A test harness with compliance gating** | Every deploy runs the suites; a failing consent, permission or residency test blocks the release | **Built** — the deploy gate |
 
-### G. What the rest of this document covers
+### G. Test-driven compliance with AI: the harness checklist
 
-The machinery that makes A to F true: where JavaScript is allowed to run after 1 October (§1–§4),
+The last row of F — a test harness with compliance gating — is what keeps A to F true after the day
+they are written. This section says what that means in practice and gives the checklist.
+
+<a class="doc-button" href="https://crm-sync.dev/docs/raw?f=GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md&download=1">Download the global compliance harness checklist (Markdown) →</a>
+
+**TDD and unit testing are not the same thing.** A *unit test* is a kind of test: it runs one
+function on its own, with everything around it faked. *Test-driven development* (TDD) is an order of
+work: write the test first, watch it fail (red), write the least code that makes it pass (green),
+then tidy the code with the test still passing (refactor). The two are independent. You can write
+unit tests after the code, which is not TDD; and you can do TDD with any kind of test — unit,
+integration, or a browser test that pays with a test card.
+
+| | Unit testing | Test-driven development |
+|---|---|---|
+| What it is | A size of test: one function, isolated | An order of work: the test before the code |
+| Answers | "Does this function return the right value?" | "What must be true before we write anything?" |
+| When the test is written | Any time, usually after | Always first, and it must fail first |
+| Kinds of test used | Unit only | Unit, integration and end to end |
+| What a compliance rule becomes | A check someone may or may not add | The first thing written; the feature does not exist until it passes |
+
+**Why compliance needs TDD, not just tests.** A legal rule written after the feature is tested
+against what the feature already does, so the test tends to agree with the code. Written first, the
+test states the rule — "no ad request before consent", "no Korean identifier to Google before
+overseas-transfer consent" — and the code has to meet it. Once in the gate, the rule is checked on
+every deploy, not once at launch.
+
+**Where the AI fits.** An AI agent is good at the slow parts of TDD: turning a rule's text into a
+failing test, writing code until it passes, and running the suites. It must not be the judge of its
+own work. In this estate the agent drafts, a person reads every test that states a legal rule, and
+the gate refuses a release when a test fails, is skipped, or is quietly added to the known-failures
+list. The download button above was built this way: a test for the download route was written and
+failed before the route existed.
+
+**Paying in a test: Selenium and Playwright.** Unit tests cannot show that a buyer can pay, or that
+no ad tag fired before they agreed to one — that takes a real browser on a real page. Both tools
+drive one. Neither should ever touch a live card: use a development store with Shopify's Bogus
+Gateway (card number `1` approves, `2` declines, `3` fails) or Stripe test mode (`4242 4242 4242
+4242` succeeds; `4000 0027 6000 3184` requires a 3-D Secure challenge).
+
+| | Selenium | Playwright |
+|---|---|---|
+| Standard | W3C WebDriver; the longest-established choice | Its own protocol over each browser's debugging interface |
+| Languages | Java, Python, C#, Ruby, JavaScript | TypeScript/JavaScript, Python, Java, .NET |
+| Waiting | Explicit waits you write | Waits for elements automatically |
+| Card fields in an iframe | Switch into the frame, then back out | `frameLocator` reaches in directly |
+| Watching network requests | Possible (Selenium 4, BiDi or DevTools); more setup | Built in — `page.on("request")`, `page.route()` |
+| Best fit | An existing Selenium grid and multi-language teams | Consent and network assertions; new suites |
+
+The consent test is where Playwright is simplest, because it can list every request the page made:
+
+```ts
+// consent.spec.ts — Playwright. Written first; it fails until the stack loader defers tags.
+import { test, expect } from "@playwright/test";
+
+const AD_HOSTS = /google-analytics\.com|googletagmanager\.com|doubleclick\.net|facebook\.com\/tr/;
+
+test("no advertising or analytics request before consent", async ({ page }) => {
+  const early: string[] = [];
+  page.on("request", (r) => { if (AD_HOSTS.test(r.url())) early.push(r.url()); });
+  await page.goto("https://dev-store.example.com/");
+  await page.waitForLoadState("networkidle");
+  expect(early).toEqual([]);            // nothing fired while consent is denied
+});
+
+test("pays with the Bogus Gateway", async ({ page }) => {
+  await page.goto("https://dev-store.example.com/products/sample");
+  await page.getByRole("button", { name: /add to cart/i }).click();
+  await page.goto("https://dev-store.example.com/checkout");
+  // Card fields sit in the gateway's own iframes; selectors vary by checkout — read yours.
+  await page.frameLocator("iframe[title*='Card number']").locator("input").fill("1");
+  await page.frameLocator("iframe[title*='Expiration']").locator("input").fill("12 / 30");
+  await page.frameLocator("iframe[title*='Security code']").locator("input").fill("123");
+  await page.frameLocator("iframe[title*='Name on card']").locator("input").fill("Test Buyer");
+  await page.getByRole("button", { name: /pay now/i }).click();
+  await expect(page.getByText(/thank you/i)).toBeVisible();
+});
+```
+
+The same payment in Selenium, where each iframe has to be entered and left explicitly:
+
+```python
+# test_pay.py — Selenium 4, Python. Bogus Gateway on a development store only.
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+def fill_in_frame(driver, title_part, value):
+    frame = WebDriverWait(driver, 15).until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, f"iframe[title*='{title_part}']")))
+    driver.switch_to.frame(frame)
+    driver.find_element(By.CSS_SELECTOR, "input").send_keys(value)
+    driver.switch_to.default_content()   # back out before the next frame
+
+def test_pays_with_bogus_gateway():
+    driver = webdriver.Chrome()
+    try:
+        driver.get("https://dev-store.example.com/products/sample")
+        driver.find_element(By.XPATH, "//button[contains(., 'Add to cart')]").click()
+        driver.get("https://dev-store.example.com/checkout")
+        fill_in_frame(driver, "Card number", "1")
+        fill_in_frame(driver, "Expiration", "12 / 30")
+        fill_in_frame(driver, "Security code", "123")
+        fill_in_frame(driver, "Name on card", "Test Buyer")
+        driver.find_element(By.XPATH, "//button[contains(., 'Pay now')]").click()
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(., 'Thank you')]")))
+    finally:
+        driver.quit()
+```
+
+Each payment test gets its failing twins — `2` must show a decline, `3` a gateway error — and the
+consent test gets one per market, since the rule differs by where the buyer is. The checklist lists
+them all: the gate itself, consent before measurement and before retargeting, where personal data
+may go, data subject requests, payments, Shopify after 1 October, the catalog, accessibility, and
+secrets.
+
+### H. What the rest of this document covers
+
+The machinery that makes A to G true: where JavaScript is allowed to run after 1 October (§1–§4),
 what is reserved in cart and checkout (§5), the ISO standards a global catalog uses (§6), and — for
 Korea — the routes, the rules and the consent that must come before any retargeting (§8).
 
@@ -1155,3 +1279,10 @@ briefly here so the list stands on its own.
 
 *Not legal advice and not a certification. Dates and limits are Shopify's and
 may change; check the linked pages before acting.*
+- Playwright: network events and frames — https://playwright.dev/docs/network ; https://playwright.dev/docs/api/class-framelocator
+- Selenium: working with iframes, waits — https://www.selenium.dev/documentation/webdriver/interactions/frames/ ;
+  https://www.selenium.dev/documentation/webdriver/waits/
+- Shopify Bogus Gateway (test card numbers 1, 2, 3) — https://help.shopify.com/en/manual/checkout-settings/test-orders
+- Stripe test cards, including 3-D Secure — https://docs.stripe.com/testing
+- California CCPA regulations §7025, opt-out preference signals — https://cppa.ca.gov/regulations/
+- European Accessibility Act, applicable from 28 June 2025 — https://eur-lex.europa.eu/eli/dir/2019/882/oj
