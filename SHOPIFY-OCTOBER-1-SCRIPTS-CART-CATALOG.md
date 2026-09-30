@@ -1277,8 +1277,6 @@ briefly here so the list stands on its own.
 - Agent Development Kit — https://google.github.io/adk-docs/
 - AIP-122 resource names — https://google.aip.dev/122
 
-*Not legal advice and not a certification. Dates and limits are Shopify's and
-may change; check the linked pages before acting.*
 - Playwright: network events and frames — https://playwright.dev/docs/network ; https://playwright.dev/docs/api/class-framelocator
 - Selenium: working with iframes, waits — https://www.selenium.dev/documentation/webdriver/interactions/frames/ ;
   https://www.selenium.dev/documentation/webdriver/waits/
@@ -1286,3 +1284,6 @@ may change; check the linked pages before acting.*
 - Stripe test cards, including 3-D Secure — https://docs.stripe.com/testing
 - California CCPA regulations §7025, opt-out preference signals — https://cppa.ca.gov/regulations/
 - European Accessibility Act, applicable from 28 June 2025 — https://eur-lex.europa.eu/eli/dir/2019/882/oj
+
+*Not legal advice and not a certification. Dates and limits are Shopify's and
+may change; check the linked pages before acting.*
