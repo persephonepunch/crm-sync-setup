@@ -40,6 +40,8 @@ citation:
 **For media managers, DAM owners, front-end leads and the person who has to answer why the
 product page is four megabytes.**
 
+**Companion article:** [ALT, XMP and Favicons: Image Metadata for Rights and Media Management](https://persephonepunch.github.io/game11ty/article/) — the same pipeline worked end to end on a live demo site: alt text, XMP and JSON-LD kept in agreement, a release scan with adversarial tests, and a higher-order head function at the edge ([download the Markdown](https://persephonepunch.github.io/game11ty/docs/alt-xmp-favicons.md)).
+
 > A transform is not an edit. When a pipeline resizes an image it does not modify the original —
 > it authors a new file. That single fact decides both halves of this document: it is why a
 > transformed asset is safe, and it is why your metadata is gone.
