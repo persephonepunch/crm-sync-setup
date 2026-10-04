@@ -52,6 +52,7 @@ chapters:
       - FIRMWARE-ASSET-PUBLISHING.md   # 2026-09-20 · Security Reinforcement: Firmware Asset Publishing
       - QA-RELEASE-GATING.md   # 2026-09-20 · QA and Release Gating for Agents, Mandates and Robots
       - AI-CROSS-BORDER-REQUIREMENTS-CHECKLIST.md   # 2026-09-25 · AI cross-border requirements: a scannable checklist
+      - SECURE-FRONTEND-AI-SAFE-BACKEND.md   # 2026-10-04 · Secure frontend, AI-safe backend: Webflow collections, fallback publish
   - category: Specs
     docs:
       - ARCHITECTURE.md   # 2026-05-26 · CRM Sync — Why This Architecture Is Safer
