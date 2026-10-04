@@ -1,0 +1,117 @@
+# The CRM Sync book: what is in it, and in what order. mdBook's SUMMARY.md, as YAML.
+#
+# A file listed here appears in the book. Its CHAPTER is its own front-matter `category`;
+# the chapter heading here must match it, or the build stops and says which file disagrees.
+# So a doc moves chapter by editing its category (one writer), and this file only orders.
+# Reorder chapters or docs freely. Seeded 2026-10-04 from the knowledge-base list,
+# docs ordered oldest first within each chapter.
+
+title: CRM Sync Knowledge Base
+chapters:
+  - category: Setup
+    docs:
+      - MIGRATION-GUIDE.md   # 2026-05-26 · CRM Sync — Migration Guide: CSV & Legacy Tools → Connected Streams
+      - AGENCY-HANDOFF.md   # 2026-06-12 · Agency → Client Deploy Handoff
+      - README.md   # 2026-07-06 · CRM Sync — PWA & Native App Commerce Setup Reference
+      - SETUP-GUIDE.md   # 2026-07-07 · CRM Sync Setup Reference
+      - CONSENT-COOKIES-PREFERENCES.md   # 2026-07-09 · Consent, Cookies & Preferences — User Guide
+      - WORDPRESS-WEB-COMPONENTS.md   # 2026-07-18 · File System Agnostic Publishing
+      - HOW-TO-CAPTURE-A-HAR.md   # 2026-09-07 · How to capture a HAR file — a plain-language guide
+      - LOGGING-AND-TRACE-FEES.md   # 2026-09-16 · Logging and trace fees: what monitoring costs by volume
+  - category: Security
+    docs:
+      - SECURITY-AUDIT.md   # 2026-05-26 · CRM Sync — Security Audit & Paired Data Requirements
+      - SHOPIFY-TOKEN-MANAGEMENT.md   # 2026-05-26 · Shopify Expiring Token Management
+      - docs/AUTH-PIPELINES.md   # 2026-05-29 · CRM Sync — Auth Pipelines
+      - docs/KEY-CEREMONY-LOOP-REVIEW.md   # 2026-06-22 · Key Ceremony — Loop Review Checklist (Automation)
+      - docs/KEY-MANAGEMENT-LIFECYCLE.md   # 2026-07-03 · CRM Sync — Key Management Lifecycle
+      - CISO-DPO-FAQ.md   # 2026-07-14 · Security & Privacy — Questions from CISOs and DPOs
+      - BIM-FORTRESS-EVENT-SOCKET.md   # 2026-07-18 · BIM Fortress vs Event-Socket
+      - DARK-FACTORY-ENTITLEMENT-SECURITY.md   # 2026-07-19 · Dark Factory Entitlement Security
+      - ENTITLEMENT-STRATEGY.md   # 2026-07-20 · Entitlement Strategy — RBAC, ABAC, RuBAC & Permissions for AI Agents
+      - FIRMWARE-SBOM-CRA.md   # 2026-07-20 · CRM Sync — Firmware, SBOM & the Cyber Resilience Act
+      - CYBERSECURITY-FOR-AI.md   # 2026-07-25 · Cybersecurity for AI — CISO · CTO · DPO
+      - SOC-SOX-APP-REVIEW.md   # 2026-07-25 · SOC / SOX Application Review — AI Middleware, Reinforced Security, Dat
+      - WRONG-SIZE-TOOL.md   # 2026-07-25 · The Wrong-Size Tool — Why Consent Never Lands on a Server
+      - AGENT-AUTHORITY-BRIEF.md   # 2026-07-27 · Agent Authority — Technical Brief
+      - AGENT-KEY-CUSTODY-MODELS.md   # 2026-07-27 · Two Ways to Give an Agent a Key
+      - CRA-EVIDENCE-CHAIN.md   # 2026-07-29 · Your Firmware Is a URL — the CRA Assumes an Evidence Chain
+      - KEY-ROTATION-123.md   # 2026-07-29 · Rotate a Key in Three Steps — the AI-Safe Ceremony for Webflow Teams
+      - SBOM-EVERYONE.md   # 2026-07-29 · What Is an SBOM? Who Uses This? Everyone.
+      - TRUST-VOCABULARY.md   # 2026-07-29 · The Trust Vocabulary — Every Term on One Page
+      - VERIFY-IT-SHEET.md   # 2026-07-29 · Verify It Yourself — the IT Sheet
+      - SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md   # 2026-08-05 · Server-Side or It Didn't Happen — Developer Due Diligence for Commerce
+      - TRUST-WITH-LOGIN.md   # 2026-08-06 · Trust With Login — The Bind Is the Product
+      - CAPABILITY-NOT-PERIMETER.md   # 2026-08-09 · Permissions for AI, in plain terms — capability, not perimeter
+      - SECURITY-POSTURE.md   # 2026-08-16 · CRM Sync — Security & Compliance Posture
+      - docs/KEYS-TO-THE-CASTLE.md   # 2026-08-16 · CRM Sync — Keys to the Castle with Design Ops Tools
+      - HAR-PERMISSIONS-AUDIT.md   # 2026-09-07 · HAR permissions audit — a portable prompt for testing an e-commerce st
+      - TRUST-ROOTS-ACROSS-CLOUDS.md   # 2026-09-09 · Trust Roots Across Clouds
+      - MACHINE-ENDPOINT-GRANT-IMPACT.md   # 2026-09-10 · Paired permissions and grant impact on machine endpoints
+      - BYO-DATA-PLANE-FALLBACK-LADDER.md   # 2026-09-16 · The BYO data plane fallback ladder: whose warehouse, and what erasure 
+      - FIRMWARE-ASSET-PUBLISHING.md   # 2026-09-20 · Security Reinforcement: Firmware Asset Publishing
+      - QA-RELEASE-GATING.md   # 2026-09-20 · QA and Release Gating for Agents, Mandates and Robots
+      - AI-CROSS-BORDER-REQUIREMENTS-CHECKLIST.md   # 2026-09-25 · AI cross-border requirements: a scannable checklist
+  - category: Specs
+    docs:
+      - ARCHITECTURE.md   # 2026-05-26 · CRM Sync — Why This Architecture Is Safer
+      - docs/ANALYTICS-EXPORT-SPEC.md   # 2026-05-27 · Analytics Export via Xano Polling + Worker Cron
+      - docs/CLEAN-ROOM-SPEC.md   # 2026-05-27 · CRM Sync — Clean Room Utility & Security Rules
+      - FORWARD-DEPLOY-AGENTIC-GRAPHQL.md   # 2026-06-21 · Forward-Deploy Guideline — Server-Side GraphQL + Agentic Workflows + T
+      - FEATURE-SPEC-UA-MIGRATION.md   # 2026-06-25 · CRM Sync — Feature Specification Addendum
+      - FEATURE-SPEC-ACCESSIBILITY-INDEX.md   # 2026-07-06 · CRM Sync — Feature Specification
+      - UI-COMPONENT-REGISTRY.md   # 2026-07-07 · CRM Sync — UI Component & ID Registry
+      - JS-EXECUTION-ORDER.md   # 2026-07-09 · JS Execution Order — Challenge & Solution
+      - CRM-SYNC-FUNCTIONAL-SPEC.md   # 2026-07-12 · CRM Sync — Functional Specification
+      - docs/AI-NATIVE-CRM-COMPARISON.md   # 2026-07-19 · CRM Sync — What Traditional CRMs Miss
+      - docs/EVENT-DRIVEN-INTEGRATION-SPEC.md   # 2026-07-22 · CRM Sync — Event-Driven Integration Spec
+      - AI-TRUST-FRAMEWORK-REQUIREMENTS.md   # 2026-07-27 · AI Trust Framework Requirements — and What to Add to Your REST Layer
+      - PROCESS-MANAGEMENT-DATA-LAYER.md   # 2026-07-27 · Process Management Guide — Webflow · Xano · Cloudflare · Shopify
+      - SERVER-SIDE-FUNCTION-TOOLS.md   # 2026-07-28 · Server-Side Function Tools with AI Runners
+      - SUNRISE-2027-IDENTIFIER-THREAD.md   # 2026-07-28 · Product Taxonomy, GraphQL and the GID Rename — CPG Planning for Sunris
+      - AEM-SCAFFOLD-WEBFLOW-EXPORT.md   # 2026-08-02 · Shopify / Google Integration on an AEM Scaffold — via Webflow Export
+      - FRAGMENTS-ANY-FRONTEND.md   # 2026-08-03 · Fragments on Any Frontend — One Webflow Source, Every Platform
+      - PIM-ANYWHERE.md   # 2026-08-04 · PIM Anywhere — One Catalog Record, Any Frontend
+      - posts/git-to-every-surface.md   # 2026-08-11 · Git to Every Surface — the Article Pipeline
+      - CLAIM-PROVENANCE.md   # 2026-09-04 · Claim Provenance — the metadata schema
+      - CONSENT-RESOLUTION-PATTERN.md   # 2026-09-04 · Consent Resolution on Higher-Order Load
+      - WHY-XANO-RUNTIME-AS-A-SERVICE.md   # 2026-09-06 · Why Xano + AI + e-commerce is the right runtime as a service
+      - COMPILE-TO-UPDATE.md   # 2026-09-07 · Compile to update — the estate by seven lifecycle stages
+      - SPEC-IS-THE-SOURCE.md   # 2026-09-07 · The spec is the source — a writing layer for designers and analysts
+      - AI-ENABLED-FORMS.md   # 2026-09-08 · AI enabled forms with LLM weighting — one form, many outcomes
+      - BYO-SHAPE-PIPELINE.md   # 2026-09-09 · BYO Shape Pipeline
+      - GOOGLE-SIGNALS-DATA-LAYER.md   # 2026-09-10 · Consent-first tracking and the demotion of page and client data
+      - BYO-XANO-BIGQUERY-VS-GOOGLE-AGENT-COSTS.md   # 2026-09-16 · BYO Xano and BigQuery against Google's agent platform: what AI automat
+      - FROM-PLUGINS-TO-MANDATES.md   # 2026-09-20 · From Plugins to Mandates
+      - RENDER-RUNTIME-DICTIONARY.md   # 2026-09-20 · Render and Runtime: A Working Dictionary
+      - WHAT-SURVIVES-THE-TRANSFORM.md   # 2026-09-20 · Asset Management, Security and AI
+      - AI-LADDER-ESCALATION-AND-MANDATES.md   # 2026-09-25 · The AI ladder: retrieval, adapters, humans, and who holds the keys
+      - SHOPIFY-OCTOBER-1-SCRIPTS-CART-CATALOG.md   # 2026-09-29 · October 1: script tags, Functions, the cart, the catalog agents read —
+  - category: Compliance
+    docs:
+      - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08
+  - category: Global
+    docs:
+      - GLOBALIZATION-GOALS.md   # 2026-06-12 · Globalization — Goal Checklist (Pending / Review State)
+      - GLOBAL-PAYOUTS.md   # 2026-06-21 · Global Payouts — Dependency Map
+      - WAYFAIR-TO-AI-COMMERCE.md   # 2026-07-24 · From Wayfair to AI Agents — The Road to Machine-Readable Commerce
+      - TRUST-FRAMEWORK.md   # 2026-07-27 · The Trust Framework
+      - AI-DIALOG-TERMS.md   # 2026-08-03 · The AI Dialog — Terms for Designers and BAs
+      - COMPLIANCE-CALENDAR.md   # 2026-08-07 · The Compliance Calendar — 2018 to 2027
+      - SOVEREIGN-EDGE-SERVING.md   # 2026-09-21 · Served, stored, subpoenaed — sovereign edge serving for Korea
+      - GLOBAL-COMPLIANCE-HARNESS-CHECKLIST.md   # 2026-09-30 · Global compliance harness checklist: test-driven, AI-assisted
+  - category: Shopify
+    docs:
+      - SHOPIFY-APP-PIVOT.md   # 2026-05-26 · CRM Sync — Shopify App Platform Changes
+      - SHOPIFY-APP-CHECKLIST.md   # 2026-05-29 · Shopify App Requirements Checklist (2026)
+      - SHOPIFY-2026-RISK-BRIEF.md   # 2026-06-21 · Risk & Liability Brief — The 2026 Client-Side Cliff
+      - DAWN-HORIZON-GA4.md   # 2026-06-24 · Dawn → Horizon: Agentic Cart Functions
+      - SEGMENTS-GOOGLE-CONNECT.md   # 2026-07-10 · Google turned off the list upload. We were never uploading lists.
+      - SEGMENTS-GA4-BIDDING.md   # 2026-07-22 · Marketing was built on the page view. The funnel now pays for the cons
+      - REST-IS-NOT-GRAPHQL.md   # 2026-07-27 · REST Is Not GraphQL
+      - SHOPIFY-AND-GOOGLE-SUNSETS.md   # 2026-09-16 · Shopify and Google sunsets: what is due before 11 November 2026
+  - category: Webflow
+    docs:
+      - WEBFLOW-APP-CHECKLIST.md   # 2026-05-29 · Webflow App Requirements Checklist (2026)
+      - WEBFLOW-VITE-STACK.md   # 2026-07-29 · The Webflow App Stack — Vite + TypeScript Monorepo, with 11ty/Vue/Svel
+      - SAFE-SVG.md   # 2026-09-20 · Safe SVG for Webflow and UIkit

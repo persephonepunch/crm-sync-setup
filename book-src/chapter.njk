@@ -1,0 +1,8 @@
+---
+pagination: { data: book.pages, size: 1, alias: doc }
+permalink: "/{{ doc.slug }}/"
+layout: book.njk
+eleventyComputed:
+  title: "{{ doc.title }}"
+---
+{{ doc.html | safe }}

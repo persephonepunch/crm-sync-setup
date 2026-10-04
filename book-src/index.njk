@@ -1,0 +1,21 @@
+---
+layout: book.njk
+permalink: "/"
+title: Introduction
+---
+<header class="hero">
+  <span class="kicker">Introduction</span>
+  <h1>{{ book.title }}</h1>
+  <p class="sub summary">Every article in the CRM Sync knowledge base, as one book: {{ book.pages.length }} articles in {{ book.chapters.length }} chapters, in reading order. Use the sidebar or the table below, <kbd>←</kbd> <kbd>→</kbd> to turn pages, and <kbd>S</kbd> to search.</p>
+  <div class="meta"><span>Built from the Markdown in <a href="https://github.com/persephonepunch/crm-sync-setup" rel="noopener">crm-sync-setup</a>, so it never drifts from the source</span></div>
+</header>
+<article class="doc contents">
+{%- for ch in book.chapters %}
+<h2 id="chapter-{{ ch.n }}"><span class="secno">{{ ch.n }}.</span> {{ ch.title }}</h2>
+<ol class="toc-list">
+{%- for p in ch.pages %}
+  <li><a href="/{{ p.slug }}/"><strong>{{ p.number }}</strong> {{ p.title }}</a>{% if p.description %}<p>{{ p.description }}</p>{% endif %}</li>
+{%- endfor %}
+</ol>
+{%- endfor %}
+</article>

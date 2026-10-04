@@ -1,0 +1,112 @@
+/* The book shell on top of doc.css. Themes are mdBook's five (Light, Rust, Coal, Navy, Ayu),
+   done as overrides of doc.css's own variables, so every doc.css rule follows the theme.
+   Muted text greys (--g4/--g5) keep 4.5:1 or better on each theme's paper. */
+
+:root{ --bar:46px; --side:300px; --rail:240px; --accent:var(--cyan) }
+html[data-theme="rust"]{ --ink:#262625; --paper:#e1e1db; --g1:#d6d6cf; --g2:#c6c6bf; --g3:#b4b4ad;
+  --g4:#5e5a52; --g5:#4f4b44; --g6:#33312d; --grid:#dbdbd4; --rule:#262625; --link:#2b6a8f; --accent:#b7410e }
+html[data-theme="coal"]{ --ink:#c5c5c5; --paper:#141617; --g1:#1e2022; --g2:#2c2f31; --g3:#3c4043;
+  --g4:#8f959a; --g5:#a5abb0; --g6:#c3c8cc; --grid:#191b1c; --rule:#c5c5c5; --link:#6cb3e0; --accent:#06b6d4; color-scheme:dark }
+html[data-theme="navy"]{ --ink:#bcbdd0; --paper:#161923; --g1:#1f2331; --g2:#2b3044; --g3:#3b415a;
+  --g4:#8e93ad; --g5:#a5a9c2; --g6:#c6c8da; --grid:#1a1d28; --rule:#bcbdd0; --link:#6cb3e0; --accent:#38bdf8; color-scheme:dark }
+html[data-theme="ayu"]{ --ink:#c5c5c5; --paper:#0f1419; --g1:#171d24; --g2:#232b34; --g3:#323c47;
+  --g4:#8c949e; --g5:#a6aeb8; --g6:#cbd0d6; --grid:#12171d; --rule:#c5c5c5; --link:#39bae6; --accent:#ffb454; color-scheme:dark }
+html[data-theme]:not([data-theme="light"]) .doc a{ color:var(--link) }
+
+.skip{position:absolute;left:-999px;top:0;z-index:50;background:var(--ink);color:var(--paper);padding:8px 12px}
+.skip:focus{left:8px}
+
+/* ---- menu bar ---------------------------------------------------------- */
+.menubar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;align-items:center;gap:4px;
+  padding:0 10px;background:var(--paper);border-bottom:1px solid var(--g2)}
+.menubar .icon{display:inline-grid;place-items:center;width:36px;height:36px;border:0;background:none;
+  color:var(--g5);cursor:pointer;border-radius:4px}
+.menubar .icon:hover,.menubar .icon[aria-expanded="true"]{color:var(--ink);background:var(--g1)}
+.menubar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.book-title{flex:1;text-align:center;font:600 13px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.themes{position:relative}
+.theme-menu{position:absolute;top:40px;left:0;margin:0;padding:6px 0;list-style:none;min-width:130px;
+  background:var(--paper);border:1px solid var(--g3);box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:40}
+.theme-menu button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);
+  font:400 14px/1 var(--sans);padding:9px 14px;cursor:pointer}
+.theme-menu button:hover,.theme-menu button[aria-checked="true"]{background:var(--g1)}
+.theme-menu button[aria-checked="true"]{font-weight:700;box-shadow:inset 3px 0 0 var(--accent)}
+
+/* ---- search ------------------------------------------------------------ */
+.searchbar{position:sticky;top:var(--bar);z-index:25;background:var(--paper);border-bottom:1px solid var(--g2);
+  padding:12px max(16px, calc(var(--side) + 24px)) 12px}
+.searchbar input{width:100%;font:400 16px/1.4 var(--sans);padding:10px 12px;color:var(--ink);
+  background:var(--g1);border:1px solid var(--g3);border-radius:4px}
+.searchbar input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.results{list-style:none;margin:8px 0 0;padding:0;max-height:60vh;overflow-y:auto}
+.results li a{display:block;padding:10px 12px;border-left:2px solid transparent;color:var(--ink);text-decoration:none}
+.results li a:hover,.results li a:focus{background:var(--g1);border-left-color:var(--accent);outline:none}
+.results .rt{font:600 15px/1.3 var(--sans)}
+.results .rh{font:12px/1.4 var(--mono);color:var(--g5)}
+.results .rb{font-size:13.5px;line-height:1.5;color:var(--g5);margin-top:3px}
+.results mark{background:none;color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:var(--accent)}
+.results .none{padding:10px 12px;color:var(--g5);font-size:14px}
+
+/* ---- three columns: chapters | page | on this page ---------------------- */
+.book{display:grid;grid-template-columns:var(--side) minmax(0,1fr) var(--rail)}
+html.no-sidebar .book{grid-template-columns:0 minmax(0,1fr) var(--rail)}
+html.no-sidebar .sidebar{visibility:hidden}
+.sidebar{position:sticky;top:var(--bar);align-self:start;height:calc(100vh - var(--bar));overflow-y:auto;
+  overscroll-behavior:contain;border-right:1px solid var(--g2);background:var(--paper);padding:18px 0 40px}
+.chapters{list-style:none;margin:0;padding:0}
+.chapters a{display:block;padding:6px 16px 6px 18px;border-left:3px solid transparent;color:var(--g5);
+  text-decoration:none;font:400 14px/1.35 var(--sans)}
+.chapters a strong{font-weight:600;color:var(--g4);margin-right:2px}
+.chapters a:hover{color:var(--ink);background:var(--g1)}
+.chapters a.on{color:var(--ink);background:var(--g1);border-left-color:var(--accent);font-weight:600}
+.chapters .part{margin:22px 0 6px;padding:0 18px;font:600 11px/1.2 var(--mono);letter-spacing:.24em;
+  text-transform:uppercase;color:var(--ink)}
+.page{min-width:0}
+.page .wrap{max-width:860px;margin:0 auto;padding:44px 32px 80px}
+.hero .tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:16px 0 0;padding:0}
+.hero .tags li{font:11px/1 var(--mono);letter-spacing:.06em;color:var(--g5);border:1px solid var(--g3);padding:5px 7px}
+.doc .secno{font-weight:300;color:var(--g4);margin-right:.25em}
+.doc h2,.doc h3{scroll-margin-top:calc(var(--bar) + 16px)}
+.doc .table-wrap,.doc pre{overflow-x:auto;max-width:100%}
+/* Long URLs and inline code would otherwise push a phone-width page sideways. */
+.doc a,.doc :not(pre)>code,.doc p,.doc li{overflow-wrap:anywhere}
+.doc .table-wrap table{display:table}
+kbd{font:600 12px/1 var(--mono);border:1px solid var(--g3);border-bottom-width:2px;padding:2px 5px;border-radius:3px}
+
+.onpage{position:sticky;top:var(--bar);align-self:start;max-height:calc(100vh - var(--bar));overflow-y:auto;
+  padding:44px 16px 40px 18px;border-left:1px solid var(--g2)}
+.onpage .label{font:600 11px/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--g5);margin:0 0 12px}
+.onpage a{display:block;color:var(--g5);text-decoration:none;font:400 13px/1.35 var(--sans);padding:5px 8px;
+  border-left:2px solid transparent}
+.onpage a.sub{padding-left:20px;font-size:12.5px}
+.onpage a:hover{color:var(--ink)}
+.onpage a.on{color:var(--ink);border-left-color:var(--accent);font-weight:600}
+
+/* ---- prev / next ------------------------------------------------------- */
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:56px;padding-top:24px;border-top:1px solid var(--g2)}
+.pager a{display:block;padding:14px 16px;border:1px solid var(--g3);color:var(--ink);text-decoration:none;font:600 15px/1.35 var(--sans)}
+.pager a:hover{border-color:var(--ink);background:var(--g1)}
+.pager a span{display:block;font:600 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--g5);margin-bottom:8px}
+.pager .next{grid-column:2;text-align:right}
+
+/* ---- introduction contents --------------------------------------------- */
+.contents .toc-list{list-style:none;padding:0;margin:8px 0 0}
+.contents .toc-list li{padding:10px 0;border-bottom:1px solid var(--g2)}
+.contents .toc-list a{text-decoration:none;font-weight:600}
+.contents .toc-list strong{color:var(--g4);font-weight:400;margin-right:6px}
+.contents .toc-list p{margin:4px 0 0;font-size:15px;color:var(--g5)}
+
+/* ---- narrower ---------------------------------------------------------- */
+@media (max-width:1280px){ .book{grid-template-columns:var(--side) minmax(0,1fr)} .onpage{display:none}
+  html.no-sidebar .book{grid-template-columns:0 minmax(0,1fr)} }
+@media (max-width:900px){
+  .book,html.no-sidebar .book{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:fixed;left:0;top:var(--bar);width:min(86vw,var(--side));z-index:20;box-shadow:4px 0 18px rgba(0,0,0,.2)}
+  html:not(.show-sidebar) .sidebar{visibility:hidden}
+  .page .wrap{padding:28px 16px 64px}
+  .searchbar{padding:12px 16px}
+  .pager{grid-template-columns:1fr}
+  .pager .next{grid-column:1}
+}
+@media print{ .menubar,.sidebar,.onpage,.pager,.searchbar{display:none} .book{display:block} }

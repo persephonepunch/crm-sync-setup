@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+{#- The book shell: mdBook's menu bar, chapter sidebar, prev/next and themes, on the CRM Sync
+    reference-doc design system (doc.css, same as every styled page in this repo and the
+    game11ty article). No third-party request: doc.css and its fonts are same-origin. -#}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if doc %}{{ doc.number }} {{ doc.title }} · {% endif %}{{ book.title }}</title>
+{%- set desc = doc.description if doc else "Every CRM Sync knowledge-base article as one book: chapters, search and prev/next." %}
+<meta name="description" content="{{ desc }}">
+{#- The book is a second view of each article; the styled page stays the canonical copy. -#}
+{%- if doc and doc.canonical %}
+<link rel="canonical" href="{{ doc.canonical }}">{% endif %}
+<script>
+// Theme before first paint (no flash). Stored choice, else the system's dark preference.
+(function () {
+  var t = null
+  try { t = localStorage.getItem("book-theme") } catch (e) {}
+  if (!t && matchMedia("(prefers-color-scheme: dark)").matches) t = "coal"
+  if (t && t !== "light") document.documentElement.setAttribute("data-theme", t)
+})()
+</script>
+<link rel="stylesheet" href="https://persephonepunch.github.io/crm-sync-setup/doc.css">
+<link rel="stylesheet" href="/assets/book.css">
+{%- if doc %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org", "@type": "TechArticle", "headline": doc.title,
+  "description": doc.description, "dateModified": doc.date, "isPartOf": { "@type": "Book", "name": book.title },
+  "keywords": doc.tags | join(", ")
+} | dump | replace("</", "<\\/") | safe }}</script>{% endif %}
+</head>
+<body data-base="{{ '/' | htmlBaseUrl }}">
+<a class="skip" href="#content">Skip to content</a>
+<header class="menubar">
+  <button class="icon" id="toggle-sidebar" aria-label="Toggle chapters" aria-controls="sidebar" aria-expanded="true">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="themes">
+    <button class="icon" id="theme-button" aria-label="Change theme" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.5A5.5 5.5 0 0 1 13.5 3.1 9 9 0 0 0 12 3z"/></svg></button>
+    <ul class="theme-menu" id="theme-menu" role="menu" hidden>
+      {%- for t in [["light","Light"],["rust","Rust"],["coal","Coal"],["navy","Navy"],["ayu","Ayu"]] %}
+      <li role="none"><button role="menuitemradio" data-theme="{{ t[0] }}">{{ t[1] }}</button></li>{% endfor %}
+    </ul>
+  </div>
+  <button class="icon" id="search-toggle" aria-label="Search (S)" aria-controls="searchbar" aria-expanded="false">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <a class="book-title" href="/">{{ book.title }}</a>
+  <a class="icon" href="https://github.com/persephonepunch/crm-sync-setup" aria-label="Source on GitHub" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M9 19c-4 1.5-4-2-6-2.5m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a>
+</header>
+<div class="searchbar" id="searchbar" hidden>
+  <input type="search" id="search" placeholder="Search the book…" aria-label="Search the book" autocomplete="off">
+  <ol class="results" id="results" aria-live="polite"></ol>
+</div>
+
+<div class="book">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters">
+    <ol class="chapters">
+      <li><a href="/"{% if not doc %} class="on" aria-current="page"{% endif %}>Introduction</a></li>
+      {%- for ch in book.chapters %}
+      <li class="part"><span class="partno">{{ ch.n }}.</span> {{ ch.title }}</li>
+      {%- for p in ch.pages %}
+      <li><a href="/{{ p.slug }}/"{% if doc and doc.slug == p.slug %} class="on" aria-current="page"{% endif %}><strong>{{ p.number }}.</strong> {{ p.title }}</a></li>
+      {%- endfor %}{% endfor %}
+    </ol>
+  </nav>
+
+  <main class="page" id="content">
+    <div class="wrap">
+    {%- if doc %}
+      <header class="hero">
+        <span class="kicker">Chapter {{ doc.chapterN }} · {{ doc.chapter }}</span>
+        <h1>{{ doc.title }}</h1>
+        {%- if doc.showSummary %}
+        <p class="sub summary">{{ doc.description }}</p>{% endif %}
+        <div class="meta">
+          {%- if doc.date %}<span>Updated <b>{{ doc.date }}</b></span>{% endif %}
+          <span><a href="{{ doc.raw }}" download>Markdown</a></span>
+          <span><a href="{{ doc.source }}" rel="noopener">GitHub source</a></span>
+          {%- if doc.canonical %}<span><a href="{{ doc.canonical }}">Styled page</a></span>{% endif %}
+        </div>
+        {%- if doc.tags.length %}
+        <ul class="tags">{% for t in doc.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+      </header>
+      <article class="doc">
+{{ content | safe }}
+      </article>
+      <nav class="pager" aria-label="Previous and next">
+        {%- if doc.prev %}<a class="prev" rel="prev" href="/{{ doc.prev.slug }}/"><span>Previous</span>{{ doc.prev.number }}. {{ doc.prev.title }}</a>
+        {%- else %}<a class="prev" rel="prev" href="/"><span>Previous</span>Introduction</a>{% endif %}
+        {%- if doc.next %}<a class="next" rel="next" href="/{{ doc.next.slug }}/"><span>Next</span>{{ doc.next.number }}. {{ doc.next.title }}</a>{% endif %}
+      </nav>
+    {%- else %}
+      {{ content | safe }}
+    {%- endif %}
+    </div>
+  </main>
+
+  {%- if doc and doc.toc.length %}
+  <aside class="onpage" aria-label="On this page">
+    <p class="label">On this page</p>
+    {%- for h in doc.toc %}
+    <a href="#{{ h.id }}"{% if h.level == 3 %} class="sub"{% endif %}>{{ h.text }}</a>{% endfor %}
+  </aside>{% endif %}
+</div>
+<footer class="docfoot"><span>CRM Sync · Knowledge base · CC-BY-4.0</span><span><a href="https://github.com/persephonepunch/crm-sync-setup/blob/master/book-src/SUMMARY.yml" rel="noopener">Edit the table of contents</a></span></footer>
+<script src="/assets/book.js" defer></script>
+</body>
+</html>

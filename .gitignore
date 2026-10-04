@@ -1,1 +1,5 @@
 build-legal-i18n.py
+
+# The book is built by the Pages workflow (book-src -> book/), never committed.
+book/
+book-src/node_modules/

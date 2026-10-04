@@ -33,6 +33,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      # The knowledge base as a book (/book/), built from the Markdown in this repo and
+      # book-src/SUMMARY.yml. Built here, never committed, so it cannot drift from the source.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: book-src/package-lock.json
+      - name: Build the book
+        working-directory: book-src
+        run: npm ci && npx @11ty/eleventy
+      - name: Keep build tooling out of the published site
+        run: rm -rf book-src/node_modules
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
