@@ -1,0 +1,327 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 1600 2260" width="1600" height="2260" role="img" aria-labelledby="t d" font-family="Roboto, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="t">One knowledge base, four type structures, one backend, one decision ladder</title>
+  <desc id="d">A HyperX support article with its category, tags and PDF, shown as a Webflow Collection item, a Shopify metaobject, a Rust struct and a Jekyll page, with when each checks its shape and how each keeps a private article out. A table maps every field across the four structures to its Xano record field, what the Cloudflare Worker returns, and its single owner. Five Worker functions serve the search page and the chatbot, each with its check. An RMA decision ladder shows the chatbot climbing from knowledge-base answers to lookup to opening an RMA, with the conditions that escalate to a person, and a safety path that escalates immediately.</desc>
+  <style>
+    .paper{fill:#ffffff} .ink{fill:#000000} .g5{fill:#4d4d4d} .g4{fill:#6b6b6b}
+    .card{fill:#ffffff;stroke:#000000} .head{fill:#f2f2f2} .code{fill:#f2f2f2} .rule{stroke:#d9d9d9} .band{fill:#f2f2f2}
+    .accent{fill:#000000} .accentS{stroke:#000000} .tint{fill:#000000;fill-opacity:.06}
+    .warn{fill:#000000;font-weight:700} .warnS{stroke:#000000} .warnTint{fill:#000000;fill-opacity:.12}
+    .axis{stroke:#000000} .hollow{fill:#ffffff;stroke:#000000}
+    .mono{font-family:'Roboto Mono', ui-monospace, Menlo, Consolas, monospace;white-space:pre}
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="ink"/></marker>
+    <marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" class="warn"/></marker>
+  </defs>
+
+  <rect width="1600" height="2260" class="paper"/>
+
+  <!-- ================= title ================= -->
+  <text x="40" y="58" class="g5 mono" font-size="12" letter-spacing="3.6">TYPE STRUCTURES · PERMISSIONS · CRM SYNC KNOWLEDGE BASE</text>
+  <text x="40" y="100" class="ink" font-size="36" font-weight="300">One knowledge base, four type structures, one backend</text>
+  <text x="40" y="130" class="g5" font-size="16">A HyperX support article (FAQ, category, tags and PDF) as each system types it, served to the search page and the chatbot. Values are examples.</text>
+
+  <!-- ================= card 1: Webflow ================= -->
+  <g transform="translate(40 160)">
+    <rect width="350" height="640" class="card"/>
+    <rect width="350" height="64" class="head"/><rect width="350" height="3" class="accent"/>
+    <text x="20" y="32" class="ink" font-size="20" font-weight="600">Webflow Collection</text>
+    <text x="20" y="52" class="g5 mono" font-size="11" letter-spacing="1.5">SCHEMA IN THE DESIGNER</text>
+    <rect x="16" y="78" width="318" height="300" class="code"/><rect x="16" y="78" width="3" height="300" class="accent"/>
+    <g class="ink mono" font-size="12.5">
+      <text x="32" y="102" class="g5">Collection · KB Articles</text>
+      <text x="32" y="128">Question      Plain text *</text>
+      <text x="32" y="150">Slug          Plain text *</text>
+      <text x="32" y="172">Answer        Rich text</text>
+      <text x="32" y="194">Category      Reference</text>
+      <text x="32" y="212" class="g5">              → Categories</text>
+      <text x="32" y="234">Tags          Multi-reference</text>
+      <text x="32" y="252" class="g5">              → Tags</text>
+      <text x="32" y="274">PDF           File</text>
+      <text x="32" y="296">Escalation    Option</text>
+      <text x="32" y="314" class="g5">              none · tier 1–3</text>
+      <text x="32" y="336" class="warn">Private       Switch</text>
+      <text x="32" y="364" class="g4" font-size="11">* required</text>
+    </g>
+    <g font-size="13">
+      <text x="20" y="410" class="g5 mono" font-size="10.5" letter-spacing="1.5">SHAPE CHECKED</text>
+      <text x="20" y="430" class="ink">When an editor saves or publishes</text>
+      <line x1="20" x2="330" y1="448" y2="448" class="rule"/>
+      <text x="20" y="470" class="g5 mono" font-size="10.5" letter-spacing="1.5">MISSING VALUE</text>
+      <text x="20" y="490" class="ink">Required fields block publish;</text>
+      <text x="20" y="508" class="ink">the rest render empty</text>
+      <line x1="20" x2="330" y1="526" y2="526" class="rule"/>
+      <text x="20" y="548" class="g5 mono" font-size="10.5" letter-spacing="1.5">REFERENCES</text>
+      <text x="20" y="568" class="ink">Picked from existing items</text>
+      <line x1="20" x2="330" y1="586" y2="586" class="rule"/>
+      <text x="20" y="608" class="g5 mono" font-size="10.5" letter-spacing="1.5">PRIVATE ARTICLE</text>
+      <text x="20" y="628" class="warn">Published unless every list filters it</text>
+    </g>
+  </g>
+
+  <!-- ================= card 2: Shopify ================= -->
+  <g transform="translate(430 160)">
+    <rect width="350" height="640" class="card"/>
+    <rect width="350" height="64" class="head"/><rect width="350" height="3" class="accent"/>
+    <text x="20" y="32" class="ink" font-size="20" font-weight="600">Shopify metaobject</text>
+    <text x="20" y="52" class="g5 mono" font-size="11" letter-spacing="1.5">SCHEMA IN A DEFINITION</text>
+    <rect x="16" y="78" width="318" height="300" class="code"/><rect x="16" y="78" width="3" height="300" class="accent"/>
+    <g class="ink mono" font-size="12.5">
+      <text x="32" y="102">type: kb_article</text>
+      <text x="32" y="122">access.storefront: PUBLIC_READ</text>
+      <text x="32" y="142">fields:</text>
+      <text x="32" y="162">  question: single_line_text…*</text>
+      <text x="32" y="182">  answer: rich_text_field</text>
+      <text x="32" y="202">  category: metaobject_reference</text>
+      <text x="32" y="222">  tags:</text>
+      <text x="32" y="240" class="g5">    list.metaobject_reference</text>
+      <text x="32" y="260">  pdf: file_reference</text>
+      <text x="32" y="280">  escalation: single_line_text…</text>
+      <text x="32" y="298" class="g5">    choices: [none, tier1, tier2, tier3]</text>
+      <text x="32" y="318" class="warn">  is_private: boolean</text>
+      <text x="32" y="364" class="g4" font-size="11">* required: true   … _field</text>
+    </g>
+    <g font-size="13">
+      <text x="20" y="410" class="g5 mono" font-size="10.5" letter-spacing="1.5">SHAPE CHECKED</text>
+      <text x="20" y="430" class="ink">On every Admin API or admin write</text>
+      <line x1="20" x2="330" y1="448" y2="448" class="rule"/>
+      <text x="20" y="470" class="g5 mono" font-size="10.5" letter-spacing="1.5">MISSING VALUE</text>
+      <text x="20" y="490" class="ink">Required fields and validations</text>
+      <text x="20" y="508" class="ink">reject the write</text>
+      <line x1="20" x2="330" y1="526" y2="526" class="rule"/>
+      <text x="20" y="548" class="g5 mono" font-size="10.5" letter-spacing="1.5">REFERENCES</text>
+      <text x="20" y="568" class="ink">Typed to one definition</text>
+      <line x1="20" x2="330" y1="586" y2="586" class="rule"/>
+      <text x="20" y="608" class="g5 mono" font-size="10.5" letter-spacing="1.5">PRIVATE ARTICLE</text>
+      <text x="20" y="628" class="warn">Access is per definition: filter each query</text>
+    </g>
+  </g>
+
+  <!-- ================= card 3: Rust ================= -->
+  <g transform="translate(820 160)">
+    <rect width="350" height="640" class="card"/>
+    <rect width="350" height="64" class="head"/><rect width="350" height="3" class="accent"/>
+    <text x="20" y="32" class="ink" font-size="20" font-weight="600">Rust struct</text>
+    <text x="20" y="52" class="g5 mono" font-size="11" letter-spacing="1.5">SCHEMA IN THE TYPE</text>
+    <rect x="16" y="78" width="318" height="300" class="code"/><rect x="16" y="78" width="3" height="300" class="accent"/>
+    <g class="ink mono" font-size="12.5">
+      <text x="32" y="102" class="g5">#[derive(Serialize, Deserialize)]</text>
+      <text x="32" y="122">struct KbArticle {</text>
+      <text x="32" y="142">    question: String,</text>
+      <text x="32" y="162">    slug: String,</text>
+      <text x="32" y="182">    answer: String, <tspan class="g5">// HTML</tspan></text>
+      <text x="32" y="202">    category: CategoryId,</text>
+      <text x="32" y="222">    tags: Vec&lt;TagId&gt;,</text>
+      <text x="32" y="242">    pdf: Option&lt;Url&gt;,</text>
+      <text x="32" y="262">    escalation: Escalation, <tspan class="g5">// enum</tspan></text>
+      <text x="32" y="282">}</text>
+      <text x="32" y="310" class="g5">// only Public&lt;KbArticle&gt; is searchable</text>
+      <text x="32" y="330" class="warn">struct Public&lt;T&gt;(T);</text>
+    </g>
+    <g font-size="13">
+      <text x="20" y="410" class="g5 mono" font-size="10.5" letter-spacing="1.5">SHAPE CHECKED</text>
+      <text x="20" y="430" class="ink">Code at compile time; data when</text>
+      <text x="20" y="448" class="ink">serde parses it</text>
+      <line x1="20" x2="330" y1="462" y2="462" class="rule"/>
+      <text x="20" y="482" class="g5 mono" font-size="10.5" letter-spacing="1.5">MISSING VALUE</text>
+      <text x="20" y="502" class="ink">Must be Option&lt;T&gt;, or parsing fails</text>
+      <line x1="20" x2="330" y1="526" y2="526" class="rule"/>
+      <text x="20" y="548" class="g5 mono" font-size="10.5" letter-spacing="1.5">REFERENCES</text>
+      <text x="20" y="568" class="ink">Typed IDs; existence checked at run</text>
+      <line x1="20" x2="330" y1="586" y2="586" class="rule"/>
+      <text x="20" y="608" class="g5 mono" font-size="10.5" letter-spacing="1.5">PRIVATE ARTICLE</text>
+      <text x="20" y="628" class="ink">A type: private never reaches search</text>
+    </g>
+  </g>
+
+  <!-- ================= card 4: Jekyll ================= -->
+  <g transform="translate(1210 160)">
+    <rect width="350" height="640" class="card"/>
+    <rect width="350" height="64" class="head"/><rect width="350" height="3" class="accent"/>
+    <text x="20" y="32" class="ink" font-size="20" font-weight="600">GitHub Markdown · Jekyll</text>
+    <text x="20" y="52" class="g5 mono" font-size="11" letter-spacing="1.5">NO SCHEMA · FREE-FORM KEYS</text>
+    <rect x="16" y="78" width="318" height="300" class="code"/><rect x="16" y="78" width="3" height="300" class="accent"/>
+    <g class="ink mono" font-size="12.5">
+      <text x="32" y="102" class="g5">_kb/cloud-ii-core-firmware.md</text>
+      <text x="32" y="126">---</text>
+      <text x="32" y="146">title: How do I update the</text>
+      <text x="32" y="164">  firmware?</text>
+      <text x="32" y="184">category: support</text>
+      <text x="32" y="204">tags: [cloud-family,</text>
+      <text x="32" y="222">       cloud-ii-core-wireless]</text>
+      <text x="32" y="242">pdf: /pdf/cloud-ii-core-qsg.pdf</text>
+      <text x="32" y="262">escalation: none</text>
+      <text x="32" y="282" class="warn">published: true</text>
+      <text x="32" y="302">---</text>
+      <text x="32" y="326" class="g5">Open NGENUITY and …</text>
+    </g>
+    <g font-size="13">
+      <text x="20" y="410" class="g5 mono" font-size="10.5" letter-spacing="1.5">SHAPE CHECKED</text>
+      <text x="20" y="430" class="ink">Never, unless your build adds a check</text>
+      <line x1="20" x2="330" y1="448" y2="448" class="rule"/>
+      <text x="20" y="470" class="g5 mono" font-size="10.5" letter-spacing="1.5">MISSING VALUE</text>
+      <text x="20" y="490" class="ink">Renders empty, silently</text>
+      <line x1="20" x2="330" y1="526" y2="526" class="rule"/>
+      <text x="20" y="548" class="g5 mono" font-size="10.5" letter-spacing="1.5">REFERENCES</text>
+      <text x="20" y="568" class="warn">Plain slugs; a typo is a broken link</text>
+      <line x1="20" x2="330" y1="586" y2="586" class="rule"/>
+      <text x="20" y="608" class="g5 mono" font-size="10.5" letter-spacing="1.5">PRIVATE ARTICLE</text>
+      <text x="20" y="628" class="ink">published: false keeps it out of the build</text>
+    </g>
+  </g>
+
+  <!-- ================= timeline ================= -->
+  <text x="40" y="858" class="ink" font-size="18" font-weight="600">When does the shape get checked?</text>
+  <text x="40" y="880" class="g5" font-size="13">The earlier a model refuses a bad record, the fewer bad pages ship and the less the chatbot can quote.</text>
+  <line x1="120" x2="1480" y1="926" y2="926" class="axis" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="120" y="910" class="g5 mono" font-size="11" letter-spacing="1.5">EARLIER</text>
+  <text x="1480" y="910" class="g5 mono" font-size="11" letter-spacing="1.5" text-anchor="end">LATER, OR NEVER</text>
+  <circle cx="250" cy="926" r="9" class="accent"/>
+  <text x="250" y="958" class="ink" font-size="14" font-weight="600" text-anchor="middle">Rust: compile</text>
+  <text x="250" y="976" class="g5" font-size="12" text-anchor="middle">bad code never builds</text>
+  <circle cx="620" cy="926" r="9" class="accent"/>
+  <text x="620" y="958" class="ink" font-size="14" font-weight="600" text-anchor="middle">Shopify: write</text>
+  <text x="620" y="976" class="g5" font-size="12" text-anchor="middle">bad data never saves</text>
+  <circle cx="990" cy="926" r="9" class="accent"/>
+  <text x="990" y="958" class="ink" font-size="14" font-weight="600" text-anchor="middle">Webflow: save / publish</text>
+  <text x="990" y="976" class="g5" font-size="12" text-anchor="middle">required fields only</text>
+  <circle cx="1360" cy="926" r="9" class="hollow" stroke-width="2"/>
+  <text x="1360" y="958" class="ink" font-size="14" font-weight="600" text-anchor="middle">Jekyll: build</text>
+  <text x="1360" y="976" class="g5" font-size="12" text-anchor="middle">only if you add the check</text>
+
+  <!-- ================= mapping table ================= -->
+  <text x="40" y="1040" class="ink" font-size="24" font-weight="300">Mapped across all four, onto one backend</text>
+  <text x="40" y="1064" class="g5" font-size="14">Xano holds the record. The Cloudflare Worker is the only way out and decides what each function returns. Every field has one writer.</text>
+  <rect x="190" y="1082" width="780" height="22" class="band"/>
+  <text x="200" y="1097" class="g5 mono" font-size="10.5" letter-spacing="1.5">TYPE STRUCTURES</text>
+  <rect x="970" y="1082" width="590" height="22" class="tint"/>
+  <text x="980" y="1097" class="ink mono" font-size="10.5" letter-spacing="1.5">BACKEND · RECORD → GATE → OWNER</text>
+  <g font-size="12" font-weight="700" class="ink">
+    <text x="40" y="1128">Field</text><text x="190" y="1128">Webflow</text><text x="385" y="1128">Shopify</text>
+    <text x="580" y="1128">Rust</text><text x="775" y="1128">Jekyll</text><text x="970" y="1128">Xano · the record</text>
+    <text x="1165" y="1128">Cloudflare · the gate</text><text x="1360" y="1128">Owner · one writer</text>
+  </g>
+  <line x1="40" x2="1560" y1="1138" y2="1138" class="axis" stroke-width="1.5"/>
+  <rect x="40" y="1378" width="1520" height="40" class="warnTint"/>
+  <rect x="40" y="1418" width="1520" height="40" class="tint"/>
+  <g font-size="12" class="ink">
+    <text x="40" y="1164" class="mono">question</text><text x="190" y="1164">Plain text *</text><text x="385" y="1164" class="mono">single_line_text_field</text><text x="580" y="1164" class="mono">String</text><text x="775" y="1164" class="mono">title:</text><text x="970" y="1164">text, required</text><text x="1165" y="1164">returned (public)</text><text x="1360" y="1164">Support editor</text>
+    <text x="40" y="1204" class="mono">answer</text><text x="190" y="1204">Rich text</text><text x="385" y="1204" class="mono">rich_text_field</text><text x="580" y="1204" class="mono">String <tspan class="g5">// HTML</tspan></text><text x="775" y="1204">Markdown body</text><text x="970" y="1204">text (HTML)</text><text x="1165" y="1204">returned, sanitized</text><text x="1360" y="1204">Support editor; client for ko</text>
+    <text x="40" y="1244" class="mono">category</text><text x="190" y="1244">Reference</text><text x="385" y="1244" class="mono">metaobject_reference</text><text x="580" y="1244" class="mono">CategoryId</text><text x="775" y="1244" class="mono">category: slug</text><text x="970" y="1244">table ref → categories</text><text x="1165" y="1244">joined; search filter</text><text x="1360" y="1244">Support lead</text>
+    <text x="40" y="1284" class="mono">tags</text><text x="190" y="1284">Multi-reference</text><text x="385" y="1284" class="mono">list.metaobject_reference</text><text x="580" y="1284" class="mono">Vec&lt;TagId&gt;</text><text x="775" y="1284" class="mono">tags: [slugs]</text><text x="970" y="1284">list of refs → tags</text><text x="1165" y="1284">joined; search filter</text><text x="1360" y="1284">PIM: family and product</text>
+    <text x="40" y="1324" class="mono">pdf</text><text x="190" y="1324">File</text><text x="385" y="1324" class="mono">file_reference</text><text x="580" y="1324" class="mono">Option&lt;Url&gt;</text><text x="775" y="1324" class="mono">pdf: path</text><text x="970" y="1324">R2 object key</text><text x="1165" y="1324">served from R2 via /media/*</text><text x="1360" y="1324">Product documentation</text>
+    <text x="40" y="1364" class="mono">escalation</text><text x="190" y="1364">Option</text><text x="385" y="1364" class="mono">text + choices</text><text x="580" y="1364" class="mono">enum Escalation</text><text x="775" y="1364" class="mono">escalation:</text><text x="970" y="1364">enum none / tier 1–3</text><text x="1165" y="1364">routes the chatbot</text><text x="1360" y="1364">Support lead</text>
+    <g class="warn">
+      <text x="40" y="1404" class="mono">is_private</text><text x="190" y="1404">Switch</text><text x="385" y="1404" class="mono">boolean</text><text x="580" y="1404" class="mono">Public&lt;T&gt; type</text><text x="775" y="1404" class="mono">published: false</text><text x="970" y="1404">bool</text><text x="1165" y="1404" font-weight="700">excluded from every query</text><text x="1360" y="1404">Support lead</text>
+    </g>
+    <text x="40" y="1444" class="mono">rma case</text><text x="190" y="1444" class="g4">— no per-user rows</text><text x="385" y="1444" class="g4">— app-owned orders</text><text x="580" y="1444" class="mono">owner: CustomerId</text><text x="775" y="1444" class="g4">—</text><text x="970" y="1444">customer_id → customers</text><text x="1165" y="1444">id AND owner, else 404</text><text x="1360" y="1444">The signed-in customer</text>
+  </g>
+  <g class="rule" stroke-width="1">
+    <line x1="40" x2="1560" y1="1178" y2="1178"/><line x1="40" x2="1560" y1="1218" y2="1218"/><line x1="40" x2="1560" y1="1258" y2="1258"/>
+    <line x1="40" x2="1560" y1="1298" y2="1298"/><line x1="40" x2="1560" y1="1338" y2="1338"/><line x1="40" x2="1560" y1="1378" y2="1378"/>
+    <line x1="40" x2="1560" y1="1418" y2="1418"/><line x1="40" x2="1560" y1="1458" y2="1458"/>
+    <line x1="965" x2="965" y1="1082" y2="1458"/>
+  </g>
+
+  <!-- ================= functions ================= -->
+  <text x="40" y="1506" class="ink" font-size="18" font-weight="600">Worker functions behind the search page and the chatbot, each with its check</text>
+  <text x="40" y="1528" class="g5" font-size="13">The page and the &lt;crm-chat&gt; embed hold no rule and no key. Paths and cap names are illustrative; caps follow plane:resource:verb.</text>
+  <g font-size="12.5">
+    <g transform="translate(40 1546)"><rect width="290" height="118" class="card"/><rect width="3" height="118" class="accent"/>
+      <text x="16" y="26" class="ink mono" font-size="12.5" font-weight="700">GET /kb/search?q&amp;category&amp;tag</text>
+      <text x="16" y="50" class="ink">Articles and PDFs, filtered by</text><text x="16" y="68" class="ink">category and tag</text>
+      <text x="16" y="100" class="ink mono" font-size="11">CHECK  is_private = false</text></g>
+    <g transform="translate(347 1546)"><rect width="290" height="118" class="card"/><rect width="3" height="118" class="accent"/>
+      <text x="16" y="26" class="ink mono" font-size="13" font-weight="700">GET /kb/articles/:slug</text>
+      <text x="16" y="50" class="ink">Answer, PDF and FAQPage</text><text x="16" y="68" class="ink">JSON-LD for answer engines</text>
+      <text x="16" y="100" class="ink mono" font-size="11">CHECK  is_private = false</text></g>
+    <g transform="translate(654 1546)"><rect width="290" height="118" class="card"/><rect width="3" height="118" class="accent"/>
+      <text x="16" y="26" class="ink mono" font-size="13" font-weight="700">POST /chat</text>
+      <text x="16" y="50" class="ink">Answers from public articles;</text><text x="16" y="68" class="ink">returns an escalation tier</text>
+      <text x="16" y="100" class="ink mono" font-size="11">CHECK  public only · GPC honored</text></g>
+    <g transform="translate(961 1546)"><rect width="290" height="118" class="card"/><rect width="3" height="118" class="accent"/>
+      <text x="16" y="26" class="ink mono" font-size="13" font-weight="700">POST /rma</text>
+      <text x="16" y="50" class="ink">Opens an RMA request for one</text><text x="16" y="68" class="ink">of the caller's own orders</text>
+      <text x="16" y="100" class="ink mono" font-size="11">CHECK  rma:request:create + owner</text></g>
+    <g transform="translate(1268 1546)"><rect width="292" height="118" class="card"/><rect width="3" height="118" class="warn"/>
+      <text x="16" y="26" class="ink mono" font-size="13" font-weight="700">POST /rma/:id/decision</text>
+      <text x="16" y="50" class="ink">Approves a refund or replacement;</text><text x="16" y="68" class="ink">the grant goes to the ledger</text>
+      <text x="16" y="100" class="warn mono" font-size="11">CHECK  rma:refund:approve · a person</text></g>
+  </g>
+
+  <!-- ================= RMA decision ladder ================= -->
+  <text x="40" y="1720" class="ink" font-size="24" font-weight="300">The RMA decision ladder: when the chatbot hands over to a person</text>
+  <text x="40" y="1744" class="g5" font-size="14">Each rung is a permission, not a script. The chatbot climbs while the rules hold; money moves only on a person's grant. Conditions are examples.</text>
+
+  <g font-size="12.5">
+    <!-- rung 0 -->
+    <g transform="translate(40 1770)"><rect width="300" height="270" class="card"/><rect width="300" height="3" class="accent"/>
+      <text x="18" y="34" class="ink" font-size="18" font-weight="600">0 · Knowledge base</text>
+      <text x="18" y="56" class="g5 mono" font-size="10.5" letter-spacing="1.2">WHO  CHATBOT · NO SIGN-IN</text>
+      <text x="18" y="88" class="ink">Answers from public articles,</text><text x="18" y="106" class="ink">FAQs and PDFs only</text>
+      <text x="18" y="134" class="ink">Never reads a private article</text>
+      <text x="18" y="162" class="g5">Tier: none</text>
+      <line x1="18" x2="282" y1="200" y2="200" class="rule"/>
+      <text x="18" y="222" class="g5 mono" font-size="10.5" letter-spacing="1.2">UP WHEN</text>
+      <text x="18" y="244" class="ink">No article answers it, or the</text><text x="18" y="262" class="ink">customer asks to return</text></g>
+    <line x1="342" x2="366" y1="1905" y2="1905" class="axis" stroke-width="2" marker-end="url(#arrow)"/>
+    <!-- rung 1 -->
+    <g transform="translate(370 1770)"><rect width="300" height="270" class="card"/><rect width="300" height="3" class="accent"/>
+      <text x="18" y="34" class="ink" font-size="18" font-weight="600">1 · Look up</text>
+      <text x="18" y="56" class="g5 mono" font-size="10.5" letter-spacing="1.2">WHO  SIGNED-IN CUSTOMER</text>
+      <text x="18" y="88" class="ink">Reads their own order and</text><text x="18" y="106" class="ink">warranty: id AND owner</text>
+      <text x="18" y="134" class="ink">Checks the serial against the order</text>
+      <text x="18" y="162" class="g5">Tier 1: automated, any hour</text>
+      <line x1="18" x2="282" y1="200" y2="200" class="rule"/>
+      <text x="18" y="222" class="g5 mono" font-size="10.5" letter-spacing="1.2">UP WHEN</text>
+      <text x="18" y="244" class="ink">Every policy check passes</text></g>
+    <line x1="672" x2="696" y1="1905" y2="1905" class="axis" stroke-width="2" marker-end="url(#arrow)"/>
+    <!-- rung 2 -->
+    <g transform="translate(700 1770)"><rect width="300" height="270" class="card"/><rect width="300" height="3" class="accent"/>
+      <text x="18" y="34" class="ink" font-size="18" font-weight="600">2 · Open an RMA</text>
+      <text x="18" y="56" class="g5 mono" font-size="10.5" letter-spacing="1.2">CAP  RMA:REQUEST:CREATE</text>
+      <text x="18" y="88" class="ink">Creates an RMA request with a</text><text x="18" y="106" class="ink">reference the customer keeps</text>
+      <text x="18" y="134" class="ink">Never issues a refund or replacement</text>
+      <text x="18" y="162" class="g5">Tier 1: automated</text>
+      <line x1="18" x2="282" y1="200" y2="200" class="rule"/>
+      <text x="18" y="222" class="g5 mono" font-size="10.5" letter-spacing="1.2">UP WHEN</text>
+      <text x="18" y="244" class="ink">Money would move, or any</text><text x="18" y="262" class="ink">condition below is true</text></g>
+    <line x1="1002" x2="1026" y1="1905" y2="1905" class="warnS" stroke-width="2" marker-end="url(#arrowW)"/>
+    <!-- rung 3 -->
+    <g transform="translate(1030 1770)"><rect width="300" height="270" class="card"/><rect width="300" height="3" class="warn"/>
+      <text x="18" y="34" class="ink" font-size="18" font-weight="600">3 · Person decides</text>
+      <text x="18" y="56" class="warn mono" font-size="10.5" letter-spacing="1.2">CAP  RMA:REFUND:APPROVE · A PERSON</text>
+      <text x="18" y="88" class="ink">Approves a refund or replacement;</text><text x="18" y="106" class="ink">the grant goes to the ledger</text>
+      <text x="18" y="134" class="ink">The agent brings a mandate, never</text><text x="18" y="152" class="ink">the refund key</text>
+      <text x="18" y="180" class="g5">Tier 2: next business window</text>
+      <line x1="18" x2="282" y1="200" y2="200" class="rule"/>
+      <text x="18" y="222" class="g5 mono" font-size="10.5" letter-spacing="1.2">THEN</text>
+      <text x="18" y="244" class="ink">The answer becomes a new KB</text><text x="18" y="262" class="ink">article, in both languages</text></g>
+    <!-- tier 3 rail -->
+    <g transform="translate(1360 1770)"><rect width="200" height="270" class="warnTint"/><rect width="200" height="270" fill="none" class="warnS" stroke-width="1.5"/>
+      <text x="16" y="34" class="warn" font-size="18" font-weight="600">Safety · now</text>
+      <text x="16" y="56" class="warn mono" font-size="10.5" letter-spacing="1.2">TIER 3 · FROM ANY RUNG</text>
+      <text x="16" y="88" class="ink">Overheating, smoke,</text><text x="16" y="106" class="ink">a swelling battery,</text><text x="16" y="124" class="ink">or an injury</text>
+      <text x="16" y="156" class="ink">Straight to a person</text>
+      <text x="16" y="186" class="ink">US CPSC §15(b):</text><text x="16" y="204" class="ink">a 24-hour clock</text>
+      <text x="16" y="240" class="g5">Any form can carry it</text></g>
+    <path d="M190 2042 V2056 H1460 V2042" fill="none" class="warnS" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrowW)"/>
+  </g>
+
+  <!-- escalation conditions -->
+  <text x="40" y="2096" class="ink" font-size="15" font-weight="600">Escalate to a person (tier 2) when any of these is true:</text>
+  <g font-size="12.5" class="ink">
+    <g transform="translate(40 2110)"><rect width="235" height="34" class="band"/><text x="12" y="22">Outside the warranty window</text></g>
+    <g transform="translate(287 2110)"><rect width="250" height="34" class="band"/><text x="12" y="22">Serial doesn't match the order</text></g>
+    <g transform="translate(549 2110)"><rect width="260" height="34" class="band"/><text x="12" y="22">Second return for the same serial</text></g>
+    <g transform="translate(821 2110)"><rect width="250" height="34" class="band"/><text x="12" y="22">Over the automatic refund limit</text></g>
+    <g transform="translate(1083 2110)"><rect width="230" height="34" class="band"/><text x="12" y="22">Customer disputes the answer</text></g>
+    <g transform="translate(1325 2110)"><rect width="235" height="34" class="warnTint"/><text x="12" y="22" class="warn">Any refund or replacement</text></g>
+  </g>
+  <text x="40" y="2178" class="g5" font-size="13">The escalation record holds no name, email or phone: it links to the customer by ID, so the question can become training data without becoming personal data.</text>
+
+  <!-- footnote -->
+  <rect x="40" y="2212" width="3" height="32" class="warn"/>
+  <text x="52" y="2225" class="g5" font-size="12.5">In bold: is_private. The live search page publishes data-is-private-article on every item; all 31 read "false" today. The flag itself is public, so the filter</text>
+  <text x="52" y="2243" class="g5" font-size="12.5">has to run before publishing and in every Worker query, never in the browser. Tiers from "The AI ladder" (book 3.32); RMA conditions and cap names are hypothetical.</text>
+</svg>
