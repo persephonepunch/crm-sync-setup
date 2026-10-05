@@ -24,7 +24,11 @@ The companion diagram shows the same model visually: the four type structures, t
 
 ![One knowledge base, four type structures, one backend: a HyperX support article as a Webflow Collection item, a Shopify metaobject, a Rust struct and a Jekyll page, mapped onto Xano and the Cloudflare Worker, with the Worker functions and the RMA decision ladder](assets/kb-type-structures-rma-ladder.svg)
 
-*[Open the diagram full size](https://persephonepunch.github.io/crm-sync-setup/assets/kb-type-structures-rma-ladder.svg).* The Mermaid diagrams in sections 5, 8 and 9 render on [GitHub](https://github.com/persephonepunch/crm-sync-setup/blob/master/RMA-LADDER-SPEC.md); the book shows their source. The principles come from the CRM Sync book: [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/book/ai-ladder-escalation-and-mandates/#4-human-in-the-loop-escalation) for the escalation tiers, [QA and Release Gating](https://persephonepunch.github.io/crm-sync-setup/book/qa-release-gating/#3-the-gate-mechanics) for the gate, and [Secure frontend, AI-safe backend](https://persephonepunch.github.io/crm-sync-setup/book/secure-frontend-ai-safe-backend/) for publishing.
+*[Open the diagram full size](https://persephonepunch.github.io/crm-sync-setup/assets/kb-type-structures-rma-ladder.svg).*
+
+**Try the chatbot:** [live preview on the hx-stage demo store](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com). This is the same `<crm-chat>` the knowledge-base search page embeds; the ladder in this spec is the hypothetical design behind it, not a description of what the preview does today.
+
+The Mermaid diagrams in sections 5, 8 and 9 render on [GitHub](https://github.com/persephonepunch/crm-sync-setup/blob/master/RMA-LADDER-SPEC.md); the book shows their source. The principles come from the CRM Sync book: [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/book/ai-ladder-escalation-and-mandates/#4-human-in-the-loop-escalation) for the escalation tiers, [QA and Release Gating](https://persephonepunch.github.io/crm-sync-setup/book/qa-release-gating/#3-the-gate-mechanics) for the gate, and [Secure frontend, AI-safe backend](https://persephonepunch.github.io/crm-sync-setup/book/secure-frontend-ai-safe-backend/) for publishing.
 
 ## 1. Scope
 
