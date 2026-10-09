@@ -13,11 +13,12 @@
 {%- if doc and doc.canonical %}
 <link rel="canonical" href="{{ doc.canonical }}">{% endif %}
 <script>
-// Theme before first paint (no flash). Stored choice, else the system's dark preference.
+// Theme before first paint (no flash). Stored choice, else Light: the knowledge base's own look
+// on crm-sync.dev (white paper, grid, cyan rule), whatever the system's colour preference.
+// Readers who want Coal, Navy or Ayu pick it from the theme menu, and the choice is kept.
 (function () {
   var t = null
   try { t = localStorage.getItem("book-theme") } catch (e) {}
-  if (!t && matchMedia("(prefers-color-scheme: dark)").matches) t = "coal"
   if (t && t !== "light") document.documentElement.setAttribute("data-theme", t)
 })()
 </script>
