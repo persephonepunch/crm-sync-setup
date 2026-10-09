@@ -4,6 +4,7 @@ description: "A runtime as a service is judged by what it holds when nothing is 
 canonical: https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html
 category: "Specs"
 date: 2026-09-06
+updated: 2026-10-09
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/WHY-XANO-RUNTIME-AS-A-SERVICE.md
 licence: CC-BY-4.0
 tags:
@@ -27,6 +28,8 @@ keywords:
   - answer engine optimization
   - agentic commerce
   - Deno
+  - workerd
+  - celld
   - Node
   - AWS Lambda
   - Silverlight
@@ -402,7 +405,7 @@ and tested for rather than assumed away.
 | Catalog syndication | Merchant Center | — | — (build the feed via an endpoint) |
 
 Read down a column and you get a vendor; read across a row and you get the job — and the row is
-the direction that matters, because **the three are not alternatives.** A real estate runs all of
+the direction that matters, because **the three are not alternatives.** (Since 9 October 2026 the Cloudflare column can also be self-hosted: see the update at the end of §9.) A real estate runs all of
 them at once. The question is never which vendor, but which of them holds this role. The last two rows are not gaps at the
 edge — as §4 argues, that is where the lifecycle is adjudicated, and the edge is not in that
 business.
@@ -511,7 +514,9 @@ without discussing it, about the runtime underneath.
 
 Both are legitimate boundaries. They sit at different layers: **with Deno the runtime says no; with
 Lambda on Node the cloud account says no.** Which permissions Xano grants a Lambda step is not
-documented in anything this estate has read, so this document does not claim them.
+documented in anything this estate has read, so this document does not claim them. For what the
+Deno team joining Cloudflare (9 October 2026) does and does not change, see the update at the
+end of §9.
 
 ### The branch that ended: Silverlight
 
@@ -911,6 +916,31 @@ credential vault, one rule artifact every path calls, and evidence whose orderin
 enforces — while nothing is being rendered?** Four yeses and the choice is about operating cost
 and who has to read the rule. Fewer than four and the gap does not close by adding a framework
 in front of it.
+
+### Update, 9 October 2026: Deno joins Cloudflare
+
+[Cloudflare announced](https://blog.cloudflare.com/deno-joins-cloudflare/) that the Deno team is
+joining it. Ryan Dahl and Bert Belder will make self-hosting workerd, the open-source Workers
+runtime, a first-class option, merging in celld: the Deno team's distributed Workers and Durable
+Objects engine, whose only external dependency is object storage. Here is what that changes in
+this document and what it doesn't.
+
+- **The Cloudflare column becomes portable (§7).** Until now, self-hosted workerd ran Durable
+  Objects only as a single instance, so the coordinated-state row could not leave Cloudflare at
+  scale. With celld it can. The roles in §7 stay roles; the Cloudflare one can now be run
+  somewhere else, for example on servers in a country whose rules require it.
+- **"Cloudflare alone" gets closer, not complete.** Coordination and compute can now be
+  self-hosted, but neither workerd nor celld is a system of record with a queryable relational
+  model, or a rule surface a non-engineer can read. The gap named above stands, and so does the
+  test below.
+- **Declared reach survives the merge (§8).** workerd was never Deno, but it already works by
+  declaration: a Worker reaches only the databases, storage and services bound to it before it
+  runs. One difference matters. Outbound `fetch` is open by default in Workers, where Deno
+  refuses it without `--allow-net`. A Worker's network reach is therefore declared by the
+  platform around it (outbound controls, the firewall), not by the runtime.
+- **The Deno runtime is not addressed.** The announcement points to Deno's own blog for what
+  happens to the runtime. Nothing here claims a change to Xano's Lambda steps or Supabase's edge
+  functions, which run on Deno (§8).
 
 ---
 
