@@ -92,6 +92,7 @@ chapters:
   - category: Compliance
     docs:
       - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08
+      - OWNERSHIP-BEFORE-THE-WIRE.md   # 2026-10-09 · Ownership before the wire: a per-country rules ladder for AI, functions and forms
   - category: Global
     docs:
       - GLOBALIZATION-GOALS.md   # 2026-06-12 · Globalization — Goal Checklist (Pending / Review State)
