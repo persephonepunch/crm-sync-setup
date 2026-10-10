@@ -30,7 +30,7 @@ The companion diagram shows the same model visually: the four type structures, t
 
 [![The chatbot preview: a notice that this is an AI assistant, product search with Add to cart and Agent buy on each result, and the menu with Start a return](https://crm-sync.dev/kb/media/docs/chatbot-preview-stage.png)](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com)
 
-*The chatbot preview on the demo store ([open it live](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com)): product search with Add to cart and Agent buy, and Start a return, the entry to rung 2 of the ladder.*
+*Proof of concept: the chatbot on the HyperX demo store, `hx-stage` ([open it live](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com)). Product search with Add to cart and Agent buy, and Start a return, the entry to rung 2 of the ladder.*
 
 The Mermaid diagrams in sections 5, 8 and 9 render on [GitHub](https://github.com/persephonepunch/crm-sync-setup/blob/master/RMA-LADDER-SPEC.md); the book shows their source. The principles come from the CRM Sync book: [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/book/ai-ladder-escalation-and-mandates/#4-human-in-the-loop-escalation) for the escalation tiers, [QA and Release Gating](https://persephonepunch.github.io/crm-sync-setup/book/qa-release-gating/#3-the-gate-mechanics) for the gate, and [Secure frontend, AI-safe backend](https://persephonepunch.github.io/crm-sync-setup/book/secure-frontend-ai-safe-backend/) for publishing.
 
