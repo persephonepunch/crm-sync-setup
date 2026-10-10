@@ -88,7 +88,7 @@ chapters:
       - WHAT-SURVIVES-THE-TRANSFORM.md   # 2026-09-20 · Asset Management, Security and AI
       - AI-LADDER-ESCALATION-AND-MANDATES.md   # 2026-09-25 · The AI ladder: retrieval, adapters, humans, and who holds the keys
       - SHOPIFY-OCTOBER-1-SCRIPTS-CART-CATALOG.md   # 2026-09-29 · October 1: script tags, Functions, the cart, the catalog agents read —
-      - RMA-LADDER-SPEC.md   # 2026-10-04 · RMA decision ladder — functional and data design spec (hypothetical)
+      - RMA-LADDER-SPEC.md   # 2026-10-04 · Decision ladder — functional and data design spec (hypothetical)
   - category: Compliance
     docs:
       - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08

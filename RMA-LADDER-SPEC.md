@@ -1,5 +1,5 @@
 ---
-title: "RMA decision ladder — functional and data design spec (hypothetical)"
+title: "Decision ladder — functional and data design spec (hypothetical)"
 description: "A hypothetical functional and data design for a support chatbot that climbs from knowledge-base answers to opening an RMA, escalates to a person on named conditions, links only attested firmware, runs only verified browser code, and deploys only through a locked, human-reviewed workflow. With a test matrix and testing diagrams."
 canonical: https://persephonepunch.github.io/crm-sync-setup/book/rma-ladder-spec/
 category: "Specs"
@@ -16,13 +16,13 @@ tags:
   - xano
 ---
 
-# RMA decision ladder — functional and data design spec (hypothetical)
+# Decision ladder — functional and data design spec (hypothetical)
 
 **Status: hypothetical.** This is a design for discussion, using the HyperX support knowledge base and its chatbot as the worked example. It does not describe a live system. Statements about the current HyperX estate are marked **Observed 2026-10-04** and were checked on that date; everything else is proposed.
 
 The companion diagram shows the same model visually: the four type structures, the mapping onto Xano and the Cloudflare Worker, the functions, and the ladder.
 
-![One knowledge base, four type structures, one backend: a HyperX support article as a Webflow Collection item, a Shopify metaobject, a Rust struct and a Jekyll page, mapped onto Xano and the Cloudflare Worker, with the Worker functions and the RMA decision ladder](https://crm-sync.dev/kb/media/docs/kb-type-structures-rma-ladder.svg)
+![One knowledge base, four type structures, one backend: a support article as a Webflow Collection item, a Shopify metaobject, a Rust struct and a Jekyll page, mapped onto Xano and the Cloudflare Worker, with the Worker functions and the decision ladder](https://crm-sync.dev/kb/media/docs/kb-type-structures-rma-ladder.svg)
 
 *[Open the diagram full size](https://crm-sync.dev/kb/media/docs/kb-type-structures-rma-ladder.svg).*
 
