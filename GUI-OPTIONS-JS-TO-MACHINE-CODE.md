@@ -193,6 +193,46 @@ JavaScript is present in four of the six layers, and in none of them is it trust
 | 7. iced / egui / Slint | Rust (+ `.slint` markup) | None | Native machine code | Compiler, inside one process | resvg or the framework's own canvas | Desktop tools, kiosks, MCU screens |
 | 8. `no_std` firmware | Rust | None | Machine code on the device | Compiled into the unit; the app only asks | None — there is no GUI | Safety limits |
 
+## Gentle or total: an Elm island in Webflow against a full egui app
+
+Options 3 and 5 both bring a compiler's guarantees into the browser, and teams weighing a move to Rust often jump straight to the second. The difference is scope. **An Elm island adds one widget to a site that keeps working as it is. An egui app replaces the whole interface.**
+
+The island fits the pipeline above without changing it. The designer places an empty block in Webflow marked `data-component="estimator"`; the Beautiful Soup sync already maps marked elements to Eleventy components, so the component renders a mount point and loads one compiled file:
+
+```html
+<div id="estimator"></div>
+<script type="module">
+  import "/assets/estimator.js";              // compiled Elm, self-hosted, pinned by the CSP
+  const app = Elm.Main.init({
+    node: document.getElementById("estimator"),
+    flags: { locale: "ko", sku: "ONDOL-120" }  // page config, decoded and checked on arrival
+  });
+  app.ports.requestQuote.subscribe(q =>       // Elm asks; the Worker decides
+    fetch("/api/quote", { method: "POST", body: JSON.stringify(q) })
+      .then(r => r.json()).then(app.ports.quoteReceived.send));
+</script>
+```
+
+| | Elm island in Webflow | Full Rust egui app |
+|---|---|---|
+| What changes | One box on one page | The entire interface, rewritten in Rust |
+| Designers | Keep designing everything in Webflow | Leave the process; the interface is code |
+| Content and CMS | Unchanged: Webflow CMS, the sync, Eleventy | Rebuilt, or fed in through code |
+| What the browser receives | Ordinary HTML with one interactive area | One canvas element |
+| Search engines | Read the page as usual | See an empty canvas |
+| Accessibility | Ordinary elements that screen readers understand | Extra work before a screen reader sees more than a canvas |
+| Download | One compiled JavaScript file, typically tens of kilobytes | A Wasm module, usually megabytes |
+| Content-Security-Policy | No change | Must allow `'wasm-unsafe-eval'` |
+| Learning curve | A small functional language, no memory rules | Rust's ownership and borrowing, plus the egui API |
+| Toolchain | `elm make`, one file out | Rust, a Wasm target, and Trunk or `wasm-bindgen` |
+| If it does not work out | Delete one box; the site is unchanged | Going back is a second rebuild |
+
+The underlying reason is who draws the pixels. egui draws its own — text, layout, every widget — so it brings everything with it and gives up what the browser provides for free: HTML, search, screen readers, and the designers' tool. Elm renders ordinary HTML and SVG, so it takes over only the part it is handed.
+
+Neither moves the trust boundary. The island asks through a port and the Worker validates the request like any other; an egui app in a tab is equally under the user's control. **Elm makes the widget correct. Only the edge makes the system trustworthy.**
+
+egui is still the right call when the browser's free features do not matter and rendering does: CAD, page layout, 3D editors, and one Rust codebase shipped to both desktop and web, as CADCraft and DesignCraft are. Those are applications that happen to run in a tab. A site of content, products and a few interactive tools is not, and for that the gentle path fits: Webflow for the pages, an Elm island where one tool's state gets complicated, and Rust where the safety limits live.
+
 ## Choosing
 
 1. **Start with where the decision must live, not the interface.** If it can hurt someone or cost money, it goes in firmware (8), a sandbox (4) or behind the edge (1). The interface is chosen afterwards.
