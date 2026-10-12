@@ -355,6 +355,22 @@ Three rules keep it honest:
 - **The assignment is made on the server.** A coin flip in the browser is fine for a colour and useless for anything that matters, because the visitor controls it. Xano's answer is the one that counts.
 - **Rollback is a record change.** Set the split to 100% `a` in Xano and every visitor is back on the original at the next page load, with no compile and no deploy. Ending an experiment is a deploy that removes the losing path.
 
+#### The same gate for market rules — with one difference
+
+The mechanism carries over directly to *if US, if Korea*: which form rules, newsletter rules and payment components load for a visitor. The difference is that **a market rule is not an experiment**. It is never a percentage split, it is never left to a variant record someone might edit for a test, and when the market is unknown it **fails toward the stricter rules**, not toward the default. The Worker already works this way: it resolves the visitor's consent regime on the server, and the newsletter handler treats an unknown region as needing the Korean disclosure.
+
+Most market differences are *rules*, and rules are data, so they belong in one compiled bundle, read from the Worker at load time:
+
+| Rule | United States | Korea |
+|---|---|---|
+| Where the sign-up is stored | The US Xano | The Korea team's Xano, once configured — the data stays in Korea |
+| Cross-border disclosure | None | Until Korean storage is live: the itemised disclosure and its own required box, in the Webflow form |
+| Consent model | Opt-out, honouring Global Privacy Control | Opt-in before collection |
+| Language | English | Korean, including error and confirmation text |
+| If the rules cannot load | — | The form says so and the button stays off |
+
+Changing any of these is a record or configuration change, with no compile. Separate, namespaced bundles are for *code* that only one market needs — the Kakao Pay buy button is the example, loaded only where Kakao Pay is offered — so a US visitor never downloads it at all. The test is the one this whole section uses: if it is a rule, fetch it; if it is code, compile it, and let the server decide which code a market receives.
+
 One browser detail decides how components are namespaced. A custom element's tag name can be defined only once per page, so if both variants define `<ondol-newsletter>`, the loader must make sure only one of them ever loads. Variants that need to coexist on a page, for a side-by-side preview, take namespaced tags such as `<ondol-newsletter-b>`.
 
 **The pattern in one line:** Webflow designs every component, and the Worker decides what each one does. Design changes publish from Webflow with no compile. Behaviour changes compile once, in the Worker, and reach every page through one line nobody edits.
