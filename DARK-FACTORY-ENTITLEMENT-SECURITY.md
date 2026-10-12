@@ -127,6 +127,29 @@ It also reframes what custody can and cannot do. Encrypting an asset, granting i
 
 Between those two poles sits everything a modern operation ships and stores: **IoT and device firmware** (expanding EXEs with embedded secrets), **game and metaverse distribution** (Roblox and Unity bundles carrying your product's 3D twins), **3D/BIM assets in business operations** (models locked in PIM/BIM silos, exchanged as executable-adjacent XML). The vulnerability does not live in your network perimeter. It lives in your artifacts and your silos — the two places perimeter security cannot reach.
 
+## The long-run AI requirement: JSON records, not a single Java bundle
+
+The receipts share a shape: value and logic fused into one thing you cannot hand out in pieces. That shape has a second cost that arrives more slowly than a CVE. **AI does not use your application. It uses your data** — and it needs that data in a form it can be handed one record at a time.
+
+The enterprise default is the single bundle: a Java WAR or EAR, a content package, a JCR repository, an object graph persisted with the platform's own serialisation. The data's shape lives inside the code that owns it, so the only ways in are the application's own screens or an export somebody scheduled. That was tolerable when the reader was a person. An agent asks a different question — *give me this one asset's state, now, joined against operations* — and the bundle can answer only by handing over last night's snapshot or the application's whole authority. Neither is an entitlement.
+
+Typed JSON records answer it directly. Each record is addressable by its own key, validated against a published schema, readable as text, and small enough to carry its own grant. An agent can be given exactly one record under exactly one capability, and what it was given can be ledgered by the byte. It is the Shopify Functions contract again, typed JSON in and typed JSON out, applied to data at rest instead of code in flight.
+
+| Long-run requirement | Typed JSON records | Single Java bundle |
+|---|---|---|
+| Hand an agent one item | One record, one key, one grant | The app's API or the app's authority — usually the whole of it |
+| Freshness | Read the record now | Whatever the last export captured |
+| Audit what was disclosed | Ledger the record and the bytes served | Reconstruct from application logs, if they exist |
+| Schema change | Version the schema; old readers fail loudly | Redeploy the bundle; every consumer moves at once |
+| Fixing a flaw | Rotate a grant, re-validate a record | Rebuild and redeploy the whole artifact — the Unity remediation |
+| What the parser must do | Read data | Serialised formats rebuild objects, which means running code |
+
+The last row is the security one, and it is Cityworks again. Native serialisation formats, Java's `ObjectInputStream` and .NET's binary formatters alike, do not read data; they **reconstruct objects**, and reconstructing an object runs its code. That is why deserialisation is a vulnerability class rather than a bug: the 2015 Java gadget chains through Apache Commons Collections and CVE-2025-0994 in Cityworks' .NET stack are the same flaw ten years apart. A JSON parser builds maps, lists, strings and numbers, and nothing else.
+
+That is a narrower surface, not a safe one. JSON still needs size and nesting limits, a rule for duplicate keys, schema validation on the way in, and — in JavaScript — a guard against `__proto__` keys polluting the prototype. And JSON stops being data the moment a library is allowed to choose the class from a field in the payload; polymorphic typing in Jackson and its peers reopened the gadget problem inside JSON. The requirement is plain data with a published schema, not the letters J-S-O-N.
+
+None of this is *rewrite the Java*. The JVM is a runtime, not a boundary, and a Java service emitting typed records behind a capability check meets the requirement as well as anything else. What does not meet it is the bundle as the unit of access. **Keep the platform; change what crosses its edge.** Records out, grants per record, schemas published, and no format crossing the boundary that asks the receiver to run something to read it.
+
 ## The exception that proves it: Shopify Functions
 
 If executable content is an attack surface by definition, consider the case that ought to be the
