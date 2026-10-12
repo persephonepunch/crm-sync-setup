@@ -60,7 +60,8 @@ module.exports = () => {
       const h1 = html.match(/^\s*<h1>(.*?)<\/h1>/)
       const title = fm.title || fm.name || (h1 ? text(h1[1]) : path.basename(src, ".md"))
 
-      // Ids on h2/h3, numbered h2s (2.3.1 style, like a Rust book chapter), and the page TOC.
+      // Ids on h2/h3/h4 (h4 so a subsection can be linked to; it stays out of the TOC), numbered h2s
+      // (2.3.1 style, like a Rust book chapter), and the page TOC.
       const toc = [], used = new Set()
       let h2 = 0
       // A doc that numbers its own sections keeps its scheme throughout: the book adds no
@@ -68,14 +69,14 @@ module.exports = () => {
       const authorNumbered = [...html.matchAll(/<h2>(.*?)<\/h2>/g)]
         .some((m) => /^\s*(§\s*)?\d+(\.\d+)*[.)·]?\s/.test(text(m[1])))
       const number = `${ci + 1}.${di + 1}`
-      html = html.replace(/<h([23])>(.*?)<\/h\1>/g, (_, level, inner) => {
+      html = html.replace(/<h([234])>(.*?)<\/h\1>/g, (_, level, inner) => {
         let id = slugify(inner) || "section", k = 2
         while (used.has(id)) id = `${slugify(inner)}-${k++}`
         used.add(id)
         // Number h2s 2.3.1-style, unless the author already numbered it ("1. Summary", "§2").
         if (level === "2") { ++h2; if (!authorNumbered)
           inner = `<span class="secno">${number}.${h2}</span> ${inner}` }
-        toc.push({ id, level: +level, text: text(inner) })
+        if (level !== "4") toc.push({ id, level: +level, text: text(inner) })
         return `<h${level} id="${id}">${inner}</h${level}>`
       })
 
