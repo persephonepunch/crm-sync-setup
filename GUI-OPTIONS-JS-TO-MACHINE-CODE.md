@@ -356,6 +356,65 @@ Turnstile is anti-abuse, not a security boundary. It raises the cost of volume; 
 
 If the newsletter ever does attract sign-ups the rate limit lets through, the fix is the same as on the other forms: a Turnstile widget registered for the real domain, with the Worker verifying the token. Switching Webflow's checkbox back on would only bring back the disabled button.
 
+### A Webflow form, end to end, with no framework and no state manager
+
+The newsletter form is the whole pattern in one component, and it needs nothing beyond what the browser already has: no React, no Redux, no Elm runtime, no build step that rewrites the code. TypeScript checks it but ships nothing of its own.
+
+**Attributes are the configuration.** The script tag carries everything that changes between sites and markets, so the code holds no hard-coded hosts:
+
+```html
+<script src="https://<worker>/embed/newsletter.js" defer
+  data-endpoint="<Xano /newsletter>"
+  data-endpoint-kr="<Korea Xano /newsletter, or empty>"
+  data-lang="en"
+  data-regime="https://<worker>/consent/regime"
+  data-disclosure="https://<worker>/legal/disclosure?form=newsletter&lang=en"
+  data-terms-version="…"></script>
+```
+
+The form itself is found by Webflow's own markup (`.newswidth form`) or by an attribute the designer can add to any form (`data-ondol-newsletter`). If the designer sets the form's **Action** in Webflow to an `https://` URL, that wins over `data-endpoint`.
+
+**POST to Xano.** The script detaches Webflow's handler from that one form and sends a JSON `POST` with `credentials: "omit"`, so no cookie rides along. The body is the email plus what the consent record needs: the region and regime from the Worker, each box's state and the time it was ticked, the exact label text the visitor saw, the terms version and, in Korea, the disclosure. A Korean visitor posts to the Korea Xano once one is configured.
+
+**Validation in two places, one rule.** The browser check uses the input's `pattern` attribute, set to the same rule Xano applies, so a mistake shows before anything is sent:
+
+```
+[^@\s]+@[^@\s]+\.[^@\s]+
+```
+
+That reads "something with no spaces or @, then @, then the same, a dot, the same." A pattern the designer has already set in Webflow is kept. The `pattern` attribute is a courtesy; Xano applies the same rule again and is the authority.
+
+**Success, error, redirect.**
+
+| Outcome | What the visitor sees |
+|---|---|
+| **Success** | The form hides and Webflow's own success block (`.w-form-done`) shows. If Xano says the sign-up is pending — an EU sign-up waiting for email confirmation — its text changes to say so. An `ondol:newsletter` event fires for anything else on the page that wants to know |
+| **Error** | Webflow's error block (`.w-form-fail`) shows with the designer's text, and the button comes back |
+| **Redirect** | Not followed. Webflow's "Redirect URL" setting is ignored on this form: the success block is the result. Where the codebase does redirect — the Kakao Pay button — it only follows an address the server returned, never one written into the page |
+
+**Eager and lazy loading.** Loading is decided by attribute and by where the component sits on the page:
+
+| | How | Used for |
+|---|---|---|
+| **Eager** | `<script defer>` in the page — downloads alongside it and runs once the HTML is parsed; scripts the loader adds run as soon as they arrive | The loader, the consent stack, the newsletter, the header's account menu, chat |
+| **Lazy** | An `IntersectionObserver` with a margin (400–600 px) starts the component only as the visitor scrolls near it | The 3D model viewers and the scroll story — the heavy parts |
+| **On demand** | The loader adds a `<script>` only when the page has the element it serves, and never twice | The newsletter script is added only if a newsletter form exists |
+
+**State without a state manager.** Each piece of state lives in the one place that already holds it:
+
+| State | Lives in |
+|---|---|
+| Sending, so a double click does not post twice | An attribute on the form: `data-sending` |
+| The button while sending | The button's own `disabled` and its label, restored afterwards |
+| When each box was ticked | An attribute on the box: `data-checked-at` |
+| Webflow's drawn checkbox matching the real one | A class on the drawn box: `w--redirected-checked` |
+| The visitor's consent regime | Fetched once from the Worker into a variable inside the component; an unknown region gets the stricter rules |
+| Anything durable | Xano |
+
+The DOM is the store. Webflow's own classes and blocks are the view. Nothing here needs synchronising, because nothing is kept in two places.
+
+**TypeScript, shipped as plain JavaScript.** The embeds are written as plain JavaScript and served exactly as written. TypeScript runs in the Worker's `typecheck` script with `checkJs` and `noEmit`: it reads the JavaScript, checks it against the Worker's types, and produces no output. So the file that is tested is the file that is served, a Webflow embed is plain JS, HTML and CSS — the component's styles are a string it injects once, scoped under `[data-ondol-form]` — and there is no compiled bundle to fall out of date. The one generated file, `ondol-bundle.js`, is a concatenation of these modules for pasting into a Webflow Embed, not a transpile.
+
 ### A/B gating: Xano decides, the Worker serves, a vanilla loader picks
 
 The same split extends to experiments without adding a testing vendor's script to every page. This is a proposed pattern, not yet built into Ondol Life, and it uses only the pieces above:
