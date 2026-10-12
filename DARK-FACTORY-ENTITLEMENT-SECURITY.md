@@ -135,6 +135,8 @@ The enterprise default is the single bundle: a Java WAR or EAR, a content packag
 
 Typed JSON records answer it directly. Each record is addressable by its own key, validated against a published schema, readable as text, and small enough to carry its own grant. An agent can be given exactly one record under exactly one capability, and what it was given can be ledgered by the byte. It is the Shopify Functions contract again, typed JSON in and typed JSON out, applied to data at rest instead of code in flight.
 
+The deeper difference is where each model decides that data can be trusted. Shopify's Catalog and its Wasm Functions run on **JSON arriving in real time from a live endpoint**: every invocation receives a typed payload, checks it against a schema, and earns its permission on that request, so where the data came from is established fresh each time. The single bundle assumes the opposite. **Its data's shape and origin are taken as permissioned by the architecture boundary** — the object came from inside the application, so it is trusted, and nothing is re-checked once it is past the perimeter. Trust by location held while the boundary held. An agent reads from outside it, at AI speed, and a deserialisation flaw like Cityworks' is exactly an attacker's object arriving through a door the architecture had already marked as inside.
+
 | Long-run requirement | Typed JSON records | Single Java bundle |
 |---|---|---|
 | Hand an agent one item | One record, one key, one grant | The app's API or the app's authority — usually the whole of it |
