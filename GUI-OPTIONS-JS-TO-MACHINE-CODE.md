@@ -431,19 +431,45 @@ Three rules keep it honest:
 
 #### The same gate for market rules — with one difference
 
-The mechanism carries over directly to *if US, if Korea*: which form rules, newsletter rules and payment components load for a visitor. The difference is that **a market rule is not an experiment**. It is never a percentage split, it is never left to a variant record someone might edit for a test, and when the market is unknown it **fails toward the stricter rules**, not toward the default. The Worker already works this way: it resolves the visitor's consent regime on the server, and the newsletter handler treats an unknown region as needing the Korean disclosure.
+The mechanism carries over directly to *if US, if Korea, if Canada*: which form rules, newsletter rules and payment components load for a visitor. The difference is that **a market rule is not an experiment**. It is never a percentage split, it is never left to a variant record someone might edit for a test, and when the market is unknown it **fails toward the stricter rules**, not toward the default. The Worker already works this way: it resolves the visitor's consent regime on the server, and the newsletter handler treats an unknown region as needing the Korean disclosure.
 
 Most market differences are *rules*, and rules are data, so they belong in one compiled bundle, read from the Worker at load time:
 
-| Rule | United States | Korea |
-|---|---|---|
-| Where the sign-up is stored | The US Xano | The Korea team's Xano, once configured — the data stays in Korea |
-| Cross-border disclosure | None | Until Korean storage is live: the itemised disclosure and its own required box, in the Webflow form |
-| Consent model | Opt-out, honouring Global Privacy Control | Opt-in before collection |
-| Language | English | Korean, including error and confirmation text |
-| If the rules cannot load | — | The form says so and the button stays off |
+| Rule | United States | Korea | Canada |
+|---|---|---|---|
+| Where the sign-up is stored | The US Xano | The Korea team's Xano, once configured — the data stays in Korea | The US Xano |
+| Cross-border disclosure | None | Until Korean storage is live: the itemised disclosure and its own required box, in the Webflow form | None itemised |
+| Consent model | Opt-out, honouring Global Privacy Control | Opt-in before collection | Opt-in (CASL), and the sign-up counts only after the confirmation email is clicked |
+| Language | English | Korean, including error and confirmation text | English; French for Quebec is not built |
+| If the rules cannot load | — | The form says so and the button stays off | Same as Korea |
 
 Changing any of these is a record or configuration change, with no compile. Separate, namespaced bundles are for *code* that only one market needs — the Kakao Pay buy button is the example, loaded only where Kakao Pay is offered — so a US visitor never downloads it at all. The test is the one this whole section uses: if it is a rule, fetch it; if it is code, compile it, and let the server decide which code a market receives.
+
+#### Korea, US, Canada as a closed type
+
+Rust and Elm have no directives — `v-if` and `ng-if` belong to Vue and Angular. What they have is better for market rules: a **closed type**, a list of markets the compiler knows is complete, and a `match` (Elm: `case`) that must answer for every one of them.
+
+```rust
+enum Market { Korea, Us, Canada }
+
+fn newsletter_rules(m: Market) -> Rules {
+    match m {
+        Market::Korea  => Rules { consent: OptIn,  confirm_by_email: false, cross_border_box: true,  lang: Ko },
+        Market::Us     => Rules { consent: OptOut, confirm_by_email: false, cross_border_box: false, lang: En },
+        Market::Canada => Rules { consent: OptIn,  confirm_by_email: true,  cross_border_box: false, lang: En },
+    }
+}
+```
+
+Add `Canada` to the enum and the build fails until every rule says what Canada gets. That is the whole benefit, and it is not a style preference. The Ondol Worker keeps its opt-in markets in a JavaScript `Set`, and a set has no idea what is missing from it: Canada was not in it, so Canadian visitors fell through to the default — opt-out, every Google Consent Mode signal starting *granted*, and eligible for ad audiences before they had agreed to anything. Under CASL, Canada's anti-spam law, marketing email generally needs express consent first. A `match` would have refused to compile; the `Set` said nothing.
+
+The fix was three lines of data, which is the point of rules-as-data — no new bundle, no new component:
+
+- **Worker:** `CA` joins the opt-in list. A Canadian visitor now starts with `ad_user_data` and `ad_personalization` denied and is not audience-eligible until they say yes. The Worker does not resolve provinces, so treating all of Canada as opt-in also covers Quebec's stricter Law 25.
+- **Xano:** `CA` joins the double-opt-in list. CASL puts the burden of proving consent on the sender, and the click on the confirmation email is that proof.
+- **A test** that asks the live route for US, Korea, Germany, Canada and an unknown country, and fails if any of them starts on the wrong side.
+
+The JavaScript still cannot tell you that a fourth market is missing; only that test can, for the markets it names. That is the honest trade: in Rust or Elm the compiler checks completeness for free, and in JavaScript a test has to.
 
 One browser detail decides how components are namespaced. A custom element's tag name can be defined only once per page, so if both variants define `<ondol-newsletter>`, the loader must make sure only one of them ever loads. Variants that need to coexist on a page, for a side-by-side preview, take namespaced tags such as `<ondol-newsletter-b>`.
 
