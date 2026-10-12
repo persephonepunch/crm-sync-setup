@@ -295,6 +295,54 @@ Neither moves the trust boundary. The island asks through a port and the Worker 
 
 egui is still the right call when the browser's free features do not matter and rendering does: CAD, page layout, 3D editors, and one Rust codebase shipped to both desktop and web, as CADCraft and DesignCraft are. Those are applications that happen to run in a tab. A site of content, products and a few interactive tools is not, and for that the gentle path fits: Webflow for the pages, an Elm island where one tool's state gets complicated, and Rust where the safety limits live.
 
+## Updating: what recompiles, and how the Worker reaches Webflow
+
+Every compiled option raises the same practical question: when something changes, is it a rebuild? For code, yes. For data, no. Designing for that split decides how often anyone has to touch a compiler.
+
+### A Wasm dashboard
+
+| Change | Recompile? | Why |
+|---|---|---|
+| Rust logic, components, a new chart type | Yes | The code is compiled into the `.wasm` file |
+| Markup inside `rsx!` or `view!` | Often not, while developing | Dioxus and Leptos can hot-reload markup edits without a full rebuild |
+| CSS in a separate stylesheet | No | The browser loads it on its own |
+| The dashboard's data — orders, leads, sensor readings | No | Fetched at runtime from the Worker or Xano as JSON |
+| Settings, flags, labels, translations | No, if loaded as JSON at startup | Yes only if they were compiled in as constants |
+
+In development, `trunk serve` (Yew, egui), `dx serve` (Dioxus) and `cargo leptos watch` (Leptos) rebuild on save, and incremental builds take seconds; the first build and an optimised release build take longer. On deploy, a code change produces a new `.wasm` file with a content-hashed name, so browsers fetch it instead of a cached copy. Data changes go live the moment the API returns them. **Compile the logic, fetch the data** — the same rule as the [JSON-records section](DARK-FACTORY-ENTITLEMENT-SECURITY.md#the-long-run-ai-requirement-json-records-not-a-single-java-bundle) of the Dark Factory article. The other compiled pieces follow it too: the TypeScript Worker is rebuilt and redeployed with `wrangler deploy`, and a Shopify Function is recompiled and published as a new app version with `shopify app deploy`.
+
+### The Worker compiles; Webflow's head and footer only load
+
+Webflow's site-wide **Head code** and **Footer code** are the obvious place for behaviour, and the worst place to keep it: pasted code there has no build, no tests, no version history and no review. So the stack keeps exactly one line in Webflow and everything else in the Worker:
+
+```html
+<!-- Webflow → Site settings → Custom code → Footer code. The only line written in Webflow. -->
+<script src="https://<worker>/embed/webflow-preview.js" data-sitekey="<turnstile site key>" defer></script>
+```
+
+The loader reads the Worker's address from its own `src`, so that line is the only place the address is written. Everything it loads — the header's account menu, the chat launcher, the newsletter form handler — is built and served by the Worker:
+
+- **Source.** Components are ES modules in the repository, and header and footer markup are design files. Both are the source of truth.
+- **Compile.** A build step turns them into what the Worker serves. Design HTML is `JSON.stringify`-ed into a generated TypeScript module, which is immune to the backticks, `${` and backslashes that break hand-pasted code. The modules can also be flattened into one classic-script bundle, with each component in its own scope, for pages that need a single embed. Generated files say so at the top and are never edited by hand.
+- **Ship.** `wrangler deploy`. The new header, footer or form behaviour is live on the next page load, with no change in Webflow.
+
+The built Eleventy site and Webflow's own `.webflow.io` copy stay in step through the same mechanism. On the built site, the Beautiful Soup sync swaps marked elements for components at build time. Webflow's hosted copy is never built, so the loader performs the same swap in the browser — and on the built site it finds nothing left to swap and does nothing.
+
+### Webflow components: who designs, who decides
+
+| Component | Webflow owns | The Worker's code owns | Change it by |
+|---|---|---|---|
+| **Header** | Layout, logo, navigation, an empty element marked `component-account` | The `<ondol-header>` account menu that replaces that element: sign-in, session | Design: publish in Webflow. Behaviour: rebuild and deploy |
+| **Footer** | Layout, links, the newsletter form's design | The chat launcher, the newsletter submission, consent | Same split |
+| **Form** | The fields, the button, the success block (`.w-form-done`) and the error block (`.w-form-fail`), and their text | The **submission only**: it detaches Webflow's handler from that one form, posts to Xano — or to the form's own `action` when the designer set one — and then shows Webflow's own success or error block | Copy and layout in Webflow; endpoint and rules in code |
+| **Validation** | The browser check: `required` fields and boxes stop an empty or unticked submission before anything is sent | **The real check**, in the Worker and Xano: the email, the consent, and in Korea the itemised cross-border disclosure and its own required box | The browser check is courtesy; the server check is the authority |
+| **Load** | Nothing beyond the one loader line | Deferred scripts, each component defined once, one run per page even when two addresses load it, Google tags only after consent, all within the Content-Security-Policy | Rebuild and deploy |
+| **State** | None that matters | Interface state in the component — the button disables while sending and comes back if Xano refuses; durable state in Xano; the visitor's consent regime from the Worker | Records change in Xano with no compile at all |
+
+Two details carry the rest. Webflow's own spam protection is removed from forms the Worker handles: it waits for a Turnstile token issued for `webflow.io`, which never arrives on the real domain, so it would leave the button permanently disabled. Abuse is handled where it can be enforced instead — Xano rate-limits sign-ups by IP, and EU sign-ups are confirmed by email before they count. The browser also applies the same email rule Xano does, so a mistake shows before anything is sent. And every one of these behaviours is pinned by an end-to-end test against Webflow's real markup — that Xano is posted to rather than Webflow, that Webflow's error block keeps the designer's text and the button returns, that a Korean visitor sees the disclosure in the form — so a designer's edit in Webflow and a code change in the Worker are checked against the same page.
+
+**The pattern in one line:** Webflow designs every component, and the Worker decides what each one does. Design changes publish from Webflow with no compile. Behaviour changes compile once, in the Worker, and reach every page through one line nobody edits.
+
 ## Choosing
 
 1. **Start with where the decision must live, not the interface.** If it can hurt someone or cost money, it goes in firmware (8), a sandbox (4) or behind the edge (1). The interface is chosen afterwards.
