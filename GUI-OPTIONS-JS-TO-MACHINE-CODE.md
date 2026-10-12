@@ -25,6 +25,7 @@ keywords:
   - wasm-bindgen
   - Leptos
   - Dioxus
+  - Yew
   - no_std
   - ESP32-C6
   - Content-Security-Policy
@@ -147,6 +148,23 @@ There is a sovereignty benefit as well. The customer's card and Kakao account da
 ### 5. Rust in the browser through WebAssembly
 
 **What it is.** Two shapes. **DOM frameworks** — Leptos, Dioxus, Yew — render ordinary HTML elements from Rust. **Canvas frameworks** — egui through eframe — draw the whole interface onto a canvas with WebGPU or WebGL. CADCraft's web build is the second kind: a full AutoCAD-style interface running from one Wasm module.
+
+The three DOM frameworks, defined by the choice each one makes:
+
+- **Leptos** — *fine-grained reactivity, no virtual DOM.* State lives in signals, and when a signal changes only the exact text or attribute that reads it is updated, the approach SolidJS made popular in JavaScript. It is built for full-stack work: the same Rust renders on the server, hydrates in the browser, and calls back to the server through *server functions*, typed Rust functions that the framework turns into HTTP endpoints. Closest to a Rust Next.js.
+- **Dioxus** — *React's model, many targets.* Components, hooks and an `rsx!` macro that reads like JSX, over a virtual DOM. Its distinguishing bet is reach: one codebase builds for the web, for desktop and mobile (through a system web view, much like Tauri), and for server rendering. Closest to a Rust React Native.
+- **Yew** — *the oldest of the three, and the one nearest Elm.* Its original component model was the Elm Architecture almost verbatim — a `Message` type and an `update` method — and it later added React-style function components and hooks, with an `html!` macro over a virtual DOM. It is aimed mainly at single-page applications in the browser.
+
+| | Leptos | Dioxus | Yew |
+|---|---|---|---|
+| Model | Signals, fine-grained updates | React-style components and hooks | Elm-style messages, then React-style hooks |
+| Virtual DOM | No | Yes | Yes |
+| Markup | `view!` macro | `rsx!` macro | `html!` macro |
+| Server rendering | Built in, with server functions | Built in, with server functions | Supported; browser-first |
+| Targets | Web (client and server) | Web, desktop, mobile, server | Web |
+| Nearest JavaScript relative | SolidJS / Next.js | React / React Native | React, with Elm roots |
+
+All three still load through a small `wasm-bindgen` glue file, and all three need `'wasm-unsafe-eval'` in a strict Content-Security-Policy. Unlike egui, they render ordinary HTML, so search engines and screen readers see a normal page.
 
 **What JavaScript remains.** A small generated glue file from `wasm-bindgen`. It cannot be zero, because Wasm reaches the browser's APIs through JavaScript.
 
@@ -293,4 +311,5 @@ egui is still the right call when the browser's free features do not matter and 
 - [Shopify Functions](https://shopify.dev/docs/apps/build/functions) — the sandbox options 4 and 8 are measured against.
 - [Kakao Pay developers](https://developers.kakaopay.com) — the ready and approve flow.
 - [PCI DSS document library](https://www.pcisecuritystandards.org/document_library/) — the self-assessment questionnaires, including SAQ A.
+- [Leptos](https://leptos.dev) · [Dioxus](https://dioxuslabs.com) · [Yew](https://yew.rs)
 - [The Elm Architecture](https://guide.elm-lang.org/architecture/) · [iced](https://iced.rs) · [egui](https://www.egui.rs) · [Slint](https://slint.dev) · [Tauri](https://tauri.app)
