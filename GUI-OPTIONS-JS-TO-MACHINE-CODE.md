@@ -471,6 +471,26 @@ The fix was three lines of data, which is the point of rules-as-data — no new 
 
 The JavaScript still cannot tell you that a fourth market is missing; only that test can, for the markets it names. That is the honest trade: in Rust or Elm the compiler checks completeness for free, and in JavaScript a test has to.
 
+#### CASL: what a North American newsletter sign-up needs
+
+The US and Canada sit side by side on the same form and run opposite laws. The US federal law, CAN-SPAM, is **opt-out**: a business may email first, so long as every message identifies the sender and the unsubscribe works. Canada's Anti-Spam Legislation (CASL) is **opt-in**, and among the strictest anywhere: no commercial email at all without consent first, and the sender must be able to prove it. CASL follows the recipient, not the sender — a US business emailing someone in Canada is covered.
+
+| Requirement | US (CAN-SPAM) | Canada (CASL) | Where the Ondol form stands |
+|---|---|---|---|
+| Consent before the first email | Not required | **Required.** Express consent: the visitor acts; a pre-ticked box does not count. Implied consent exists only for narrow cases such as a recent purchase or inquiry | The opt-in box starts unticked and Xano refuses a sign-up without it |
+| What the request must say | — | Why consent is sought, who is asking, how to contact them, and that consent can be withdrawn | The box's label and the terms it links to; the exact label text is stored with each sign-up |
+| Proof of consent | — | **The sender's burden** | Each sign-up records the box, the time it was ticked, the label and the terms version. Canadian sign-ups now also confirm by email (double opt-in) |
+| Every message | Sender, postal address, working unsubscribe | Sender, contact details, working unsubscribe, honoured within 10 business days | **Not built.** There is no unsubscribe link yet, and nothing sends the newsletter; both are required before the first issue |
+| Maximum penalty | Per-email civil penalties | Up to $10 million per violation for a business, $1 million for an individual | — |
+
+**Is it enforced?** Rarely, but there is precedent, and the precedent is the reason to comply rather than gamble:
+
+- **CompuFinder.** The CRTC's first contested case: a $1.1 million notice for emails sent without consent and with broken unsubscribes, reduced to $200,000. The company then challenged CASL itself; the Federal Court of Appeal held it constitutional in 2020 ([3510395 Canada Inc. v. Canada (AG), 2020 FCA 103](https://www.blg.com/en/insights/2020/07/federal-court-of-appeal-rules-casl-constitutionally-valid-and-provides-interpretive-guidance)), and the Supreme Court of Canada declined to hear an appeal ([summary](https://www.mltaikins.com/insights/supreme-court-of-canada-confirms-casl-is-constitutional)). The law's validity is settled.
+- **Plenty of Fish.** $48,000 for a technical failure alone — an unsubscribe mechanism that was not clear and simple enough — settled by undertaking ([summary](https://bennettjones.com/Blogs-Section/CRTC-Issues-$48000-Fine-for-Technical-Violation-of-CASL)). A business with consent can still be penalised for the unsubscribe.
+- **Since then, very little.** In 2023 the CRTC published one CASL enforcement action, against a phishing campaign ([2023 review](https://www.blg.com/en/insights/2024/01/canadas-anti-spam-legislation-2023-year-in-review)). Most matters close quietly as undertakings. The private right of action that would have let individuals sue was suspended before it took effect, so the regulator is the only enforcer.
+
+So the honest read is: low probability, settled law, high ceiling, and the cheapest violations to prove are the technical ones — no record of consent, an unsubscribe that does not work. Those are exactly the parts a form and a database can get right once, which is why this codebase does consent as data and leaves no market to a default. This is a summary for engineers, not legal advice; confirm the specifics with counsel before the first send.
+
 One browser detail decides how components are namespaced. A custom element's tag name can be defined only once per page, so if both variants define `<ondol-newsletter>`, the loader must make sure only one of them ever loads. Variants that need to coexist on a page, for a side-by-side preview, take namespaced tags such as `<ondol-newsletter-b>`.
 
 **The pattern in one line:** Webflow designs every component, and the Worker decides what each one does. Design changes publish from Webflow with no compile. Behaviour changes compile once, in the Worker, and reach every page through one line nobody edits.
