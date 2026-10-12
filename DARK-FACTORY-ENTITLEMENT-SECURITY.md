@@ -156,6 +156,35 @@ None of this is *rewrite the Java*. The JVM is a runtime, not a boundary, and a 
 
 Which leaves the obvious objection: if data and assets are always streaming, what is ever guaranteed? Nothing, up front, and that is the point. A stream cannot be proven safe in advance, so **security moves from a one-time guarantee to a per-request one**. Every payload is validated against its schema at the edge, with size and depth caps, and rejected rather than repaired; every asset is typed from its bytes, served `nosniff`, and rendered inline only from an allow-list. The data streams, but **the code does not**: a Content-Security-Policy with nonces or hashes, Subresource Integrity on anything third-party and Trusted Types on the DOM mean only scripts pinned in advance can run, whatever arrives alongside them. Each request runs where a bad one costs little — a Wasm sandbox or an isolate with no filesystem and no ambient network, reaching only what it was bound to and disclosing only what was granted. And every serve is ledgered and every grant is short-lived, so a leak is a fact you can look up and a rotation that ends it in seconds, not a recall. The bundle earned trust once, at compile time, and kept it. The stream earns it on every request, and loses it the moment a request fails.
 
+## One architecture, two trust models: Elm, iced and Webflow + Xano
+
+The JSON-versus-bundle argument has a cleaner illustration than any enterprise platform: the same application architecture, built once inside a compiler and once across a network.
+
+**The Elm Architecture** — and **iced**, the Rust GUI library modelled on it — has four parts. *State* is the single source of truth. A *Message* is a typed description of something that happened. *update(state, message)* is the only place state may change. *view(state)* draws the interface and can change nothing. A Webflow front end on a Xano backend has the same four parts, spread across two services and the internet:
+
+| The Elm Architecture | Role | Webflow + Xano |
+|---|---|---|
+| State (`struct App`) | The single source of truth | Xano tables — the records are the state |
+| Message (`enum Message`) | A typed account of what happened | The JSON request to an endpoint, `POST /lead {…}` |
+| `update(state, message)` | The only place state changes | The endpoint's function stack: validate, then write |
+| `view(state)` | Renders, mutates nothing | Webflow pages, CMS bindings and embeds reading Xano |
+
+The shared discipline is real. Data flows one way: a click never edits a record, it sends a message, and the update decides. The view is disposable, which is why the same backend can sit behind Webflow, 11ty or a native app. And messages have a closed shape.
+
+The difference is **where that shape is enforced**, and it is the whole of this article in one comparison. In iced, `Message` is a Rust enum: a message the program does not declare cannot be constructed, and the compiler proves it before anything runs. `update` trusts its input because its input could only have come from its own code. That is the single-bundle model at its most honest — trust by compile, inside one process, and correct *because* nothing crosses a boundary. Webflow + Xano has no such proof. The endpoint's declared inputs play the enum's part, but anyone on the internet can send a request, so the guarantee the compiler gives iced for free has to be re-earned on every call: schema validation, a capability check, a grant per record. State lives in a shared database, read by people and agents alike, rather than in one process's memory. **Same architecture; the compiler's guarantee becomes the edge's job.**
+
+### SVG: a picture, or a program
+
+The setup section called SVG a picture that executes. That is a property of the renderer, not the format. A browser rendering an SVG document will run its scripts and fetch its references. Elm draws SVG through its own virtual DOM — `elm/svg` views are typed values, not strings — and Elm's virtual DOM refuses `<script>` elements, inline `on*` handlers and `javascript:` URLs outright, so a view cannot be talked into executing what it displays. On the Rust side, **resvg** (with its parser, usvg) renders SVG as a static picture: it implements no scripting and no animation, and with external references switched off an SVG becomes geometry and paint and nothing more. The file did not change. The runtime denied it — the Shopify Functions principle again, at the scale of one image.
+
+### The Adobe-clone case: an InDesign in Rust
+
+The clearest working example is a desktop one. **DesignCraft** is an open-source InDesign clone written in Rust — the same File menu, IDML and EPUB export, Print Booklet, an Interactive panel — and its binary names its parts: **egui** for the interface, **usvg/resvg** for SVG, **quick-xml** and **roxmltree** for XML, **krilla** and **pdf-writer** for PDF, **rustybuzz** and **skrifa** for type. (egui is immediate-mode — it redraws the interface from state every frame rather than dispatching messages through an `update` — so it shares Elm's state-drives-view rule without the typed message log.)
+
+A layout application is the parser pole in its purest form. Its entire job is to open files other people made: IDML, which is zipped XML; placed SVG, PDF and images; fonts. In C++, each of those parsers carries the memory-corruption class that produced a decade of ImageMagick and font-engine advisories, and Rust removes that class at compile time. It does not remove the logic class. roxmltree resolves no external entities, which closes XXE by design, but an IDML archive still needs a decompression cap, a placed SVG still needs its external references off, and a font is still a program for a hinting engine. Outbound, the question reverses: an *interactive* PDF export can carry actions that the reader's viewer will run, so what a layout tool writes deserves the same allow-list as what it reads.
+
+That is the Adobe use case reduced to the article's terms. Rust makes the parser memory-safe; it does not make the file trustworthy. A desktop tool can lean on the compiler because its boundary is one machine and one user. **The moment the same layouts are served to a storefront or handed to an agent, the boundary is the network again**, and the per-request rules above apply to every page, every SVG and every PDF it produces.
+
 ## The exception that proves it: Shopify Functions
 
 If executable content is an attack surface by definition, consider the case that ought to be the
