@@ -341,6 +341,22 @@ The built Eleventy site and Webflow's own `.webflow.io` copy stay in step throug
 
 Two details carry the rest. Webflow's own spam protection is removed from forms the Worker handles: it waits for a Turnstile token issued for `webflow.io`, which never arrives on the real domain, so it would leave the button permanently disabled. Abuse is handled where it can be enforced instead — Xano rate-limits sign-ups by IP, and EU sign-ups are confirmed by email before they count. The browser also applies the same email rule Xano does, so a mistake shows before anything is sent. And every one of these behaviours is pinned by an end-to-end test against Webflow's real markup — that Xano is posted to rather than Webflow, that Webflow's error block keeps the designer's text and the button returns, that a Korean visitor sees the disclosure in the form — so a designer's edit in Webflow and a code change in the Worker are checked against the same page.
 
+### A/B gating: Xano decides, the Worker serves, a vanilla loader picks
+
+The same split extends to experiments without adding a testing vendor's script to every page. This is a proposed pattern, not yet built into Ondol Life, and it uses only the pieces above:
+
+1. **Xano decides the variant.** A conditional in an endpoint's function stack — if this subject is eligible and their hashed ID falls in the first half, then `b`, else `a` — reads the split from an experiment *record*, not from code. Eligibility is part of the same decision: market, signed-in or not, and whether the visitor's consent allows the result to be measured. Because the subject's ID is hashed, the same visitor always gets the same variant.
+2. **The Worker serves both builds under namespaced paths.** Both variants are compiled ahead of time and deployed together, each under its own immutable path — `/embed/exp/newsletter-copy/a/newsletter.js` and `.../b/newsletter.js`. Same origin, so the Content-Security-Policy does not change. The Worker asks Xano once per subject and caches the answer, so a page load does not wait on the database.
+3. **A vanilla loader picks.** The one loader line in Webflow's footer is unchanged. It asks the Worker for the assignment and loads the matching path — plain JavaScript, no framework, nothing to install.
+
+Three rules keep it honest:
+
+- **A variant changes presentation, never authority.** It may change copy, layout or the order of steps. It may not change a price, a limit, a consent requirement or what the server accepts — the Worker and Xano validate both variants identically. The thermostat's boundary applies: a gate may change what a feature looks like, never move a ceiling.
+- **The assignment is made on the server.** A coin flip in the browser is fine for a colour and useless for anything that matters, because the visitor controls it. Xano's answer is the one that counts.
+- **Rollback is a record change.** Set the split to 100% `a` in Xano and every visitor is back on the original at the next page load, with no compile and no deploy. Ending an experiment is a deploy that removes the losing path.
+
+One browser detail decides how components are namespaced. A custom element's tag name can be defined only once per page, so if both variants define `<ondol-newsletter>`, the loader must make sure only one of them ever loads. Variants that need to coexist on a page, for a side-by-side preview, take namespaced tags such as `<ondol-newsletter-b>`.
+
 **The pattern in one line:** Webflow designs every component, and the Worker decides what each one does. Design changes publish from Webflow with no compile. Behaviour changes compile once, in the Worker, and reach every page through one line nobody edits.
 
 ## Choosing
