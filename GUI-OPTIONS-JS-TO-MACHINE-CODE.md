@@ -29,6 +29,9 @@ keywords:
   - ESP32-C6
   - Content-Security-Policy
   - wasm-unsafe-eval
+  - Kakao Pay
+  - PCI DSS
+  - SAQ A
 about:
   - GUI architecture
   - JavaScript and TypeScript dependencies
@@ -99,6 +102,47 @@ So you can keep your JavaScript and TypeScript. What changes is the job they are
 **The trade.** An interpreter inside Wasm costs instructions that compiled Rust does not, so on large carts a JS function reaches Shopify's limits sooner. The usual path is to start in JavaScript with Javy, where the team already works, and move a function to Rust when the numbers say so. The sandbox is the same either way.
 
 **Fits.** Every checkout rule a merchant needs, written by a team that does not write Rust.
+
+#### A Javy build is not a safer import — it is a narrower one
+
+It is tempting to read Javy as a more secure way to `import` JavaScript. It is not an import mechanism at all, and it does not make code safer. The bundler resolves every `import` at build time, Javy compiles the bundle and a JavaScript engine into one Wasm module, and the code inside is exactly as buggy, or as hostile, as it was before. What changes is what it can reach:
+
+| | `import` in a browser page | JavaScript compiled with Javy, run by Shopify |
+|---|---|---|
+| When imports resolve | At runtime; the browser may fetch modules from URLs | At build time; everything is bundled, nothing is fetched later |
+| What the code can reach | Whatever the page can: the DOM, readable cookies, `fetch` to any origin the CSP allows | Only the JSON it is handed; it can only return JSON |
+| A malicious dependency could | Read the page, skim form input, send it elsewhere | Return a wrong discount, which Shopify still checks against what that extension point may change |
+| An infinite loop | Freezes the tab | Hits the instruction limit and is stopped |
+| Safety comes from | The CSP, SRI and the author's care | The sandbox the module runs in |
+
+Run the same module in a host that grants network or file access and none of the right-hand column holds. **The sandbox makes it safe, not the compiler.**
+
+The guarantee is an allow-list in both directions. On the way in, each Function declares a GraphQL **input query** naming exactly the fields it receives — cart lines, prices, customer tags — and nothing outside that query reaches the code. On the way out, it may only return operations from its extension point's schema, and Shopify rejects anything else. It is not a stream: each run is one payload in, one result out, and the Function keeps nothing afterwards.
+
+In Rust's terms, the Function is handed a **shared borrow** of the cart and returns *proposed* changes, while Shopify keeps the only mutable reference and applies them itself:
+
+| Rust ownership | Shopify Function |
+|---|---|
+| `&T` — read, never change | The input JSON: the cart can be read, not edited |
+| Only the owner holds `&mut T` | Shopify owns the cart and applies changes itself |
+| The borrow ends with the scope | The Function exits after one call and keeps nothing |
+| Checked by the **compiler**, before anything runs | Checked by the **sandbox**, on every call |
+
+The last row is the difference that matters. Ownership is a compile-time rule about memory inside one program. Shopify's is a runtime rule between two parties, which is why it holds just as well for JavaScript, a language with no ownership at all. **A Function is an allow-listed, read-only borrow of the cart: it sees only what it asked for, can only propose, and Shopify keeps sole ownership.**
+
+#### The same shape at the payment: separate wallets such as Kakao Pay
+
+Payment wallets apply the same pattern one step later, to the most sensitive data in the transaction. Kakao Pay is a separate, Korean-regulated payment service that runs its own authentication and holds its own card and account data. The Ondol Life Worker integrates it in two server-side calls:
+
+1. **Ready.** The Worker sends the order total to Kakao Pay with a secret key that never leaves the Worker, and receives a transaction ID and a redirect URL. The transaction ID is stored server-side, because a transaction ID in a query string is a payment anyone can complete.
+2. **The customer pays inside Kakao Pay** — its app or its page, under its authentication. The card number is entered there, or was stored there already.
+3. **Approve.** Kakao Pay returns the customer with a one-time token, and the Worker exchanges the token and the stored transaction ID for the approved result.
+
+At no point does a card number reach the page, the Worker, Xano or Shopify. The merchant receives an approval and an amount — the read-only borrow again — while the wallet keeps sole ownership of the card. Shopify's own checkout works the same way for cards: the storefront never handles a card number.
+
+That is what narrows PCI DSS scope. PCI obligations follow the systems that store, process or transmit cardholder data, so a merchant that only redirects to a wallet and receives a result has far less in scope than one whose pages take card numbers — typically the shortest self-assessment, SAQ A, rather than a full one. Scope narrows; it does not disappear. The merchant still secures the pages that launch the redirect, the secret key, and the approve step, which is why the redirect host must be registered with Kakao Pay and the key is held only by the Worker. The wallet's own compliance is the wallet's: Kakao Pay is supervised under Korea's electronic-finance rules, and a merchant whose acquirer asks for evidence of PCI DSS compliance should request the provider's attestation directly rather than assume it.
+
+There is a sovereignty benefit as well. The customer's card and Kakao account data stay with a Korean provider under Korean regulation. Ondol Life's own systems receive only what the approval contains, which is what lets the Korean launch keep personal data in Korea without moving card data across a border it was never going to cross.
 
 ### 5. Rust in the browser through WebAssembly
 
@@ -247,4 +291,6 @@ egui is still the right call when the browser's free features do not matter and 
 - [*Why I'm so bullish about Rust in 2026*](https://youtu.be/WhjEL817Onw) — Dreams of Code (video).
 - [Javy](https://github.com/bytecodealliance/javy) — JavaScript to WebAssembly, the toolchain behind JavaScript Shopify Functions.
 - [Shopify Functions](https://shopify.dev/docs/apps/build/functions) — the sandbox options 4 and 8 are measured against.
+- [Kakao Pay developers](https://developers.kakaopay.com) — the ready and approve flow.
+- [PCI DSS document library](https://www.pcisecuritystandards.org/document_library/) — the self-assessment questionnaires, including SAQ A.
 - [The Elm Architecture](https://guide.elm-lang.org/architecture/) · [iced](https://iced.rs) · [egui](https://www.egui.rs) · [Slint](https://slint.dev) · [Tauri](https://tauri.app)
