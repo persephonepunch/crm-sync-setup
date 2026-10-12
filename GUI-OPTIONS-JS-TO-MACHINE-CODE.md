@@ -339,7 +339,22 @@ The built Eleventy site and Webflow's own `.webflow.io` copy stay in step throug
 | **Load** | Nothing beyond the one loader line | Deferred scripts, each component defined once, one run per page even when two addresses load it, Google tags only after consent, all within the Content-Security-Policy | Rebuild and deploy |
 | **State** | None that matters | Interface state in the component — the button disables while sending and comes back if Xano refuses; durable state in Xano; the visitor's consent regime from the Worker | Records change in Xano with no compile at all |
 
-Two details carry the rest. Webflow's own spam protection is removed from forms the Worker handles: it waits for a Turnstile token issued for `webflow.io`, which never arrives on the real domain, so it would leave the button permanently disabled. Abuse is handled where it can be enforced instead — Xano rate-limits sign-ups by IP, and EU sign-ups are confirmed by email before they count. The browser also applies the same email rule Xano does, so a mistake shows before anything is sent. And every one of these behaviours is pinned by an end-to-end test against Webflow's real markup — that Xano is posted to rather than Webflow, that Webflow's error block keeps the designer's text and the button returns, that a Korean visitor sees the disclosure in the form — so a designer's edit in Webflow and a code change in the Worker are checked against the same page.
+Two details carry the rest. Webflow's own spam protection is removed from the newsletter form: it waits for a Turnstile token issued for `webflow.io`, which never arrives on the real domain, so it would leave the button permanently disabled. Abuse is handled where it can be enforced instead — Xano rate-limits sign-ups by IP, and EU sign-ups are confirmed by email before they count. The browser also applies the same email rule Xano does, so a mistake shows before anything is sent. And every one of these behaviours is pinned by an end-to-end test against Webflow's real markup — that Xano is posted to rather than Webflow, that Webflow's error block keeps the designer's text and the button returns, that a Korean visitor sees the disclosure in the form — so a designer's edit in Webflow and a code change in the Worker are checked against the same page.
+
+#### Which forms still need the Turnstile checkbox
+
+Removing Webflow's checkbox from the newsletter does not mean the site has no Turnstile. Turnstile is Cloudflare's checkbox (reCAPTCHA is Google's), and the Worker checks a token from its own widget, on the real domain, wherever a form can be turned into a weapon or a cost:
+
+| Form | Turnstile | Why |
+|---|---|---|
+| **Newsletter** | No | Webflow's widget is bound to `webflow.io` and can never pass on the real domain. A sign-up sends nothing and buys nothing, so Xano's per-IP rate limit and email confirmation for EU sign-ups are enough |
+| **Email sign-in link** | Yes, before anything is sent | Without it, the endpoint mails a link to any address typed in — a free way to flood someone's inbox from your domain |
+| **Order and inquiry** | Yes | The buy button can be embedded on any site, so an order could be created from anywhere. Every site that embeds it must be on the widget's hostname list |
+| **Loyalty enrolment** | Yes | Same discipline as leads |
+
+Turnstile is anti-abuse, not a security boundary. It raises the cost of volume; it does not decide what may be stored. The consent gate and the content-address check hold with it switched off, which is why the Worker lets requests through when Turnstile is unconfigured — and logs every time it does. A consent gate that let requests through would be a violation; a bot filter that does is a site that still works.
+
+If the newsletter ever does attract sign-ups the rate limit lets through, the fix is the same as on the other forms: a Turnstile widget registered for the real domain, with the Worker verifying the token. Switching Webflow's checkbox back on would only bring back the disabled button.
 
 ### A/B gating: Xano decides, the Worker serves, a vanilla loader picks
 
