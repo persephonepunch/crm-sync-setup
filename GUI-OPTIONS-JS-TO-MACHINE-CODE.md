@@ -295,6 +295,58 @@ Neither moves the trust boundary. The island asks through a port and the Worker 
 
 egui is still the right call when the browser's free features do not matter and rendering does: CAD, page layout, 3D editors, and one Rust codebase shipped to both desktop and web, as CADCraft and DesignCraft are. Those are applications that happen to run in a tab. A site of content, products and a few interactive tools is not, and for that the gentle path fits: Webflow for the pages, an Elm island where one tool's state gets complicated, and Rust where the safety limits live.
 
+## Elm in a design tool: inside an InDesign panel, beside DesignCraft
+
+The Webflow pattern — a host that owns the page, an Elm island that owns its state, typed messages between them — carries over to desktop publishing. Whether the island goes *inside* the tool or *beside* it depends on one thing: whether the tool has a web engine to put it in.
+
+### InDesign: Elm inside a UXP panel
+
+| InDesign extension type | Does Elm run? | Notes |
+|---|---|---|
+| **UXP plugin panel** (current; Adobe's replacement for CEP) | Yes — best inside a `<webview>` in the panel | UXP's own interface implements only part of the browser DOM, and inline SVG is limited. A webview gives Elm a full browser engine, so Elm and `elm/svg` behave as on the web. Confirm the InDesign version supports webviews in panels, and declare it in the plugin manifest |
+| **CEP extension panel** (older, Chromium-based) | Yes, unchanged | Full Chromium, so any Elm app works. CEP is being phased out; don't start new work on it |
+| **Interactive documents** (Publish Online, fixed-layout EPUB, HTML5 animation) | Barely | These live inside the exported document, not in InDesign. Script support is narrow and differs by reader |
+
+```
+Elm app (webview)  ──port: Msg out──►  UXP plugin JS  ──►  require("indesign") DOM
+                   ◄──port: data in──                  ◄──  selection, pages, styles
+```
+
+- **Elm keeps the panel's state**, in its model, changed only through `update` — no state-manager library, as in the Webflow form.
+- **Elm cannot reach InDesign.** It can only send messages you defined, such as `ApplyStyle "Heading 1"` or `PlaceAsset id`, through a port.
+- **The plugin JS is the allow-list.** Only it can call `require("indesign")`, and it decides which messages become document changes: Elm proposes, the host decides — the Shopify Functions and Webflow shape again.
+- **Data coming in is decoded.** JSON crossing the port goes through Elm's typed decoders, so a malformed payload is refused at the border instead of crashing the panel.
+
+It suits panels that are mostly forms and state: an asset picker, a style or pre-flight checklist, a CRM or catalog lookup feeding a layout. Limits: the plugin still needs its JS layer; a webview costs load time and memory against native UXP controls; and a plugin ships through Adobe's packaging and marketplace, not a script tag.
+
+### DesignCraft: Elm beside an egui app
+
+DesignCraft, the open-source InDesign clone in Rust (v0.6.0, examined from the installed app), is the opposite case. It is built on **egui** (`egui`/`eframe` 0.36.2, drawn with `wgpu`) — the "total" option above, every pixel Rust — and **no web engine is compiled in**: no `wry` or other WebView, no JavaScript engine. There is nowhere inside it to load Elm; a panel there is egui code.
+
+What it has instead are two doors, both taking data rather than code:
+
+- **Window → Interactive → Scripts** runs **JSON command lines** — `command.id {json}`, one per line or as a JSON array, with `$N.path` referring to an earlier command's result — not JavaScript or ExtendScript. Objects are found by **script label** (`object.findByLabel`), so scripts and agents address frames by name.
+- **A control server**, started with `--control` or `DESIGNCRAFT_CONTROL_PORT`, listening on `127.0.0.1` only. Each request is a JSON object with `method` and `params`; anything else is refused ("not a control request … closing the connection"), and the number of connections is capped.
+
+So the Elm app runs next to it and drives it:
+
+```
+Elm UI (Tauri window or browser)
+   └─ port: Msg ──► small bridge (Tauri command / local process)
+                       └─ {"method": …, "params": …} ──► DesignCraft control server (127.0.0.1)
+```
+
+The bridge is needed because the control server appears to be a raw local socket, which a browser page cannot open. Tauri fits: its command allow-list becomes the list of DesignCraft methods the panel may call — the same arrangement as the thermostat app. The method names themselves are not readable from the binary; take them from the DesignCraft repository or `designcraft --help` before building against them.
+
+| | InDesign (UXP) | DesignCraft |
+|---|---|---|
+| Elm inside a panel | Yes, in a webview | No — egui has no web engine |
+| Elm beside it, driving it | Possible | Yes — JSON to the local control port |
+| Scripting language | JavaScript (UXP) | JSON command lines |
+| What the tool accepts from outside | Whatever the plugin's JS calls | Well-formed `{method, params}` only; no script code is run |
+
+That last row is the argument of the rest of this book in one line. InDesign extends by running more code inside it; DesignCraft extends by accepting command records — JSON with a fixed shape, from this machine, refused if malformed. The narrower door is the one built for an age of agents writing the requests.
+
 ## Updating: what recompiles, and how the Worker reaches Webflow
 
 Every compiled option raises the same practical question: when something changes, is it a rebuild? For code, yes. For data, no. Designing for that split decides how often anyone has to touch a compiler.
