@@ -1,6 +1,6 @@
 ---
 title: "SVG, Rust and Elm: the security gaps illustration"
-description: "One diagram that follows a single SVG file from source to base64 to the browser, through an Elm client, TLS, Cloudflare, Xano and a Rust service, two TLS pipelines, JVM, iPaaS and Wasm stacks, and VM, Docker and Kubernetes isolation — with 31 numbered gaps, where each appears, and the control that closes it."
+description: "One diagram that follows a single SVG file from source to base64 to the browser, through an Elm client, TLS, Cloudflare, Xano and a Rust service, two TLS pipelines, JVM, iPaaS and Wasm stacks, and VM, Docker and Kubernetes isolation — with 31 numbered gaps and their fixes, a second illustration of browser, machine and agent callers, the assumptions that break as a system adds commerce, goes global and becomes AI-legible, and a list of known foot guns."
 canonical: https://persephonepunch.github.io/crm-sync-setup/svg-rust-elm-security-gaps.html
 category: "Security"
 date: 2026-10-13
@@ -36,6 +36,11 @@ keywords:
   - confidential VM
   - PCI DSS
   - PHI
+  - prompt injection
+  - excessive agency
+  - MCP token passthrough
+  - AP2 mandate
+  - foot gun
 about:
   - Data security for PII, PCI and PHI
   - SVG and base64 encoding
@@ -154,6 +159,83 @@ Where each numbered circle appears, and the control that closes it.
 | 29 | Integration credentials are too broad | SAP S/4HANA (lane D) | Least privilege per interface; managed identity; rotation |
 | 30 | Checkout JavaScript gets skimmed | Magento (lane D) | Patch; CSP and Subresource Integrity; PCI DSS 4.0 script inventory |
 | 31 | Batch files sit in plaintext | SAP S/4HANA (lane D) | PGP-encrypt; delete after pickup; prefer APIs or queues |
+
+## Browser, machine and agent: three callers, one endpoint
+
+The same Worker or Xano endpoint is called by three kinds of caller, and each one fails differently. A **browser** is a person whose code you can't trust. A **machine** is code with no person behind it. An **agent** is code choosing what to do for a person who isn't watching.
+
+![Browser vs Machine vs Agent. Three caller cards: a browser (a person and every script on the page, proving identity with a session cookie, consent as a banner choice, limited by same-origin policy, CSP, SameSite cookies and CORS); a machine (a service account with no person behind it, proving identity with an API key, HMAC or mTLS, carrying consent only as data, limited by scopes and network policy); and an agent (a model choosing tools for a user, proving identity with a delegated token and a signed mandate, limited by a tool allowlist, mandate check, budget and approval). Arrows meet at one endpoint that must ask which kind of caller it is. A table compares failure, replay, leaks, consent and audit. A band traces assumptions from a JVM that never leaves the VM through commerce, global and AI-legible stages. Seventeen lettered gaps have fixes.](https://persephonepunch.github.io/crm-sync-setup/assets/browser-machine-agent-gaps.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/browser-machine-agent-gaps.svg) (1600 × 2022) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/browser-machine-agent-gaps.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/browser-machine-agent-gaps.jpg). Gaps here are lettered: B for browser, M for machine, A for agent.*
+
+The endpoint's first question is **which kind of caller is this?** One rule for all three fails all three:
+
+| Caller | The endpoint requires |
+| --- | --- |
+| Browser | A user session, CSRF protection, and server-side authorization per record |
+| Machine | A verified signature or mTLS, a narrow scope, and an idempotency key |
+| Agent | The user **and** the agent identified, a valid mandate, an allowed tool, and an audit entry |
+
+| Gap | Fix |
+| --- | --- |
+| B1 Client checks are suggestions | Authorize every request on the server, per record |
+| B2 Third-party tags see the page | CSP, [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity), a script inventory (PCI DSS 6.4.3) |
+| B3 Tokens readable by XSS | [HttpOnly, Secure, SameSite cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies); nothing in `localStorage` |
+| B4 Tags fire before consent | Consent Mode default denied; load tags after the choice |
+| B5 Hydration ships data | Pass only what the screen shows; fetch PII after consent |
+| M1 Keys too broad, too long | Least-privilege scopes, short lifetimes, rotation |
+| M2 No person in the loop | Act as a named service, log it, cap what it can change |
+| M3 Consent drops out | Carry consent state as a field; refuse records without it |
+| M4 Replays duplicate writes | [Verify the HMAC on the raw body](https://shopify.dev/docs/apps/build/webhooks/subscribe/https); one idempotency key per event |
+| M5 Payloads persist | Store IDs, not payloads; purge queues; scrub logs |
+| A1 [Prompt injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) | Treat fetched content as data; approve side effects outside the model |
+| A2 [Excessive agency](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/) | One narrow tool per task; read and write as separate tools |
+| A3 Token passthrough | Audience-bound tokens per tool; never forward the user's token ([MCP security best practices](https://modelcontextprotocol.io/specification/2025-06-18/basic/security_best_practices)) |
+| A4 Mandate replay or drift | Sign amount, merchant, expiry and nonce ([AP2](https://ap2-protocol.org/)); check every call |
+| A5 Exfiltration by tool | Egress allowlist; no raw-URL tools; filter outputs for PII |
+| A6 Retries double-spend | An idempotency key on every side-effecting tool call |
+| A7 No record of why | Log user, agent, mandate, tool and inputs to an append-only ledger |
+
+## Assumptions that break as you grow
+
+A JVM that never leaves its VM can get away with assumptions that stop holding one stage at a time. Each stage keeps every problem from the stages before it.
+
+| Assumption | A JVM that never leaves the VM | When you add commerce | When you go global | When you add LLMs: AI-legible |
+| --- | --- | --- | --- | --- |
+| Trust boundary | The VM is the wall; inside is trusted | Payments, tax and tag scripts run outside it | Clouds and regions multiply the walls | Your content is input to someone else's model |
+| Identity | One app, one user table, one session store | Customers, guests, staff, payment tokens | Local logins and age rules per market | An agent acts for a user: identify both |
+| Where data lives | In the heap and one database | Card data enters PCI scope; webhooks leave | Residency: where each copy lives is a legal question | Prompts, embeddings and model logs are new copies |
+| Consent | Not modeled: the app owns its data | Marketing consent and order data diverge | GDPR, CPRA, PIPA, CASL: the defaults differ | Training and retrieval each need their own yes |
+| Time and money | One clock, one currency, one locale | Retries and refunds need idempotency keys | Currencies, tax, FX, time zones, languages | An agent can spend: a mandate with amount and expiry |
+| Failure | An exception stays in the log | A failure can charge twice or lose an order | One region down mustn't take the others | A plausible wrong answer looks like success |
+| Audit asks | Who logged in? | Who paid, refunded or changed a price? | Which law applied, and where did the data go? | Which user, agent, mandate and source? |
+| Readable by | Your own team | Auditors, the PCI assessor, payment partners | Regulators in every market | Crawlers, answer engines and agents |
+
+The last column is the one teams plan least for. Making a system legible to AI — structured data, `llms.txt`, clean JSON-LD, Markdown descriptors — is how answer engines and agents find and recommend it. The same legibility makes it readable, quotable and steerable by every model that fetches it, so anything an agent can read is something an attacker can phrase as an instruction (A1).
+
+## Known foot guns
+
+A **foot gun** is a feature, API or default that makes it unusually easy to shoot yourself in the foot: a perfectly natural-looking use causes the bug, outage or leak. The blame lands on the design, because the design invites the mistake. The remedy is the same every time: **make the safe path the default, and make the dangerous path explicit and loud** — the way Rust spells it `unsafe` and React spells it `dangerouslySetInnerHTML`.
+
+| Foot gun | What happens | Instead |
+| --- | --- | --- |
+| `el.innerHTML = svgFromCms` (or `{{ html \| safe }}`) | An uploaded SVG's `<script>` runs on your origin (gap 3) | `<img src>`, or sanitize first ([Safe SVG](SAFE-SVG.md)) |
+| `atob()` called "decrypt" | Anyone reverses it; the secret was never hidden (gap 1) | Real encryption, or a token that means nothing on its own |
+| Cloudflare SSL mode **Flexible** | Plain HTTP from the edge to your origin (gap 5) | Full (strict) |
+| Reflecting the request's `Origin` with `Access-Control-Allow-Credentials: true` | Any site can make credentialed reads of your API. (Browsers already refuse `*` with credentials; echoing the origin bypasses that.) | An explicit origin allowlist; CORS is not authorization (gap 4) |
+| A secret in a `NEXT_PUBLIC_` variable | Compiled into every visitor's JavaScript (gap 13) | Server-only variables; scan the bundle in CI |
+| A Kubernetes Secret YAML in Git | base64 in history forever (gap 24) | Sealed or external secrets; etcd encryption |
+| `docker build --build-arg API_KEY=…` | The key lives in the image history (gap 26) | `docker build --secret` |
+| `console.log(req.body)` in a Worker, or body logging in Xano | Every payload copied into logs (gap 6) | Log IDs and outcomes, never bodies |
+| Verifying a webhook HMAC on re-serialized JSON | Valid webhooks fail, so someone turns verification off (M4) | Verify on the raw body, then parse |
+| Workers KV as the idempotency store | [Eventually consistent](https://developers.cloudflare.com/kv/concepts/how-kv-works/): two retries both see "not seen yet" (gap 21) | A Durable Object or a database unique constraint |
+| `#[derive(Debug, Serialize)]` on a struct holding PII | PII prints in logs and ships in JSON | A `Pii<T>` wrapper with a redacting `Debug` and no `Serialize` |
+| `unsafe` in a file parser "for speed" | One malformed upload corrupts memory | Safe Rust; measure before reaching for `unsafe` |
+| An Elm port that sends the whole model to JavaScript | Every field crosses into code Elm can't protect | Ports that carry only the fields the JS needs |
+| Consent Mode with defaults left at `granted` | Tags collect before the visitor chooses (B4) | Default `denied`; update after the choice |
+| An agent tool that fetches any URL it is given | Prompt injection turns it into an exfiltration channel (A5) | An allowlisted fetch, or no fetch tool at all |
+| Forwarding the user's OAuth token to a tool or MCP server | Token passthrough: the tool can act as the user anywhere (A3) | A token issued for that tool's audience only |
+| A service account with `SAP_ALL` or full Shopify Admin scopes | One leaked key is the whole ERP or store (gap 29) | One narrow credential per interface |
 
 ## Related
 

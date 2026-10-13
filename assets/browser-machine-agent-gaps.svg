@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 2022" role="img" aria-labelledby="t d">
+<title id="t">Browser vs Machine vs Agent: three callers, three ways to fail</title>
+<desc id="d">Three kinds of caller reach the same endpoint: a browser (a person and every script on the page), a machine (a service account with no person behind it) and an AI agent (a model choosing tools for a person). Each card shows who calls, how identity is proven, how consent arrives, what limits it, and its gaps. Arrows meet at one endpoint that must ask which kind of caller it is and apply that caller's rule. A table compares how each fails open, what replay looks like, where data leaks, where consent is checked and what an audit must answer. A band traces assumptions that hold for a JVM that never leaves its VM and how each breaks when you add commerce, go global, and add LLMs that make the system AI-legible. Seventeen lettered gaps, B1 to B5, M1 to M5 and A1 to A7, each have a fix.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .big{font:700 18px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .n{font:700 10px Helvetica,Arial,sans-serif;fill:#000;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .gap{fill:#fff;stroke:#000;stroke-width:1.5;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .ah{fill:#767676}
+</style></defs>
+<rect width="1600" height="2022" fill="#fff"/>
+<text class="h" x="60" y="52">BROWSER vs MACHINE vs AGENT — THREE CALLERS, THREE WAYS TO FAIL</text>
+<text class="g" x="60" y="76">who is calling, what proves it, what limits it, and where each one breaks</text>
+<text class="s" x="1540" y="76" text-anchor="end">Dashed = a gap. B = browser, M = machine, A = agent. Numbers match the list below.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">THREE CALLERS, ONE ENDPOINT — THE SAME API CAN&#x27;T TRUST THEM THE SAME WAY</text>
+<rect class="box" x="60" y="140" width="473" height="470"/>
+<text class="big" x="78" y="172">Browser</text>
+<text class="s" x="78" y="190">a person, through a user agent you don&#x27;t control</text>
+<text class="lab" x="78" y="218">WHO CALLS</text>
+<text class="b" x="78" y="235">A person, plus every script on the page</text>
+<text class="lab" x="78" y="260">PROVES IDENTITY WITH</text>
+<text class="b" x="78" y="277">Session cookie, OAuth or passkey login</text>
+<text class="lab" x="78" y="302">CONSENT ARRIVES AS</text>
+<text class="b" x="78" y="319">A banner choice: Consent Mode v2 signals</text>
+<text class="lab" x="78" y="344">LIMITS ENFORCED BY</text>
+<text class="b" x="78" y="361">Same-origin policy, CSP, SameSite cookies, CORS</text>
+<rect class="gap" x="72" y="390" width="449" height="206"/>
+<text class="lab" x="86" y="410">GAPS</text>
+<rect x="88" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="431.5">B1</text>
+<text class="b" x="124" y="432">Client checks are suggestions: anyone edits the JS</text>
+<rect x="88" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="454.5">B2</text>
+<text class="b" x="124" y="455">Third-party tags see everything on the page</text>
+<rect x="88" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="477.5">B3</text>
+<text class="b" x="124" y="478">Tokens in localStorage are readable by any XSS</text>
+<rect x="88" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="500.5">B4</text>
+<text class="b" x="124" y="501">Tags fire before the consent choice lands</text>
+<rect x="88" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="523.5">B5</text>
+<text class="b" x="124" y="524">Hydrated props ship data into the HTML</text>
+<path class="ln" d="M296.5,610L613.2,678.5"/>
+<path class="ah" d="M620,680L612.2,673.7L610.3,682.5z"/>
+<rect class="box" x="563" y="140" width="473" height="470"/>
+<text class="big" x="581" y="172">Machine</text>
+<text class="s" x="581" y="190">a service calling a service: webhooks, cron, ETL, iPaaS</text>
+<text class="lab" x="581" y="218">WHO CALLS</text>
+<text class="b" x="581" y="235">A service account, often with no person behind it</text>
+<text class="lab" x="581" y="260">PROVES IDENTITY WITH</text>
+<text class="b" x="581" y="277">API key, HMAC signature, mTLS or client credentials</text>
+<text class="lab" x="581" y="302">CONSENT ARRIVES AS</text>
+<text class="b" x="581" y="319">Nothing, unless the record carries it as data</text>
+<text class="lab" x="581" y="344">LIMITS ENFORCED BY</text>
+<text class="b" x="581" y="361">Scopes, network policy, allowlists, rate limits</text>
+<rect class="gap" x="575" y="390" width="449" height="206"/>
+<text class="lab" x="589" y="410">GAPS</text>
+<rect x="591" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="431.5">M1</text>
+<text class="b" x="627" y="432">Long-lived keys with whole-store scopes</text>
+<rect x="591" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="454.5">M2</text>
+<text class="b" x="627" y="455">No person in the loop: the job runs with full power</text>
+<rect x="591" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="477.5">M3</text>
+<text class="b" x="627" y="478">Consent drops out of the record in transforms</text>
+<rect x="591" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="500.5">M4</text>
+<text class="b" x="627" y="501">Retries and redelivery replay writes</text>
+<rect x="591" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="523.5">M5</text>
+<text class="b" x="627" y="524">Queues and logs keep the payload</text>
+<path class="ln" d="M799.5,610L800.0,673.0"/>
+<path class="ah" d="M800,680L804.4,671.0L795.4,671.0z"/>
+<rect class="box" x="1066" y="140" width="473" height="470"/>
+<text class="big" x="1084" y="172">Agent</text>
+<text class="s" x="1084" y="190">an AI acting for a person: MCP tools, agentic checkout</text>
+<text class="lab" x="1084" y="218">WHO CALLS</text>
+<text class="b" x="1084" y="235">A model choosing tools, for a user who isn&#x27;t watching</text>
+<text class="lab" x="1084" y="260">PROVES IDENTITY WITH</text>
+<text class="b" x="1084" y="277">A delegated token plus a signed mandate (AP2)</text>
+<text class="lab" x="1084" y="302">CONSENT ARRIVES AS</text>
+<text class="b" x="1084" y="319">A mandate per action: what, how much, until when</text>
+<text class="lab" x="1084" y="344">LIMITS ENFORCED BY</text>
+<text class="b" x="1084" y="361">Tool allowlist, mandate check, budget, approval</text>
+<rect class="gap" x="1078" y="390" width="449" height="206"/>
+<text class="lab" x="1092" y="410">GAPS</text>
+<rect x="1094" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="431.5">A1</text>
+<text class="b" x="1130" y="432">Prompt injection: content becomes instructions</text>
+<rect x="1094" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="454.5">A2</text>
+<text class="b" x="1130" y="455">Excessive agency: tools broader than the task</text>
+<rect x="1094" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="477.5">A3</text>
+<text class="b" x="1130" y="478">Token passthrough: the agent forwards your token</text>
+<rect x="1094" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="500.5">A4</text>
+<text class="b" x="1130" y="501">Mandate replay, or scope drift past the mandate</text>
+<rect x="1094" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="523.5">A5</text>
+<text class="b" x="1130" y="524">Exfiltration through a tool call or a URL</text>
+<rect x="1094" y="534" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="546.5">A6</text>
+<text class="b" x="1130" y="547">Same prompt, different action: retries double-spend</text>
+<rect x="1094" y="557" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="569.5">A7</text>
+<text class="b" x="1130" y="570">No record of why the agent acted</text>
+<path class="ln" d="M1302.5,610L986.8,678.5"/>
+<path class="ah" d="M980,680L989.7,682.5L987.8,673.7z"/>
+<rect class="box" x="360" y="680" width="880" height="140" style="stroke-width:3"/>
+<text class="bt" x="800" y="708" text-anchor="middle">Your endpoint: Cloudflare Worker · Xano · API</text>
+<text class="g" x="800" y="728" text-anchor="middle">First ask which kind of caller this is, then apply that caller&#x27;s rule. One rule for all three fails all three.</text>
+<text class="bt" x="400" y="756">Browser:</text>
+<text class="b" x="480" y="756">a user session, CSRF protection, and server-side authorization per record</text>
+<text class="bt" x="400" y="776">Machine:</text>
+<text class="b" x="480" y="776">a verified signature or mTLS, a narrow scope, and an idempotency key</text>
+<text class="bt" x="400" y="796">Agent:</text>
+<text class="b" x="480" y="796">the user AND the agent identified, a valid mandate, an allowed tool, and an audit entry</text>
+<path class="rule" d="M60,860H1540"/>
+<text class="sec" x="60" y="888">WHERE EACH ONE FAILS</text>
+<text class="lab" x="60" y="916">CONCERN</text>
+<text class="lab" x="280" y="916">BROWSER</text>
+<text class="lab" x="700" y="916">MACHINE</text>
+<text class="lab" x="1120" y="916">AGENT</text>
+<path class="rule" d="M60,926H1540"/>
+<text class="bt" x="60" y="948">Fails open when</text>
+<text class="b" x="280" y="948">A check lives only in client JavaScript</text>
+<text class="b" x="700" y="948">A key outlives its job or its scope</text>
+<text class="b" x="1120" y="948">Tool output is read as an instruction</text>
+<path class="rule" d="M60,959H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="978">Replay looks like</text>
+<text class="b" x="280" y="978">A resubmitted form or a stolen session</text>
+<text class="b" x="700" y="978">A redelivered webhook or a re-run batch</text>
+<text class="b" x="1120" y="978">A retried tool call or a reused mandate</text>
+<path class="rule" d="M60,989H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1008">Data leaks through</text>
+<text class="b" x="280" y="1008">Third-party tags, page source, caches</text>
+<text class="b" x="700" y="1008">Queues, logs, iPaaS error records</text>
+<text class="b" x="1120" y="1008">Prompts, tool calls, model context</text>
+<path class="rule" d="M60,1019H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1038">Consent is checked</text>
+<text class="b" x="280" y="1038">Before any tag loads</text>
+<text class="b" x="700" y="1038">On every record, as a field</text>
+<text class="b" x="1120" y="1038">Before every side effect, as a mandate</text>
+<path class="rule" d="M60,1049H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1068">Audit must answer</text>
+<text class="b" x="280" y="1068">Which user, which session?</text>
+<text class="b" x="700" y="1068">Which key, which job, which payload?</text>
+<text class="b" x="1120" y="1068">Which user, agent, mandate and tool, and why?</text>
+<path class="rule" d="M60,1079H1540" style="stroke:#ddd"/>
+<path class="rule" d="M60,1124H1540"/>
+<text class="sec" x="60" y="1152">ASSUMPTIONS THAT BREAK AS YOU GROW — FROM A JVM THAT NEVER LEAVES THE VM TO A SYSTEM AI CAN READ</text>
+<text class="lab" x="60" y="1180">ASSUMPTION</text>
+<text class="lab" x="230" y="1180">A JVM THAT NEVER LEAVES THE VM</text>
+<text class="lab" x="560" y="1180">WHEN YOU ADD COMMERCE</text>
+<text class="lab" x="890" y="1180">WHEN YOU GO GLOBAL</text>
+<text class="lab" x="1220" y="1180">WHEN YOU ADD LLMS: AI-LEGIBLE</text>
+<path class="rule" d="M60,1190H1540"/>
+<rect class="gap" x="1212" y="1162" width="328" height="270" style="fill:none"/>
+<text class="bt" x="60" y="1212">Trust boundary</text>
+<text class="g" x="230" y="1212">The VM is the wall; inside is trusted</text>
+<text class="b" x="560" y="1212">Payments, tax and tag scripts run outside it</text>
+<text class="b" x="890" y="1212">Clouds and regions multiply the walls</text>
+<text class="b" x="1228" y="1212">Your content is input to someone else&#x27;s model</text>
+<path class="rule" d="M60,1223H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1242">Identity</text>
+<text class="g" x="230" y="1242">One app, one user table, one session store</text>
+<text class="b" x="560" y="1242">Customers, guests, staff, payment tokens</text>
+<text class="b" x="890" y="1242">Local logins and age rules per market</text>
+<text class="b" x="1228" y="1242">An agent acts for a user: identify both</text>
+<path class="rule" d="M60,1253H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1272">Where data lives</text>
+<text class="g" x="230" y="1272">In the heap and one database</text>
+<text class="b" x="560" y="1272">Card data enters PCI scope; webhooks leave</text>
+<text class="b" x="890" y="1272">Residency: where each copy lives is legal</text>
+<text class="b" x="1228" y="1272">Prompts, embeddings and model logs are copies</text>
+<path class="rule" d="M60,1283H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1302">Consent</text>
+<text class="g" x="230" y="1302">Not modeled: the app owns its data</text>
+<text class="b" x="560" y="1302">Marketing consent and order data diverge</text>
+<text class="b" x="890" y="1302">GDPR, CPRA, PIPA, CASL: defaults differ</text>
+<text class="b" x="1228" y="1302">Training and retrieval need their own yes</text>
+<path class="rule" d="M60,1313H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1332">Time and money</text>
+<text class="g" x="230" y="1332">One clock, one currency, one locale</text>
+<text class="b" x="560" y="1332">Retries and refunds need idempotency keys</text>
+<text class="b" x="890" y="1332">Currencies, tax, FX, time zones, languages</text>
+<text class="b" x="1228" y="1332">An agent can spend: mandate, amount, expiry</text>
+<path class="rule" d="M60,1343H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1362">Failure</text>
+<text class="g" x="230" y="1362">An exception stays in the log</text>
+<text class="b" x="560" y="1362">A failure can charge twice or lose an order</text>
+<text class="b" x="890" y="1362">One region down mustn&#x27;t take the others</text>
+<text class="b" x="1228" y="1362">A plausible wrong answer looks like success</text>
+<path class="rule" d="M60,1373H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1392">Audit asks</text>
+<text class="g" x="230" y="1392">Who logged in?</text>
+<text class="b" x="560" y="1392">Who paid, refunded or changed a price?</text>
+<text class="b" x="890" y="1392">Which law applied, and where did data go?</text>
+<text class="b" x="1228" y="1392">Which user, agent, mandate and source?</text>
+<path class="rule" d="M60,1403H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1422">Readable by</text>
+<text class="g" x="230" y="1422">Your own team</text>
+<text class="b" x="560" y="1422">Auditors, the PCI assessor, payment partners</text>
+<text class="b" x="890" y="1422">Regulators in every market</text>
+<text class="b" x="1228" y="1422">Crawlers, answer engines and agents</text>
+<path class="rule" d="M60,1433H1540" style="stroke:#ddd"/>
+<text class="s" x="60" y="1458">Each column keeps every problem to its left. The AI column is dashed: making a system legible to machines also makes it readable, quotable and steerable by them.</text>
+<path class="rule" d="M60,1488H1540"/>
+<text class="sec" x="60" y="1516">SEVENTEEN GAPS — AND THE CONTROL THAT CLOSES EACH</text>
+<rect x="60" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1547.5">B1</text>
+<text class="bt" x="96" y="1548">Client checks are suggestions</text>
+<text class="b" x="96" y="1568">Fix: Authorize every request on the server, per record</text>
+<rect x="60" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1609.5">B2</text>
+<text class="bt" x="96" y="1610">Third-party tags see the page</text>
+<text class="b" x="96" y="1630">Fix: CSP, Subresource Integrity, a script inventory (PCI DSS 6.4.3)</text>
+<rect x="60" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1671.5">B3</text>
+<text class="bt" x="96" y="1672">Tokens readable by XSS</text>
+<text class="b" x="96" y="1692">Fix: HttpOnly, Secure, SameSite cookies; nothing in localStorage</text>
+<rect x="60" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1733.5">B4</text>
+<text class="bt" x="96" y="1734">Tags fire before consent</text>
+<text class="b" x="96" y="1754">Fix: Consent Mode default denied; load tags after the choice</text>
+<rect x="60" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1795.5">B5</text>
+<text class="bt" x="96" y="1796">Hydration ships data</text>
+<text class="b" x="96" y="1816">Fix: Pass only what the screen shows; fetch PII after consent</text>
+<rect x="563" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1547.5">M1</text>
+<text class="bt" x="599" y="1548">Keys too broad, too long</text>
+<text class="b" x="599" y="1568">Fix: Least-privilege scopes, short lifetimes, rotation</text>
+<rect x="563" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1609.5">M2</text>
+<text class="bt" x="599" y="1610">No person in the loop</text>
+<text class="b" x="599" y="1630">Fix: Act as a named service, log it, cap what it can change</text>
+<rect x="563" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1671.5">M3</text>
+<text class="bt" x="599" y="1672">Consent drops out</text>
+<text class="b" x="599" y="1692">Fix: Carry consent state as a field; refuse records without it</text>
+<rect x="563" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1733.5">M4</text>
+<text class="bt" x="599" y="1734">Replays duplicate writes</text>
+<text class="b" x="599" y="1754">Fix: Verify the HMAC on the raw body; one idempotency key per event</text>
+<rect x="563" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1795.5">M5</text>
+<text class="bt" x="599" y="1796">Payloads persist</text>
+<text class="b" x="599" y="1816">Fix: Store IDs, not payloads; purge queues; scrub logs</text>
+<rect x="1066" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1547.5">A1</text>
+<text class="bt" x="1102" y="1548">Prompt injection</text>
+<text class="b" x="1102" y="1568">Fix: Treat fetched content as data; approve side effects outside the model</text>
+<rect x="1066" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1609.5">A2</text>
+<text class="bt" x="1102" y="1610">Excessive agency</text>
+<text class="b" x="1102" y="1630">Fix: One narrow tool per task; read and write as separate tools</text>
+<rect x="1066" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1671.5">A3</text>
+<text class="bt" x="1102" y="1672">Token passthrough</text>
+<text class="b" x="1102" y="1692">Fix: Audience-bound tokens per tool; never forward the user&#x27;s token</text>
+<rect x="1066" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1733.5">A4</text>
+<text class="bt" x="1102" y="1734">Mandate replay or drift</text>
+<text class="b" x="1102" y="1754">Fix: Sign amount, merchant, expiry and nonce; check every call</text>
+<rect x="1066" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1795.5">A5</text>
+<text class="bt" x="1102" y="1796">Exfiltration by tool</text>
+<text class="b" x="1102" y="1816">Fix: Egress allowlist; no raw-URL tools; filter outputs for PII</text>
+<rect x="1066" y="1845" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1857.5">A6</text>
+<text class="bt" x="1102" y="1858">Retries double-spend</text>
+<text class="b" x="1102" y="1878">Fix: An idempotency key on every side-effecting tool call</text>
+<rect x="1066" y="1907" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1919.5">A7</text>
+<text class="bt" x="1102" y="1920">No record of why</text>
+<text class="b" x="1102" y="1940">Fix: Log user, agent, mandate, tool and inputs to an append-only ledger</text>
+<text class="s" x="60" y="2000">A browser is a person whose code you can&#x27;t trust. A machine is code with no person. An agent is code choosing what to do for a person. Each needs its own rule at the same endpoint.</text>
+</svg>
