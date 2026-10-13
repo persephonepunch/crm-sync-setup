@@ -6,6 +6,8 @@ category: "Security"
 date: 2026-10-13
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SVG-RUST-ELM-SECURITY-GAPS.md
 licence: CC-BY-4.0
+ogImage: https://persephonepunch.github.io/crm-sync-setup/og/svg-rust-elm-security-gaps.png
+ogImageAlt: "SVG, Rust and Elm: the security gaps. Three panels: an SVG holding patient metadata and a cookie-stealing script, which never runs through img but runs when inlined; Rust code where a consent grant moved into one send cannot be reused; and Elm, where views are pure and ports are the only exit to JavaScript, but the browser is still untrusted."
 tags:
   - security
   - architecture

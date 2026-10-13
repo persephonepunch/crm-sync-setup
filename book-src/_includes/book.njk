@@ -12,6 +12,18 @@
 {#- The book is a second view of each article; the styled page stays the canonical copy. -#}
 {%- if doc and doc.canonical %}
 <link rel="canonical" href="{{ doc.canonical }}">{% endif %}
+{#- Optional per-chapter link preview: only chapters whose frontmatter sets ogImage get one. -#}
+{%- if doc and doc.ogImage %}
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{{ book.title }}">
+<meta property="og:title" content="{{ doc.number }} {{ doc.title }}">
+<meta property="og:description" content="{{ desc }}">
+<meta property="og:image" content="{{ doc.ogImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">{% if doc.ogImageAlt %}
+<meta property="og:image:alt" content="{{ doc.ogImageAlt }}">{% endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ doc.ogImage }}">{% endif %}
 <script>
 // Theme before first paint (no flash). Stored choice, else Light: the knowledge base's own look
 // on crm-sync.dev (white paper, grid, cyan rule), whatever the system's colour preference.

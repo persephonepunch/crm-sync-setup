@@ -100,6 +100,7 @@ module.exports = () => {
         src, slug: slugOf.get(src), number, title, chapter: chapter.title, chapterN: chapter.n,
         description, showSummary, date: day(fm.date),
         tags: fm.tags || fm.hashtags || [], canonical: fm.canonical || "",
+        ogImage: fm.ogImage || "", ogImageAlt: fm.ogImageAlt || "",
         source: REPO + src, raw: PAGES + src, html, toc,
       }
       chapter.pages.push(page)
