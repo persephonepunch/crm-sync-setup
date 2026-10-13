@@ -198,6 +198,20 @@ No web view and no JavaScript; the interface compiles to machine code for the de
 
 **Fits.** Professional desktop tools, and kiosk or appliance screens.
 
+#### egui and eframe, defined
+
+- **egui** is a Rust library for drawing an application's interface: buttons, panels, sliders, text fields. It is **immediate mode**: the program redraws the whole interface from its data, about 60 times a second.
+
+  ```rust
+  if ui.button("Insert Page").clicked() { doc.add_page(); }
+  ui.label(format!("Pages: {}", doc.pages.len()));
+  ```
+
+  There is no retained tree of widgets — nothing like a web page's DOM — to keep in sync with the data. The program's own data is the only state, and each frame answers "what should be on screen now?", much as Elm's `view` does.
+- **eframe** is egui's application shell. It opens the window on macOS, Windows or Linux, connects keyboard and mouse, and hands drawing to the GPU (DesignCraft uses `wgpu`). The same code can also be compiled to WebAssembly and drawn onto a `<canvas>` in a browser — CADCraft's web build is that.
+
+In short: egui is the interface library, eframe is the app around it. It is the "total" option in this article — every pixel drawn by compiled Rust, no HTML, CSS or JavaScript, and so no web engine for an Elm panel to live in. Gains: fast, light, one codebase for desktop and web. Costs: it looks the same on every system rather than native, and accessibility and complex text layout take more work than on the web.
+
 ### 8. No GUI on the device: firmware compiled to machine code
 
 **What it is.** The Ondol Life solar-dock controller is a `no_std` Rust library with no dependencies, compiled for the RISC-V core of an ESP32-C6. It holds the controller rules, the sensor contract and an 18-byte Bluetooth status record, and nothing that draws.
