@@ -88,16 +88,16 @@ The diagram reads top to bottom in seven bands:
 
 An SVG is XML. Besides shapes it can carry `<script>`, `onload=` handlers, `<foreignObject>` with embedded HTML, outside references, and text and metadata that hold names and IDs. Base64 keeps every one of those, about a third larger, and hides `<script` from any filter that only reads text.
 
-`<img src>` renders in the browser's image sandbox: no script, no outside references, no DOM. Inlining promotes the file to a node in your document, where script runs. [Safe SVG for Webflow and UIkit](SAFE-SVG.md) shows how to keep stylable, animatable SVG without spending that sandbox: an allow-list sanitizer, then inline. For anything an uploader supplied, display it with `<img>`, send `Content-Security-Policy: sandbox` on `.svg` responses, and serve uploads from a separate asset domain.
+`<img src>` renders in the browser's image sandbox: no script, no outside references, no DOM. Inlining promotes the file to a node in your document, where script runs. [Safe SVG for Webflow and UIkit](https://persephonepunch.github.io/crm-sync-setup/safe-svg.html) shows how to keep stylable, animatable SVG without spending that sandbox: an allow-list sanitizer, then inline. For anything an uploader supplied, display it with `<img>`, send `Content-Security-Policy: sandbox` on `.svg` responses, and serve uploads from a separate asset domain.
 
-Treat an exported chart as the data it shows. An SVG of patient results is PHI, wherever it is cached or shared — the same point [What Survives the Transform](WHAT-SURVIVES-THE-TRANSFORM.md) makes about XMP inside media files.
+Treat an exported chart as the data it shows. An SVG of patient results is PHI, wherever it is cached or shared — the same point [What Survives the Transform](https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html) makes about XMP inside media files.
 
 ## Rust: ownership as access control
 
 Rust appears three times in the diagram. Each idea maps to a chapter of [The Rust Book](https://doc.rust-lang.org/book/):
 
 - **The Rust service** at the end of the request path. A `ConsentGrant` is moved into the function that sends data out, so one consent cannot cover two exports ([ownership](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html)). A reporting function that takes `&PatientRecord` cannot change it; only `&mut` can, and only one at a time ([references and borrowing](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html)). A `Pii<T>` wrapper whose `Debug` prints `[REDACTED]` and which does not implement `Serialize` cannot reach a log line or a JSON response. And with no [`unsafe`](https://doc.rust-lang.org/book/ch20-01-unsafe-rust.html), whole classes of memory bugs are ruled out.
-- **Bare metal.** [`#![no_std]`](https://docs.rust-embedded.org/book/intro/no-std.html) firmware, where memory safety is the only wall. [Firmware Asset Publishing](FIRMWARE-ASSET-PUBLISHING.md) covers the publishing side.
+- **Bare metal.** [`#![no_std]`](https://docs.rust-embedded.org/book/intro/no-std.html) firmware, where memory safety is the only wall. [Firmware Asset Publishing](https://persephonepunch.github.io/crm-sync-setup/firmware-asset-publishing.html) covers the publishing side.
 - **The Shopify Function** in lane E: [Rust compiled to Wasm](https://shopify.dev/docs/apps/build/functions/programming-languages/rust-for-functions), with no network access. Gap 22 covers the host imports that remain.
 
 ```rust
@@ -114,7 +114,7 @@ The limit is printed on the Rust box: **types force a check to happen; they cann
 
 Elm is the first box of the request path. Functions are pure, so a view that renders patient data cannot send it anywhere. Opaque types decide in one module what any screen may show. [Ports](https://guide.elm-lang.org/interop/ports.html) are the only exit to JavaScript, which gives you one list to audit, and Elm packages cannot contain JavaScript.
 
-The box's "does not" side is gap 8. The browser is untrusted: anyone can edit the compiled JavaScript or call the API directly. Elm protects your users from your own bugs, not your server from attackers — the same split the [Dark Factory article](DARK-FACTORY-ENTITLEMENT-SECURITY.md#one-architecture-two-trust-models-elm-iced-and-webflow-xano) draws between the Elm Architecture and Webflow + Xano. Every rule has to be enforced again in the Worker or Xano.
+The box's "does not" side is gap 8. The browser is untrusted: anyone can edit the compiled JavaScript or call the API directly. Elm protects your users from your own bugs, not your server from attackers — the same split the [Dark Factory article](https://persephonepunch.github.io/crm-sync-setup/book/dark-factory-entitlement-security/#one-architecture-two-trust-models-elm-iced-and-webflow-xano) draws between the Elm Architecture and Webflow + Xano. Every rule has to be enforced again in the Worker or Xano.
 
 ## Wasm, containers and VMs limit reach, not readership
 
@@ -139,12 +139,12 @@ Where each numbered circle appears, and the control that closes it.
 | 9 | Compiled is not hidden | Machine code definition | Secrets stay server-side; ship only scoped, short-lived tokens |
 | 10 | Hydration ships data into the page | Browser hydrates (lane A) | Pass only what the screen needs; fetch PII after consent |
 | 11 | Shared caches mix customers | CDN · edge (lane A) | `Cache-Control: private, no-store` on personalized routes |
-| 12 | Server fetch runs before consent | Browser request; Next server (lane A) | Gate server fetches on the consent cookie ([Consent Resolution](CONSENT-RESOLUTION-PATTERN.md)) |
+| 12 | Server fetch runs before consent | Browser request; Next server (lane A) | Gate server fetches on the consent cookie ([Consent Resolution](https://persephonepunch.github.io/crm-sync-setup/consent-resolution-pattern.html)) |
 | 13 | `NEXT_PUBLIC_` compiles into the bundle | Next server (lane A) | Secrets server-only; scan the built bundle in CI |
 | 14 | TLS is hop by hop on a data bus | Cloudflare Worker (lane B) | Sign messages; encrypt fields end to end; mTLS |
 | 15 | Unverified or replayed webhooks | Shopify webhook back (lane B) | Verify the HMAC on the raw body; reject stale events |
 | 16 | Queue rows outlive the message | Queue · webhook table (lane B) | Store IDs, not payloads; purge processed rows |
-| 17 | Admin tokens at the edge | Cloudflare Worker (lane B) | Least-privilege scopes, short lifetimes, rotation ([Shopify Token Management](SHOPIFY-TOKEN-MANAGEMENT.md)) |
+| 17 | Admin tokens at the edge | Cloudflare Worker (lane B) | Least-privilege scopes, short lifetimes, rotation ([Shopify Token Management](https://persephonepunch.github.io/crm-sync-setup/shopify-token-management.html)) |
 | 18 | Middleware sees everything | MuleSoft; SFCC (lane C) | Mask fields in transforms; turn off payload logging |
 | 19 | The JVM has no in-process sandbox | Salesforce core; SFCC (lane C) | Isolate services; scan dependencies; patch fast ([JEP 411](https://openjdk.org/jeps/411)) |
 | 20 | Consent isn't carried with the event | Google Merchant (lanes C, E); Customer Privacy API (lane E) | Attach [Consent Mode v2](https://developers.google.com/tag-platform/security/guides/consent) state at capture; drop when denied |
@@ -219,7 +219,7 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 
 | Foot gun | What happens | Instead |
 | --- | --- | --- |
-| `el.innerHTML = svgFromCms` (or `{{ html \| safe }}`) | An uploaded SVG's `<script>` runs on your origin (gap 3) | `<img src>`, or sanitize first ([Safe SVG](SAFE-SVG.md)) |
+| `el.innerHTML = svgFromCms` (or `{{ html \| safe }}`) | An uploaded SVG's `<script>` runs on your origin (gap 3) | `<img src>`, or sanitize first ([Safe SVG](https://persephonepunch.github.io/crm-sync-setup/safe-svg.html)) |
 | `atob()` called "decrypt" | Anyone reverses it; the secret was never hidden (gap 1) | Real encryption, or a token that means nothing on its own |
 | Cloudflare SSL mode **Flexible** | Plain HTTP from the edge to your origin (gap 5) | Full (strict) |
 | Reflecting the request's `Origin` with `Access-Control-Allow-Credentials: true` | Any site can make credentialed reads of your API. (Browsers already refuse `*` with credentials; echoing the origin bypasses that.) | An explicit origin allowlist; CORS is not authorization (gap 4) |
@@ -239,9 +239,9 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 
 ## Related
 
-- [Safe SVG for Webflow and UIkit](SAFE-SVG.md) — inline SVG without inheriting the upload's privileges
-- [GUIs when you still ship JavaScript](GUI-OPTIONS-JS-TO-MACHINE-CODE.md) — Webflow, Elm, Javy, Tauri and Rust down to machine code
-- [Dark Factory Entitlement Security](DARK-FACTORY-ENTITLEMENT-SECURITY.md) — one architecture, two trust models
+- [Safe SVG for Webflow and UIkit](https://persephonepunch.github.io/crm-sync-setup/safe-svg.html) — inline SVG without inheriting the upload's privileges
+- [GUIs when you still ship JavaScript](https://persephonepunch.github.io/crm-sync-setup/gui-options-js-to-machine-code.html) — Webflow, Elm, Javy, Tauri and Rust down to machine code
+- [Dark Factory Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html) — one architecture, two trust models
 - [Where Your Code Runs Is a Business Decision](https://persephonepunch.github.io/crm-sync-setup/where-code-runs.html) — VMs, containers and isolates
-- [What Survives the Transform](WHAT-SURVIVES-THE-TRANSFORM.md) — metadata, re-encodes and where media should live
+- [What Survives the Transform](https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html) — metadata, re-encodes and where media should live
 - Also published on the game11ty reference site: [SVG/Rust/Elm: The Security Gaps Illustration](https://persephonepunch.github.io/game11ty/svg-rust-elm/) and [Machine Code/Rust/WASM, SVG/Native, Server/Client](https://persephonepunch.github.io/game11ty/machine-code-rust-wasm/)
