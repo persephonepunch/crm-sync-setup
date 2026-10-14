@@ -12,9 +12,9 @@
  .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
  .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
  .bd{font:700 8.5px Helvetica,Arial,sans-serif;fill:#fff;letter-spacing:.08em}
- .n{font:700 10px Helvetica,Arial,sans-serif;fill:#000;text-anchor:middle}
+ .n{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
  .box{fill:#fff;stroke:#000;stroke-width:1.5}
- .gap{fill:#fff;stroke:#000;stroke-width:1.5;stroke-dasharray:5 4}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
  .rule{stroke:#000;stroke-width:.8;fill:none}
  .ln{stroke:#767676;stroke-width:1.2;fill:none}
  .ah{fill:#767676}
@@ -22,7 +22,7 @@
 <rect width="1600" height="820" fill="#fff"/>
 <text class="h" x="60" y="52">WHERE MEMORY GETS MANAGED — RUST AT COMPILE TIME, THE JVM AT RUNTIME</text>
 <text class="g" x="60" y="76">Rust has no bytecode and no memory manager at runtime: the compiler proves memory safety, then gets out of the way</text>
-<text class="s" x="1540" y="76" text-anchor="end">Dashed = a gap. Black tag = where memory is managed.</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = a gap. Black tag = where memory is managed.</text>
 <path class="rule" d="M60,96H1540"/>
 <text class="sec" x="60" y="124">FIVE PIPELINES FROM SOURCE TO RUNNING CODE</text>
 <text class="lab" x="60" y="156">SOURCE</text>
@@ -72,7 +72,7 @@
 <rect class="box" x="960" y="256" width="360" height="62"/>
 <text class="bt" x="974" y="282">Host: V8 or Wasmtime</text>
 <text class="b" x="974" y="302">compiles at load; walls off memory; no GC</text>
-<rect x="1282.0" y="264" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1296.0" y="276.5">22</text>
+<rect x="1282.0" y="264" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1296.0" y="276.5">22</text>
 <text class="b" x="1340" y="282">Compile time, plus the host&#x27;s wall</text>
 <text class="s" x="1340" y="302">Rust to Wasm</text>
 <rect class="box" x="60" y="340" width="200" height="62"/>
@@ -94,7 +94,7 @@
 <text class="bt" x="974" y="366">JVM: JIT and GC</text>
 <text class="b" x="974" y="386">a garbage collector frees memory while running</text>
 <rect x="1180.2" y="347" width="129.8" height="18" fill="#000"/><text class="bd" x="1245.1" y="359.5" text-anchor="middle">MEMORY MANAGED HERE</text>
-<rect x="1144.2" y="348" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1158.2" y="360.5">19</text>
+<rect x="1144.2" y="348" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1158.2" y="360.5">19</text>
 <text class="b" x="1340" y="366">At runtime</text>
 <text class="s" x="1340" y="386">JVM</text>
 <rect class="box" x="60" y="424" width="200" height="62"/>
@@ -151,7 +151,7 @@
 <rect class="box" x="560" y="652" width="480" height="110"/>
 <text class="bt" x="574" y="678">Secrets can be wiped</text>
 <text class="b" x="574" y="698"></text>
-<rect x="1002.0" y="660" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1016.0" y="672.5">19</text>
+<rect x="1002.0" y="660" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1016.0" y="672.5">19</text>
 <text class="b" x="574" y="700">Rust frees memory at a known point, so</text>
 <text class="b" x="574" y="718">zeroize can erase a key. JVM Strings</text>
 <text class="b" x="574" y="736">can&#x27;t be changed, and the GC copies them.</text>

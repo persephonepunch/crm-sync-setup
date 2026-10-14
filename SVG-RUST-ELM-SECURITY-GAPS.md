@@ -99,9 +99,9 @@ Security can no longer ride along with the binding. It has to attach to four thi
 | Mark | Meaning |
 | --- | --- |
 | Solid box | Data passes through and a control holds |
-| Dashed box | A gap: data is stored, cached or exposed there, or code can run |
-| Dashed circle with a number | One of the 31 gaps listed at the bottom of the diagram and below |
-| Dashed arrow | Traffic that is plaintext by default (between Kubernetes pods) |
+| Red dashed box | A gap: data is stored, cached or exposed there, or code can run |
+| Red dashed circle with a number | One of the 31 gaps listed at the bottom of the diagram and below |
+| Red dashed arrow | Traffic that is plaintext by default (between Kubernetes pods) |
 | Grey arrow labeled TLS | One TLS session; the data is decrypted in the box at each end |
 | "decrypts here" | Inside this box the data is plaintext, whatever the arrows say |
 

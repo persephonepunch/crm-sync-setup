@@ -11,9 +11,9 @@
  .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
  .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
  .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
- .n{font:700 10px Helvetica,Arial,sans-serif;fill:#000;text-anchor:middle}
+ .n{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
  .box{fill:#fff;stroke:#000;stroke-width:1.5}
- .gap{fill:#fff;stroke:#000;stroke-width:1.5;stroke-dasharray:5 4}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
  .rule{stroke:#000;stroke-width:.8;fill:none}
  .ln{stroke:#767676;stroke-width:1.2;fill:none}
  .ah{fill:#767676}
@@ -21,7 +21,7 @@
 <rect width="1600" height="2022" fill="#fff"/>
 <text class="h" x="60" y="52">BROWSER vs MACHINE vs AGENT — THREE CALLERS, THREE WAYS TO FAIL</text>
 <text class="g" x="60" y="76">who is calling, what proves it, what limits it, and where each one breaks</text>
-<text class="s" x="1540" y="76" text-anchor="end">Dashed = a gap. B = browser, M = machine, A = agent. Numbers match the list below.</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = a gap. B = browser, M = machine, A = agent. Numbers match the list below.</text>
 <path class="rule" d="M60,96H1540"/>
 <text class="sec" x="60" y="124">THREE CALLERS, ONE ENDPOINT — THE SAME API CAN&#x27;T TRUST THEM THE SAME WAY</text>
 <rect class="box" x="60" y="140" width="473" height="470"/>
@@ -37,15 +37,15 @@
 <text class="b" x="78" y="361">Same-origin policy, CSP, SameSite cookies, CORS</text>
 <rect class="gap" x="72" y="390" width="449" height="206"/>
 <text class="lab" x="86" y="410">GAPS</text>
-<rect x="88" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="431.5">B1</text>
+<rect x="88" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="102" y="431.5">B1</text>
 <text class="b" x="124" y="432">Client checks are suggestions: anyone edits the JS</text>
-<rect x="88" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="454.5">B2</text>
+<rect x="88" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="102" y="454.5">B2</text>
 <text class="b" x="124" y="455">Third-party tags see everything on the page</text>
-<rect x="88" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="477.5">B3</text>
+<rect x="88" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="102" y="477.5">B3</text>
 <text class="b" x="124" y="478">Tokens in localStorage are readable by any XSS</text>
-<rect x="88" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="500.5">B4</text>
+<rect x="88" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="102" y="500.5">B4</text>
 <text class="b" x="124" y="501">Tags fire before the consent choice lands</text>
-<rect x="88" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="102" y="523.5">B5</text>
+<rect x="88" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="102" y="523.5">B5</text>
 <text class="b" x="124" y="524">Hydrated props ship data into the HTML</text>
 <path class="ln" d="M296.5,610L613.2,678.5"/>
 <path class="ah" d="M620,680L612.2,673.7L610.3,682.5z"/>
@@ -62,15 +62,15 @@
 <text class="b" x="581" y="361">Scopes, network policy, allowlists, rate limits</text>
 <rect class="gap" x="575" y="390" width="449" height="206"/>
 <text class="lab" x="589" y="410">GAPS</text>
-<rect x="591" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="431.5">M1</text>
+<rect x="591" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="605" y="431.5">M1</text>
 <text class="b" x="627" y="432">Long-lived keys with whole-store scopes</text>
-<rect x="591" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="454.5">M2</text>
+<rect x="591" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="605" y="454.5">M2</text>
 <text class="b" x="627" y="455">No person in the loop: the job runs with full power</text>
-<rect x="591" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="477.5">M3</text>
+<rect x="591" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="605" y="477.5">M3</text>
 <text class="b" x="627" y="478">Consent drops out of the record in transforms</text>
-<rect x="591" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="500.5">M4</text>
+<rect x="591" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="605" y="500.5">M4</text>
 <text class="b" x="627" y="501">Retries and redelivery replay writes</text>
-<rect x="591" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="605" y="523.5">M5</text>
+<rect x="591" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="605" y="523.5">M5</text>
 <text class="b" x="627" y="524">Queues and logs keep the payload</text>
 <path class="ln" d="M799.5,610L800.0,673.0"/>
 <path class="ah" d="M800,680L804.4,671.0L795.4,671.0z"/>
@@ -87,19 +87,19 @@
 <text class="b" x="1084" y="361">Tool allowlist, mandate check, budget, approval</text>
 <rect class="gap" x="1078" y="390" width="449" height="206"/>
 <text class="lab" x="1092" y="410">GAPS</text>
-<rect x="1094" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="431.5">A1</text>
+<rect x="1094" y="419" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="431.5">A1</text>
 <text class="b" x="1130" y="432">Prompt injection: content becomes instructions</text>
-<rect x="1094" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="454.5">A2</text>
+<rect x="1094" y="442" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="454.5">A2</text>
 <text class="b" x="1130" y="455">Excessive agency: tools broader than the task</text>
-<rect x="1094" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="477.5">A3</text>
+<rect x="1094" y="465" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="477.5">A3</text>
 <text class="b" x="1130" y="478">Token passthrough: the agent forwards your token</text>
-<rect x="1094" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="500.5">A4</text>
+<rect x="1094" y="488" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="500.5">A4</text>
 <text class="b" x="1130" y="501">Mandate replay, or scope drift past the mandate</text>
-<rect x="1094" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="523.5">A5</text>
+<rect x="1094" y="511" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="523.5">A5</text>
 <text class="b" x="1130" y="524">Exfiltration through a tool call or a URL</text>
-<rect x="1094" y="534" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="546.5">A6</text>
+<rect x="1094" y="534" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="546.5">A6</text>
 <text class="b" x="1130" y="547">Same prompt, different action: retries double-spend</text>
-<rect x="1094" y="557" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1108" y="569.5">A7</text>
+<rect x="1094" y="557" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1108" y="569.5">A7</text>
 <text class="b" x="1130" y="570">No record of why the agent acted</text>
 <path class="ln" d="M1302.5,610L986.8,678.5"/>
 <path class="ah" d="M980,680L989.7,682.5L987.8,673.7z"/>
@@ -201,58 +201,58 @@
 <text class="b" x="890" y="1422">Regulators in every market</text>
 <text class="b" x="1228" y="1422">Crawlers, answer engines and agents</text>
 <path class="rule" d="M60,1433H1540" style="stroke:#ddd"/>
-<text class="s" x="60" y="1458">Each column keeps every problem to its left. The AI column is dashed: making a system legible to machines also makes it readable, quotable and steerable by them.</text>
+<text class="s" x="60" y="1458">Each column keeps every problem to its left. The AI column is red dashed: making a system legible to machines also makes it readable, quotable and steerable by them.</text>
 <path class="rule" d="M60,1488H1540"/>
 <text class="sec" x="60" y="1516">SEVENTEEN GAPS — AND THE CONTROL THAT CLOSES EACH</text>
-<rect x="60" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1547.5">B1</text>
+<rect x="60" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="74" y="1547.5">B1</text>
 <text class="bt" x="96" y="1548">Client checks are suggestions</text>
 <text class="b" x="96" y="1568">Fix: Authorize every request on the server, per record</text>
-<rect x="60" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1609.5">B2</text>
+<rect x="60" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="74" y="1609.5">B2</text>
 <text class="bt" x="96" y="1610">Third-party tags see the page</text>
 <text class="b" x="96" y="1630">Fix: CSP, Subresource Integrity, a script inventory (PCI DSS 6.4.3)</text>
-<rect x="60" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1671.5">B3</text>
+<rect x="60" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="74" y="1671.5">B3</text>
 <text class="bt" x="96" y="1672">Tokens readable by XSS</text>
 <text class="b" x="96" y="1692">Fix: HttpOnly, Secure, SameSite cookies; nothing in localStorage</text>
-<rect x="60" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1733.5">B4</text>
+<rect x="60" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="74" y="1733.5">B4</text>
 <text class="bt" x="96" y="1734">Tags fire before consent</text>
 <text class="b" x="96" y="1754">Fix: Consent Mode default denied; load tags after the choice</text>
-<rect x="60" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="74" y="1795.5">B5</text>
+<rect x="60" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="74" y="1795.5">B5</text>
 <text class="bt" x="96" y="1796">Hydration ships data</text>
 <text class="b" x="96" y="1816">Fix: Pass only what the screen shows; fetch PII after consent</text>
-<rect x="563" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1547.5">M1</text>
+<rect x="563" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="577" y="1547.5">M1</text>
 <text class="bt" x="599" y="1548">Keys too broad, too long</text>
 <text class="b" x="599" y="1568">Fix: Least-privilege scopes, short lifetimes, rotation</text>
-<rect x="563" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1609.5">M2</text>
+<rect x="563" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="577" y="1609.5">M2</text>
 <text class="bt" x="599" y="1610">No person in the loop</text>
 <text class="b" x="599" y="1630">Fix: Act as a named service, log it, cap what it can change</text>
-<rect x="563" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1671.5">M3</text>
+<rect x="563" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="577" y="1671.5">M3</text>
 <text class="bt" x="599" y="1672">Consent drops out</text>
 <text class="b" x="599" y="1692">Fix: Carry consent state as a field; refuse records without it</text>
-<rect x="563" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1733.5">M4</text>
+<rect x="563" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="577" y="1733.5">M4</text>
 <text class="bt" x="599" y="1734">Replays duplicate writes</text>
 <text class="b" x="599" y="1754">Fix: Verify the HMAC on the raw body; one idempotency key per event</text>
-<rect x="563" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="577" y="1795.5">M5</text>
+<rect x="563" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="577" y="1795.5">M5</text>
 <text class="bt" x="599" y="1796">Payloads persist</text>
 <text class="b" x="599" y="1816">Fix: Store IDs, not payloads; purge queues; scrub logs</text>
-<rect x="1066" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1547.5">A1</text>
+<rect x="1066" y="1535" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1547.5">A1</text>
 <text class="bt" x="1102" y="1548">Prompt injection</text>
 <text class="b" x="1102" y="1568">Fix: Treat fetched content as data; approve side effects outside the model</text>
-<rect x="1066" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1609.5">A2</text>
+<rect x="1066" y="1597" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1609.5">A2</text>
 <text class="bt" x="1102" y="1610">Excessive agency</text>
 <text class="b" x="1102" y="1630">Fix: One narrow tool per task; read and write as separate tools</text>
-<rect x="1066" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1671.5">A3</text>
+<rect x="1066" y="1659" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1671.5">A3</text>
 <text class="bt" x="1102" y="1672">Token passthrough</text>
 <text class="b" x="1102" y="1692">Fix: Audience-bound tokens per tool; never forward the user&#x27;s token</text>
-<rect x="1066" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1733.5">A4</text>
+<rect x="1066" y="1721" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1733.5">A4</text>
 <text class="bt" x="1102" y="1734">Mandate replay or drift</text>
 <text class="b" x="1102" y="1754">Fix: Sign amount, merchant, expiry and nonce; check every call</text>
-<rect x="1066" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1795.5">A5</text>
+<rect x="1066" y="1783" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1795.5">A5</text>
 <text class="bt" x="1102" y="1796">Exfiltration by tool</text>
 <text class="b" x="1102" y="1816">Fix: Egress allowlist; no raw-URL tools; filter outputs for PII</text>
-<rect x="1066" y="1845" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1857.5">A6</text>
+<rect x="1066" y="1845" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1857.5">A6</text>
 <text class="bt" x="1102" y="1858">Retries double-spend</text>
 <text class="b" x="1102" y="1878">Fix: An idempotency key on every side-effecting tool call</text>
-<rect x="1066" y="1907" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1080" y="1919.5">A7</text>
+<rect x="1066" y="1907" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="n" x="1080" y="1919.5">A7</text>
 <text class="bt" x="1102" y="1920">No record of why</text>
 <text class="b" x="1102" y="1940">Fix: Log user, agent, mandate, tool and inputs to an append-only ledger</text>
 <text class="s" x="60" y="2000">A browser is a person whose code you can&#x27;t trust. A machine is code with no person. An agent is code choosing what to do for a person. Each needs its own rule at the same endpoint.</text>
