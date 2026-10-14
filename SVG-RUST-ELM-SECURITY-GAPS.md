@@ -49,6 +49,9 @@ keywords:
   - LangChain
   - LoRA
   - localization
+  - Webflow CMS
+  - audience targeting
+  - DSR
 about:
   - Data security for PII, PCI and PHI
   - SVG and base64 encoding
@@ -494,6 +497,95 @@ Training runs inside the clean room: only records consented for training, pseudo
 | L10 Personalization served without a consent check | Check consent and blocked markets on every request; fall back to the language adapter |
 
 L3 is the confusion at the heart of this section. Allowing a crawler is a decision about content. It never grants consent to use a person's data, and an agent acting for a user may not read either file at all.
+
+## Audience targets in a CMS: definitions, not members
+
+An AI-enabled audience collection in Webflow stores **definitions, never members**. It holds no emails, hashes or customer IDs. Membership is resolved at sync time in Shopify, Klaviyo or BigQuery, checked against each person's state, and sent to Google with consent fields attached. An agent may **propose** an audience as a draft item; a person approves it by publishing.
+
+Each audience carries **targeting conditions** (consent, DSR, device, location and campaign rules) that a person must meet. Each person's own state stays in Xano and the ledger. Webflow gets back only aggregate **state snapshots**.
+
+### `Audience Targets`
+
+| Field | Webflow type | Purpose |
+| --- | --- | --- |
+| Name, Slug | Plain text, Slug | "US loyal buyers, 3+ orders" |
+| Status | Option: Proposed by agent · In review · Approved · Live · Paused · Retired | Only *Live* syncs |
+| Description | Plain text | Plain-language meaning, for people |
+| Definition format | Option: Shopify segment query · Klaviyo segment · BigQuery template · pLTV threshold | How to read the definition |
+| Definition | Plain text, multi-line | The query that defines the audience, not a snapshot of its members |
+| Definition hash | Plain text | SHA-256 of the definition; any change needs re-approval |
+| Source system | Option: Shopify · Klaviyo · BigQuery · Xano | Where membership is resolved |
+| Markets | Multi-reference → Markets | Where the audience may be used |
+| Consent required | Multi-reference → Consent Purposes | Purposes each member must have granted |
+| **Consent state** | Option: All required granted · Any required granted · Not required (language only) | Personalization and ad destinations use *All required granted* |
+| **DSR rule** | Option: Exclude any open DSR · Exclude listed DSR types | Default: exclude any open DSR |
+| **DSR types excluded** | Multi-reference → DSR Types | Used with *Exclude listed DSR types* |
+| **Devices** | Multi-reference → Device Classes | Device classes the audience may reach |
+| **Device signal** | Option: User-agent class · App SDK · None | Never device IDs or fingerprints |
+| **Location granularity** | Option: Country · Region or state · None | Coarse only: no city, postcode or coordinates |
+| **Location source** | Option: Shopify market · Billing country · IP country | IP country never sets the locale or the legal rules (L7) |
+| **Campaigns** | Multi-reference → Campaigns | Campaigns allowed to use this audience |
+| Destinations | Multi-reference → Destinations | Google Ads Customer Match, Klaviyo, the on-site assistant |
+| LoRA adapter | Reference → Adapters | The personalization adapter for this cohort, if any |
+| Min cohort | Number | Don't sync or report below this size |
+| Retire by | Date/time | The definition must be reviewed again by this date |
+| Contains personal data | Switch | Must be off; the sync refuses items with it on |
+| AI: Proposed by · Rationale · Eval result | Plain text · Rich text · Option: PASS, FAIL, REVIEW | The agent's proposal, reasoning and rubric result |
+| AI: Assistant summary · Embedding text | Plain text | What the assistant may say, and the public text indexed for RAG |
+| Approved by · Approved at · Ledger entry | Plain text · Date/time · Link | Who approved it, when, and the ledger record |
+
+### Supporting collections
+
+| Collection | Fields |
+| --- | --- |
+| Markets | Name, Country code, Regime (GDPR · UK GDPR · CCPA/CPRA · PIPA · APPI), Personalization allowed, Training allowed, Hold note |
+| Consent Purposes | Name, Key (`ad_user_data`, `ad_personalization`, `marketing`, `preferences`, `training`), Google consent field, Shopify API method |
+| Destinations | Name, Platform, Required consent fields, Credential reference: the *name* of the secret in Cloudflare or Xano, never the secret |
+| Adapters | Adapter ID, Base model, Locale, Market, Purpose (Language · Personalization), Dataset hash, Record count, Trained at, Retire by |
+| DSR Types | Name, Key (`access` · `deletion` · `opt_out_sale_share` · `correction` · `restrict` · `object`), Excludes from targeting, Regimes, Deadline days (30 GDPR, 45 CCPA, 10 PIPA) |
+| Device Classes | Name, Key (`desktop` · `mobile_web` · `ios_app` · `android_app` · `ctv` · `agent_api`), Consent source, Personalization allowed |
+| Campaigns | Name, Platform, External campaign ID, Objective, Markets, Consent required, Start, End, Status, Ledger entry |
+
+`agent_api` is its own device class: an AI agent shopping for a user gets no persona adapter unless the user's mandate covers it.
+
+### `Audience States`: aggregate snapshots, written by the sync
+
+One item per audience, campaign, market and device class for each sync: the **State** (Synced · Held below cohort · Blocked by consent · Blocked by DSR · Blocked by market · Error), **Matched by definition**, **Excluded: open DSR**, **Excluded: consent not granted**, **Excluded: blocked market or location**, **Excluded: device not allowed**, **Sent to destination**, **Consent coverage** (percent), Snapshot at and Ledger entry. Every count below the audience's *Min cohort* is left empty: small counts sliced by device, market and campaign can identify a person (C2).
+
+### Per-person state, outside the CMS
+
+```json
+{
+  "subject": "hmac:7e1a…",
+  "consent": { "ad_user_data": true, "ad_personalization": true, "marketing": true, "preferences": true, "training": false, "source": "shopify_customer_privacy", "at": "2026-10-12T09:14:00Z" },
+  "dsr": { "open": null, "last": { "type": "access", "closed_at": "2026-08-02" } },
+  "device_class": "mobile_web",
+  "location": { "country": "US", "region": "CA", "source": "shopify_market" },
+  "campaigns": ["spring-sale"]
+}
+```
+
+For each person the definition matches, the sync checks in this order and stops at the first failure:
+
+1. **DSR:** an open request, or one of the excluded types, excludes the person. Deletion and opt-out win over everything else.
+2. **Consent:** every purpose in *Consent required*, and the destination's required consent fields, must be granted.
+3. **Location:** the person's market must be listed and not blocked; that market's regime rules apply.
+4. **Device:** the device class must be listed, and allow personalization if a LoRA adapter is attached.
+5. **Campaign:** the campaign must be *Live*, in its dates, with its consent requirements met.
+6. **Cohort:** below *Min cohort*, the state is *Held below cohort* and nothing is sent.
+
+Customer Match uploads carry `ad_user_data` and `ad_personalization`. The ledger keeps each person's decision; Webflow gets only totals. The agent creates items through the Data API (`POST /v2/collections/{id}/items`) with `isDraft: true` and can't publish. The sync reads only published *Live* items and refuses any item whose definition hash doesn't match the approved one.
+
+| Gap | Fix |
+| --- | --- |
+| T1 Members stored in the CMS | Definitions only; *Contains personal data* must be off, and the sync refuses the item otherwise |
+| T2 A template page publishes the collection | Don't bind it to a Collection template page; every field on one is public |
+| T3 The agent publishes its own audience | Agents create drafts only; a person reviews and publishes |
+| T4 Definition changed after approval | A definition hash recorded at approval; a mismatch blocks the sync |
+| T5 Small slices identify people | Counts below *Min cohort* left empty in every snapshot |
+| T6 Open DSR still targeted | DSR checked first, before consent, on every sync |
+| T7 Precise location or device IDs | Country or region and a device class only |
+| T8 Secrets in the Destinations collection | Store the secret's name; the secret lives in Cloudflare or Xano |
 
 ## VM, container or managed database — and the storage wrappers
 
