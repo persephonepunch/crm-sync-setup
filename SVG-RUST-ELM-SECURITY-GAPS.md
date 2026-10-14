@@ -215,6 +215,74 @@ A JVM that never leaves its VM can get away with assumptions that stop holding o
 
 The last column is the one teams plan least for. Making a system legible to AI — structured data, `llms.txt`, clean JSON-LD, Markdown descriptors — is how answer engines and agents find and recommend it. The same legibility makes it readable, quotable and steerable by every model that fetches it, so anything an agent can read is something an attacker can phrase as an instruction (A1).
 
+## VM, container or managed database — and the storage wrappers
+
+Where the database runs decides who patches it, where its data sits, and which wall you are relying on. In every case the **app points to the database**: connections start at the app, and the database never connects back to it.
+
+```
+Hardware (cloud host)
+└─ Hypervisor                       ← the wall between VMs
+   └─ VM: guest OS (its own kernel)
+      └─ Database process
+         └─ Data files ─── on an attached virtual disk (EBS, Persistent Disk, Managed Disks)
+```
+
+| | VM | Container | Managed database |
+| --- | --- | --- | --- |
+| **What it holds** | Its own OS kernel, plus whatever you install | The app process and its libraries; it shares the host's kernel | You never see the machine; you get an address or an API |
+| **Where the data lives** | On an attached virtual disk you can detach, snapshot and reattach | On a mounted persistent volume, or it disappears with the container | Provider storage, with backups and replicas included |
+| **Who patches the OS and engine** | You | You patch the image; the platform patches the node | The provider |
+| **The wall** | The hypervisor (gap 27) | One shared kernel (gap 23) | The provider's tenancy, plus your access settings |
+| **What you still secure** | Disk and snapshot encryption, the database port, the OS | Image secrets (gap 26), pod traffic (gap 25), Secrets (gap 24) | Who can reach it, with which credential, and whether anything is public |
+
+A managed service moves the operating system and the patching to the provider. **It does not move the access model.** Keys, IAM bindings, bucket policies and public toggles stay yours — that is the shared responsibility line, and almost every public data leak sits on your side of it.
+
+### Container, Docker, Kubernetes, and a container in the cloud
+
+Four words, four different layers. They are easy to blur because they usually appear together.
+
+| Layer | What it is | Analogy |
+| --- | --- | --- |
+| **Container** | The thing itself: an app and its libraries packaged as an [OCI image](https://opencontainers.org/), run as an isolated process that shares the host's kernel | A shipping container |
+| **Docker** | A tool that builds images from a `Dockerfile` and runs containers on **one machine** | The crane and packing crew at one dock |
+| **Kubernetes** | An [orchestrator](https://kubernetes.io/docs/concepts/overview/): runs many containers across **many machines**, restarts and scales them, networks them, and stores their config and Secrets. It doesn't build images | The port's scheduling system across every dock |
+| **A container in the cloud** | Someone else runs the machines. You hand over an image | Renting space in a port someone else operates |
+
+The same image runs under all of them. Build it once with Docker, and it can run on a laptop, in a Kubernetes cluster or on a cloud service unchanged.
+
+"A container in the cloud" comes in three amounts of control:
+
+| You want | Use | You manage | The provider manages |
+| --- | --- | --- | --- |
+| Kubernetes, without running its control plane | Managed Kubernetes: AWS EKS, Google GKE, Azure AKS | Your Kubernetes objects, node settings, network policy, Secrets | The control plane, and usually node patching |
+| Just run this image, no cluster | Serverless containers: AWS [Fargate](https://aws.amazon.com/fargate/) and App Runner, Google [Cloud Run](https://cloud.google.com/run/docs/overview/what-is-cloud-run), Azure [Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview) | The image, its settings, who may call it | Machines, scaling, patching |
+| A container next to a Worker | [Cloudflare Containers](https://developers.cloudflare.com/containers/), started and addressed from a Worker | The image and the Worker that fronts it | Machines, placement, scaling |
+
+A **Cloudflare Worker is not a container**. It is a V8 isolate: lighter, starting in milliseconds, with no filesystem and no kernel of its own. That is why the Worker sits in front and a container is reached only through it, when you need a full Linux process.
+
+Security follows the layer, not the brand. The image carries its own risks wherever it runs (secrets baked into layers, gap 26). Kubernetes adds cluster risks (Secrets as base64, gap 24; plaintext pod traffic, gap 25). A serverless container service removes the cluster risks but keeps the image risks and your access settings.
+
+### The wrappers, by provider
+
+| Service | What it is | How you reach it | Public by default? | Encryption at rest | Classic foot gun |
+| --- | --- | --- | --- | --- | --- |
+| [Cloudflare D1](https://developers.cloudflare.com/d1/) | Serverless SQLite | A Worker binding; a REST API with an account token | No | Yes | An account-wide API token used where a binding would do |
+| [Cloudflare KV](https://developers.cloudflare.com/kv/) | Global key-value, cached at the edge | A Worker binding | No | Yes | Eventually consistent: wrong for idempotency or counters (gap 21) |
+| [Cloudflare R2](https://developers.cloudflare.com/r2/) | S3-compatible object storage | A Worker binding, S3 API keys, presigned URLs | No, until you enable [public access](https://developers.cloudflare.com/r2/buckets/public-buckets/) | [Yes](https://developers.cloudflare.com/r2/reference/data-security/) | Public access is per bucket: one bucket mixing public and private files exposes both |
+| [Durable Objects](https://developers.cloudflare.com/durable-objects/) | A single, strongly consistent instance with its own storage | Only through a Worker | No | Yes | Putting a per-user object's ID somewhere a stranger can guess it |
+| [Hyperdrive](https://developers.cloudflare.com/hyperdrive/) | A connection pool to your existing Postgres or MySQL | A Worker binding | — | Credentials held by Cloudflare | Forgetting the database behind it still needs TLS and its own allowlist |
+| AWS S3 | Object storage | IAM, bucket policies, presigned URLs | No: [Block Public Access](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html) is on for new buckets | Yes, by default | A bucket policy with `"Principal": "*"` |
+| AWS RDS | Managed Postgres, MySQL, SQL Server and others | A host name and a database user, or IAM auth | Only if "publicly accessible" is set | [Chosen at creation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html); can't be switched on later in place | "Publicly accessible" plus an open security group |
+| AWS DynamoDB | Managed key-value and document | IAM | No | Yes, by default | IAM policies with `dynamodb:*` on `*` |
+| GCP Cloud Storage | Object storage | IAM, signed URLs | No, with [public access prevention](https://cloud.google.com/storage/docs/public-access-prevention) | Yes, by default | Granting [`allAuthenticatedUsers`](https://cloud.google.com/iam/docs/principals-overview): that means any Google account, not your users |
+| GCP Cloud SQL | Managed Postgres, MySQL, SQL Server | Private IP, the Cloud SQL Auth Proxy, or IAM auth | Only with a public IP and authorized networks | Yes, by default | Authorizing `0.0.0.0/0` to reach a public IP |
+| GCP Firestore / BigQuery | Managed document store / warehouse | IAM | No | Yes, by default | A dataset shared too broadly, or exported to a public bucket |
+| Azure Blob Storage | Object storage | Entra ID roles, account keys, SAS tokens | No: [anonymous access](https://learn.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-prevent) is off by default on new accounts | [Yes, by default](https://learn.microsoft.com/en-us/azure/storage/common/storage-service-encryption) | [Account keys](https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent) grant everything; long-lived SAS tokens leak |
+| Azure SQL / Cosmos DB | Managed relational / multi-model | Entra ID or keys, private endpoints | Depends on network settings | Yes, by default | A primary key embedded in an app instead of Entra ID |
+| Xano | A managed backend: database plus API | Xano's API with a token; never the database port | No | Managed by Xano | An endpoint left without auth or per-record checks (gap 4) |
+
+"Encrypted at rest by default" means the provider's disks are encrypted. It does not mean your data is hidden from anyone who holds a valid key, token or IAM role — and those are what leak. For PII, card data and PHI, keep the access model narrow, prefer identity-based access over long-lived keys, and encrypt sensitive fields yourself where the provider would otherwise see them.
+
 ## Known foot guns
 
 A **foot gun** is a feature, API or default that makes it unusually easy to shoot yourself in the foot: a perfectly natural-looking use causes the bug, outage or leak. The blame lands on the design, because the design invites the mistake. The remedy is the same every time: **make the safe path the default, and make the dangerous path explicit and loud** — the way Rust spells it `unsafe` and React spells it `dangerouslySetInnerHTML`.
@@ -238,6 +306,10 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 | An agent tool that fetches any URL it is given | Prompt injection turns it into an exfiltration channel (A5) | An allowlisted fetch, or no fetch tool at all |
 | Forwarding the user's OAuth token to a tool or MCP server | Token passthrough: the tool can act as the user anywhere (A3) | A token issued for that tool's audience only |
 | A service account with `SAP_ALL` or full Shopify Admin scopes | One leaked key is the whole ERP or store (gap 29) | One narrow credential per interface |
+| One R2, S3 or Blob bucket for both public and private files | Making the public files public exposes the private ones too | One bucket per audience |
+| Granting `allAuthenticatedUsers` on GCP | Any Google account on the internet can read it | Name your own users, groups or service accounts |
+| An Azure storage account key in app config | Full control of the whole account if it leaks | Entra ID roles and managed identity; disable shared-key auth |
+| RDS "publicly accessible" with a wide security group | The database port answers the internet | Private subnets; reach it through the app or a proxy |
 
 ## Related
 
