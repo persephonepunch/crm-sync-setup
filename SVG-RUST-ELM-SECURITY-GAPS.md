@@ -291,7 +291,7 @@ The platforms a commerce stack connects don't just run different languages. Each
 | Salesforce | Java: Apex, SFCC's server JavaScript on Rhino in the JVM, MuleSoft | Data Cloud identity resolution rules | Contact and Account IDs | Salesforce consent objects |
 | Adobe | Java for AEM; **PHP** for Adobe Commerce (Magento) | Experience Platform identity graph | ECID and identity namespaces | Consent and governance labels |
 | Shopify | Ruby on Rails at the core; [Functions](https://shopify.dev/docs/apps/build/functions/programming-languages/rust-for-functions) as Wasm, written in Rust or JavaScript compiled by Javy | Customer accounts | `gid://shopify/Customer/…` | The Customer Privacy API |
-| Google Merchant · Ads | Google's own, not public; **your** side is the Python client, notebooks and BigQuery exports | Hashed user data for enhanced conversions | `offerId` and GTIN | Consent Mode v2 signals |
+| Google Merchant · Ads | Google's own, not public; **your** side is the Python client, notebooks and BigQuery exports | Hashed user data for enhanced conversions | `offerId` and GTIN | Consent Mode v2 consent states (`ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization`) |
 
 Rust, Wasm and Javy are Shopify's *extension* layer — the code you write — not its core. Python is the *client* side of Google Merchant, not Google's runtime. And "Adobe is Java" holds for AEM but not for Adobe Commerce.
 

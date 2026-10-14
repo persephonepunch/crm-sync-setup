@@ -70,7 +70,7 @@
 <text class="lab" x="1201" y="290">ID KEY</text>
 <text class="b" x="1201" y="307">offerId and GTIN</text>
 <text class="lab" x="1201" y="334">CONSENT MODEL</text>
-<text class="b" x="1201" y="351">Consent Mode v2 signals</text>
+<text class="b" x="1201" y="351">Consent Mode v2 consent states</text>
 <path class="ln" d="M237.5,380L473.4,465.6"/>
 <path class="ah" d="M480.0,468L473.1,460.7L470.0,469.2z"/>
 <path class="ln" d="M612.5,380L688.6,462.8"/>
@@ -124,7 +124,7 @@
 <text class="b" x="380" y="808">Never. A JVM, a Ruby process, a Wasm module and Google&#x27;s services only exchange messages.</text>
 <path class="rule" d="M60,819H1540" style="stroke:#ddd"/>
 <text class="bt" x="60" y="838">What crosses?</text>
-<text class="b" x="380" y="838">JSON over HTTPS: records, events, IDs and consent signals.</text>
+<text class="b" x="380" y="838">JSON over HTTPS: records, events, IDs and consent states.</text>
 <path class="rule" d="M60,849H1540" style="stroke:#ddd"/>
 <text class="bt" x="60" y="868">What does memory safety protect?</text>
 <text class="b" x="380" y="868">Each plane from its own inputs. It stops at the plane&#x27;s edge.</text>

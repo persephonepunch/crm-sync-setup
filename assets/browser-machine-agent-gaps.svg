@@ -32,7 +32,7 @@
 <text class="lab" x="78" y="260">PROVES IDENTITY WITH</text>
 <text class="b" x="78" y="277">Session cookie, OAuth or passkey login</text>
 <text class="lab" x="78" y="302">CONSENT ARRIVES AS</text>
-<text class="b" x="78" y="319">A banner choice: Consent Mode v2 signals</text>
+<text class="b" x="78" y="319">A banner choice: Consent Mode v2 consent states</text>
 <text class="lab" x="78" y="344">LIMITS ENFORCED BY</text>
 <text class="b" x="78" y="361">Same-origin policy, CSP, SameSite cookies, CORS</text>
 <rect class="gap" x="72" y="390" width="449" height="206"/>
