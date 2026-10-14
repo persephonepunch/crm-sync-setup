@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1420" role="img" aria-labelledby="t d">
+<title id="t">Binding and the clean room for AI-first automation</title>
+<desc id="d">A clean room for AI-first automation is a controlled place where data from more than one party is joined and analyzed while no party, model or agent sees another party's individual records: only consented records enter, only reviewed templates run, only aggregates above a privacy threshold leave, and every query is logged. Two ways to bind systems: an owned pipeline of a signed event, an edge check of the signature, idempotency key and consent, a durable queue of IDs and consent state, an idempotent processor and a ledger; and a latent iPaaS path whose gaps are marked in red, scheduled flows minutes behind, mappings outside code review, payload copies in retry stores and broad connector accounts. Three ways Shopify and Google data meet: enhanced conversions and Customer Match, where Google does the join; Ads Data Hub and BigQuery data clean rooms, where only thresholded aggregates leave; and the CRM Sync clean room with salted hashes, a session Durable Object, a clean_room consent scope and fixed query templates. What an agent may learn: it asks through a template, the clean room checks thresholds and differencing, and only an aggregate answer returns. Eight red gaps have fixes.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .def{font:16px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .chip{font:700 12px Helvetica,Arial,sans-serif;fill:#fff}
+ .c{font:11px 'Courier New',Courier,monospace;fill:#000}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .ah{fill:#767676}
+ .ahr{fill:#c8102e}
+</style></defs>
+<rect width="1600" height="1420" fill="#fff"/>
+<text class="h" x="60" y="52">BINDING AND THE CLEAN ROOM — OWNED EVENTS vs LATENT iPaaS, AND WHAT AI MAY LEARN</text>
+<text class="g" x="60" y="76">bind by reference, carry consent with every record, and let agents learn from aggregates, never rows</text>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text class="s" x="1326" y="76">Red dashed = a security gap.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">CLEAN ROOM FOR AI-FIRST AUTOMATION, DEFINED</text>
+<rect x="60" y="140" width="1480" height="150" fill="#fff" stroke="#000" stroke-width="3"/>
+<text class="def" x="84" y="176">A controlled place where data from more than one party is joined and analyzed, while no party, model or agent</text>
+<text class="def" x="84" y="200">sees another party&#x27;s individual records. Agents learn from the combined data without ever receiving a row.</text>
+<rect x="84" y="234" width="229.20000000000002" height="30" fill="#000"/>
+<text class="chip" x="198.60000000000002" y="254" text-anchor="middle">Only consented records enter</text>
+<rect x="327.20000000000005" y="234" width="221.8" height="30" fill="#000"/>
+<text class="chip" x="438.1" y="254" text-anchor="middle">Only reviewed templates run</text>
+<rect x="563.0" y="234" width="310.6" height="30" fill="#000"/>
+<text class="chip" x="718.3" y="254" text-anchor="middle">Only aggregates above a threshold leave</text>
+<rect x="887.6" y="234" width="177.4" height="30" fill="#000"/>
+<text class="chip" x="976.3000000000001" y="254" text-anchor="middle">Every query is logged</text>
+<path class="rule" d="M60,320H1540"/>
+<text class="sec" x="60" y="348">TWO WAYS TO BIND SYSTEMS</text>
+<text class="lt" x="60" y="382">A · Owned event binding — recommended for personal data, consent and agent actions</text>
+<rect class="box" x="60" y="396" width="280" height="82"/>
+<text class="bt" x="74" y="420">1 · Signed event</text>
+<text class="b" x="74" y="440">a Shopify webhook, or EventBridge</text>
+<text class="b" x="74" y="457">or Pub/Sub delivery</text>
+<path class="ln" d="M342,437L351.0,437.0"/>
+<path class="ah" d="M358,437L349.0,432.5L349.0,441.5z"/>
+<rect class="box" x="360" y="396" width="280" height="82"/>
+<text class="bt" x="374" y="420">2 · Edge check</text>
+<text class="b" x="374" y="440">HMAC on the raw body,</text>
+<text class="b" x="374" y="457">idempotency key, consent gate</text>
+<path class="ln" d="M642,437L651.0,437.0"/>
+<path class="ah" d="M658,437L649.0,432.5L649.0,441.5z"/>
+<rect class="box" x="660" y="396" width="280" height="82"/>
+<text class="bt" x="674" y="420">3 · Durable queue</text>
+<text class="b" x="674" y="440">IDs, minimal fields and</text>
+<text class="b" x="674" y="457">the consent state, not payloads</text>
+<path class="ln" d="M942,437L951.0,437.0"/>
+<path class="ah" d="M958,437L949.0,432.5L949.0,441.5z"/>
+<rect class="box" x="960" y="396" width="280" height="82"/>
+<text class="bt" x="974" y="420">4 · Idempotent processor</text>
+<text class="b" x="974" y="440">upserts by stable keys:</text>
+<text class="b" x="974" y="457">offerId, global ID, record ID</text>
+<path class="ln" d="M1242,437L1251.0,437.0"/>
+<path class="ah" d="M1258,437L1249.0,432.5L1249.0,441.5z"/>
+<rect class="box" x="1260" y="396" width="280" height="82"/>
+<text class="bt" x="1274" y="420">5 · Ledger</text>
+<text class="b" x="1274" y="440">every mapping, every</text>
+<text class="b" x="1274" y="457">yes and every no</text>
+<text class="ltr" x="60" y="516">B · Latent iPaaS flow, as MuleSoft and Celigo are often deployed — fine for ERP back office and batch reconciliation</text>
+<rect class="box" x="60" y="530" width="280" height="82"/>
+<text class="bt" x="74" y="554">Source system</text>
+<text class="b" x="74" y="574">an order, a customer,</text>
+<text class="b" x="74" y="591">a price change</text>
+<path class="lnr" d="M342,571L351.0,571.0"/>
+<path class="ahr" d="M358,571L349.0,566.5L349.0,575.5z"/>
+<rect class="rgap" x="360" y="530" width="280" height="82"/>
+<text class="btr" x="374" y="554">Scheduled or polling flow</text>
+<text class="r" x="374" y="574">runs minutes behind;</text>
+<text class="r" x="374" y="591">consent checked at the last run</text>
+<rect x="602.0" y="538" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="616.0" y="550.5">I1</text>
+<path class="lnr" d="M642,571L651.0,571.0"/>
+<path class="ahr" d="M658,571L649.0,566.5L649.0,575.5z"/>
+<rect class="rgap" x="660" y="530" width="280" height="82"/>
+<text class="btr" x="674" y="554">Mapping in the vendor UI</text>
+<text class="r" x="674" y="574">changes skip code review;</text>
+<text class="r" x="674" y="591">consent fields often unmapped</text>
+<rect x="902.0" y="538" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="916.0" y="550.5">I2</text>
+<path class="lnr" d="M942,571L951.0,571.0"/>
+<path class="ahr" d="M958,571L949.0,566.5L949.0,575.5z"/>
+<rect class="rgap" x="960" y="530" width="280" height="82"/>
+<text class="btr" x="974" y="554">Retry and error store</text>
+<text class="r" x="974" y="574">keeps full payload copies</text>
+<text class="r" x="974" y="591">outside your systems (gap 28)</text>
+<rect x="1202.0" y="538" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1216.0" y="550.5">I3</text>
+<path class="lnr" d="M1242,571L1251.0,571.0"/>
+<path class="ahr" d="M1258,571L1249.0,566.5L1249.0,575.5z"/>
+<rect class="rgap" x="1260" y="530" width="280" height="82"/>
+<text class="btr" x="1274" y="554">Targets</text>
+<text class="r" x="1274" y="574">reached with a broad</text>
+<text class="r" x="1274" y="591">connector account (gap 29)</text>
+<rect x="1502.0" y="538" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1516.0" y="550.5">I4</text>
+<path class="rule" d="M60,650H1540"/>
+<text class="sec" x="60" y="678">THREE WAYS SHOPIFY AND GOOGLE DATA MEET</text>
+<rect class="rgap" x="60" y="694" width="480" height="150"/>
+<text class="btr" x="74" y="718">Enhanced conversions · Customer Match</text>
+<text class="r" x="74" y="738">You send hashed email or phone.</text>
+<text class="r" x="74" y="755">Google matches them against its users.</text>
+<text class="r" x="74" y="772">Google sees the hashes and does the join.</text>
+<text class="btr" x="74" y="830">Not a clean room: Google does the join</text>
+<rect class="box" x="560" y="694" width="480" height="150"/>
+<text class="bt" x="574" y="718">Ads Data Hub · BigQuery clean room</text>
+<text class="b" x="574" y="738">Shopify orders, exported to BigQuery, join</text>
+<text class="b" x="574" y="755">Google ads data inside the room.</text>
+<text class="b" x="574" y="772">Rows under ~50 users are filtered (10 for</text>
+<text class="b" x="574" y="789">clicks and conversions); difference checks.</text>
+<text class="bt" x="574" y="830">Aggregates only leave</text>
+<rect class="box" x="1060" y="694" width="480" height="150"/>
+<text class="bt" x="1074" y="718">CRM Sync clean room</text>
+<text class="b" x="1074" y="738">Salted hashes in D1, a CleanRoomSession</text>
+<text class="b" x="1074" y="755">Durable Object, a clean_room consent scope.</text>
+<text class="b" x="1074" y="772">Only templates run: Q1 lift, Q2 overlap,</text>
+<text class="b" x="1074" y="789">Q3 UCP mandate impact, Q4 offline conversions.</text>
+<text class="bt" x="1074" y="830">Templates only; consent scoped</text>
+<path class="rule" d="M60,880H1540"/>
+<text class="sec" x="60" y="908">WHAT AN AGENT MAY LEARN</text>
+<rect class="box" x="60" y="924" width="280" height="82"/>
+<text class="bt" x="74" y="948">Agent asks</text>
+<text class="b" x="74" y="968">&quot;which segment lifted</text>
+<text class="b" x="74" y="985">after the campaign?&quot;</text>
+<path class="ln" d="M342,965L351.0,965.0"/>
+<path class="ah" d="M358,965L349.0,960.5L349.0,969.5z"/>
+<rect class="box" x="360" y="924" width="280" height="82"/>
+<text class="bt" x="374" y="948">Template only</text>
+<text class="b" x="374" y="968">Q1 to Q4, each reviewed;</text>
+<text class="b" x="374" y="985">a new question is a new tool</text>
+<path class="ln" d="M642,965L651.0,965.0"/>
+<path class="ah" d="M658,965L649.0,960.5L649.0,969.5z"/>
+<rect class="box" x="660" y="924" width="280" height="82" style="stroke-width:3"/>
+<text class="bt" x="674" y="948">Clean room</text>
+<text class="b" x="674" y="968">consented records only,</text>
+<text class="b" x="674" y="985">salted hashes, no raw IDs</text>
+<path class="ln" d="M942,965L951.0,965.0"/>
+<path class="ah" d="M958,965L949.0,960.5L949.0,969.5z"/>
+<rect class="box" x="960" y="924" width="280" height="82"/>
+<text class="bt" x="974" y="948">Threshold + difference check</text>
+<text class="b" x="974" y="968">small rows dropped;</text>
+<text class="b" x="974" y="985">overlapping queries refused</text>
+<path class="ln" d="M1242,965L1251.0,965.0"/>
+<path class="ah" d="M1258,965L1249.0,960.5L1249.0,969.5z"/>
+<rect class="box" x="1260" y="924" width="280" height="82"/>
+<text class="bt" x="1274" y="948">Aggregate answer</text>
+<text class="b" x="1274" y="968">counts and rates, never</text>
+<text class="b" x="1274" y="985">a row or an identifier</text>
+<rect class="rgap" x="60" y="1026" width="355" height="36"/>
+<rect x="68.0" y="1035" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="82" y="1047.5">C1</text>
+<text class="btr" x="102" y="1048">Free-form SQL from the agent</text>
+<rect class="rgap" x="435" y="1026" width="355" height="36"/>
+<rect x="443.0" y="1035" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="457" y="1047.5">C2</text>
+<text class="btr" x="477" y="1048">Differencing rebuilds a person</text>
+<rect class="rgap" x="810" y="1026" width="355" height="36"/>
+<rect x="818.0" y="1035" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="832" y="1047.5">C3</text>
+<text class="btr" x="852" y="1048">Revoked consent still in the room</text>
+<rect class="rgap" x="1185" y="1026" width="355" height="36"/>
+<rect x="1193.0" y="1035" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1207" y="1047.5">C4</text>
+<text class="btr" x="1227" y="1048">Rows exported, not aggregates</text>
+<path class="rule" d="M60,1090H1540"/>
+<text class="secr" x="60" y="1118">EIGHT GAPS — AND THE FIX FOR EACH</text>
+<rect x="60.0" y="1139" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1151.5">I1</text>
+<text class="btr" x="98" y="1152">Minutes behind</text>
+<text class="b" x="98" y="1171">Fix: Event-driven for personal data; check consent at send time, not at the last run</text>
+<rect x="60.0" y="1193" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1205.5">I2</text>
+<text class="btr" x="98" y="1206">Mapping outside review</text>
+<text class="b" x="98" y="1225">Fix: Export mappings to Git; review a mapping change like a code change</text>
+<rect x="60.0" y="1247" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1259.5">I3</text>
+<text class="btr" x="98" y="1260">Payload copies in retry stores</text>
+<text class="b" x="98" y="1279">Fix: Mask sensitive fields in the flow; short retention on error records</text>
+<rect x="60.0" y="1301" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1313.5">I4</text>
+<text class="btr" x="98" y="1314">Broad connector accounts</text>
+<text class="b" x="98" y="1333">Fix: One narrow credential per interface; rotate on a schedule</text>
+<rect x="810.0" y="1139" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1151.5">C1</text>
+<text class="btr" x="848" y="1152">Free-form SQL from the agent</text>
+<text class="b" x="848" y="1171">Fix: Templates only; a new question is a new, reviewed template (A2)</text>
+<rect x="810.0" y="1193" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1205.5">C2</text>
+<text class="btr" x="848" y="1206">Differencing rebuilds a person</text>
+<text class="b" x="848" y="1225">Fix: Difference checks, query budgets or added noise</text>
+<rect x="810.0" y="1247" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1259.5">C3</text>
+<text class="btr" x="848" y="1260">Revoked consent still in the room</text>
+<text class="b" x="848" y="1279">Fix: Remove a record on revocation, before the next query runs</text>
+<rect x="810.0" y="1301" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1313.5">C4</text>
+<text class="btr" x="848" y="1314">Rows exported, not aggregates</text>
+<text class="b" x="848" y="1333">Fix: Only aggregates above the threshold leave; no row-level export</text>
+<text class="bt" x="60" y="1398">Bind by reference. Carry consent with every record. Let agents learn from aggregates, never rows.</text>
+</svg>

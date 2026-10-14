@@ -314,6 +314,65 @@ The join is your code: middleware, an iPaaS flow or an agent. It is the only pla
 
 No plane learns about another plane's opt-out or erasure on its own. If a customer withdraws consent in Shopify, Salesforce, Adobe and Google still hold their own copy of "yes" until your join tells them otherwise — and keeps the receipt that it did.
 
+## Binding: owned events vs latent iPaaS, and the clean room for AI
+
+**A clean room, for AI-first automation, is a controlled place where data from more than one party is joined and analyzed while no party, model or agent sees another party's individual records.** Agents learn from the combined data without ever receiving a row. Four rules make it one:
+
+1. **Only consented records enter** — a separate consent scope, checked on the way in.
+2. **Only reviewed templates run** — no free-form queries, from people or from agents.
+3. **Only aggregates above a privacy threshold leave** — never rows or identifiers.
+4. **Every query is logged** — who or what asked, which template, what came out.
+
+![Binding and the clean room for AI-first automation. A definition box states the four rules. Two ways to bind systems: an owned pipeline of a signed event, an edge check of the HMAC, idempotency key and consent, a durable queue of IDs and consent state, an idempotent processor and a ledger; and a latent iPaaS flow whose steps are marked as red gaps — scheduled flows minutes behind, mappings in a vendor UI outside code review, retry stores with full payload copies, and broad connector accounts. Three ways Shopify and Google data meet: enhanced conversions and Customer Match, marked in red as not a clean room because Google does the join; Ads Data Hub and BigQuery clean rooms, where only thresholded aggregates leave; and the CRM Sync clean room with templates Q1 to Q4. What an agent may learn: a question goes through a template into the clean room, through threshold and difference checks, and comes back as an aggregate. Eight red gaps have fixes.](https://persephonepunch.github.io/crm-sync-setup/assets/binding-clean-room.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/binding-clean-room.svg) (1600 × 1420) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/binding-clean-room.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/binding-clean-room.jpg). Security gaps are marked in red.*
+
+### Recommended binding: owned events
+
+1. **The source emits a signed event** — a Shopify webhook, or delivery through EventBridge or Pub/Sub.
+2. **The edge checks it** — the HMAC on the raw body, an idempotency key from the event ID, and the consent state before anything leaves (the egress gate).
+3. **A durable queue carries IDs, minimal fields and the consent state** — not whole payloads.
+4. **An idempotent processor upserts by stable keys** — `offerId`, Shopify global IDs, Salesforce record IDs — through each plane's API.
+5. **A ledger records every mapping and every yes and no.**
+
+The rule underneath is **reference, don't replicate**: bind systems by ID and resolve details when they are needed. When you must copy, copy the minimum, and carry the consent state with it.
+
+| | Owned event binding | Latent iPaaS flow, as MuleSoft and Celigo are often deployed |
+| --- | --- | --- |
+| Latency | Seconds, triggered by the event | Often scheduled or polling, minutes behind (both also support real-time listeners) |
+| Where the mapping lives | Code in Git, reviewed and tested | The vendor's UI, often outside code review |
+| Copies of data | IDs and minimal fields | Retry and error records keep full payloads (gap 28) |
+| Credentials | One narrow token per interface | Broad connector accounts (gap 29) |
+| Consent | A field the gate checks at send time | Often unmapped, or checked at the last run (J1) |
+| Good for | Personal data, consent, agent actions | ERP back office, batch reconciliation, low-sensitivity data |
+
+### How Shopify and Google data meet
+
+There is no joint Shopify–Google clean room product. Data meets in one of three ways, and only two of them are clean rooms:
+
+| Path | How identities are matched | What comes out |
+| --- | --- | --- |
+| Enhanced conversions · Customer Match | You send hashed email or phone; Google matches them | Google sees the hashes and does the join. **Not a clean room** |
+| [Ads Data Hub](https://support.google.com/ads-data-hub/answer/9902984) · [BigQuery data clean rooms](https://cloud.google.com/blog/products/data-analytics/introducing-bigquery-data-clean-rooms) | Shopify orders, exported to BigQuery, join Google ads data inside the room | Aggregates only. Ads Data Hub filters rows under about 50 users (10 for clicks and conversions) and runs difference checks; BigQuery's [aggregation-threshold rule](https://docs.cloud.google.com/bigquery/docs/analysis-rules) sets your own minimum |
+| [CRM Sync clean room](https://persephonepunch.github.io/crm-sync-setup/clean-room.html) | Salted hashes in D1, a `CleanRoomSession` Durable Object, a `clean_room` consent scope | Only templates run: Q1 attribution lift, Q2 segment overlap, Q3 UCP mandate impact, Q4 offline conversions back to Google |
+
+### What an agent may learn
+
+An agent asks a question, the question runs only as a reviewed template, the clean room joins consented records under salted hashes, threshold and difference checks drop anything too small or too overlapping, and the agent gets counts and rates back — never a row or an identifier.
+
+| Gap | Fix |
+| --- | --- |
+| I1 iPaaS runs minutes behind | Event-driven for personal data; check consent at send time, not at the last run |
+| I2 Mapping outside review | Export mappings to Git; review a mapping change like a code change |
+| I3 Payload copies in retry stores | Mask sensitive fields in the flow; short retention on error records |
+| I4 Broad connector accounts | One narrow credential per interface; rotate on a schedule |
+| C1 Free-form SQL from the agent | Templates only; a new question is a new, reviewed template (A2) |
+| C2 Differencing rebuilds a person | Difference checks, query budgets or added noise |
+| C3 Revoked consent still in the room | Remove a record on revocation, before the next query runs |
+| C4 Rows exported, not aggregates | Only aggregates above the threshold leave; no row-level export |
+
+C2 is the AI-era risk. A person rarely runs hundreds of nearly identical queries; an agent can, and subtracting their results isolates one person. Ads Data Hub's difference checks exist for exactly this, and a homegrown clean room needs the same protection.
+
 ## VM, container or managed database — and the storage wrappers
 
 Where the database runs decides who patches it, where its data sits, and which wall you are relying on. In every case the **app points to the database**: connections start at the app, and the database never connects back to it.
