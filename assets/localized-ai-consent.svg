@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1490" role="img" aria-labelledby="t d">
+<title id="t">Localized AI: crawler files, locale-aware retrieval and LoRA adapters chosen by consent</title>
+<desc id="d">Two channels that never mix. The content channel: public pages pass robots.txt and llms.txt, which are public requests rather than access control, to crawlers: Googlebot for Search and AI Overviews, Google-Extended for Gemini, Storebot-Google for Merchant Center, and AI tools that read llms.txt. The consent channel: the Shopify Customer Privacy API gives the consent state, the edge attaches it to every event, and Google receives Consent Mode v2 states and Customer Match consent fields, while the Merchant API carries products only. Allowing a crawler is never consent to use a person's data. Localized retrieval loads each locale, tags every chunk with locale, market, canonical ID and translation source, embeds all locales in one multilingual index, retrieves the user's locale first with an English fallback, and answers in the user's language with live prices. LoRA adapters: a request's locale, market and consent go to an adapter picker; no consent gives the language adapter with public chunks, preferences add stated preferences, preferences and marketing unlock a personalization adapter with a cohort label. Personalization adapters are trained only on records consented for training, inside the clean room, registered with a dataset hash, and retired and retrained without people who withdrew. Rules for the EU and UK, the US, South Korea and Japan, and ten red gaps with fixes.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .def{font:16px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .chip{font:700 12px Helvetica,Arial,sans-serif;fill:#fff}
+ .c{font:11px 'Courier New',Courier,monospace;fill:#000}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .ah{fill:#767676}
+ .ahr{fill:#c8102e}
+</style></defs>
+<rect width="1600" height="1490" fill="#fff"/>
+<text class="h" x="60" y="52">LOCALIZED AI — CRAWLER FILES vs CONSENT, LOCALE-AWARE RETRIEVAL, LoRA CHOSEN BY CONSENT</text>
+<text class="g" x="60" y="76">crawler files decide which content AI may read; consent decides which people your systems may use</text>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text class="s" x="1326" y="76">Red dashed = a security gap.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">TWO CHANNELS THAT NEVER MIX</text>
+<text class="lt" x="60" y="154">A · Content channel — which content AI may read</text>
+<rect class="box" x="60" y="168" width="220" height="110"/>
+<text class="bt" x="74" y="192">Public pages</text>
+<text class="b" x="74" y="212">products, KB, articles,</text>
+<text class="b" x="74" y="229">JSON-LD on every page</text>
+<rect class="rgap" x="300" y="168" width="220" height="110"/>
+<text class="btr" x="314" y="192">robots.txt · llms.txt</text>
+<text class="r" x="314" y="212">requests, not access control;</text>
+<text class="r" x="314" y="229">public: they list the paths</text>
+<text class="r" x="314" y="246">llms.txt is a hint only</text>
+<rect x="482.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="496.0" y="188.5">L2</text>
+<rect x="448.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="462.0" y="188.5">L1</text>
+<rect class="box" x="540" y="168" width="240" height="110"/>
+<text class="bt" x="554" y="192">Crawlers</text>
+<text class="b" x="554" y="212">Googlebot: Search, AI Overviews</text>
+<text class="b" x="554" y="229">Google-Extended: Gemini</text>
+<text class="b" x="554" y="246">Storebot-Google: Merchant Center</text>
+<text class="b" x="554" y="263">AI tools that read llms.txt</text>
+<path class="ln" d="M282,223L291.0,223.0"/>
+<path class="ah" d="M298,223L289.0,218.5L289.0,227.5z"/>
+<path class="ln" d="M522,223L531.0,223.0"/>
+<path class="ah" d="M538,223L529.0,218.5L529.0,227.5z"/>
+<text class="lt" x="820" y="154">B · Consent channel — which people your systems may use</text>
+<rect class="box" x="820" y="168" width="220" height="110"/>
+<text class="bt" x="834" y="192">Customer Privacy API</text>
+<text class="b" x="834" y="212">Shopify: preferences, marketing,</text>
+<text class="b" x="834" y="229">analytics, sale of data</text>
+<rect class="box" x="1060" y="168" width="220" height="110" style="stroke-width:3"/>
+<text class="bt" x="1074" y="192">Edge: consent on every event</text>
+<text class="b" x="1074" y="212">the state is attached before</text>
+<text class="b" x="1074" y="229">anything leaves (gap 20)</text>
+<rect class="box" x="1300" y="168" width="240" height="110"/>
+<text class="bt" x="1314" y="192">Google</text>
+<text class="b" x="1314" y="212">tags: Consent Mode v2 states</text>
+<text class="b" x="1314" y="229">Customer Match: ad_user_data and</text>
+<text class="b" x="1314" y="246">ad_personalization fields</text>
+<text class="b" x="1314" y="263">Merchant API: products only</text>
+<path class="ln" d="M1042,223L1051.0,223.0"/>
+<path class="ah" d="M1058,223L1049.0,218.5L1049.0,227.5z"/>
+<path class="ln" d="M1282,223L1291.0,223.0"/>
+<path class="ah" d="M1298,223L1289.0,218.5L1289.0,227.5z"/>
+<path class="lnr" d="M800,140V282"/>
+<rect class="rgap" x="60" y="296" width="460" height="36"/>
+<rect x="70.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="317.5">L4</text>
+<text class="btr" x="108" y="318">Customer names or orders in JSON-LD</text>
+<rect class="rgap" x="540" y="296" width="520" height="36"/>
+<rect x="550.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="564" y="317.5">L3</text>
+<text class="btr" x="588" y="318">Crawl permission read as consent: it never is</text>
+<path class="rule" d="M60,350H1540"/>
+<text class="sec" x="60" y="378">LOCALIZED RETRIEVAL — FILTER BY LOCALE FIRST, THEN FALL BACK</text>
+<rect class="box" x="60" y="394" width="280" height="82"/>
+<text class="bt" x="74" y="418">1 · Load each locale</text>
+<text class="b" x="74" y="438">Webflow cmsLocaleId, Shopify</text>
+<text class="b" x="74" y="455">@inContext, hreflang, translation</text>
+<path class="ln" d="M342,435L351.0,435.0"/>
+<path class="ah" d="M358,435L349.0,430.5L349.0,439.5z"/>
+<rect class="box" x="360" y="394" width="280" height="82"/>
+<text class="bt" x="374" y="418">2 · Tag every chunk</text>
+<text class="b" x="374" y="438">locale, market, canonical_id,</text>
+<text class="b" x="374" y="455">translation: human or machine</text>
+<path class="ln" d="M642,435L651.0,435.0"/>
+<path class="ah" d="M658,435L649.0,430.5L649.0,439.5z"/>
+<rect class="box" x="660" y="394" width="280" height="82"/>
+<text class="bt" x="674" y="418">3 · One multilingual index</text>
+<text class="b" x="674" y="438">bge-m3 embeddings; Vectorize</text>
+<text class="b" x="674" y="455">metadata indexes: locale, market</text>
+<path class="ln" d="M942,435L951.0,435.0"/>
+<path class="ah" d="M958,435L949.0,430.5L949.0,439.5z"/>
+<rect class="box" x="960" y="394" width="280" height="82"/>
+<text class="bt" x="974" y="418">4 · Retrieve</text>
+<text class="b" x="974" y="438">the user&#x27;s locale and market first;</text>
+<text class="b" x="974" y="455">English fallback by canonical_id</text>
+<path class="ln" d="M1242,435L1251.0,435.0"/>
+<path class="ah" d="M1258,435L1249.0,430.5L1249.0,439.5z"/>
+<rect class="box" x="1260" y="394" width="280" height="82"/>
+<text class="bt" x="1274" y="418">5 · Answer in the user&#x27;s language</text>
+<text class="b" x="1274" y="438">cite the localized URL;</text>
+<text class="b" x="1274" y="455">fetch the price live, not embedded</text>
+<text class="lab" x="60" y="504">LOCALE COMES FROM</text>
+<rect x="180" y="488" width="244.0" height="26" fill="#000"/>
+<text class="chip" x="302.0" y="505" text-anchor="middle">1 · The user&#x27;s explicit choice</text>
+<rect x="436.0" y="488" width="184.8" height="26" fill="#000"/>
+<text class="chip" x="528.4" y="505" text-anchor="middle">2 · The Shopify market</text>
+<rect x="632.8" y="488" width="162.6" height="26" fill="#000"/>
+<text class="chip" x="714.0999999999999" y="505" text-anchor="middle">3 · Accept-Language</text>
+<text class="btr" x="813.4" y="505">Never the IP address alone.</text>
+<rect class="rgap" x="60" y="532" width="480" height="36"/>
+<rect x="70.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="553.5">L5</text>
+<text class="btr" x="108" y="554">Stale price from the vector store</text>
+<rect class="rgap" x="560" y="532" width="480" height="36"/>
+<rect x="570.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="553.5">L6</text>
+<text class="btr" x="608" y="554">Machine-translated claims in answers</text>
+<rect class="rgap" x="1060" y="532" width="480" height="36"/>
+<rect x="1070.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="553.5">L7</text>
+<text class="btr" x="1108" y="554">Locale guessed from the IP address</text>
+<path class="rule" d="M60,590H1540"/>
+<text class="sec" x="60" y="618">LoRA ADAPTERS — THE LOCALE PICKS THE LANGUAGE, CONSENT UNLOCKS PERSONALIZATION</text>
+<rect class="box" x="60" y="634" width="240" height="132"/>
+<text class="bt" x="74" y="658">Request</text>
+<text class="b" x="74" y="678">locale: ko · market: KR</text>
+<text class="b" x="74" y="695">consent state from the</text>
+<text class="b" x="74" y="712">Customer Privacy API,</text>
+<text class="b" x="74" y="729">stored on the session</text>
+<rect class="box" x="340" y="634" width="270" height="132" style="stroke-width:3"/>
+<text class="bt" x="354" y="658">pickAdapter()</text>
+<text class="b" x="354" y="678">live adapters only (retire_by)</text>
+<text class="b" x="354" y="695">every consent_required granted</text>
+<text class="b" x="354" y="712">market not blocked</text>
+<text class="b" x="354" y="729">else: the language adapter</text>
+<path class="ln" d="M302,700L331.0,700.0"/>
+<path class="ah" d="M338,700L329.0,695.5L329.0,704.5z"/>
+<rect class="box" x="660" y="634" width="480" height="40"/>
+<text class="bt" x="674" y="651">No consent, or denied: language adapter</text>
+<text class="b" x="674" y="667">the query and public retrieved chunks only</text>
+<path class="ln" d="M612,700L653.1,658.9"/>
+<path class="ah" d="M658,654L648.5,657.2L654.8,663.5z"/>
+<path class="ln" d="M1142,654L1173.7,694.5"/>
+<path class="ah" d="M1178,700L1176.0,690.1L1168.9,695.7z"/>
+<rect class="box" x="660" y="680" width="480" height="40"/>
+<text class="bt" x="674" y="697">Preferences: language adapter</text>
+<text class="b" x="674" y="713">plus stated preferences such as size or language; no history</text>
+<path class="ln" d="M612,700L651.0,700.0"/>
+<path class="ah" d="M658,700L649.0,695.5L649.0,704.5z"/>
+<path class="ln" d="M1142,700L1171.0,700.0"/>
+<path class="ah" d="M1178,700L1169.0,695.5L1169.0,704.5z"/>
+<rect class="box" x="660" y="726" width="480" height="40"/>
+<text class="bt" x="674" y="743">Preferences and marketing: personalization adapter</text>
+<text class="b" x="674" y="759">plus a cohort label and recent views; never raw personal data</text>
+<path class="ln" d="M612,700L653.1,741.1"/>
+<path class="ah" d="M658,746L654.8,736.5L648.5,742.8z"/>
+<path class="ln" d="M1142,746L1173.7,705.5"/>
+<path class="ah" d="M1178,700L1168.9,704.3L1176.0,709.9z"/>
+<rect class="box" x="1180" y="634" width="360" height="132"/>
+<text class="bt" x="1194" y="658">Workers AI: env.AI.run(model, { lora })</text>
+<text class="b" x="1194" y="678">-lora base models only</text>
+<text class="b" x="1194" y="695">the ledger records the adapter, locale,</text>
+<text class="b" x="1194" y="712">market and consent state of every answer</text>
+<text class="lab" x="60" y="796">TRAINING A PERSONALIZATION ADAPTER</text>
+<rect class="box" x="60" y="808" width="280" height="76"/>
+<text class="bt" x="74" y="832">Consented for training</text>
+<text class="b" x="74" y="852">a separate training scope,</text>
+<text class="b" x="74" y="869">recorded for every record</text>
+<path class="ln" d="M342,846L351.0,846.0"/>
+<path class="ah" d="M358,846L349.0,841.5L349.0,850.5z"/>
+<rect class="box" x="360" y="808" width="280" height="76" style="stroke-width:3"/>
+<text class="bt" x="374" y="832">Clean room</text>
+<text class="b" x="374" y="852">pseudonymize; drop cohorts</text>
+<text class="b" x="374" y="869">under min_cohort</text>
+<path class="ln" d="M642,846L651.0,846.0"/>
+<path class="ah" d="M658,846L649.0,841.5L649.0,850.5z"/>
+<rect class="box" x="660" y="808" width="280" height="76"/>
+<text class="bt" x="674" y="832">Train the LoRA</text>
+<text class="b" x="674" y="852">one per locale and market;</text>
+<text class="b" x="674" y="869">never sent to Google</text>
+<path class="ln" d="M942,846L951.0,846.0"/>
+<path class="ah" d="M958,846L949.0,841.5L949.0,850.5z"/>
+<rect class="box" x="960" y="808" width="280" height="76"/>
+<text class="bt" x="974" y="832">Registry</text>
+<text class="b" x="974" y="852">dataset_hash, record_count,</text>
+<text class="b" x="974" y="869">consent_required, retire_by</text>
+<path class="ln" d="M1242,846L1251.0,846.0"/>
+<path class="ah" d="M1258,846L1249.0,841.5L1249.0,850.5z"/>
+<rect class="box" x="1260" y="808" width="280" height="76"/>
+<text class="bt" x="1274" y="832">Retire and retrain</text>
+<text class="b" x="1274" y="852">weights can&#x27;t forget one person:</text>
+<text class="b" x="1274" y="869">retrain without the withdrawn</text>
+<rect class="rgap" x="60" y="902" width="480" height="36"/>
+<rect x="70.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="923.5">L8</text>
+<text class="btr" x="108" y="924">Adapter trained without training consent</text>
+<rect class="rgap" x="560" y="902" width="480" height="36"/>
+<rect x="570.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="923.5">L9</text>
+<text class="btr" x="608" y="924">Withdrawn consent stays in the weights</text>
+<rect class="rgap" x="1060" y="902" width="480" height="36"/>
+<rect x="1066.5" y="911" width="35" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="923.5">L10</text>
+<text class="btr" x="1108" y="924">Personalization served without a consent check</text>
+<path class="rule" d="M60,960H1540"/>
+<text class="sec" x="60" y="988">RULES BY LOCALE</text>
+<rect class="box" x="60" y="1004" width="355" height="104"/>
+<text class="bt" x="74" y="1028">EU · UK (GDPR, ePrivacy)</text>
+<text class="b" x="74" y="1048">Personalization: opt-in.</text>
+<text class="b" x="74" y="1065">Training on behavior: its own</text>
+<text class="b" x="74" y="1082">purpose consent, not just marketing.</text>
+<rect class="box" x="435" y="1004" width="355" height="104"/>
+<text class="bt" x="449" y="1028">US (CCPA, CPRA)</text>
+<text class="b" x="449" y="1048">Respect sale of data and</text>
+<text class="b" x="449" y="1065">Global Privacy Control. Train only on</text>
+<text class="b" x="449" y="1082">records that haven&#x27;t opted out.</text>
+<rect class="box" x="810" y="1004" width="355" height="104"/>
+<text class="bt" x="824" y="1028">South Korea (PIPA)</text>
+<text class="b" x="824" y="1048">Separate consent for use beyond the</text>
+<text class="b" x="824" y="1065">original purpose and overseas transfer.</text>
+<text class="b" x="824" y="1082">Language adapter only until in-country storage.</text>
+<rect class="box" x="1185" y="1004" width="355" height="104"/>
+<text class="bt" x="1199" y="1028">Japan (APPI)</text>
+<text class="b" x="1199" y="1048">Pseudonymized data is allowed for</text>
+<text class="b" x="1199" y="1065">internal analysis. Check transfer consent</text>
+<text class="b" x="1199" y="1082">before training outside Japan.</text>
+<path class="rule" d="M60,1130H1540"/>
+<text class="secr" x="60" y="1158">TEN GAPS — AND THE FIX FOR EACH</text>
+<rect x="64.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1191.5">L1</text>
+<text class="btr" x="102" y="1192">robots.txt used as access control</text>
+<text class="b" x="102" y="1211">Fix: Protect sensitive paths with authentication; a Disallow line publishes the path</text>
+<rect x="64.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1245.5">L2</text>
+<text class="btr" x="102" y="1246">llms.txt lists private pages</text>
+<text class="b" x="102" y="1265">Fix: Generate it from an allowlist of public URLs, never from the whole CMS</text>
+<rect x="64.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1299.5">L3</text>
+<text class="btr" x="102" y="1300">Crawl permission read as consent</text>
+<text class="b" x="102" y="1319">Fix: Separate channels; check the consent state on every event</text>
+<rect x="64.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1353.5">L4</text>
+<text class="btr" x="102" y="1354">Structured data leaks people</text>
+<text class="b" x="102" y="1373">Fix: No customer names or order details in JSON-LD: it is published with no consent check</text>
+<rect x="64.0" y="1395" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1407.5">L5</text>
+<text class="btr" x="102" y="1408">Stale price from the vector store</text>
+<text class="b" x="102" y="1427">Fix: Never answer price or availability from embeddings; fetch live by country</text>
+<rect x="814.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1191.5">L6</text>
+<text class="btr" x="852" y="1192">Machine-translated claims</text>
+<text class="b" x="852" y="1211">Fix: Only human-translated chunks for legal and claims text</text>
+<rect x="814.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1245.5">L7</text>
+<text class="btr" x="852" y="1246">Locale guessed from the IP address</text>
+<text class="b" x="852" y="1265">Fix: Explicit choice, then market, then Accept-Language; apply that locale&#x27;s rules</text>
+<rect x="814.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1299.5">L8</text>
+<text class="btr" x="852" y="1300">Adapter trained without training consent</text>
+<text class="b" x="852" y="1319">Fix: A separate training scope per record; dataset_hash and record_count in the ledger</text>
+<rect x="814.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1353.5">L9</text>
+<text class="btr" x="852" y="1354">Withdrawn consent stays in the weights</text>
+<text class="b" x="852" y="1373">Fix: Scheduled retirement (retire_by) and a retrain without the withdrawn</text>
+<rect x="810.5" y="1395" width="35" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1407.5">L10</text>
+<text class="btr" x="852" y="1408">Personalization without a consent check</text>
+<text class="b" x="852" y="1427">Fix: Check consent and blocked markets on every request; fall back to the language adapter</text>
+<text class="bt" x="60" y="1468">Crawler files decide which content AI reads. Consent decides which people your systems use. The ledger records which adapter answered, under which consent.</text>
+</svg>
