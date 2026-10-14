@@ -61,6 +61,35 @@ alternativeHeadline: "Encoding is not a security boundary — and neither is a c
 
 ---
 
+## From cron to agents: who binds the systems, and where security has to live
+
+Before APIs, data mostly stayed inside one cloud or one data center. When it had to move, a developer wrote an EDI or ETL mapping, someone reviewed it, and a cron job ran it — nightly, or every 15 minutes. **The binding between systems happened at build time**, and security lived at the perimeter, on the SFTP server and in the reviewed mapping.
+
+APIs and iPaaS (integration platform as a service: hosted tools such as MuleSoft, Celigo or Boomi that connect one system's API to another's) moved the binding to **event time**: every order or update travels on its own, in seconds, through integration code. Security moved into API keys, scopes and signed webhooks.
+
+AI agents move it to **runtime**. A model decides, per request, which systems to connect and what data to move — and the same model can be steered by anything it reads. So AI now does much of the *binding* between systems. It must not do the *security*. If the thing that chooses the connection also decides what is allowed, the security is only as strong as the model's resistance to a well-phrased instruction.
+
+![From cron to agents. Three lanes. Cron EDI and ETL: an ERP's batch file waits in an SFTP drop folder until a cron job runs a reviewed mapping into a warehouse or storefront. APIs and iPaaS: a Shopify order becomes a signed webhook that an iPaaS or Worker flow maps and forwards to the ERP, CRM and Google Merchant within seconds. AI agents: a person asks an agent for an outcome; the agent proposes, and a deterministic gate checks the user and agent identity, a signed mandate and a tool allowlist, writes every decision to a ledger, and only then reaches Shopify, Xano, Google Merchant or SAP. Four cards show where security has to live: the data, the identity, the authority and the gate. A table compares the three eras.](https://persephonepunch.github.io/crm-sync-setup/assets/cron-to-agents.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/cron-to-agents.svg) (1600 × 1090) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/cron-to-agents.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/cron-to-agents.jpg).*
+
+| Era | Who binds the systems | When | Where security lived | What fails |
+| --- | --- | --- | --- | --- |
+| Cron EDI / ETL | A developer's mapping, reviewed | On a schedule | The perimeter, SFTP, the mapping | Plaintext batch files (gap 31), stale data |
+| APIs and iPaaS | Integration code or iPaaS flows | Per event, in real time | API keys, scopes, signed webhooks | Broad keys (M1), middleware copies (gaps 18, 28) |
+| AI agents | A model, choosing at runtime | Per request, on the fly | Outside the model: a deterministic gate | Injection (A1), excessive agency (A2), token passthrough (A3) |
+
+Security can no longer ride along with the binding. It has to attach to four things the model can't rewrite:
+
+1. **The data.** Consent state is a field on every record, and a record without it is refused, whoever asks (M3, gap 20).
+2. **The identity.** The user *and* the agent are each identified, and every token is scoped to one tool's audience (A3).
+3. **The authority.** A signed mandate carries the amount, merchant, expiry and a one-time nonce, and it is checked on every call (A4).
+4. **The gate.** Deterministic code at the endpoint says yes or no, and writes every grant and denial to an append-only ledger (A7).
+
+**The model proposes. Deterministic systems decide. Every grant and denial is recorded.** The rest of this article maps where that breaks today, from a single SVG file to SAP.
+
+## The security gaps illustration
+
 ![The full illustration, top to bottom: one SVG with a hidden script and patient metadata, the same file as a base64 data URI, and the three ways a page can display it; definitions of base64, compile, machine code and bare metal; what each layer checks and misses from an Elm client through TLS, Cloudflare, Xano and a Rust service; TLS hops in Next.js hydration and a CRM-to-Shopify data bus; JVM, iPaaS and Wasm stacks compared on isolation, network access, memory safety, supply chain, patching, Consent Mode v2 and idempotency; VM, Docker and Kubernetes isolation and transport; and 31 numbered security gaps, each with a fix.](https://persephonepunch.github.io/crm-sync-setup/assets/svg-rust-elm-security-gaps.svg)
 
 *[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/svg-rust-elm-security-gaps.svg) (1600 × 4290) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/svg-rust-elm-security-gaps.pdf) (233 KB, one vector page) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/svg-rust-elm-security-gaps.jpg). The diagram is shown here as an image, never inlined, so its SVG cannot run code on this page — gap 3, applied to itself.*

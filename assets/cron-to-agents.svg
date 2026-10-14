@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1090" role="img" aria-labelledby="t d">
+<title id="t">From cron to agents: who binds the systems, and where security has to live</title>
+<desc id="d">Three eras of moving data between systems. Cron EDI and ETL: a developer's reviewed mapping moves batch files on a schedule, with security at the perimeter, SFTP and the mapping. APIs and iPaaS: integration code moves each event in real time, with security in API keys, scopes and signed webhooks. AI agents: a model chooses tools at runtime, so a deterministic gate between the model and every system checks the user and agent identity, a signed mandate and a tool allowlist, and writes every decision to a ledger. Four cards show where security has to live: the data, the identity, the authority and the gate. A table compares the eras.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .n{font:700 10px Helvetica,Arial,sans-serif;fill:#000;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .gap{fill:#fff;stroke:#000;stroke-width:1.5;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .ah{fill:#767676}
+</style></defs>
+<rect width="1600" height="1090" fill="#fff"/>
+<text class="h" x="60" y="52">FROM CRON TO AGENTS — WHO BINDS THE SYSTEMS, AND WHERE SECURITY HAS TO LIVE</text>
+<text class="g" x="60" y="76">binding moved from build time, to event time, to runtime; security has to stay where the model can&#x27;t reach it</text>
+<text class="s" x="1540" y="76" text-anchor="end">Dashed = a gap. Numbers and letters match the security gaps article.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">THREE ERAS OF MOVING DATA BETWEEN SYSTEMS</text>
+<text class="lt" x="60" y="160">1 · Cron EDI and ETL — binding at build time, data moves on a schedule</text>
+<rect class="box" x="60" y="176" width="230" height="74"/>
+<text class="bt" x="74" y="202">ERP · SAP</text>
+<text class="b" x="74" y="222">Cloud A, or on premises</text>
+<path class="ln" d="M292,213L321.0,213.0"/>
+<path class="ah" d="M328,213L319.0,208.5L319.0,217.5z"/>
+<rect class="gap" x="330" y="176" width="230" height="74"/>
+<text class="bt" x="344" y="202">Batch file</text>
+<text class="b" x="344" y="222">an SFTP drop folder</text>
+<rect x="518.0" y="185" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="532.0" y="197.5">31</text>
+<path class="ln" d="M562,213L591.0,213.0"/>
+<path class="ah" d="M598,213L589.0,208.5L589.0,217.5z"/>
+<rect class="box" x="600" y="176" width="230" height="74"/>
+<text class="bt" x="614" y="202">Cron job</text>
+<text class="b" x="614" y="222">a mapping someone wrote</text>
+<path class="ln" d="M832,213L861.0,213.0"/>
+<path class="ah" d="M868,213L859.0,208.5L859.0,217.5z"/>
+<rect class="box" x="870" y="176" width="230" height="74"/>
+<text class="bt" x="884" y="202">Warehouse · storefront</text>
+<text class="b" x="884" y="222">Cloud B</text>
+<rect x="1150" y="170" width="390" height="98" fill="#f6f6f6" stroke="none"/>
+<text class="lab" x="1164" y="194">WHO BINDS</text>
+<text class="b" x="1270" y="194">a developer, and a reviewer</text>
+<text class="lab" x="1164" y="214">WHEN</text>
+<text class="b" x="1270" y="214">on a schedule: nightly, or every 15 minutes</text>
+<text class="lab" x="1164" y="234">SECURITY</text>
+<text class="b" x="1270" y="234">the perimeter, SFTP, the reviewed mapping</text>
+<text class="lab" x="1164" y="254">FAILS</text>
+<text class="b" x="1270" y="254">files at rest in plaintext; stale data</text>
+<text class="lt" x="60" y="300">2 · APIs and iPaaS (integration platform as a service) — binding at integration time, data moves per event</text>
+<rect class="box" x="60" y="316" width="230" height="74"/>
+<text class="bt" x="74" y="342">Shopify</text>
+<text class="b" x="74" y="362">an order is placed</text>
+<path class="ln" d="M292,353L321.0,353.0"/>
+<path class="ah" d="M328,353L319.0,348.5L319.0,357.5z"/>
+<rect class="box" x="330" y="316" width="230" height="74"/>
+<text class="bt" x="344" y="342">Webhook</text>
+<text class="b" x="344" y="362">signed with HMAC</text>
+<rect x="518.0" y="325" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="532.0" y="337.5">M4</text>
+<path class="ln" d="M562,353L591.0,353.0"/>
+<path class="ah" d="M598,353L589.0,348.5L589.0,357.5z"/>
+<rect class="gap" x="600" y="316" width="230" height="74"/>
+<text class="bt" x="614" y="342">iPaaS or Worker flow</text>
+<text class="b" x="614" y="362">maps and forwards</text>
+<rect x="788.0" y="325" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="802.0" y="337.5">28</text>
+<rect x="754.0" y="325" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="768.0" y="337.5">18</text>
+<path class="ln" d="M832,353L861.0,353.0"/>
+<path class="ah" d="M868,353L859.0,348.5L859.0,357.5z"/>
+<rect class="box" x="870" y="316" width="230" height="74"/>
+<text class="bt" x="884" y="342">ERP · CRM · Merchant</text>
+<text class="b" x="884" y="362">updated within seconds</text>
+<rect x="1150" y="310" width="390" height="98" fill="#f6f6f6" stroke="none"/>
+<text class="lab" x="1164" y="334">WHO BINDS</text>
+<text class="b" x="1270" y="334">integration code, or an iPaaS flow</text>
+<text class="lab" x="1164" y="354">WHEN</text>
+<text class="b" x="1270" y="354">per event, in real time</text>
+<text class="lab" x="1164" y="374">SECURITY</text>
+<text class="b" x="1270" y="374">API keys, scopes, signed webhooks</text>
+<text class="lab" x="1164" y="394">FAILS</text>
+<text class="b" x="1270" y="394">broad keys; middleware keeps copies</text>
+<text class="lt" x="60" y="440">3 · AI agents — binding at runtime, the model chooses which systems to connect</text>
+<rect class="box" x="60" y="496" width="160" height="74"/>
+<text class="bt" x="74" y="522">Person</text>
+<text class="b" x="74" y="542">asks for an outcome</text>
+<rect class="gap" x="262" y="496" width="230" height="74"/>
+<text class="bt" x="276" y="522">Agent</text>
+<text class="b" x="276" y="542">the model chooses tools</text>
+<text class="g" x="276" y="560">steerable by what it reads</text>
+<rect x="450.0" y="505" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="464.0" y="517.5">A2</text>
+<rect x="416.0" y="505" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="430.0" y="517.5">A1</text>
+<path class="ln" d="M222,533L253.0,533.0"/>
+<path class="ah" d="M260,533L251.0,528.5L251.0,537.5z"/>
+<rect class="box" x="560" y="456" width="290" height="160" style="stroke-width:3"/>
+<text class="bt" x="574" y="482">The gate: deterministic code</text>
+<text class="b" x="574" y="502">who: the user AND the agent</text>
+<text class="b" x="574" y="520">authority: a signed mandate</text>
+<text class="b" x="574" y="538">tool: on the allowlist</text>
+<text class="b" x="574" y="556">record: every yes and no, to a ledger</text>
+<text class="g" x="574" y="574">the model can&#x27;t edit this</text>
+<path class="ln" d="M494,533L551.0,533.0"/>
+<path class="ah" d="M558,533L549.0,528.5L549.0,537.5z"/>
+<text class="s" x="500" y="524">proposes</text>
+<rect class="box" x="900" y="460" width="200" height="30"/>
+<text class="b" x="1000" y="479" text-anchor="middle">Shopify</text>
+<path class="ln" d="M852,536.0L893.8,480.6"/>
+<path class="ah" d="M898,475L889.0,479.5L896.2,484.9z"/>
+<rect class="box" x="900" y="500" width="200" height="30"/>
+<text class="b" x="1000" y="519" text-anchor="middle">Xano</text>
+<path class="ln" d="M852,536.0L891.6,517.9"/>
+<path class="ah" d="M898,515L887.9,514.6L891.7,522.8z"/>
+<rect class="box" x="900" y="540" width="200" height="30"/>
+<text class="b" x="1000" y="559" text-anchor="middle">Google Merchant</text>
+<path class="ln" d="M852,536.0L891.5,552.3"/>
+<path class="ah" d="M898,555L891.4,547.4L888.0,555.7z"/>
+<rect class="box" x="900" y="580" width="200" height="30"/>
+<text class="b" x="1000" y="599" text-anchor="middle">SAP</text>
+<path class="ln" d="M852,536.0L893.7,589.5"/>
+<path class="ah" d="M898,595L896.0,585.1L888.9,590.7z"/>
+<text class="s" x="862" y="452">decides</text>
+<rect x="1150" y="450" width="390" height="118" fill="#f6f6f6" stroke="none"/>
+<text class="lab" x="1164" y="474">WHO BINDS</text>
+<text class="b" x="1270" y="474">a model, choosing tools at runtime</text>
+<text class="lab" x="1164" y="494">WHEN</text>
+<text class="b" x="1270" y="494">per request, decided on the fly</text>
+<text class="lab" x="1164" y="514">SECURITY</text>
+<text class="b" x="1270" y="514">the gate, outside the model</text>
+<text class="lab" x="1164" y="534">FAILS</text>
+<text class="b" x="1270" y="534">without it: injection, excessive agency,</text>
+<text class="lab" x="1164" y="554"></text>
+<text class="b" x="1270" y="554">token passthrough (A1, A2, A3)</text>
+<path class="rule" d="M60,660H1540"/>
+<text class="sec" x="60" y="688">WHERE SECURITY HAS TO LIVE — FOUR THINGS THE MODEL CAN&#x27;T REWRITE</text>
+<rect class="box" x="60" y="704" width="355" height="124"/>
+<text class="bt" x="74" y="730">1 · The data</text>
+<text class="b" x="74" y="750"></text>
+<rect x="373.0" y="713" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="387.0" y="725.5">20</text>
+<rect x="339.0" y="713" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="353.0" y="725.5">M3</text>
+<text class="b" x="74" y="754">Consent state is a field on</text>
+<text class="b" x="74" y="774">every record. A record without</text>
+<text class="b" x="74" y="794">it is refused, whoever asks.</text>
+<rect class="box" x="435" y="704" width="355" height="124"/>
+<text class="bt" x="449" y="730">2 · The identity</text>
+<text class="b" x="449" y="750"></text>
+<rect x="748.0" y="713" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="762.0" y="725.5">A3</text>
+<text class="b" x="449" y="754">The user and the agent are each</text>
+<text class="b" x="449" y="774">identified. Every token is</text>
+<text class="b" x="449" y="794">scoped to one tool&#x27;s audience.</text>
+<rect class="box" x="810" y="704" width="355" height="124"/>
+<text class="bt" x="824" y="730">3 · The authority</text>
+<text class="b" x="824" y="750"></text>
+<rect x="1123.0" y="713" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1137.0" y="725.5">A4</text>
+<text class="b" x="824" y="754">A signed mandate: amount,</text>
+<text class="b" x="824" y="774">merchant, expiry and a</text>
+<text class="b" x="824" y="794">one-time nonce, checked per call.</text>
+<rect class="box" x="1185" y="704" width="355" height="124"/>
+<text class="bt" x="1199" y="730">4 · The gate</text>
+<text class="b" x="1199" y="750"></text>
+<rect x="1498.0" y="713" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1512.0" y="725.5">A7</text>
+<text class="b" x="1199" y="754">Code at the endpoint says yes</text>
+<text class="b" x="1199" y="774">or no, and writes every grant</text>
+<text class="b" x="1199" y="794">and denial to an append-only ledger.</text>
+<path class="rule" d="M60,870H1540"/>
+<text class="sec" x="60" y="898">THE THREE ERAS SIDE BY SIDE</text>
+<text class="lab" x="60" y="926">ERA</text>
+<text class="lab" x="240" y="926">WHO BINDS THE SYSTEMS</text>
+<text class="lab" x="560" y="926">WHEN</text>
+<text class="lab" x="820" y="926">WHERE SECURITY LIVED</text>
+<text class="lab" x="1180" y="926">WHAT FAILS</text>
+<path class="rule" d="M60,936H1540"/>
+<text class="bt" x="60" y="958">Cron EDI / ETL</text>
+<text class="b" x="240" y="958">A developer&#x27;s mapping, reviewed</text>
+<text class="b" x="560" y="958">On a schedule</text>
+<text class="b" x="820" y="958">The perimeter, SFTP, the mapping</text>
+<text class="b" x="1180" y="958">Plaintext batch files (31), stale data</text>
+<path class="rule" d="M60,969H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="988">APIs and iPaaS</text>
+<text class="b" x="240" y="988">Integration code or iPaaS flows</text>
+<text class="b" x="560" y="988">Per event, in real time</text>
+<text class="b" x="820" y="988">API keys, scopes, signed webhooks</text>
+<text class="b" x="1180" y="988">Broad keys (M1), middleware copies (18, 28)</text>
+<path class="rule" d="M60,999H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1018">AI agents</text>
+<text class="b" x="240" y="1018">A model, choosing at runtime</text>
+<text class="b" x="560" y="1018">Per request, on the fly</text>
+<text class="b" x="820" y="1018">Outside the model: a deterministic gate</text>
+<text class="b" x="1180" y="1018">Injection (A1), agency (A2), passthrough (A3)</text>
+<path class="rule" d="M60,1029H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="1064">The model proposes. Deterministic systems decide. Every grant and denial is recorded.</text>
+</svg>
