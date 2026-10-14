@@ -43,6 +43,12 @@ keywords:
   - MCP token passthrough
   - AP2 mandate
   - foot gun
+  - robots.txt
+  - llms.txt
+  - Google-Extended
+  - LangChain
+  - LoRA
+  - localization
 about:
   - Data security for PII, PCI and PHI
   - SVG and base64 encoding
@@ -372,6 +378,118 @@ An agent asks a question, the question runs only as a reviewed template, the cle
 | C4 Rows exported, not aggregates | Only aggregates above the threshold leave; no row-level export |
 
 C2 is the AI-era risk. A person rarely runs hundreds of nearly identical queries; an agent can, and subtracting their results isolates one person. Ads Data Hub's difference checks exist for exactly this, and a homegrown clean room needs the same protection.
+
+## Localized AI: crawler files, locale-aware retrieval and LoRA adapters chosen by consent
+
+**`robots.txt` and `llms.txt` can't carry consent.** They are public, site-wide files that tell crawlers which pages to fetch or read first. They hold nothing about any person, and Google's ad and audience systems never look in them for consent. A localized AI stack needs two channels kept apart: one decides **which content** AI may read, the other decides **which people** your systems may use.
+
+| | Content channel (crawlers) | Consent channel (people) |
+| --- | --- | --- |
+| What moves | Product pages, structured data, articles | Events, conversions, hashed emails, audience lists |
+| Controlled by | `robots.txt`, meta robots and `nosnippet`, `llms.txt` (a hint only) | Consent Mode v2 states, Google Ads API consent fields, the Shopify Customer Privacy API |
+| Scope | The whole site, for each bot | Each person, each event |
+| Enforced by | The bot's good behavior: a request, not access control | Google's processing rules, and your own server before data leaves |
+
+### The content channel, bot by bot
+
+- **Googlebot** feeds Search, AI Overviews and AI Mode. There is no separate AI Overviews opt-out; `nosnippet`, `max-snippet` or blocking Googlebot are the only levers.
+- **Google-Extended** decides whether Gemini models may train on or ground answers in your content. It doesn't affect Search ranking or AI Overviews.
+- **Storebot-Google** is the shopping crawler. It checks product pages against Merchant Center data (price, availability, automatic item updates). Blocking it can get products disapproved.
+- **[`llms.txt`](https://llmstxt.org/)** is a community proposal: a Markdown map of the pages you want language models to read. Google has said it doesn't use it; some AI tools and agents do. It has no enforcement and no consent meaning.
+
+The Merchant API carries **products, never people**, so it needs no consent state. Shopper data reaches Google only through tags that carry `ad_storage`, `analytics_storage`, `ad_user_data` and `ad_personalization`, and through Customer Match and enhanced-conversion uploads with their own `ad_user_data` and `ad_personalization` consent fields. A shopper's consent state has to be attached to every event at the edge before anything leaves (gap 20).
+
+### Loading localized content for retrieval (LangChain)
+
+LangChain doesn't know about locales. Localization works when **every document carries its locale in metadata**, and retrieval **filters by locale first, then falls back** to another language.
+
+| Source | How to fetch each locale |
+| --- | --- |
+| Webflow CMS | `GET /v2/collections/{id}/items/live?cmsLocaleId=…`, once per locale |
+| Shopify | Storefront API with `@inContext(language: KO, country: KR)` |
+| KB and site pages | Sitemap `hreflang` alternates; one `llms.txt` for each locale, from an allowlist |
+| Machine translation | The translation proxy, with the document marked as machine-translated |
+
+```ts
+new Document({
+  pageContent: item.text,
+  metadata: {
+    locale: "ko", market: "KR",
+    canonical_id: item.baseId,          // same ID for every translation of this item
+    source: "webflow",
+    translation: "human",               // or "machine"
+    url: item.localizedUrl,             // cite the localized page
+  },
+});
+```
+
+Embed every locale in one index with a multilingual model (Workers AI `@cf/baai/bge-m3`), and create Vectorize metadata indexes on `locale` and `market` so they can be filtered. Retrieve in the user's locale and market first. When too few chunks match, add English chunks whose `canonical_id` has no native translation, and have the model answer in the user's language, citing the localized URL. Detect the locale from the user's explicit choice, then the Shopify market, then `Accept-Language`. Never from the IP alone.
+
+### LoRA adapters, chosen by locale and consent
+
+A LoRA adapter is a small set of weights loaded on top of a base model at answer time. Choose it by **locale, market and the user's consent state**, and allow it to be trained only on data whose consent covers training. There are two consent questions: **may these records train the adapter**, and **may this user's request use it right now**.
+
+| Adapter | Trained on | Consent to train | Consent to use |
+| --- | --- | --- | --- |
+| **Language** (`lang-ko`, `lang-ja`) | Public catalog, KB, human-reviewed translations, brand terms | None: no personal data | None |
+| **Personalization** (`persona-us-loyal`) | Pseudonymized behavior from customers who consented to training | Yes, for every record | Yes, on every request |
+
+The language adapter is the default. A personalization adapter is a privilege that consent turns on. Each adapter has a registry entry that records its consent basis:
+
+```json
+{
+  "id": "persona-us-loyal-v3",
+  "base_model": "@cf/mistral/mistral-7b-instruct-v0.2-lora",
+  "locale": "en", "market": "US", "purpose": "personalization",
+  "consent_required": ["preferences", "marketing"],
+  "dataset_hash": "sha256:…", "record_count": 18421, "min_cohort": 50,
+  "trained_at": "2026-10-01", "retire_by": "2026-10-31"
+}
+```
+
+```ts
+function pickAdapter(reg, locale, market, consent, now = Date.now()) {
+  const live = reg.filter(a => Date.parse(a.retire_by) > now);
+  const persona = live.find(a =>
+    a.purpose === "personalization" && a.locale === locale && a.market === market &&
+    a.consent_required.every(k => consent[k]) && !BLOCKED_MARKETS.has(market));
+  return persona ?? live.find(a => a.purpose === "language" && a.locale === locale) ?? null;
+}
+```
+
+Consent comes from the Shopify Customer Privacy API (`preferencesProcessingAllowed()`, `marketingAllowed()`, `analyticsProcessingAllowed()`, `saleOfDataAllowed()`), stored on the session at the edge. The Worker calls `env.AI.run(model, { messages, lora: adapter.id })` and writes the adapter, locale, market and consent state to the ledger. Workers AI accepts LoRA only on its `-lora` base models; wrap the call in a `RunnableLambda` if the LangChain chat wrapper doesn't pass `lora` through.
+
+| Consent state | Adapter | Context sent to the model |
+| --- | --- | --- |
+| None, or denied | Language | The query and public retrieved chunks only |
+| Preferences | Language | Plus stated preferences such as size or language; no history |
+| Preferences and marketing | Personalization | Plus a cohort label and recent product views; never raw personal data |
+
+### Rules by locale
+
+| Market | Personalization | Training on behavior |
+| --- | --- | --- |
+| EU and UK (GDPR, ePrivacy) | Opt-in | Its own purpose consent, not just "marketing" |
+| US (CCPA and CPRA) | Respect `saleOfDataAllowed()` and Global Privacy Control | Only records that haven't opted out |
+| South Korea (PIPA) | Separate consent for use beyond the original purpose and for overseas transfer | Language adapter only until in-country storage is live |
+| Japan (APPI) | Pseudonymized data allowed for internal analysis | Check transfer consent before training outside Japan |
+
+Training runs inside the clean room: only records consented for training, pseudonymized, with cohorts below `min_cohort` dropped. You can't remove one person from trained weights, so `retire_by` forces a retrain without the people who withdrew, and the privacy notice says so. Adapters never go to Google: Google Ads audience targeting still runs only through consent states and Customer Match consent fields.
+
+| Gap | Fix |
+| --- | --- |
+| L1 `robots.txt` used as access control | Protect sensitive paths with authentication. A `Disallow` line publishes the path |
+| L2 `llms.txt` lists private pages | Generate it from an allowlist of public URLs, never from the whole CMS |
+| L3 Crawl permission read as consent | Content opt-ins and data consent are separate channels; check consent states on every event |
+| L4 Structured data leaks people | No customer names or order details in JSON-LD; it is published with no consent check |
+| L5 Stale price from the vector store | Never answer price or availability from embeddings; fetch live with `@inContext(country:)` |
+| L6 Machine-translated claims in answers | Only `translation: "human"` chunks for legal and claims text |
+| L7 Locale guessed from IP | Explicit choice, then market, then `Accept-Language`; apply that locale's rules |
+| L8 Adapter trained without training consent | A separate training scope, recorded per record; `dataset_hash` and `record_count` in the ledger |
+| L9 Withdrawn consent stays in the weights | Scheduled retirement (`retire_by`) and a retrain without the withdrawn |
+| L10 Personalization served without a consent check | Check consent and blocked markets on every request; fall back to the language adapter |
+
+L3 is the confusion at the heart of this section. Allowing a crawler is a decision about content. It never grants consent to use a person's data, and an agent acting for a user may not read either file at all.
 
 ## VM, container or managed database — and the storage wrappers
 
