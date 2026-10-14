@@ -291,6 +291,22 @@ A **Cloudflare Worker is not a container**. It is a V8 isolate: lighter, startin
 
 Security follows the layer, not the brand. The image carries its own risks wherever it runs (secrets baked into layers, gap 26). Kubernetes adds cluster risks (Secrets as base64, gap 24; plaintext pod traffic, gap 25). A serverless container service removes the cluster risks but keeps the image risks and your access settings.
 
+### Kubernetes Secrets and SVG bundles: the same wrapper
+
+A Kubernetes Secret and an SVG that embeds images as `data:` URIs use base64 for the same reason: to carry bytes inside a text format (YAML for one, XML for the other). In both, anyone who gets the text can decode it in one line, and a scanner that only reads text sees nothing but the encoded string.
+
+![Kubernetes Secret vs SVG bundle. Left: Secret YAML with a base64 password is stored in etcd as base64 unless encryption at rest is on, read through the API server where RBAC decides who may get or list it, and mounted into a pod decoded; committed to Git, the base64 stays in history. Right: an SVG embeds patient metadata and a base64 nested SVG carrying an onload handler; the browser decodes it and either draws it through img with no script, or, inlined, runs the outer file's script on your origin; anyone with the file decodes every embedded byte. A table compares the two, and three cards give the shared lesson.](https://persephonepunch.github.io/crm-sync-setup/assets/k8s-secret-vs-svg.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/k8s-secret-vs-svg.svg) (1600 × 960) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/k8s-secret-vs-svg.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/k8s-secret-vs-svg.jpg).*
+
+They differ in one way that matters: **only the Kubernetes Secret can be locked.** The cluster puts RBAC in front of it and can encrypt it in etcd with a KMS provider. An SVG has no lock to turn on — once the file is shipped, its bytes *are* its contents. And only the SVG can execute: an inlined outer SVG runs its script, while a nested SVG loaded through `<img>` or `<image>` is drawn as a picture.
+
+The shared lesson:
+
+- **Decode before you scan** (gap 2). Secret scanners must decode `data:` values; SVG sanitizers must open nested data URIs before judging them.
+- **Keep secrets out of both** (gap 1). A Secret YAML committed to Git and an SVG with an embedded payload leak the same way: to everyone who gets the file.
+- **Only one has a lock** (gaps 24 and 7). Turn on RBAC and etcd encryption for Secrets. For SVG, carry nothing private at all — no patient labels, no IDs in `<metadata>`.
+
 ### The wrappers, by provider
 
 | Service | What it is | How you reach it | Public by default? | Encryption at rest | Classic foot gun |
