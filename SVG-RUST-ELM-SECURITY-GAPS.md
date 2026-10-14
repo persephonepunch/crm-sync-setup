@@ -141,6 +141,34 @@ send_to_ads(other_email, grant)?;     // compile error: use of moved value `gran
 
 The limit is printed on the Rust box: **types force a check to happen; they cannot prove the check is the right one.**
 
+### Where memory gets managed: compile time, not runtime
+
+A common mental model is that Rust compiles to bytecode and a runtime manages its memory, the way the JVM does. Neither is true, and that is the point of Rust. **The JVM manages memory at runtime; Rust proves it at compile time.**
+
+![Where memory gets managed. Five pipelines split by a line between build time and run time. Rust: the compiler and borrow checker prove each memory access and insert each free, then ship native machine code that runs with no runtime manager. Rust to Wasm: the same proof, shipped as a Wasm module that V8 or Wasmtime compiles at load and walls off, still with no garbage collector. Java and Kotlin: javac ships bytecode, and the JVM's JIT and garbage collector manage memory while running. Elm and TypeScript: compiled to JavaScript, with V8's garbage collector at runtime. C: machine code with no ownership check, and memory freed by hand. Three cards draw the security consequences.](https://persephonepunch.github.io/crm-sync-setup/assets/memory-compile-vs-runtime.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/memory-compile-vs-runtime.svg) (1600 × 820) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/memory-compile-vs-runtime.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/memory-compile-vs-runtime.jpg). The black tag marks where memory is managed in each pipeline.*
+
+| Language | What the compiler produces | Becomes machine code | Who frees memory | When safety is checked |
+| --- | --- | --- | --- | --- |
+| C | Machine code | At build time | You (`malloc` / `free`) | Never: bugs become exploits |
+| Rust | Machine code | At build time | Compiler-inserted [drops](https://doc.rust-lang.org/book/ch15-03-drop.html), decided by ownership | At compile time; only bounds checks run |
+| Java / Kotlin (JVM) | Bytecode | While running (JIT) | A garbage collector | At runtime |
+| C# / .NET | IL bytecode | While running (JIT) | A garbage collector | At runtime |
+| JavaScript / TypeScript | JavaScript | While running, in V8 | A garbage collector | At runtime |
+| Elm | JavaScript | While running, in V8 | JavaScript's garbage collector | Types at compile time; memory at runtime |
+| Rust to Wasm | A Wasm module (portable bytecode) | When the host loads it | Rust's ownership, inside the host's memory wall | Compile time, plus the host's sandbox |
+
+Rust to Wasm is the one case with bytecode, and even there nothing manages memory at runtime: the host only puts a wall around the module's memory.
+
+Three consequences for security:
+
+- **No runtime to patch, but you rebuild.** A JVM security fix can ship as a runtime update. A Rust fix means recompiling and redeploying the binary.
+- **Secrets can be wiped.** Rust frees memory at a known point, so [`zeroize`](https://docs.rs/zeroize/latest/zeroize/) can overwrite a key when it goes out of scope. JVM Strings can't be changed and the garbage collector may copy them, so a secret can't be reliably erased (gap 19).
+- **Nothing to escape, except `unsafe`.** The compile-time proof holds everywhere except inside `unsafe` blocks — the first thing to search for in a Rust review.
+
+**Is a garbage collector like Redis or a cache?** Only in that both decide when something is removed. A garbage collector reclaims memory **inside one process**, and only what nothing refers to any more, so it never removes something in use. A cache such as Redis or Workers KV is **a separate store of copies**, shared across processes, that removes entries by policy (expiry, least recently used) even if someone will ask for them again. Neither one erases securely: memory freed by a garbage collector keeps its bytes until it is reused, and an expired cache entry may survive in snapshots and replicas. A cache is also one more copy of the data — sessions and PII in a cache need [the same access controls](https://redis.io/docs/latest/operate/oss_and_stack/management/security/) as the database (gaps 6 and 11).
+
 ## Elm: no hidden side effects
 
 Elm is the first box of the request path. Functions are pure, so a view that renders patient data cannot send it anywhere. Opaque types decide in one module what any screen may show. [Ports](https://guide.elm-lang.org/interop/ports.html) are the only exit to JavaScript, which gives you one list to audit, and Elm packages cannot contain JavaScript.

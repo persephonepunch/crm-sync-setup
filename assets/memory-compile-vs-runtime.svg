@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 820" role="img" aria-labelledby="t d">
+<title id="t">Where memory gets managed: Rust at compile time, the JVM at runtime</title>
+<desc id="d">Five pipelines from source to running code, split by a line between build time and run time. Rust: the compiler and borrow checker prove every memory access and insert each free, then ship native machine code that runs with no runtime manager. Rust to Wasm: the same proof, shipped as a portable Wasm module that a host such as V8 or Wasmtime compiles at load and walls off, still with no garbage collector. Java and Kotlin on the JVM: the compiler ships bytecode, and the JVM's JIT and garbage collector manage memory while the program runs. Elm and TypeScript: compiled to JavaScript, with V8's garbage collector managing memory at runtime. C: compiled to machine code with no ownership check, and memory freed by hand. Three cards draw the security consequences.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 12px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .bd{font:700 8.5px Helvetica,Arial,sans-serif;fill:#fff;letter-spacing:.08em}
+ .n{font:700 10px Helvetica,Arial,sans-serif;fill:#000;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .gap{fill:#fff;stroke:#000;stroke-width:1.5;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .ah{fill:#767676}
+</style></defs>
+<rect width="1600" height="820" fill="#fff"/>
+<text class="h" x="60" y="52">WHERE MEMORY GETS MANAGED — RUST AT COMPILE TIME, THE JVM AT RUNTIME</text>
+<text class="g" x="60" y="76">Rust has no bytecode and no memory manager at runtime: the compiler proves memory safety, then gets out of the way</text>
+<text class="s" x="1540" y="76" text-anchor="end">Dashed = a gap. Black tag = where memory is managed.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">FIVE PIPELINES FROM SOURCE TO RUNNING CODE</text>
+<text class="lab" x="60" y="156">SOURCE</text>
+<text class="lab" x="290" y="156">COMPILER</text>
+<text class="lab" x="650" y="156">WHAT SHIPS</text>
+<text class="lab" x="960" y="156">AT RUNTIME</text>
+<text class="lab" x="1340" y="156">SAFETY CHECKED</text>
+<text class="lab" x="922" y="138" text-anchor="end">BUILD TIME</text>
+<text class="lab" x="942" y="138">RUN TIME</text>
+<rect class="box" x="60" y="172" width="200" height="62"/>
+<text class="bt" x="74" y="198">Rust source</text>
+<text class="b" x="74" y="218">ownership and borrowing</text>
+<path class="ln" d="M262,203L281.0,203.0"/>
+<path class="ah" d="M288,203L279.0,198.5L279.0,207.5z"/>
+<rect class="box" x="290" y="172" width="330" height="62"/>
+<text class="bt" x="304" y="198">rustc + borrow checker</text>
+<text class="b" x="304" y="218">proves each access; inserts each free</text>
+<rect x="480.2" y="179" width="129.8" height="18" fill="#000"/><text class="bd" x="545.1" y="191.5" text-anchor="middle">MEMORY MANAGED HERE</text>
+<path class="ln" d="M622,203L641.0,203.0"/>
+<path class="ah" d="M648,203L639.0,198.5L639.0,207.5z"/>
+<rect class="box" x="650" y="172" width="250" height="62"/>
+<text class="bt" x="664" y="198">Machine code</text>
+<text class="b" x="664" y="218">native, built ahead of time</text>
+<path class="ln" d="M902,203L951.0,203.0"/>
+<path class="ah" d="M958,203L949.0,198.5L949.0,207.5z"/>
+<rect class="box" x="960" y="172" width="360" height="62"/>
+<text class="bt" x="974" y="198">The CPU runs it</text>
+<text class="b" x="974" y="218">no runtime manager; bounds checks only</text>
+<text class="bt" x="1340" y="198">At compile time</text>
+<text class="s" x="1340" y="218">Rust</text>
+<rect class="box" x="60" y="256" width="200" height="62"/>
+<text class="bt" x="74" y="282">Rust source</text>
+<text class="b" x="74" y="302">the same code</text>
+<path class="ln" d="M262,287L281.0,287.0"/>
+<path class="ah" d="M288,287L279.0,282.5L279.0,291.5z"/>
+<rect class="box" x="290" y="256" width="330" height="62"/>
+<text class="bt" x="304" y="282">rustc + borrow checker</text>
+<text class="b" x="304" y="302">same proof, targeting wasm32</text>
+<rect x="480.2" y="263" width="129.8" height="18" fill="#000"/><text class="bd" x="545.1" y="275.5" text-anchor="middle">MEMORY MANAGED HERE</text>
+<path class="ln" d="M622,287L641.0,287.0"/>
+<path class="ah" d="M648,287L639.0,282.5L639.0,291.5z"/>
+<rect class="box" x="650" y="256" width="250" height="62"/>
+<text class="bt" x="664" y="282">Wasm module</text>
+<text class="b" x="664" y="302">portable bytecode</text>
+<path class="ln" d="M902,287L951.0,287.0"/>
+<path class="ah" d="M958,287L949.0,282.5L949.0,291.5z"/>
+<rect class="box" x="960" y="256" width="360" height="62"/>
+<text class="bt" x="974" y="282">Host: V8 or Wasmtime</text>
+<text class="b" x="974" y="302">compiles at load; walls off memory; no GC</text>
+<rect x="1282.0" y="264" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1296.0" y="276.5">22</text>
+<text class="b" x="1340" y="282">Compile time, plus the host&#x27;s wall</text>
+<text class="s" x="1340" y="302">Rust to Wasm</text>
+<rect class="box" x="60" y="340" width="200" height="62"/>
+<text class="bt" x="74" y="366">Java · Kotlin</text>
+<text class="b" x="74" y="386">Salesforce, SFCC, MuleSoft</text>
+<path class="ln" d="M262,371L281.0,371.0"/>
+<path class="ah" d="M288,371L279.0,366.5L279.0,375.5z"/>
+<rect class="box" x="290" y="340" width="330" height="62"/>
+<text class="bt" x="304" y="366">javac</text>
+<text class="b" x="304" y="386">compiles to bytecode; no memory proof</text>
+<path class="ln" d="M622,371L641.0,371.0"/>
+<path class="ah" d="M648,371L639.0,366.5L639.0,375.5z"/>
+<rect class="box" x="650" y="340" width="250" height="62"/>
+<text class="bt" x="664" y="366">Bytecode (.class, .jar)</text>
+<text class="b" x="664" y="386">runs on any JVM</text>
+<path class="ln" d="M902,371L951.0,371.0"/>
+<path class="ah" d="M958,371L949.0,366.5L949.0,375.5z"/>
+<rect class="box" x="960" y="340" width="360" height="62"/>
+<text class="bt" x="974" y="366">JVM: JIT and GC</text>
+<text class="b" x="974" y="386">a garbage collector frees memory while running</text>
+<rect x="1180.2" y="347" width="129.8" height="18" fill="#000"/><text class="bd" x="1245.1" y="359.5" text-anchor="middle">MEMORY MANAGED HERE</text>
+<rect x="1144.2" y="348" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1158.2" y="360.5">19</text>
+<text class="b" x="1340" y="366">At runtime</text>
+<text class="s" x="1340" y="386">JVM</text>
+<rect class="box" x="60" y="424" width="200" height="62"/>
+<text class="bt" x="74" y="450">Elm · TypeScript</text>
+<text class="b" x="74" y="470">types checked when compiled</text>
+<path class="ln" d="M262,455L281.0,455.0"/>
+<path class="ah" d="M288,455L279.0,450.5L279.0,459.5z"/>
+<rect class="box" x="290" y="424" width="330" height="62"/>
+<text class="bt" x="304" y="450">elm make · tsc</text>
+<text class="b" x="304" y="470">compiles to JavaScript</text>
+<path class="ln" d="M622,455L641.0,455.0"/>
+<path class="ah" d="M648,455L639.0,450.5L639.0,459.5z"/>
+<rect class="box" x="650" y="424" width="250" height="62"/>
+<text class="bt" x="664" y="450">JavaScript</text>
+<text class="b" x="664" y="470">to the browser or a Worker</text>
+<path class="ln" d="M902,455L951.0,455.0"/>
+<path class="ah" d="M958,455L949.0,450.5L949.0,459.5z"/>
+<rect class="box" x="960" y="424" width="360" height="62"/>
+<text class="bt" x="974" y="450">V8: JIT and GC</text>
+<text class="b" x="974" y="470">a garbage collector frees memory while running</text>
+<rect x="1180.2" y="431" width="129.8" height="18" fill="#000"/><text class="bd" x="1245.1" y="443.5" text-anchor="middle">MEMORY MANAGED HERE</text>
+<text class="b" x="1340" y="450">Types at build; memory at run</text>
+<text class="s" x="1340" y="470">Elm · TypeScript</text>
+<rect class="box" x="60" y="508" width="200" height="62"/>
+<text class="bt" x="74" y="534">C source</text>
+<text class="b" x="74" y="554">malloc and free, by hand</text>
+<path class="ln" d="M262,539L281.0,539.0"/>
+<path class="ah" d="M288,539L279.0,534.5L279.0,543.5z"/>
+<rect class="box" x="290" y="508" width="330" height="62"/>
+<text class="bt" x="304" y="534">C compiler</text>
+<text class="b" x="304" y="554">no ownership check</text>
+<path class="ln" d="M622,539L641.0,539.0"/>
+<path class="ah" d="M648,539L639.0,534.5L639.0,543.5z"/>
+<rect class="box" x="650" y="508" width="250" height="62"/>
+<text class="bt" x="664" y="534">Machine code</text>
+<text class="b" x="664" y="554">native, built ahead of time</text>
+<path class="ln" d="M902,539L951.0,539.0"/>
+<path class="ah" d="M958,539L949.0,534.5L949.0,543.5z"/>
+<rect class="gap" x="960" y="508" width="360" height="62"/>
+<text class="bt" x="974" y="534">The CPU runs it</text>
+<text class="b" x="974" y="554">a memory mistake is an exploit</text>
+<rect x="1205.0" y="515" width="105.0" height="18" fill="#000"/><text class="bd" x="1257.5" y="527.5" text-anchor="middle">MEMORY: BY HAND</text>
+<text class="bt" x="1340" y="534">Never</text>
+<text class="s" x="1340" y="554">C</text>
+<path d="M932,140V578" stroke="#000" stroke-width="1.2" stroke-dasharray="6 4" fill="none"/>
+<path class="rule" d="M60,608H1540"/>
+<text class="sec" x="60" y="636">WHY IT MATTERS FOR SECURITY</text>
+<rect class="box" x="60" y="652" width="480" height="110"/>
+<text class="bt" x="74" y="678">No runtime to patch, but you rebuild</text>
+<text class="b" x="74" y="698"></text>
+<text class="b" x="74" y="700">A JVM fix can ship as a runtime update.</text>
+<text class="b" x="74" y="718">A Rust fix means recompiling and</text>
+<text class="b" x="74" y="736">redeploying the binary.</text>
+<rect class="box" x="560" y="652" width="480" height="110"/>
+<text class="bt" x="574" y="678">Secrets can be wiped</text>
+<text class="b" x="574" y="698"></text>
+<rect x="1002.0" y="660" width="28" height="18" rx="9" fill="#fff" stroke="#000" stroke-width="1.2" stroke-dasharray="3 2"/><text class="n" x="1016.0" y="672.5">19</text>
+<text class="b" x="574" y="700">Rust frees memory at a known point, so</text>
+<text class="b" x="574" y="718">zeroize can erase a key. JVM Strings</text>
+<text class="b" x="574" y="736">can&#x27;t be changed, and the GC copies them.</text>
+<rect class="box" x="1060" y="652" width="480" height="110"/>
+<text class="bt" x="1074" y="678">Nothing to escape, except unsafe</text>
+<text class="b" x="1074" y="698"></text>
+<text class="b" x="1074" y="700">The compile-time proof holds everywhere</text>
+<text class="b" x="1074" y="718">but unsafe blocks: the foot gun to search</text>
+<text class="b" x="1074" y="736">for in any Rust code review.</text>
+<text class="bt" x="60" y="798">The JVM manages memory at runtime. Rust proves it at compile time.</text>
+</svg>
