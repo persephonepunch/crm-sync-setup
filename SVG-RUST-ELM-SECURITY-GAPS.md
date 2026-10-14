@@ -282,6 +282,38 @@ A JVM that never leaves its VM can get away with assumptions that stop holding o
 
 The last column is the one teams plan least for. Making a system legible to AI — structured data, `llms.txt`, clean JSON-LD, Markdown descriptors — is how answer engines and agents find and recommend it. The same legibility makes it readable, quotable and steerable by every model that fetches it, so anything an agent can read is something an attacker can phrase as an instruction (A1).
 
+## Four runtimes, four resolution planes, one join
+
+The platforms a commerce stack connects don't just run different languages. Each one decides **who a customer is, what a product is, and what that customer agreed to** on its own terms — a separate resolution plane.
+
+| Platform | Runtime | Resolves people by | ID key | Consent model |
+| --- | --- | --- | --- | --- |
+| Salesforce | Java: Apex, SFCC's server JavaScript on Rhino in the JVM, MuleSoft | Data Cloud identity resolution rules | Contact and Account IDs | Salesforce consent objects |
+| Adobe | Java for AEM; **PHP** for Adobe Commerce (Magento) | Experience Platform identity graph | ECID and identity namespaces | Consent and governance labels |
+| Shopify | Ruby on Rails at the core; [Functions](https://shopify.dev/docs/apps/build/functions/programming-languages/rust-for-functions) as Wasm, written in Rust or JavaScript compiled by Javy | Customer accounts | `gid://shopify/Customer/…` | The Customer Privacy API |
+| Google Merchant · Ads | Google's own, not public; **your** side is the Python client, notebooks and BigQuery exports | Hashed user data for enhanced conversions | `offerId` and GTIN | Consent Mode v2 signals |
+
+Rust, Wasm and Javy are Shopify's *extension* layer — the code you write — not its core. Python is the *client* side of Google Merchant, not Google's runtime. And "Adobe is Java" holds for AEM but not for Adobe Commerce.
+
+![Four runtimes, four resolution planes, one join. Four cards — Salesforce, Adobe, Shopify, Google Merchant and Ads — each list a runtime, how it resolves people, its ID key and its consent model. Arrows labeled JSON over HTTPS meet at one join, your middleware, iPaaS or agent, which maps IDs, carries consent, propagates deletion and validates payloads. Six security gaps at the join are marked in red: consent drops in the mapping, IDs resolve to different people, deletion and opt-out don't propagate, the join keeps copies, payloads are trusted without the contract, and data moves to a region it shouldn't be in. A table states what crosses the boundary.](https://persephonepunch.github.io/crm-sync-setup/assets/resolution-planes.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/resolution-planes.svg) (1600 × 1200) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/resolution-planes.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/resolution-planes.jpg). Security gaps at the join are marked in red.*
+
+**Only data crosses between planes, never runtimes.** A JVM, a Ruby process, a Wasm module and Google's services never share memory; they exchange JSON over HTTPS. So memory safety protects *within* each plane and stops at its edge. **Between** planes, the security boundary is the data contract — a schema checked on every payload — and the join that enforces it.
+
+The join is your code: middleware, an iPaaS flow or an agent. It is the only place the four planes meet, so it is where the gate from [From cron to agents](#from-cron-to-agents-who-binds-the-systems-and-where-security-has-to-live) and the consent field belong — and where the gaps concentrate:
+
+| Gap | Fix |
+| --- | --- |
+| J1 Consent drops in the mapping (gaps 20, M3) | Carry consent state as a field on every mapped record; refuse records without it |
+| J2 IDs resolve to different people | Keep a mapping table with the source of each match; never merge on a guess |
+| J3 Deletion and opt-out don't propagate | Fan every erasure and opt-out out to every plane, and log each plane's receipt |
+| J4 The join keeps copies (gaps 18, 28) | Store IDs and mappings, not payloads; purge on a schedule |
+| J5 Payloads trusted without the contract | Validate every inbound payload against the schema, whoever sent it |
+| J6 Data moved to a region it shouldn't be in | Know each plane's regions; route and store by residency, not convenience |
+
+No plane learns about another plane's opt-out or erasure on its own. If a customer withdraws consent in Shopify, Salesforce, Adobe and Google still hold their own copy of "yes" until your join tells them otherwise — and keeps the receipt that it did.
+
 ## VM, container or managed database — and the storage wrappers
 
 Where the database runs decides who patches it, where its data sits, and which wall you are relying on. In every case the **app points to the database**: connections start at the app, and the database never connects back to it.

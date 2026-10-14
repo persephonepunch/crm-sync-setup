@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1200" role="img" aria-labelledby="t d">
+<title id="t">Four runtimes, four resolution planes, one join</title>
+<desc id="d">Salesforce, Adobe, Shopify and Google Merchant and Ads each run on their own runtime and resolve customers, products and consent on their own terms: Salesforce on Java with Data Cloud identity resolution and its consent objects; Adobe on Java for AEM and PHP for Adobe Commerce, with the Experience Platform identity graph and governance labels; Shopify on Ruby on Rails with Wasm Functions written in Rust or compiled with Javy, global IDs and the Customer Privacy API; Google Merchant and Ads behind an API with BigQuery exports, offerId and GTIN keys, hashed user data and Consent Mode v2. Only JSON over HTTPS crosses between them. Every arrow meets at one join, your middleware, iPaaS or agent, which maps IDs, carries consent, propagates deletion and records each mapping. Security gaps at the join are marked in red: consent drops, IDs resolve differently, deletion and opt-out don't propagate, the join keeps copies, payloads aren't validated against the contract, and data moves across regions. A table states what crosses the boundary, and six red gaps have fixes.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .big{font:700 17px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .c{font:11px 'Courier New',Courier,monospace;fill:#000}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .ah{fill:#767676}
+ .ahr{fill:#c8102e}
+</style></defs>
+<rect width="1600" height="1200" fill="#fff"/>
+<text class="h" x="60" y="52">FOUR RUNTIMES, FOUR RESOLUTION PLANES, ONE JOIN</text>
+<text class="g" x="60" y="76">the platforms never share memory or a runtime: only data crosses, and every crossing meets in your code</text>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text class="s" x="1326" y="76">Red dashed = a security gap at the join.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">EACH PLATFORM RESOLVES WHO AND WHAT ON ITS OWN TERMS</text>
+<rect class="box" x="60" y="140" width="355" height="238"/>
+<text class="big" x="76" y="170">Salesforce</text>
+<text class="lab" x="76" y="202">RUNTIME</text>
+<text class="b" x="76" y="219">Java: Apex, SFCC on Rhino, MuleSoft</text>
+<text class="lab" x="76" y="246">RESOLVES PEOPLE BY</text>
+<text class="b" x="76" y="263">Data Cloud identity resolution rules</text>
+<text class="lab" x="76" y="290">ID KEY</text>
+<text class="b" x="76" y="307">Contact and Account IDs</text>
+<text class="lab" x="76" y="334">CONSENT MODEL</text>
+<text class="b" x="76" y="351">Salesforce consent objects</text>
+<rect class="box" x="435" y="140" width="355" height="238"/>
+<text class="big" x="451" y="170">Adobe</text>
+<text class="lab" x="451" y="202">RUNTIME</text>
+<text class="b" x="451" y="219">Java (AEM) · PHP (Adobe Commerce)</text>
+<text class="lab" x="451" y="246">RESOLVES PEOPLE BY</text>
+<text class="b" x="451" y="263">Experience Platform identity graph</text>
+<text class="lab" x="451" y="290">ID KEY</text>
+<text class="b" x="451" y="307">ECID and identity namespaces</text>
+<text class="lab" x="451" y="334">CONSENT MODEL</text>
+<text class="b" x="451" y="351">Consent and governance labels</text>
+<rect class="box" x="810" y="140" width="355" height="238"/>
+<text class="big" x="826" y="170">Shopify</text>
+<text class="lab" x="826" y="202">RUNTIME</text>
+<text class="b" x="826" y="219">Ruby on Rails · Wasm Functions (Rust, Javy)</text>
+<text class="lab" x="826" y="246">RESOLVES PEOPLE BY</text>
+<text class="b" x="826" y="263">Customer accounts</text>
+<text class="lab" x="826" y="290">ID KEY</text>
+<text class="c" x="826" y="307">gid://shopify/Customer/…</text>
+<text class="lab" x="826" y="334">CONSENT MODEL</text>
+<text class="b" x="826" y="351">The Customer Privacy API</text>
+<rect class="box" x="1185" y="140" width="355" height="238"/>
+<text class="big" x="1201" y="170">Google Merchant · Ads</text>
+<text class="lab" x="1201" y="202">RUNTIME</text>
+<text class="b" x="1201" y="219">Google&#x27;s, not public · your Python client</text>
+<text class="lab" x="1201" y="246">RESOLVES PEOPLE BY</text>
+<text class="b" x="1201" y="263">Hashed user data (enhanced conversions)</text>
+<text class="lab" x="1201" y="290">ID KEY</text>
+<text class="b" x="1201" y="307">offerId and GTIN</text>
+<text class="lab" x="1201" y="334">CONSENT MODEL</text>
+<text class="b" x="1201" y="351">Consent Mode v2 signals</text>
+<path class="ln" d="M237.5,380L473.4,465.6"/>
+<path class="ah" d="M480.0,468L473.1,460.7L470.0,469.2z"/>
+<path class="ln" d="M612.5,380L688.6,462.8"/>
+<path class="ah" d="M693.3333333333334,468L690.6,458.3L683.9,464.4z"/>
+<path class="ln" d="M987.5,380L911.4,462.8"/>
+<path class="ah" d="M906.6666666666667,468L916.1,464.4L909.4,458.3z"/>
+<path class="ln" d="M1362.5,380L1126.6,465.6"/>
+<path class="ah" d="M1120.0,468L1130.0,469.2L1126.9,460.7z"/>
+<text class="g" x="60" y="422">Every arrow: JSON over HTTPS. Only data crosses.</text>
+<rect class="box" x="400" y="470" width="800" height="150" style="stroke-width:3"/>
+<text class="big" x="800.0" y="500" text-anchor="middle">Your join: middleware, iPaaS or agent</text>
+<text class="g" x="800.0" y="520" text-anchor="middle">the only place the four planes meet, so the gate and the consent field live here</text>
+<text class="b" x="430" y="548">·  maps each plane&#x27;s IDs to the others, with the source of every match</text>
+<text class="b" x="430" y="566">·  carries consent as a field on every record it moves</text>
+<text class="b" x="430" y="584">·  sends every deletion and opt-out to every plane, and logs each receipt</text>
+<text class="b" x="430" y="602">·  validates every payload against the contract, whoever sent it</text>
+<rect class="rgap" x="60" y="464" width="300" height="64"/>
+<rect x="70.0" y="473" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="485.5">J1</text>
+<text class="btr" x="106" y="486">Consent drops in the mapping</text>
+<text class="r" x="78" y="510">gaps 20 and M3</text>
+<path class="lnr" d="M360,496H398"/>
+<rect class="rgap" x="60" y="548" width="300" height="64"/>
+<rect x="70.0" y="557" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="569.5">J2</text>
+<text class="btr" x="106" y="570">IDs resolve to different people</text>
+<text class="r" x="78" y="594">a guess becomes a merge</text>
+<path class="lnr" d="M360,580H398"/>
+<rect class="rgap" x="1240" y="464" width="300" height="64"/>
+<rect x="1250.0" y="473" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1264" y="485.5">J3</text>
+<text class="btr" x="1286" y="486">Deletion and opt-out don&#x27;t propagate</text>
+<text class="r" x="1258" y="510">one plane forgets, three remember</text>
+<path class="lnr" d="M1202,496H1240"/>
+<rect class="rgap" x="1240" y="548" width="300" height="64"/>
+<rect x="1250.0" y="557" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1264" y="569.5">J4</text>
+<text class="btr" x="1286" y="570">The join keeps copies</text>
+<text class="r" x="1258" y="594">gaps 18 and 28</text>
+<path class="lnr" d="M1202,580H1240"/>
+<rect class="rgap" x="420" y="646" width="360" height="38"/>
+<rect x="430.0" y="656" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="444" y="668.5">J5</text>
+<text class="btr" x="466" y="669">Payloads trusted without the contract</text>
+<path class="lnr" d="M600,622V646"/>
+<rect class="rgap" x="820" y="646" width="360" height="38"/>
+<rect x="830.0" y="656" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="844" y="668.5">J6</text>
+<text class="btr" x="866" y="669">Data moved to a region it shouldn&#x27;t be in</text>
+<path class="lnr" d="M1000,622V646"/>
+<path class="rule" d="M60,720H1540"/>
+<text class="sec" x="60" y="748">WHAT CROSSES THE BOUNDARY</text>
+<text class="lab" x="60" y="776">QUESTION</text>
+<text class="lab" x="380" y="776">ANSWER</text>
+<path class="rule" d="M60,786H1540"/>
+<text class="bt" x="60" y="808">Do the platforms share memory or a runtime?</text>
+<text class="b" x="380" y="808">Never. A JVM, a Ruby process, a Wasm module and Google&#x27;s services only exchange messages.</text>
+<path class="rule" d="M60,819H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="838">What crosses?</text>
+<text class="b" x="380" y="838">JSON over HTTPS: records, events, IDs and consent signals.</text>
+<path class="rule" d="M60,849H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="868">What does memory safety protect?</text>
+<text class="b" x="380" y="868">Each plane from its own inputs. It stops at the plane&#x27;s edge.</text>
+<path class="rule" d="M60,879H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="898">What protects the crossing?</text>
+<text class="b" x="380" y="898">The data contract (a schema checked on every payload) and the join that enforces it.</text>
+<path class="rule" d="M60,909H1540" style="stroke:#ddd"/>
+<text class="bt" x="60" y="928">Who carries consent and deletion?</text>
+<text class="b" x="380" y="928">Your join. No plane learns about another plane&#x27;s opt-out or erasure on its own.</text>
+<path class="rule" d="M60,939H1540" style="stroke:#ddd"/>
+<path class="rule" d="M60,958H1540"/>
+<text class="secr" x="60" y="986">SIX GAPS AT THE JOIN — AND THE FIX FOR EACH</text>
+<rect x="60.0" y="1007" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1019.5">J1</text>
+<text class="btr" x="98" y="1020">Consent drops in the mapping</text>
+<text class="b" x="98" y="1040">Fix: Carry consent state as a field on every mapped record; refuse records without it</text>
+<rect x="810.0" y="1007" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1019.5">J2</text>
+<text class="btr" x="848" y="1020">IDs resolve to different people</text>
+<text class="b" x="848" y="1040">Fix: Keep a mapping table with the source of each match; never merge on a guess</text>
+<rect x="60.0" y="1063" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1075.5">J3</text>
+<text class="btr" x="98" y="1076">Deletion and opt-out don&#x27;t propagate</text>
+<text class="b" x="98" y="1096">Fix: Fan every erasure and opt-out out to every plane; log each plane&#x27;s receipt</text>
+<rect x="810.0" y="1063" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1075.5">J4</text>
+<text class="btr" x="848" y="1076">The join keeps copies</text>
+<text class="b" x="848" y="1096">Fix: Store IDs and mappings, not payloads; purge on a schedule</text>
+<rect x="60.0" y="1119" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="74" y="1131.5">J5</text>
+<text class="btr" x="98" y="1132">Payloads trusted without the contract</text>
+<text class="b" x="98" y="1152">Fix: Validate every inbound payload against the schema, whoever sent it</text>
+<rect x="810.0" y="1119" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="824" y="1131.5">J6</text>
+<text class="btr" x="848" y="1132">Data moved to a region it shouldn&#x27;t be in</text>
+<text class="b" x="848" y="1152">Fix: Know each plane&#x27;s regions; route and store by residency, not convenience</text>
+<text class="bt" x="60" y="1178">Memory safety protects inside each plane. The data contract and the join protect between them.</text>
+</svg>
