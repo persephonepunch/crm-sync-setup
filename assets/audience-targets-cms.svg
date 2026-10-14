@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1430" role="img" aria-labelledby="t d">
+<title id="t">Audience targets in a CMS: definitions, not members</title>
+<desc id="d">An AI-enabled audience collection in Webflow stores definitions, never members. Lifecycle: an agent proposes an audience as a draft with its rationale and eval result, a person reviews it and records the definition hash, the published item goes Live, the sync reads only Live items whose hash matches, and destinations receive members with consent fields attached. Where each piece lives: the Webflow collection holds the definition, the targeting state (consent state, DSR rule, devices, location and campaigns), the AI fields and the approval; Xano and the ledger hold each person's consent, DSR, device class, coarse location and campaigns; the sync joins them and writes only totals back to Webflow as Audience States. The sync checks in order and stops at the first failure: DSR, consent, location, device, campaign, then cohort size. An example Audience States table shows counts, with every count below the minimum cohort left empty. Eight red gaps have fixes.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .def{font:16px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
+ .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
+ .chip{font:700 12px Helvetica,Arial,sans-serif;fill:#fff}
+ .c{font:11px 'Courier New',Courier,monospace;fill:#000}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .ah{fill:#767676}
+ .ahr{fill:#c8102e}
+</style></defs>
+<rect width="1600" height="1430" fill="#fff"/>
+<text class="h" x="60" y="52">AUDIENCE TARGETS IN A CMS — DEFINITIONS, NOT MEMBERS</text>
+<text class="g" x="60" y="76">the CMS holds the query and the rules; Xano holds the people; the sync joins them and writes back totals only</text>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text class="s" x="1326" y="76">Red dashed = a security gap.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="124">LIFECYCLE — THE AGENT PROPOSES, A PERSON PUBLISHES</text>
+<rect class="box" x="60" y="140" width="280" height="82"/>
+<text class="bt" x="74" y="164">1 · Agent proposes</text>
+<text class="b" x="74" y="184">POST /v2/collections/{id}/items</text>
+<text class="b" x="74" y="201">isDraft: true; rationale, eval result</text>
+<path class="ln" d="M342,181L351.0,181.0"/>
+<path class="ah" d="M358,181L349.0,176.5L349.0,185.5z"/>
+<rect class="box" x="360" y="140" width="280" height="82"/>
+<text class="bt" x="374" y="164">2 · Person reviews</text>
+<text class="b" x="374" y="184">checks the definition and rules;</text>
+<text class="b" x="374" y="201">the definition hash is recorded</text>
+<path class="ln" d="M642,181L651.0,181.0"/>
+<path class="ah" d="M658,181L649.0,176.5L649.0,185.5z"/>
+<rect class="box" x="660" y="140" width="280" height="82"/>
+<text class="bt" x="674" y="164">3 · Published, Live</text>
+<text class="b" x="674" y="184">Status: Live; Retire by set;</text>
+<text class="b" x="674" y="201">no Collection template page</text>
+<path class="ln" d="M942,181L951.0,181.0"/>
+<path class="ah" d="M958,181L949.0,176.5L949.0,185.5z"/>
+<rect class="box" x="960" y="140" width="280" height="82" style="stroke-width:3"/>
+<text class="bt" x="974" y="164">4 · Sync reads Live only</text>
+<text class="b" x="974" y="184">refuses a hash mismatch, or</text>
+<text class="b" x="974" y="201">Contains personal data: on</text>
+<path class="ln" d="M1242,181L1251.0,181.0"/>
+<path class="ah" d="M1258,181L1249.0,176.5L1249.0,185.5z"/>
+<rect class="box" x="1260" y="140" width="280" height="82"/>
+<text class="bt" x="1274" y="164">5 · Destinations</text>
+<text class="b" x="1274" y="184">Customer Match with ad_user_data</text>
+<text class="b" x="1274" y="201">and ad_personalization; Klaviyo</text>
+<rect class="rgap" x="60" y="242" width="480" height="36"/>
+<rect x="70.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="263.5">T3</text>
+<text class="btr" x="108" y="264">The agent publishes its own audience</text>
+<rect class="rgap" x="560" y="242" width="480" height="36"/>
+<rect x="570.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="263.5">T4</text>
+<text class="btr" x="608" y="264">Definition changed after approval</text>
+<rect class="rgap" x="1060" y="242" width="480" height="36"/>
+<rect x="1070.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="263.5">T2</text>
+<text class="btr" x="1108" y="264">A template page publishes the collection</text>
+<path class="rule" d="M60,300H1540"/>
+<text class="sec" x="60" y="328">WHERE EACH PIECE LIVES</text>
+<rect class="box" x="60" y="344" width="640" height="300"/>
+<text class="bt" x="74" y="368">Webflow CMS · Audience Targets (definitions)</text>
+<rect x="74" y="382" width="296" height="100" fill="#fff" stroke="#000" stroke-width="1"/>
+<text class="lab" x="86" y="402">DEFINITION</text>
+<text class="b" x="86" y="424">format: Shopify segment query</text>
+<text class="b" x="86" y="442">definition: the query, not members</text>
+<text class="b" x="86" y="460">definition hash · source system</text>
+<rect x="384" y="382" width="296" height="100" fill="#fff" stroke="#000" stroke-width="2.5"/>
+<text class="lab" x="396" y="402">TARGETING STATE</text>
+<text class="b" x="396" y="424">consent state · DSR rule</text>
+<text class="b" x="396" y="442">devices · device signal</text>
+<text class="b" x="396" y="460">location granularity and source · campaigns</text>
+<rect x="74" y="494" width="296" height="100" fill="#fff" stroke="#000" stroke-width="1"/>
+<text class="lab" x="86" y="514">AI</text>
+<text class="b" x="86" y="536">proposed by · rationale</text>
+<text class="b" x="86" y="554">eval result: PASS, FAIL, REVIEW</text>
+<text class="b" x="86" y="572">assistant summary · embedding text</text>
+<rect x="384" y="494" width="296" height="100" fill="#fff" stroke="#000" stroke-width="1"/>
+<text class="lab" x="396" y="514">APPROVAL AND LIMITS</text>
+<text class="b" x="396" y="536">approved by · approved at · ledger</text>
+<text class="b" x="396" y="554">min cohort · retire by</text>
+<text class="b" x="396" y="572">contains personal data: off</text>
+<text class="s" x="74" y="622">Also: Markets · Consent Purposes · Destinations · Adapters · DSR Types · Device Classes · Campaigns · Audience States</text>
+<rect class="box" x="760" y="404" width="240" height="180" style="stroke-width:3"/>
+<text class="bt" x="774" y="428">Sync (Worker)</text>
+<text class="b" x="774" y="448">reads Live items only</text>
+<text class="b" x="774" y="465">loads each matched person&#x27;s</text>
+<text class="b" x="774" y="482">state from Xano</text>
+<text class="b" x="774" y="499">checks DSR, consent, location,</text>
+<text class="b" x="774" y="516">device, campaign, cohort</text>
+<text class="b" x="774" y="533">sends with consent fields</text>
+<path class="ln" d="M702,450L751.0,450.0"/>
+<path class="ah" d="M758,450L749.0,445.5L749.0,454.5z"/>
+<text class="s" x="706" y="440">Live items</text>
+<path class="ln" d="M758,540L709.0,540.0"/>
+<path class="ah" d="M702,540L711.0,544.5L711.0,535.5z"/>
+<text class="s" x="706" y="560">totals only</text>
+<rect class="box" x="1060" y="344" width="480" height="300"/>
+<text class="bt" x="1074" y="368">Xano and the ledger · each person&#x27;s state</text>
+<text class="c" x="1074" y="400" xml:space="preserve">{ &quot;subject&quot;: &quot;hmac:7e1a…&quot;,</text>
+<text class="c" x="1074" y="418" xml:space="preserve">  &quot;consent&quot;: { &quot;ad_user_data&quot;: true,</text>
+<text class="c" x="1074" y="436" xml:space="preserve">               &quot;ad_personalization&quot;: true,</text>
+<text class="c" x="1074" y="454" xml:space="preserve">               &quot;marketing&quot;: true, &quot;training&quot;: false },</text>
+<text class="c" x="1074" y="472" xml:space="preserve">  &quot;dsr&quot;: { &quot;open&quot;: null },</text>
+<text class="c" x="1074" y="490" xml:space="preserve">  &quot;device_class&quot;: &quot;mobile_web&quot;,</text>
+<text class="c" x="1074" y="508" xml:space="preserve">  &quot;location&quot;: { &quot;country&quot;: &quot;US&quot;, &quot;region&quot;: &quot;CA&quot; },</text>
+<text class="c" x="1074" y="526" xml:space="preserve">  &quot;campaigns&quot;: [&quot;spring-sale&quot;] }</text>
+<text class="b" x="1074" y="568">and every per-person decision from each sync.</text>
+<text class="bt" x="1074" y="586">Never in Webflow.</text>
+<path class="ln" d="M1058,494L1009.0,494.0"/>
+<path class="ah" d="M1002,494L1011.0,498.5L1011.0,489.5z"/>
+<text class="s" x="1006" y="484">state</text>
+<rect class="rgap" x="60" y="660" width="480" height="36"/>
+<rect x="70.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="681.5">T1</text>
+<text class="btr" x="108" y="682">Members stored in the CMS</text>
+<rect class="rgap" x="560" y="660" width="480" height="36"/>
+<rect x="570.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="681.5">T7</text>
+<text class="btr" x="608" y="682">Precise location or device IDs</text>
+<rect class="rgap" x="1060" y="660" width="480" height="36"/>
+<rect x="1070.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="681.5">T8</text>
+<text class="btr" x="1108" y="682">Secrets in the Destinations collection</text>
+<path class="rule" d="M60,750H1540"/>
+<text class="sec" x="60" y="778">SYNC ORDER FOR EACH MATCHED PERSON — THE FIRST FAILURE STOPS</text>
+<rect class="box" x="60" y="794" width="228" height="82" style="stroke-width:3"/>
+<text class="bt" x="74" y="818">1 · DSR</text>
+<text class="b" x="74" y="838">an open request excludes;</text>
+<text class="b" x="74" y="855">deletion and opt-out win</text>
+<path class="ln" d="M290,835L301.0,835.0"/>
+<path class="ah" d="M308,835L299.0,830.5L299.0,839.5z"/>
+<path class="ln" d="M90,878L90.0,897.0"/>
+<path class="ah" d="M90,904L94.5,895.0L85.5,895.0z"/>
+<text class="g" x="100" y="900">excluded: open DSR</text>
+<rect class="box" x="310" y="794" width="228" height="82"/>
+<text class="bt" x="324" y="818">2 · Consent</text>
+<text class="b" x="324" y="838">every required purpose and</text>
+<text class="b" x="324" y="855">destination field granted</text>
+<path class="ln" d="M540,835L551.0,835.0"/>
+<path class="ah" d="M558,835L549.0,830.5L549.0,839.5z"/>
+<path class="ln" d="M340,878L340.0,897.0"/>
+<path class="ah" d="M340,904L344.5,895.0L335.5,895.0z"/>
+<text class="g" x="350" y="900">excluded: consent not granted</text>
+<rect class="box" x="560" y="794" width="228" height="82"/>
+<text class="bt" x="574" y="818">3 · Location</text>
+<text class="b" x="574" y="838">market listed, not blocked;</text>
+<text class="b" x="574" y="855">its regime rules apply</text>
+<path class="ln" d="M790,835L801.0,835.0"/>
+<path class="ah" d="M808,835L799.0,830.5L799.0,839.5z"/>
+<path class="ln" d="M590,878L590.0,897.0"/>
+<path class="ah" d="M590,904L594.5,895.0L585.5,895.0z"/>
+<text class="g" x="600" y="900">excluded: blocked market</text>
+<rect class="box" x="810" y="794" width="228" height="82"/>
+<text class="bt" x="824" y="818">4 · Device</text>
+<text class="b" x="824" y="838">class listed; allows personal-</text>
+<text class="b" x="824" y="855">ization if an adapter is set</text>
+<path class="ln" d="M1040,835L1051.0,835.0"/>
+<path class="ah" d="M1058,835L1049.0,830.5L1049.0,839.5z"/>
+<path class="ln" d="M840,878L840.0,897.0"/>
+<path class="ah" d="M840,904L844.5,895.0L835.5,895.0z"/>
+<text class="g" x="850" y="900">excluded: device not allowed</text>
+<rect class="box" x="1060" y="794" width="228" height="82"/>
+<text class="bt" x="1074" y="818">5 · Campaign</text>
+<text class="b" x="1074" y="838">Live, in its dates, with its</text>
+<text class="b" x="1074" y="855">consent requirements met</text>
+<path class="ln" d="M1290,835L1301.0,835.0"/>
+<path class="ah" d="M1308,835L1299.0,830.5L1299.0,839.5z"/>
+<path class="ln" d="M1090,878L1090.0,897.0"/>
+<path class="ah" d="M1090,904L1094.5,895.0L1085.5,895.0z"/>
+<text class="g" x="1100" y="900">excluded: campaign not live</text>
+<rect class="box" x="1310" y="794" width="228" height="82"/>
+<text class="bt" x="1324" y="818">6 · Cohort</text>
+<text class="b" x="1324" y="838">below Min cohort: hold and</text>
+<text class="b" x="1324" y="855">send nothing; else send</text>
+<path class="ln" d="M1340,878L1340.0,897.0"/>
+<path class="ah" d="M1340,904L1344.5,895.0L1335.5,895.0z"/>
+<text class="g" x="1350" y="900">state: held below cohort</text>
+<rect class="rgap" x="60" y="922" width="480" height="36"/>
+<rect x="70.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="943.5">T6</text>
+<text class="btr" x="108" y="944">Open DSR still targeted</text>
+<rect class="rgap" x="560" y="922" width="480" height="36"/>
+<rect x="570.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="943.5">T5</text>
+<text class="btr" x="608" y="944">Small slices identify people</text>
+<path class="rule" d="M60,980H1540"/>
+<text class="sec" x="60" y="1008">AUDIENCE STATES — WHAT COMES BACK TO WEBFLOW (EXAMPLE: MIN COHORT 50)</text>
+<text class="lab" x="60" y="1036">SLICE</text>
+<text class="lab" x="330" y="1036">STATE</text>
+<text class="lab" x="520" y="1036">MATCHED</text>
+<text class="lab" x="640" y="1036">OPEN DSR</text>
+<text class="lab" x="760" y="1036">NO CONSENT</text>
+<text class="lab" x="900" y="1036">BLOCKED MARKET</text>
+<text class="lab" x="1040" y="1036">DEVICE</text>
+<text class="lab" x="1160" y="1036">SENT</text>
+<text class="lab" x="1280" y="1036">COVERAGE</text>
+<path class="rule" d="M60,1044H1540" style="stroke:#ddd"/>
+<text class="b" x="60" y="1062">spring-sale · US · mobile_web</text>
+<text class="bt" x="330" y="1062">Synced</text>
+<text class="b" x="520" y="1062">4,210</text>
+<text class="b" x="640" y="1062">12</text>
+<text class="b" x="760" y="1062">1,380</text>
+<text class="b" x="900" y="1062">0</text>
+<text class="b" x="1040" y="1062">0</text>
+<text class="b" x="1160" y="1062">2,818</text>
+<text class="b" x="1280" y="1062">67%</text>
+<path class="rule" d="M60,1072H1540" style="stroke:#ddd"/>
+<text class="b" x="60" y="1090">spring-sale · KR · mobile_web</text>
+<text class="bt" x="330" y="1090">Blocked by market</text>
+<text class="b" x="520" y="1090">910</text>
+<text class="s" x="640" y="1090">empty</text>
+<text class="s" x="760" y="1090">empty</text>
+<text class="b" x="900" y="1090">910</text>
+<text class="s" x="1040" y="1090">empty</text>
+<text class="b" x="1160" y="1090">0</text>
+<text class="s" x="1280" y="1090">empty</text>
+<path class="rule" d="M60,1100H1540" style="stroke:#ddd"/>
+<text class="b" x="60" y="1118">spring-sale · UK · ctv</text>
+<text class="bt" x="330" y="1118">Held below cohort</text>
+<text class="s" x="520" y="1118">empty</text>
+<text class="s" x="640" y="1118">empty</text>
+<text class="s" x="760" y="1118">empty</text>
+<text class="s" x="900" y="1118">empty</text>
+<text class="s" x="1040" y="1118">empty</text>
+<text class="b" x="1160" y="1118">0</text>
+<text class="s" x="1280" y="1118">empty</text>
+<text class="s" x="60" y="1152">Below Min cohort every count is left empty: small counts sliced by device, market and campaign can identify a person (C2).</text>
+<path class="rule" d="M60,1170H1540"/>
+<text class="secr" x="60" y="1198">EIGHT GAPS — AND THE FIX FOR EACH</text>
+<rect x="62.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1227.5">T1</text>
+<text class="btr" x="100" y="1228">Members stored in the CMS</text>
+<text class="b" x="100" y="1244">Fix: Definitions only; Contains personal data must be off, or the sync refuses the item</text>
+<rect x="62.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1267.5">T2</text>
+<text class="btr" x="100" y="1268">A template page publishes the collection</text>
+<text class="b" x="100" y="1284">Fix: Don&#x27;t bind it to a Collection template page; every field on one is public</text>
+<rect x="62.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1307.5">T3</text>
+<text class="btr" x="100" y="1308">The agent publishes its own audience</text>
+<text class="b" x="100" y="1324">Fix: Agents create drafts only; a person reviews and publishes</text>
+<rect x="62.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1347.5">T4</text>
+<text class="btr" x="100" y="1348">Definition changed after approval</text>
+<text class="b" x="100" y="1364">Fix: A definition hash recorded at approval; a mismatch blocks the sync</text>
+<rect x="812.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1227.5">T5</text>
+<text class="btr" x="850" y="1228">Small slices identify people</text>
+<text class="b" x="850" y="1244">Fix: Counts below Min cohort left empty in every snapshot</text>
+<rect x="812.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1267.5">T6</text>
+<text class="btr" x="850" y="1268">Open DSR still targeted</text>
+<text class="b" x="850" y="1284">Fix: DSR checked first, before consent, on every sync</text>
+<rect x="812.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1307.5">T7</text>
+<text class="btr" x="850" y="1308">Precise location or device IDs</text>
+<text class="b" x="850" y="1324">Fix: Country or region and a device class only</text>
+<rect x="812.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1347.5">T8</text>
+<text class="btr" x="850" y="1348">Secrets in the Destinations collection</text>
+<text class="b" x="850" y="1364">Fix: Store the secret&#x27;s name; the secret lives in Cloudflare or Xano</text>
+<text class="bt" x="60" y="1408">The CMS holds the query and the rules. Xano holds the people. Only totals come back.</text>
+</svg>

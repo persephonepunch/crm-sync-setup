@@ -502,6 +502,10 @@ L3 is the confusion at the heart of this section. Allowing a crawler is a decisi
 
 An AI-enabled audience collection in Webflow stores **definitions, never members**. It holds no emails, hashes or customer IDs. Membership is resolved at sync time in Shopify, Klaviyo or BigQuery, checked against each person's state, and sent to Google with consent fields attached. An agent may **propose** an audience as a draft item; a person approves it by publishing.
 
+![Audience targets in a CMS: definitions, not members. Lifecycle in five steps: an agent proposes a draft through the Data API with its rationale and eval result, a person reviews it and the definition hash is recorded, the item is published as Live, the sync reads only Live items and refuses a hash mismatch or an item marked as containing personal data, and destinations receive members with ad_user_data and ad_personalization. Where each piece lives: the Webflow collection holds the definition, the targeting state, the AI fields and the approval; Xano and the ledger hold each person's consent, DSR, device class, coarse location and campaigns; the sync joins them and writes only totals back. The sync checks each matched person in order, DSR, consent, location, device, campaign and cohort, and stops at the first failure. An example Audience States table shows one synced slice, one blocked by market and one held below the minimum cohort with every count left empty. Eight red gaps, T1 to T8, have fixes.](https://persephonepunch.github.io/crm-sync-setup/assets/audience-targets-cms.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/audience-targets-cms.svg) (1600 × 1430) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/audience-targets-cms.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/audience-targets-cms.jpg). Security gaps are marked in red.*
+
 Each audience carries **targeting conditions** (consent, DSR, device, location and campaign rules) that a person must meet. Each person's own state stays in Xano and the ledger. Webflow gets back only aggregate **state snapshots**.
 
 ### `Audience Targets`
