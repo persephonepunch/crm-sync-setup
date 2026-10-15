@@ -13,6 +13,16 @@ tags:
   - firmware
 keywords:
   - Elm Architecture
+  - React
+  - useState
+  - Eleventy
+  - AEM Edge Delivery
+  - WordPress
+  - Checkout UI extensions
+  - Next.js
+  - Nuxt
+  - Astro
+  - SvelteKit
   - iced
   - egui
   - Slint
@@ -562,6 +572,188 @@ So the honest read is: low probability, settled law, high ceiling, and the cheap
 One browser detail decides how components are namespaced. A custom element's tag name can be defined only once per page, so if both variants define `<ondol-newsletter>`, the loader must make sure only one of them ever loads. Variants that need to coexist on a page, for a side-by-side preview, take namespaced tags such as `<ondol-newsletter-b>`.
 
 **The pattern in one line:** Webflow designs every component, and the Worker decides what each one does. Design changes publish from Webflow with no compile. Behaviour changes compile once, in the Worker, and reach every page through one line nobody edits.
+
+## Elm, Eleventy + Xano or React: isKorea, isConsented, isForm
+
+These three are often weighed as alternatives, but they answer different questions. **Eleventy + Xano decides what HTML exists, at build time. Elm decides how one widget's state changes, in the browser. React usually decides both, and brings its own runtime to do it.** The clearest comparison is to give each the same three flags every page in this stack carries — *is this Korea*, *is this visitor consented*, *what is this form doing* — and see where each one keeps them, and what each can draw.
+
+### State without `useState`
+
+In React, state is a hook. `useState` is imported from `react` and works only inside a component React is rendering, so every stateful piece of interface depends on the React runtime and ReactDOM — and, once hooks stop scaling, on a store library as well. The other two need no state library at all:
+
+| Where state lives | Eleventy + Xano | Elm island | React |
+|---|---|---|---|
+| At build time | Data files fetched from Xano — public data only | — | — (or a server render, which runs before consent) |
+| In the browser | The DOM: attributes and classes, as in the newsletter form above | One `Model` value, changed only in `update` | `useState` and `useReducer` hooks, Context, often a store library |
+| Durable | Xano | Xano, through a port and the Worker | Xano, through a `fetch` in an effect |
+| Library needed for state | None | None — it is the language | `react` and `react-dom`, at minimum |
+| Can two pieces of state disagree? | Only if one fact is kept in two places, which the pattern avoids | Not if the type rules it out | Yes: separate hooks are separate facts |
+
+### isKorea
+
+A Boolean is the wrong shape for a market. `isKorea` answers one question and says nothing about Canada — the exact gap the `Set` had above.
+
+**Eleventy + Xano.** Market *rules* are public data, so the build can fetch them and render each market's page from them. A sketch:
+
+```js
+// _data/markets.js — runs at build time; public rules only
+export default async () => {
+  const markets = await (await fetch(`${process.env.XANO_PUBLIC}/markets`)).json();
+  for (const m of markets)
+    for (const key of ["consent", "lang", "storage", "crossBorderBox"])
+      if (!(key in m)) throw new Error(`market ${m.code} has no ${key}`); // fail the build, not the visitor
+  return markets;
+};
+```
+
+The template's `{% if market.crossBorderBox %}` then renders the disclosure into the Korean page. The check in the loop is the closed type's job done by hand: it catches a market missing a field, not a market missing from the list. *Which* market a visitor is in is still decided at runtime by the Worker, never by the build.
+
+**Elm.** The market is a type, and "the Worker hasn't answered yet" is a value of it:
+
+```elm
+type Market = Korea | Us | Canada
+type Regime = Resolving | Known Market
+
+crossBorderBox : Regime -> Bool
+crossBorderBox regime =
+    case regime of
+        Resolving    -> True     -- unknown: fail toward the stricter rules
+        Known Korea  -> True
+        Known Us     -> False
+        Known Canada -> False
+```
+
+Add a market and every `case` like this one stops compiling until it answers. Avoid the `_ ->` wildcard in market rules: it compiles, and it reopens the gap.
+
+**React.**
+
+```jsx
+const [isKorea, setIsKorea] = useState(false);   // renders as "not Korea" first
+useEffect(() => {
+  fetch("/consent/regime").then(r => r.json()).then(r => setIsKorea(r.region === "KR"));
+}, []);
+```
+
+The initial value is a default, and it renders before the Worker answers: a Korean visitor first sees the US form, without the disclosure box. Starting at `true` fixes Korea and still says nothing about Canada. React can model this properly — a `null` start and an explicit loading branch — but nothing makes you.
+
+### isConsented
+
+Consent has at least three states — not asked, granted, denied — and under Consent Mode v2 it is per purpose. A Boolean folds *not asked* into one of the other two, and whichever it picks is a bug.
+
+**Eleventy + Xano.** The build never knows a visitor's consent, and does not need to: it fetches only public data, so nothing it renders depends on anyone's choice. Personal data is fetched at runtime, through the Worker, which checks consent itself ([Consent Resolution](CONSENT-RESOLUTION-PATTERN.md)). The safest place to hold `isConsented` is somewhere the build never has to look.
+
+**Elm.**
+
+```elm
+type Consent = NotAsked | Granted | Denied
+
+update msg model =
+    case msg of
+        QuoteRequested ->
+            case model.consent of
+                Granted  -> ( { model | form = Sending }, requestQuote (encodeQuote model) )
+                NotAsked -> ( { model | showBanner = True }, Cmd.none )
+                Denied   -> ( model, Cmd.none )
+```
+
+The only way out to the network is a port command returned from `update`, and the only branch that returns one is `Granted`. A view cannot fetch. A reviewer reads one `case` to know when data leaves.
+
+**React.** Any component can `fetch` in a `useEffect`, so the consent check has to be remembered in every one of them, usually through a `ConsentContext`. Forget it once and the request goes out on mount, before the banner is answered. With server components or server rendering, the fetch can happen before the page reaches the browser at all — gap 12 in [the security gaps illustration](SVG-RUST-ELM-SECURITY-GAPS.md).
+
+### isForm
+
+A form is not a flag but a sequence: editing, sending, done or pending confirmation, failed.
+
+**Eleventy + Xano.** Webflow's markup is the form and the DOM is the store: `data-sending` on the form, the button's own `disabled`, Webflow's `.w-form-done` and `.w-form-fail` blocks. That is the newsletter form above, and for a sign-up it is enough.
+
+**Elm.**
+
+```elm
+type FormState
+    = Editing
+    | Sending
+    | Done Outcome          -- Subscribed | PendingConfirmation
+    | Failed String
+```
+
+One value, so the form cannot be sending and failed at once, and the button's `disabled` is worked out in `view` rather than stored. Worth it when the form branches — a multi-step quote, a step only one market sees — not for a single email field.
+
+**React.**
+
+```jsx
+const [email, setEmail] = useState("");
+const [isSending, setIsSending] = useState(false);
+const [isError, setIsError] = useState(false);
+const [isDone, setIsDone] = useState(false);
+```
+
+Three Booleans make eight combinations, of which four mean anything, and every handler has to reset the others correctly. `useReducer` with a tagged union fixes the shape and TypeScript can check it — that is Elm's model, kept by convention instead of enforced by the language. In Webflow, a React form also replaces Webflow's own: the designer's success and error blocks are no longer the ones that show.
+
+### SVG and design capability
+
+| | Eleventy + Xano | Elm island | React |
+|---|---|---|---|
+| Who designs it | Designers, in Webflow; synced and built | Designers style it; developers draw it | Developers; designers set props |
+| Static SVG — icons, illustrations | Sanitised and inlined at build, or served as files ([Safe SVG](SAFE-SVG.md)) | Usually left to the page around it | Imported as components at build, or pasted as strings |
+| Data-driven drawing — charts, floor plans, configurators | Only what can be computed at build; anything live needs a script | **Strongest:** `elm/svg` draws from the model, as typed values | Good: JSX draws SVG elements from state |
+| Can a drawing run code? | Not once sanitised, and never through `<img>` | No: no `<script>`, `on*` handlers or `javascript:` URLs | Yes, through `dangerouslySetInnerHTML` with an SVG string |
+| Do Webflow's classes apply? | Yes — it is Webflow's markup | Yes: Elm renders into the page's own DOM, so Webflow classes work as written | Not by default: Webflow code components render inside a shadow root, isolated from the site's styles |
+| Animation | GSAP or CSS from the behaviour layer | CSS, or GSAP through a port | A React animation library, or GSAP through refs |
+| What crawlers and agents see | The whole drawing, in the HTML | An empty mount point until the script runs | An empty mount point, unless server-rendered |
+
+### Which, for what
+
+- **Pages, content, products and sign-up forms: Eleventy + Xano**, with Webflow designing. `isKorea` and `isConsented` are server decisions there, and the build has no reason to know either.
+- **One widget whose state branches by market and consent, or whose drawing is computed: an Elm island** inside those pages.
+- **React when designers must place the component in Webflow's Designer and set its props there** — Webflow's code components are React — or when an existing React codebase is the reason. Then give it Elm's shape by hand: one reducer, a tagged union for each flag, a `null` while the regime resolves, and no `fetch` outside a consent check.
+
+None of them moves the boundary. For all three, the Worker resolves the market, checks the consent and validates the form.
+
+### The same infrastructure under any theme build
+
+Nothing above lives in the theme. Webflow designs, the Cloudflare Worker decides, Xano keeps the record — so the three flags and the SVG rule carry unchanged to AEM, WordPress, Shopify, Next, Nuxt, Astro, Svelte and Vue. Per platform only three things change: where a fragment or island mounts, what the platform offers in place of `useState`, and what it does with an SVG. [Fragments on any frontend](FRAGMENTS-ANY-FRONTEND.md) covers the mounting; this table covers state and drawing.
+
+| Theme build | Mounts the fragment or Elm island in | Its own state tool | isKorea · isConsented · isForm | SVG and widgets |
+|---|---|---|---|---|
+| **AEM / Edge Delivery** | A block's `decorate()` | None — the block's DOM, like the newsletter form | The Worker | Icons ship as files in the project; block JS loads only where the block is used |
+| **WordPress** | A block or shortcode, fetched server-side; the island's script enqueued as a module | The Interactivity API — directives over server-rendered state | The Worker; PHP renders, it does not decide | **SVG uploads are refused by default.** Ship sanitised SVG from the theme or the Worker, not through the media library |
+| **Shopify theme** | A Liquid section or an app block | None — Liquid renders once, the DOM after that | The Worker; Liquid cannot enforce | **SVG is not a native asset choice** — merchants cannot pick one in the theme editor or product media. SVG reaches a theme only as a developer's theme asset, inlined with `inline_asset_content`, or from the Worker |
+| **Shopify checkout and accounts** | A checkout UI extension — **no island, no fragment** | Shopify's extension API | The extension asks the Worker, once network access is approved; checkout logic runs in Functions | **No custom widget or SVG.** See below |
+| **Next** | A client component that mounts Elm in `useEffect` | `useState` | The Worker; a server component must not fetch personal data before consent (gap 12) | `next/image` refuses SVG unless `dangerouslyAllowSVG` is set; import static SVG at build |
+| **Nuxt / Vue** | `<ClientOnly>`, mounted in `onMounted`; in a Webflow embed, petite-vue | `ref()` and `reactive()`, Pinia in Nuxt | The Worker; Nuxt's server render has Next's caveat | `v-html` is Vue's `dangerouslySetInnerHTML` |
+| **Astro** | An island with `client:visible`; static by default | None required — each island brings its own | The build fetches public rules, as Eleventy does; the Worker decides the rest | Static SVG inlined at build — the closest to Eleventy |
+| **Svelte / SvelteKit** | `onMount` | `$state` runes and stores, compiled away | The Worker; a `load` function on the server has Next's caveat | `{@html}` is the opening |
+
+Read down the last column and one pattern repeats: **every platform either names its way of turning an SVG string into live markup as a hazard, or refuses SVG outright** — `dangerouslySetInnerHTML`, `v-html`, `{@html}` and `dangerouslyAllowSVG` on one side; WordPress's refused upload and Shopify's missing asset choice on the other. Elm has none, and Eleventy's sanitiser runs before any of them see the file.
+
+#### Shopify blocks the widget and the SVG — and that is the boundary agreeing
+
+On the storefront theme, an Elm island or a sanitised SVG works as on any other page. Past the cart, it does not. Checkout, the thank-you page and customer accounts accept only **checkout UI extensions**, which run sandboxed in a web worker, off the page's DOM, and draw only with Shopify's own components. An extension can be written in React or Preact, but your code never touches the DOM: there is no `<script>`, no custom HTML, no inline SVG, and no Elm runtime to mount. Shopify has retired `checkout.liquid`, which used to allow those things.
+
+That is not something to work around. It is the same split this article argues for, enforced by Shopify:
+
+- **Decisions** — discounts, delivery rules, payment rules — run as Shopify Functions, in Javy or Rust (option 4).
+- **Data** — the market, the consent regime, a quote — reaches the extension from the Worker, which checks it as it would for any other caller.
+- **Drawings** — the configurator, the floor plan, the computed chart — stay on storefront pages, where the island can draw them. Checkout receives the result as a line item or a property, not the widget.
+
+The storefront has its own version of the block. **Shopify excludes SVG as a native asset choice**: a merchant cannot select one as an image setting or as product media, so nothing a merchant uploads can become live SVG markup on the page. An SVG on a Shopify storefront is therefore always one somebody shipped on purpose — a theme asset in the repository, or a sanitised file from the Worker — never one that arrived through the admin. That makes the Elm island the natural way to draw on Shopify: the drawing is code, built and reviewed with the theme, not an upload.
+
+Elsewhere, an uploaded file should follow the same rule: served as a file and shown through `<img>`, which never runs it (gap 3). Shopify and WordPress enforce that by default; AEM, Next and the rest leave it to you.
+
+#### Why React with a state manager does not fit AEM, WordPress or Shopify themes
+
+"You can't use React" is not strictly true: a WordPress plugin, a Shopify app block or an AEM block can each mount a React island. What does not work is **React with a state manager as the way the theme is built.** A state manager assumes React owns the page. On all three platforms, the platform owns the page.
+
+1. **The server that renders the HTML is not JavaScript.** AEM renders with HTL and Java, and Edge Delivery serves plain HTML. WordPress renders with PHP. Shopify renders with Liquid. React can only take over HTML that React itself rendered on a Node server — hydration — and none of these run one. So React builds its part in the browser, from an empty `<div>`: visitors and crawlers see a blank space until the script loads, and the layout jumps when it fills in.
+2. **A theme page is many separate roots, and state does not cross them.** Editors compose pages from independent sections, blocks and components — in Shopify's theme editor, in Gutenberg, in AEM's Universal Editor. Each React island is its own `createRoot`, and `useState`, Context and a Redux store do not reach across roots. The facts the page shares — the cart count, the market, the consent — end up in DOM events or a global anyway, so the state manager adds a dependency without doing the job.
+3. **The platform rewrites the HTML underneath React.** After an add-to-cart, Shopify's Section Rendering API replaces whole sections with fresh Liquid HTML, and the theme editor reloads sections as it fires `shopify:section:load` and `shopify:section:unload`. AEM's Universal Editor edits the page in place while authors work. Consent banners, tag managers, app blocks and browser translation edit it too. React's virtual DOM assumes it alone controls its part of the page: its state is wiped or left pointing at elements that no longer exist, and outside edits end in `removeChild` errors. Browser translation breaking React this way is well known — which matters for a Korean storefront.
+4. **These platforms do not run a build step.** Edge Delivery blocks are plain JavaScript modules by design, with no framework and no build. Shopify serves theme assets exactly as uploaded; WordPress themes enqueue plain files. JSX and a store library mean a separate build pipeline whose output is pasted in, and which can fall out of step with the theme.
+5. **Performance budgets, and duplicate runtimes.** Shopify's Theme Store sets a Lighthouse performance minimum, and Edge Delivery is built to score 100. On Shopify, every app that ships React brings its own copy of React and ReactDOM, so one page can load several.
+6. **The platforms' own answers are not React.** WordPress's block editor is written in React, yet WordPress built the **Interactivity API** for front-end state — directives on server-rendered HTML, the same shape as petite-vue. Shopify keeps state on the server, in the Cart API and Liquid, and its reference theme Dawn uses Web Components. AEM's Edge Delivery uses vanilla blocks. All three keep state on the server and in the HTML — the newsletter form's rule, *the DOM is the store*.
+
+A React island still has a place: one self-contained widget that owns its own `<div>`, shares no page-wide state, and asks the Worker for its data. Even there, an Elm island does the same job without a runtime that has to stay in step with the page.
+
+**In one line: a state manager wants to own the page, and theme platforms own the page.** Keep durable state on the server, as Xano records the Worker returns; keep shared state in the page's own markup; and let each island keep only its own.
 
 ## Choosing
 
