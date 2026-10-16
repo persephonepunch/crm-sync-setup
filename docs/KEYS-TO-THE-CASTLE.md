@@ -177,7 +177,7 @@ People hear no-code and assume toy. But the tools are only *where this runs* —
 
 Which is a claim that has to be shown rather than asserted. The rest of this section is the evidence, feature by feature, against the tools that hold the reputation.
 
-![Parity: six capabilities matched box for box against Vault, Consul, Nomad and Docker — and three with no counterpart](../assets/design-ops-parity.svg)
+![Parity: six capabilities matched box for box against Vault, Consul, Nomad and Docker — and three with no counterpart](https://persephonepunch.github.io/crm-sync-setup/assets/design-ops-parity.svg)
 
 ### Three vendors, one conclusion about who writes JSON
 
@@ -307,7 +307,7 @@ Consul exists to make a **fleet** of services find each other, prove who they ar
 
 ---
 
-![Provisioning compared: Terraform, Packer and Vagrant produce images that a hyperscaler has to run; Wrangler writes, ships and serves](../assets/infrastructure-as-code.svg)
+![Provisioning compared: Terraform, Packer and Vagrant produce images that a hyperscaler has to run; Wrangler writes, ships and serves](https://persephonepunch.github.io/crm-sync-setup/assets/infrastructure-as-code.svg)
 
 ---
 
