@@ -74,22 +74,54 @@ The revenue path runs through four steps. Each one either exists in code or is n
 | **Exact-match agent checkout** | Agent conversions attribute to the variant actually bought, so value-based bidding learns from the right item. | Partial | See "Clean IDs are the precondition" below |
 | **EDI ingest (X12 / EDIFACT)** | Purchase orders and advance ship notices from trading partners would feed the same record. | Gap | No EDI parser in the worker; the ERP side is an outbound projection only |
 
-### The "right" non-blocking IO
+### Non-blocking, in plain terms
 
-Non-blocking is the revenue condition: five destinations, a model score and a permissions check
-can't run as a serial queue at checkout speed. But not everything may be deferred. The rule
-is: **decide before sending, defer only the bookkeeping.**
+**For the BA and leadership.** "Blocking" means one job waits for another before it can move.
+"Non-blocking" means nothing stands in line that doesn't have to. That matters for revenue,
+because one order has to reach five places — the agent, Merchant Center, Google Ads, GA4 and
+the ERP — while the customer is still on the page.
 
-| Work | Blocking? | Why | Evidence |
+Picture a restaurant. A **blocking** waiter takes one order, stands at the kitchen until the
+food is ready, delivers it, then takes the next order. A **non-blocking** waiter takes the
+order, hands it to the kitchen, and serves other tables while it cooks. Nobody waits for a
+dish that isn't theirs.
+
+There is one exception, and it is the rule this design is built on: **the waiter still checks
+the customer's allergy card before the dish leaves the kitchen.** In this system, the allergy
+card is the customer's consent. Everything may run side by side except that check.
+
+> **The rule: decide before sending, defer only the bookkeeping.**
+
+#### How each technology handles waiting
+
+The same idea appears under different names across the stack. A thread is one waiter.
+
+| Technology | How it handles waiting | Where you meet it | What it means for this design |
 |---|---|---|---|
-| Resolving weights for an audience | No — one parallel pass | A model score is a lookup, not a reason to wait on each buyer in turn | `Promise.all` over eligible members, `index.ts:11171` |
-| Permissions decisions across members | Bounded — 8 at a time | Parallel enough to keep pace, bounded so the record isn't flooded | `gateEach(…, concurrency = 8)`, `release-gate.ts` |
-| The send itself | **Waits for its own decision** | A send that fires before its permissions answer is the failure the boundary exists to stop | Fail-closed rule, `release-gate.ts` |
-| Scan counters, ledger and cache writes | Deferred off the response path | The customer shouldn't wait on bookkeeping; the write still completes | `ctx.waitUntil`, 18 call sites in `index.ts` |
-| One slow destination | Isolated | Each destination is its own send with its own decision; Merchant Center being slow doesn't hold up GA4 | Independent sends, section 1 |
+| **Ruby** — the client theme | One worker handles one request at a time; if it waits on another system, that worker waits too. More traffic means adding more workers. | Shopify renders theme pages (Liquid) on its own Ruby servers. Liquid can't call other services mid-render. | Fast and predictable for the storefront, which is why theme pages never wait on Google or the ERP. Connected work happens elsewhere. |
+| **Rust** — horizontal loading | Real threads on every processor core at once, plus many waiting jobs per thread. Work spreads sideways across cores and machines. | Heavy processing: images, 3D files, large data jobs. | The right tool for heavy lifting. Not needed to make five quick sends, which are mostly waiting, not computing. |
+| **Node** (and Cloudflare Workers) | One waiter with a very good memory: starts each job, moves on while it waits, and comes back when the answer arrives. Heavy computing would hold everyone up. | Most web APIs. This stack's edge runs on the same model, in many locations. | Where the five sends run. Each one is started, and none waits for the others. |
+| **Shadow DOM** (web components) | In the browser, each component is a sealed box with its own styles and data. It can load without holding up the rest of the page. | Cart, consent banner, product cards. | The page equivalent of isolated sends: one slow box doesn't freeze the page. |
+| **Webflow eager, lazy, cache** | *Eager* loads now. *Lazy* loads when needed. *Cache* keeps a copy nearby so it isn't fetched again. | Image and asset loading settings in Webflow. | The same three choices, applied to data. The consent decision is eager. Bookkeeping is lazy. Revenue weights are cached for 45 days, so a bid never waits on the model. |
+| **Kubernetes orchestration** | Runs many copies of a service and adds copies when traffic rises; restarts any that fail. | What most bought middleware, and its managed VM, scales on. | Real scale, but someone has to operate it and pay for the copies, sized for the busiest hour. On the edge, the platform does this per request. |
 
-Bought middleware usually inverts this. The queue is non-blocking for everything, including the
-consent check that should have come first.
+#### Who waits for what
+
+| Work | Does anything wait? | Why, in one line |
+|---|---|---|
+| Looking up each buyer's revenue weight | No — all at once | A score is a lookup. There's no reason to fetch them one buyer at a time. |
+| Checking permissions across an audience | A little — 8 at a time | Fast enough to keep up, steady enough not to overload the record. |
+| **Sending a customer's data** | **Yes — it waits for its own consent check** | Sending first and checking later is exactly the mistake this design exists to prevent. |
+| Counters, ledger entries and cache updates | Not the customer — done afterwards | The customer shouldn't wait for paperwork, and the paperwork still gets done. |
+| One slow destination | Only itself | Merchant Center being slow doesn't hold up Google Ads or GA4. |
+
+Bought middleware usually gets this backwards. Its queue never blocks on anything — including
+the consent check that should have come first.
+
+*Engineering evidence:* weights resolved with `Promise.all`, `index.ts:11171`; permissions
+checks bounded with `gateEach(…, concurrency = 8)` and fail-closed, `release-gate.ts`; deferred
+writes via `ctx.waitUntil`, 18 call sites in `index.ts`; weights cached in KV with a 45-day
+TTL, `index.ts:6816`.
 
 > **What this section does not claim.** No revenue lift is measured here, and none is quoted.
 > Predicted-LTV scoring needs enough purchase history to train on, and BigQuery ML and Vertex
