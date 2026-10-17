@@ -1,10 +1,10 @@
 ---
 title: "Middleware vs AI Architecture"
 description: "Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a Channel Publish QR link."
-canonical: https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html
+canonical: https://persephonepunch.github.io/crm-sync-setup/middleware-vs-ai-architecture.html
 category: "Specs"
 date: 2026-10-17
-source: https://github.com/persephonepunch/crm-sync-setup/blob/master/GTIN-CHECK-DIGITS-AND-SIGNED-LINKS.md
+source: https://github.com/persephonepunch/crm-sync-setup/blob/master/MIDDLEWARE-VS-AI-ARCHITECTURE.md
 licence: CC-BY-4.0
 tags:
   - gs1
@@ -15,13 +15,17 @@ tags:
   - consent
   - architecture
 keywords:
+  - middleware vs AI architecture
+  - build vs buy integration
+  - AI binding ecommerce
+  - Workers AI binding
+  - predicted LTV Smart Bidding
+  - non-blocking IO
+  - Xano system of record
+  - Cloudflare event bus
   - GTIN check digit
-  - mod 10
-  - EAN-13
-  - UPC
   - GS1 Digital Link
-  - JWKS
-  - Ed25519
+  - JWKS Ed25519
   - signed QR code
 verified_on: 2026-10-17
 verified_by: execution
@@ -42,6 +46,55 @@ the same product and the same person at the same moment — and once they are, h
 identifier can be trusted?
 
 ---
+
+## Revenue benefit: build to revenue
+
+> Bought middleware is a cost line per connection. An AI binding on the record turns the same
+> data services into bid value: consented buyers, weighted by predicted revenue, sent without
+> blocking.
+
+The revenue path runs through four steps. Each one either exists in code or is named as a gap.
+
+1. **Data services land in the record.** Orders, catalog and ERP feeds resolve to one identity
+   and one set of product IDs (GID, GTIN/MPN) in Xano.
+2. **The AI binding works in the request.** Workers AI and Vectorize match and enrich in the
+   same worker that holds the permissions check — no third runtime, no model API key.
+3. **Weighted data sets the value.** A BigQuery ML model predicts each consented buyer's future
+   revenue. The score comes back as a per-user weight, and Vertex feature extraction weights the
+   tenant's own content for AEO.
+4. **The weight becomes the bid.** The audience push to Google Data Manager sends predicted
+   lifetime value as `conversion_value` in place of past spend, so Smart Bidding bids on where
+   a targeted audience is going, not where it has been.
+
+| Revenue lever | How it earns | Status | Evidence |
+|---|---|---|---|
+| **Value-based bidding on predicted LTV** | Bids follow forward value. A buyer with high predicted value and little spend so far stops being under-bid. Past spend remains the fallback when there is no score. | Built in code; scores need the client's BigQuery | Weight replaces spend, `index.ts:11171–11176`; model `pltv.purchase_ltv`, `index.ts:6356`; weight stored with a 45-day TTL, `index.ts:6816` |
+| **Spend only on audiences you may use** | Only consented, targetable buyers carry a weight. A revocation deletes the weight before the next push, so no budget goes to people who can't legally be targeted. | Built | Weight deleted on revocation, `index.ts:6588`, `index.ts:6753` |
+| **Weighted content for AEO** | Vertex feature extraction over the tenant's own corpus weights tags and taxonomy, so answer engines and on-site search rank what sells. Sold as an add-on, with terms accepted at purchase. | Partial — needs Cloud Console access | Terms-gated permission, `index.ts:41968`; Gemini remote model step, `index.ts:28097` |
+| **Exact-match agent checkout** | Agent conversions attribute to the variant actually bought, so value-based bidding learns from the right item. | Partial | See "Clean IDs are the precondition" below |
+| **EDI ingest (X12 / EDIFACT)** | Purchase orders and advance ship notices from trading partners would feed the same record. | Gap | No EDI parser in the worker; the ERP side is an outbound projection only |
+
+### The "right" non-blocking IO
+
+Non-blocking is the revenue condition: five destinations, a model score and a permissions check
+can't run as a serial queue at checkout speed. But not everything may be deferred. The rule
+is: **decide before sending, defer only the bookkeeping.**
+
+| Work | Blocking? | Why | Evidence |
+|---|---|---|---|
+| Resolving weights for an audience | No — one parallel pass | A model score is a lookup, not a reason to wait on each buyer in turn | `Promise.all` over eligible members, `index.ts:11171` |
+| Permissions decisions across members | Bounded — 8 at a time | Parallel enough to keep pace, bounded so the record isn't flooded | `gateEach(…, concurrency = 8)`, `release-gate.ts` |
+| The send itself | **Waits for its own decision** | A send that fires before its permissions answer is the failure the boundary exists to stop | Fail-closed rule, `release-gate.ts` |
+| Scan counters, ledger and cache writes | Deferred off the response path | The customer shouldn't wait on bookkeeping; the write still completes | `ctx.waitUntil`, 18 call sites in `index.ts` |
+| One slow destination | Isolated | Each destination is its own send with its own decision; Merchant Center being slow doesn't hold up GA4 | Independent sends, section 1 |
+
+Bought middleware usually inverts this. The queue is non-blocking for everything, including the
+consent check that should have come first.
+
+> **What this section does not claim.** No revenue lift is measured here, and none is quoted.
+> Predicted-LTV scoring needs enough purchase history to train on, and BigQuery ML and Vertex
+> need Cloud Console access that the analytics team owns. Without that handoff, the audience
+> push falls back to past spend, and everything else above still works.
 
 ## 1. The challenge and the solution
 
