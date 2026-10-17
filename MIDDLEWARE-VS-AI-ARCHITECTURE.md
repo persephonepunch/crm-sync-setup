@@ -277,6 +277,40 @@ link.
 
 ## 2. Vocabulary
 
+### For the Product Lead / BA: GTIN and MPN in plain terms
+
+Every channel in this article — the agent at checkout, Merchant Center, Smart Bidding, the
+warehouse — recognises a product by one of two numbers. Owning them is a product decision, not
+an engineering one.
+
+- **GTIN (Global Trade Item Number)** is the number under the barcode. The brand owner licenses
+  it from GS1, and it identifies one exact sellable version: one size, one colour, one pack
+  count. UPC (12 digits) and EAN (13 digits) are both GTINs. When a scanner, a marketplace or
+  Google says "this exact product", this is the number it means.
+- **MPN (Manufacturer Part Number)** is the maker's own catalogue code. It is only unique
+  together with the brand name, because two makers can use the same code. It is the fallback
+  for products without a GTIN: custom, made-to-order, private-label or spare parts.
+
+| Question | GTIN | MPN |
+|---|---|---|
+| Who assigns it | The brand owner, from a GS1 licence | The manufacturer, however it likes |
+| Unique on its own | Yes, worldwide | No — only together with the brand |
+| One per | Sellable variant (size, colour, pack) | Whatever the maker decides; often per model |
+| Google Merchant Center | Expected for any product that has one assigned (check Merchant Center's current product data spec) | Brand + MPN when there is no GTIN |
+| What breaks if it's wrong | Listings disapproved or merged with someone else's product; conversions credited to the wrong item | Weak matching; the product competes as "unidentified" |
+
+**What the Product Lead owns:**
+
+1. Every variant carries a GTIN, or brand + MPN when it has no GTIN. Nothing ships with neither.
+2. One source for the field: the Shopify variant barcode feeds the identifier plane, and nothing
+   downstream retypes it.
+3. Never reuse a GTIN across variants, and never invent one. A made-up number can pass the
+   check-digit test in §3 and still belong to someone else's product.
+4. When a variant changes in a way a buyer would notice — size, colour, pack — it gets a new
+   GTIN, not an edited one.
+
+### Verification terms
+
 Three mechanisms get called "verification". They answer different questions.
 
 | Term | Means | Is not |
@@ -344,6 +378,9 @@ product feed. In each of those the GTIN is the *payload*, and the signature over
 earns trust.
 
 ## 5. Where trust sits in a Channel Publish link today
+
+<style>.doc .cp-cta{border:1px solid #0a0a0a;margin:18px 0 22px;display:grid;grid-template-columns:1fr;gap:0}.doc .cp-cta .cp-head{padding:18px 20px 14px;border-bottom:1px solid #0a0a0a;background:#fafafa}.doc .cp-cta .cp-eyebrow{font:500 11px/1.4 "Roboto Mono",ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;margin:0 0 6px}.doc .cp-cta .cp-title{font-weight:300;font-size:26px;line-height:1.2;margin:0}.doc .cp-cta .cp-sub{font-weight:300;font-size:15px;margin:8px 0 0}.doc .cp-cta .cp-feats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #0a0a0a}.doc .cp-cta .cp-feat{padding:14px 16px;border-right:1px solid #ececec}.doc .cp-cta .cp-feat:last-child{border-right:0}.doc .cp-cta .cp-k{font:500 10.5px/1.4 "Roboto Mono",ui-monospace,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;margin:0 0 6px}.doc .cp-cta .cp-v{font-size:13.5px;line-height:1.45;margin:0}.doc .cp-cta .cp-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px}.doc .cp-cta .cp-note{font-size:13px;margin:0}.doc .cp-cta a.cp-btn{display:inline-block;background:#0a0a0a;color:#fff;text-decoration:none;font:500 12px/1 "Roboto Mono",ui-monospace,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase;padding:14px 20px;border:1px solid #0a0a0a;border-radius:0}.doc .cp-cta a.cp-btn:hover,.doc .cp-cta a.cp-btn:focus-visible{background:#fff;color:#0a0a0a;outline:none}@media (max-width:720px){.doc .cp-cta .cp-feats{grid-template-columns:1fr 1fr}.doc .cp-cta .cp-feat:nth-child(2){border-right:0}.doc .cp-cta .cp-feat:nth-child(-n+2){border-bottom:1px solid #ececec}}@media print{.doc .cp-cta a.cp-btn{background:#fff;color:#0a0a0a}.doc .cp-cta a.cp-btn::after{content:" — www.crm-sync.dev/products/channel-publish";text-transform:none;letter-spacing:0}}</style>
+<div class="cp-cta" role="region" aria-label="Channel Publish"><div class="cp-head"><p class="cp-eyebrow">Application · Channel Publish</p><p class="cp-title">Put the identifier on the box, the video and the stream — and know every scan.</p><p class="cp-sub">Mint a QR or short link bound to the product's own GTIN/MPN, publish it on any channel, and read every scan back in your own ledger.</p></div><div class="cp-feats"><div class="cp-feat"><p class="cp-k">Permissioned minting</p><p class="cp-v">Only an account holding the Channel Publish permission can create a link.</p></div><div class="cp-feat"><p class="cp-k">Identifier-bound</p><p class="cp-v">GTIN/MPN resolve server-side — the same values as the page's JSON-LD and barcode.</p></div><div class="cp-feat"><p class="cp-k">Refuses forgeries</p><p class="cp-v">A code that was never minted returns 404 and earns no attribution.</p></div><div class="cp-feat"><p class="cp-k">Your ledger</p><p class="cp-v">Every human scan is counted against its mint; crawlers and probes are not.</p></div></div><div class="cp-foot"><p class="cp-note">Signed, offline-verifiable links are on the roadmap — see §6 below.</p><a class="cp-btn" href="https://www.crm-sync.dev/products/channel-publish" target="_top">Open Channel Publish &rarr;</a></div></div>
 
 Channel Publish mints an attributed short link (`/r/<code>`) and a QR for it. Read from the
 worker source at commit `b26b02c`:
