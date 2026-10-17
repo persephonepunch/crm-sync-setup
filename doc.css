@@ -15,7 +15,8 @@
   --ink:#0a0a0a; --paper:#ffffff;
   --g1:#f4f4f4; --g2:#e6e6e6; --g3:#cfcfcf; --g4:#767676;  /* AA floor on white (4.54:1) — was #9a9a9a (2.81:1), failed WCAG AA at every size. g4 is a TEXT grey; do not lighten it. */ --g5:#5c5c5c; --g6:#3a3a3a;
   --grid:#eeeeee; --rule:#111; --link:#0a0a0a;
-  --cyan:#06b6d4;   /* brand accent — heading rules, so they don't get lost on the grid */
+  --accent:#1d4ed8;   /* DESIGN RULE (2026-10-17): heading rules are BLUE, never cyan — cyan #06b6d4 washed out on the grid (2.4:1 on white, 2.1:1 on the grid). #1d4ed8 is 6.7:1 on white and 5.8:1 on the grid, so the rule reads against the grid background at any zoom. Applies to every KB article via this shared sheet. */
+  --cyan:var(--accent); /* legacy alias — do not use in new rules */
   --sans:"Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --mono:"Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
 }
@@ -49,7 +50,7 @@ body{
 .wrap{max-width:1400px; margin:0 auto; padding:56px 40px 104px}
 
 /* ---- hero -------------------------------------------------------------- */
-.hero{padding-bottom:30px; margin-bottom:14px; border-bottom:2px solid var(--cyan)}
+.hero{padding-bottom:30px; margin-bottom:14px; border-bottom:2px solid var(--accent)}
 .hero .kicker{font:600 12px/1 var(--mono); letter-spacing:.30em; text-transform:uppercase; color:var(--g5)}
 .hero h1{                          /* light display headline (300 — 100 was too faint) */
   font-weight:300; font-size:clamp(2.25rem,1.7917rem + 2.2917vw,3.625rem); line-height:1.08; letter-spacing:-1px;
@@ -67,7 +68,7 @@ body{
 .doc > h1:first-child{display:none}   /* first h1 is lifted into the hero */
 .doc h2{font-size:clamp(2rem,1.7rem + 1vw,2.6rem); font-weight:300; letter-spacing:-.02em;
   line-height:1.15; text-wrap:pretty;
-  margin:56px 0 18px; padding-bottom:12px; border-bottom:1.5px solid var(--cyan)}
+  margin:56px 0 18px; padding-bottom:12px; border-bottom:1.5px solid var(--accent)}
 .doc h2 strong,.doc h2 b{font-weight:600}
 .doc h3{font-size:17px; margin:30px 0 6px; font-weight:700; letter-spacing:-.2px; text-wrap:pretty}
 .doc h4{font-size:13px; margin:20px 0 4px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--g6); text-wrap:pretty}
