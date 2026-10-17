@@ -50,8 +50,12 @@ bids weighted by predicted revenue instead of past spend.
   per connector.
 - **The architecture.** Xano holds the record. A Cloudflare edge sends to each channel, and every
   send asks permission first. Your ERP, CRM and service bus stay; they receive the same record.
-- **The revenue.** Predicted lifetime value becomes the bid value, and revoked customers drop out
-  of audiences before the next push. No lift is claimed — it isn't measured yet.
+- **Easier to run, faster to revenue.** AI bindings and low-code orchestration (Xano function
+  stacks) replace connector licences and cluster operations, so a change ships in days, not a
+  project. The new bid values go live on the next audience push.
+- **The revenue scale.** Predicted lifetime value becomes the bid value, and revoked customers drop
+  out of audiences first. At $100M in online revenue, every 1% is $1M — so the stakes run into
+  the millions. That's arithmetic, not a measured result: a holdout test gives the real number.
 - **The AI.** Models run inside the same request, with no extra vendor hop. Claude task runners
   connect over `/mcp` under the same permissions. AI finds candidates; clean IDs close the sale.
 - **The speed rule.** Everything runs side by side except the consent check: decide before
@@ -100,6 +104,31 @@ The revenue path runs through four steps. Each one either exists in code or is n
 | **Weighted content for AEO** | Vertex feature extraction over the tenant's own corpus weights tags and taxonomy, so answer engines and on-site search rank what sells. Sold as an add-on, with terms accepted at purchase. | Partial — needs Cloud Console access | Terms-gated permission, `index.ts:41968`; Gemini remote model step, `index.ts:28097` |
 | **Exact-match agent checkout** | Agent conversions attribute to the variant actually bought, so value-based bidding learns from the right item. | Partial | See "Clean IDs are the precondition" below |
 | **EDI ingest (X12 / EDIFACT)** | Purchase orders and advance ship notices from trading partners would feed the same record. | Gap | No EDI parser in the worker; the ERP side is an outbound projection only |
+
+### Easier to run, and why the stakes run into the millions
+
+**Easier to use.** Bought middleware asks for a connector licence per system and, behind it, a
+cluster someone has to operate. Here, the AI is a binding — one line of configuration — and
+orchestration is a Xano function stack a BA can read. A new destination or a new rule is a
+change to one function, not a new contract or a new deployment pipeline.
+
+**Faster to revenue.** The switch from past spend to predicted value takes effect on the next
+audience push. Google's bidding then goes through its own learning period before results
+settle, so "immediate" means the value is live immediately — not that the lift is.
+
+**The scale.** Bidding changes act on all ad-driven revenue at once, so a small percentage is a
+large number. The table below shows what a given improvement is worth. It is arithmetic, not
+a forecast: the percentage is the thing a holdout test has to measure.
+
+| Annual online revenue | +1% | +3% | +5% |
+|---|---|---|---|
+| $10M | $100K | $300K | $500K |
+| $100M | $1M | $3M | $5M |
+| $500M | $5M | $15M | $25M |
+
+How to get the real number: split the audience. One half bids on predicted value, the other
+on past spend, over the same period and budget. The difference in revenue is the lift, and it
+is the only figure worth quoting to leadership.
 
 ### Non-blocking, in plain terms
 
@@ -506,6 +535,7 @@ Ordered by exposure.
 | 5 | Store Shopify customer and product IDs in one form (the full GID), and add the GID and GTIN to product-vector metadata so an agent's search result resolves straight to an exact match. | Worker developer |
 | 6 | Confirm one Merchant Center offer key across this worker and the store's native Google channel before running both. | Data owner |
 | 7 | Add a GTIN/MPN ↔ ERP material or item-number map in Xano, with ISO country, currency and language codes, before any ERP or warehouse projection goes live. | Solutions architect |
+| 8 | Run a holdout test — predicted-value bidding against past-spend bidding, same budget and period — and report that lift, not the illustrative table. | BA with the data owner |
 
 ---
 
