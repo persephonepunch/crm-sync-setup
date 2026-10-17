@@ -34,16 +34,43 @@ review_by: 2027-04-17
 ---
 # Middleware vs AI Architecture
 
+![Fee dependency vs. architectural map: on the left, bought middleware on a managed VM, with a fee on the VM, each environment, the AI add-on and every connector; on the right, a Xano record and a Cloudflare edge, with fees on the plan and on usage, and every send a ledgered permissions decision.](https://crm-sync.dev/kb/media/docs/fee-dependency-vs-architectural-map.svg)
+
+**In short.** Bought middleware charges for every connection and makes every channel wait in
+one queue, translating product and customer IDs its own way at each step. This architecture
+keeps one record of customers, consent and product IDs in Xano, and lets a Cloudflare edge send
+to every channel at once — each send checked against the customer's consent first. The result
+is one set of clean IDs for agents and ads, budget spent only on audiences you may target, and
+bids weighted by predicted revenue instead of past spend.
+
+**The article at a glance**
+
+- **The problem.** One order must reach five places at once — an AI agent, Merchant Center,
+  Google Ads, GA4 and the ERP — under one consent decision. Middleware queues them and maps IDs
+  per connector.
+- **The architecture.** Xano holds the record. A Cloudflare edge sends to each channel, and every
+  send asks permission first. Your ERP, CRM and service bus stay; they receive the same record.
+- **The revenue.** Predicted lifetime value becomes the bid value, and revoked customers drop out
+  of audiences before the next push. No lift is claimed — it isn't measured yet.
+- **The AI.** Models run inside the same request, with no extra vendor hop. Claude task runners
+  connect over `/mcp` under the same permissions. AI finds candidates; clean IDs close the sale.
+- **The speed rule.** Everything runs side by side except the consent check: decide before
+  sending, defer only the bookkeeping.
+- **Product Lead / BA owns the IDs.** Every variant needs a GTIN, or brand + MPN. Never reuse or
+  invent one.
+- **Trust.** A barcode check digit catches typos, not fakes. Channel Publish refuses forged
+  codes today; signed, verifiable links are the next step.
+- **The cost.** Two vendors instead of one, an outage path when the consent check is
+  unreachable, and a Cloud Console handoff for predicted-value scoring.
+
+The sections below expand each point, with the evidence.
+
+**Who this is for.** A BA or product lead making the case to leadership, an architect choosing
+where integration runs, a merchant putting QR codes on packaging, and a compliance reviewer
+asked to sign off on the word *verified*.
+
 > Every system that acts on a product — an agent at checkout, a bid in Google Ads, a pick in a
 > warehouse — acts on an identifier. Clean IDs come before agentic commerce, not after it.
-
-**Who this is for.** A merchant putting QR codes on packaging, a developer wiring the scan
-path, an architect choosing where integration runs, and a compliance reviewer asked to sign off
-on the word *verified*.
-
-**The question it answers.** Where must identifiers be reconciled so that every channel acts on
-the same product and the same person at the same moment — and once they are, how much of an
-identifier can be trusted?
 
 ---
 
@@ -130,9 +157,7 @@ TTL, `index.ts:6816`.
 
 ## 1. The challenge and the solution
 
-![Fee dependency vs. architectural map: on the left, bought middleware on a managed VM, with a fee on the VM, each environment, the AI add-on and every connector; on the right, a Xano record and a Cloudflare edge, with fees on the plan and on usage, and every send a ledgered permissions decision.](https://crm-sync.dev/kb/media/docs/fee-dependency-vs-architectural-map.svg)
-
-**Fee dependency vs. architectural map — summary.** Both sides have fees. They attach in
+**Fee dependency vs. architectural map, in detail** (the diagram at the top of the page). Both sides have fees. They attach in
 different places, and that decides what a sixth destination, a second environment or an agent
 costs.
 
