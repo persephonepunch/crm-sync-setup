@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clean IDs Before Agents — CRM Sync</title>
+<title>Middleware vs AI Architecture — CRM Sync</title>
 <meta name="description" content="Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a QR link.">
 <link rel="canonical" href="https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="CRM Sync">
-<meta property="og:title" content="Clean IDs Before Agents — CRM Sync">
+<meta property="og:title" content="Middleware vs AI Architecture — CRM Sync">
 <meta property="og:description" content="Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a QR link.">
 <meta property="og:url" content="https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html#article","headline":"Clean IDs Before Agents — Event Fan-Out, GTIN Check Digits, and Signed QR Links","description":"Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a Channel Publish QR link.","datePublished":"2026-10-17","dateModified":"2026-10-17","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"publisher":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html","inLanguage":"en","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/GTIN-CHECK-DIGITS-AND-SIGNED-LINKS.md","articleSection":"Specs","license":"https://creativecommons.org/licenses/by/4.0/","keywords":["GTIN check digit","mod 10","EAN-13","UPC","GS1 Digital Link","JWKS","Ed25519","signed QR code"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","@id":"https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html#article","headline":"Middleware vs AI Architecture","description":"Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a Channel Publish QR link.","datePublished":"2026-10-17","dateModified":"2026-10-17","author":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"publisher":{"@type":"Organization","name":"CRM Sync","url":"https://crm-sync.dev"},"mainEntityOfPage":"https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html","inLanguage":"en","isBasedOn":"https://github.com/persephonepunch/crm-sync-setup/blob/master/GTIN-CHECK-DIGITS-AND-SIGNED-LINKS.md","articleSection":"Specs","license":"https://creativecommons.org/licenses/by/4.0/","keywords":["GTIN check digit","mod 10","EAN-13","UPC","GS1 Digital Link","JWKS","Ed25519","signed QR code"]}</script>
 <link rel="stylesheet" href="./doc.css?v=cffad5da4c">
 </head>
 <body
   data-md="./GTIN-CHECK-DIGITS-AND-SIGNED-LINKS.md"
-  data-title="Clean IDs Before Agents — CRM Sync"
+  data-title="Middleware vs AI Architecture — CRM Sync"
   data-kicker="Specs · Identifiers, integration &amp; trust"
   data-sub="**Fee dependency vs. architectural map** — why one Xano record and a Cloudflare edge keep IDs and consent consistent across agents, Merchant Center, Smart Bidding, GA4 and the ERP; then what a GTIN check digit proves and where a signature would add trust."
   data-source="https://github.com/persephonepunch/crm-sync-setup/blob/master/GTIN-CHECK-DIGITS-AND-SIGNED-LINKS.md">

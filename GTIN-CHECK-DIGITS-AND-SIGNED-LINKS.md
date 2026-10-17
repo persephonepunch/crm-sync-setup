@@ -1,5 +1,5 @@
 ---
-title: "Clean IDs Before Agents — Event Fan-Out, GTIN Check Digits, and Signed QR Links"
+title: "Middleware vs AI Architecture"
 description: "Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a Channel Publish QR link."
 canonical: https://persephonepunch.github.io/crm-sync-setup/gtin-check-digits-and-signed-links.html
 category: "Specs"
@@ -28,7 +28,7 @@ verified_by: execution
 method: "Check-digit arithmetic executed in Node; send-time permissions, identifier resolution, AI bindings, Durable Object sharding, tenant key partitioning and mint/scan behaviour read from the worker source and wrangler.toml at commit b26b02c (release gate merged from f3585e8). Claude runner descriptions from Anthropic documentation (vendor-doc)."
 review_by: 2027-04-17
 ---
-# Check Digits Are Not Signatures
+# Middleware vs AI Architecture
 
 > Every system that acts on a product — an agent at checkout, a bid in Google Ads, a pick in a
 > warehouse — acts on an identifier. Clean IDs come before agentic commerce, not after it.
