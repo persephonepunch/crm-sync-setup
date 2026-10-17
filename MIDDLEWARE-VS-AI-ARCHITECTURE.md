@@ -64,6 +64,9 @@ bids weighted by predicted revenue instead of past spend.
   invent one.
 - **Trust.** A barcode check digit catches typos, not fakes. Channel Publish refuses forged
   codes today; signed, verifiable links are the next step.
+- **EU data stays in the EU.** Any plugin or CRM on a US server is a transfer that needs a legal
+  basis, a contract and disclosure. Keep the EU record in the EU and send US tools pseudonymous
+  IDs only.
 - **The cost.** Two vendors instead of one, an outage path when the consent check is
   unreachable, and a Cloud Console handoff for predicted-value scoring.
 
@@ -343,6 +346,50 @@ they currently decide the outcome:
 | **Merchant Center + Smart Bidding** | Offer ID and GTIN | The same product lists as two offers, and conversions don't join back to the item that was bid on. This worker keys offers by handle; confirm the store's native Google channel uses the same key before running both. | Partial | Offer ID = handle, `index.ts:19718`; cross-channel key is unverified |
 | **ERP / Dynamics / SAP, warehouse naming, ISO data** | GTIN/MPN mapped to material or item number; ISO 3166 country, ISO 4217 currency, ISO 639 language | Pick lists, stock and landed cost key to a name the storefront never published. Cross-border pricing keys to a market code that doesn't match. | Gap | No GTIN-to-material map in the worker; ISO codes are used in the Merchant projection only |
 
+### EU data residency and disclosure
+
+**For the BA and leadership.** If a plugin or CRM on a US server handles EU customers' data,
+that is a transfer out of the EU under GDPR Chapter V. The edge doesn't make this go away —
+Cloudflare is a US company too — so every hop needs a check, not just the obvious ones.
+
+**What every US hop requires:**
+
+1. **A transfer mechanism.** Either the vendor is certified under the EU–US Data Privacy
+   Framework, or you sign standard contractual clauses and do a transfer impact assessment.
+2. **A data-processing agreement** (GDPR Art. 28), with the vendor named on your subprocessor
+   list.
+3. **Disclosure in the privacy notice** (Art. 13(1)(e)–(f)): who receives the data, that it
+   leaves the EU, and the safeguard that applies.
+4. **An entry in the record of processing** (Art. 30).
+5. **In Germany, an informed cookie consent.** The banner or its settings layer names the vendors
+   that will receive data.
+
+| Where the data sits | Is it a transfer? | What to do | Status in this stack |
+|---|---|---|---|
+| **Plugin or CRM on a US VM** | Yes, always | All five steps. Often the weakest link, because plugins add subprocessors of their own. | — |
+| **Klaviyo** | Usually; check where the account's data is hosted | DPA, check Data Privacy Framework status, disclose. Send only consented profiles. | Production connector has not run |
+| **Salesforce** | Avoidable for storage with EU hosting (Hyperforce EU). Support or admin access may still be a transfer. | Choose the EU region, DPA, disclose. | Inbound webhook and erasure only; not connected outbound |
+| **Cloudflare Workers (edge)** | A US provider. EU visitors are usually served from EU locations, but that isn't guaranteed by default. | DPA and disclosure. To keep processing inside the EU, use Cloudflare's Data Localization Suite (enterprise). | Built; not EU-pinned |
+| **KV** — revenue weights `pltv:<shop>:<uid>` | Yes. KV replicates globally, and a user ID with a score is still personal data. | Store only pseudonymous IDs and disclose, or move EU tenants to an EU-pinned store. | **Gap** — global today (`index.ts:6816`) |
+| **Durable Objects and R2** | Can be kept in the EU | Both support an EU jurisdiction setting. Use it for EU tenants' state and consent evidence. | Available; not configured for EU |
+| **Xano — the record** | Depends on the instance region | Host EU tenants' identity and consent on an EU-region instance, so the system of record stays in the EU. | Per tenant |
+| **Google (GA4, Ads, Customer Match)** | Yes | Data Privacy Framework and Google's terms. Hashed emails still count as personal data. Disclose, and keep every send behind the consent check. | Sends gated per subject (`releaseGateFor`, `index.ts:1095`) |
+
+**The design rule.**
+- Keep EU identity and consent in the EU: an EU-region Xano record and an EU-jurisdiction
+  evidence store.
+- Send the edge and US tools pseudonymous IDs only, and only what each one needs.
+- Give every remaining US hop the five steps above.
+
+This sharpens the middleware argument. A plugin on a US VM holding standing credentials to every
+system is one large transfer you have to disclose and defend. A record kept in the EU, with
+narrow, consent-checked projections out, is several small transfers — each one justified on its
+own and each one revocable.
+
+> **What this section does not claim.** Vendor certifications and regional-hosting options
+> change. Check each vendor's current Data Privacy Framework entry and hosting documentation
+> before relying on this table. This is engineering guidance, not legal advice.
+
 ### What this choice costs
 
 | Cost | What it means | Severity |
@@ -537,6 +584,7 @@ Ordered by exposure.
 | 6 | Confirm one Merchant Center offer key across this worker and the store's native Google channel before running both. | Data owner |
 | 7 | Add a GTIN/MPN ↔ ERP material or item-number map in Xano, with ISO country, currency and language codes, before any ERP or warehouse projection goes live. | Solutions architect |
 | 8 | Run a holdout test — predicted-value bidding against past-spend bidding, same budget and period — and report that lift, not the illustrative table. | BA with the data owner |
+| 9 | For EU tenants, move revenue weights out of global KV to an EU-pinned store, host the record on an EU-region Xano instance, and list every US hop in the privacy notice and subprocessor list. | Solutions architect with the DPO |
 
 ---
 
