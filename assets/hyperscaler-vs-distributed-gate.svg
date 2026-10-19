@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 760" role="img" aria-labelledby="t d">
+<title id="t">The edge distributes; the system of record decides</title>
+<desc id="d">A request reaches a Cloudflare Worker that acts as router and gate. It reads the subject&#x27;s posture from a per-subject Durable Object, routes writes to the subject&#x27;s home Xano instance (EU, US or KR, each with Postgres and a ledger), and sends only signed, gated payloads downstream. Xano pushes a projection to the Durable Object after each write. Rules: Xano wins disagreements; fail closed; personal data stays in its home instance; the signature binds the posture and the ledger head hash.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="760" fill="#fff"/>
+<text class="h" x="60" y="52">THE EDGE DISTRIBUTES; THE SYSTEM OF RECORD DECIDES</text>
+<text class="g" x="60" y="76">several regional Xano instances behind one global edge router, not one cluster stretched across regions</text>
+<text class="s" x="1540" y="76" text-anchor="end">Heavy box = the gate. Dashed = a projection, not truth.</text>
+<path class="rule" d="M60,96H1540"/>
+<rect class="box" x="60" y="170" width="260" height="120"/>
+<text class="bt" x="76" y="198">Request</text>
+<text class="b" x="76" y="222">a page, a form post,</text>
+<text class="b" x="76" y="242">or an agent tool call</text>
+<rect class="goal" x="400" y="150" width="380" height="160"/>
+<text class="bt" x="416" y="178">Cloudflare Worker</text>
+<text class="b" x="416" y="202">router and gate: resolve the subject&#x27;s</text>
+<text class="b" x="416" y="222">home region, check posture, then allow,</text>
+<text class="b" x="416" y="242">deny or redact; sign the decision</text>
+<rect class="box" x="1180" y="170" width="360" height="120"/>
+<text class="bt" x="1196" y="198">Downstream systems</text>
+<text class="b" x="1196" y="222">ad platforms, CRM, agent tools;</text>
+<text class="b" x="1196" y="242">receive signed, gated payloads only</text>
+<rect class="box" x="400" y="420" width="380" height="110"/>
+<text class="bt" x="416" y="448">Durable Object, per subject</text>
+<text class="b" x="416" y="472">cached posture from the ledger;</text>
+<text class="b" x="416" y="492">read on the hot path, no round trip</text>
+<rect class="box" x="860" y="420" width="220" height="110"/>
+<text class="bt" x="876" y="448">Xano · EU</text>
+<text class="b" x="876" y="472">Postgres + ledger;</text>
+<text class="b" x="876" y="492">this region&#x27;s subjects</text>
+<path class="ln" d="M970,385V418" marker-end="url(#a)"/>
+<rect class="box" x="1090" y="420" width="220" height="110"/>
+<text class="bt" x="1106" y="448">Xano · US</text>
+<text class="b" x="1106" y="472">Postgres + ledger;</text>
+<text class="b" x="1106" y="492">this region&#x27;s subjects</text>
+<path class="ln" d="M1200,385V418" marker-end="url(#a)"/>
+<rect class="box" x="1320" y="420" width="220" height="110"/>
+<text class="bt" x="1336" y="448">Xano · KR</text>
+<text class="b" x="1336" y="472">Postgres + ledger;</text>
+<text class="b" x="1336" y="492">this region&#x27;s subjects</text>
+<path class="ln" d="M1430,385V418" marker-end="url(#a)"/>
+<path class="ln" d="M320,230L398,230" marker-end="url(#a)"/>
+<path class="ln" d="M780,230L1178,230" marker-end="url(#a)"/>
+<text class="g" x="980" y="218" text-anchor="middle">signed, gated egress</text>
+<path class="ln" d="M590,310V418" marker-end="url(#a)"/>
+<text class="g" x="604" y="372">read posture</text>
+<path class="ln" d="M780,290H820V385H1430"/>
+<text class="g" x="1200" y="376" text-anchor="middle">route writes by home region</text>
+<path class="dash" d="M860,500H784" marker-end="url(#a)"/>
+<text class="g" x="822" y="556" text-anchor="middle">projection after each write</text>
+<text class="sec" x="60" y="600">FOUR RULES</text>
+<rect class="box" x="60" y="616" width="345" height="100"/>
+<text class="bt" x="76" y="644">Xano wins</text>
+<text class="b" x="76" y="668">the Durable Object is a projection;</text>
+<text class="b" x="76" y="688">on disagreement, the ledger rules</text>
+<rect class="box" x="435" y="616" width="345" height="100"/>
+<text class="bt" x="451" y="644">Fail closed</text>
+<text class="b" x="451" y="668">stale projection or unreachable</text>
+<text class="b" x="451" y="688">region means deny, never guess</text>
+<rect class="box" x="810" y="616" width="345" height="100"/>
+<text class="bt" x="826" y="644">Stay home</text>
+<text class="b" x="826" y="668">personal data never replicates;</text>
+<text class="b" x="826" y="688">only an opaque routing key is shared</text>
+<rect class="box" x="1185" y="616" width="345" height="100"/>
+<text class="bt" x="1201" y="644">Sign both</text>
+<text class="b" x="1201" y="668">the signature binds the posture</text>
+<text class="b" x="1201" y="688">and the ledger head hash</text>
+</svg>

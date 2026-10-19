@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 770" role="img" aria-labelledby="t d">
+<title id="t">Two decision ladders: orchestration and AI binding</title>
+<desc id="d">Orchestration ladder, bottom to top: Webflow publish; Cloudflare Worker; Durable Object; Xano as the system of record; hyperscaler or BYOC cluster. AI binding ladder, bottom to top: no model; Workers AI binding; AI Gateway to a hosted model; agent with tools on Xano; dedicated GPUs. Each rung names the condition that earns the next one. Rules on every rung: Xano wins disagreements, fail closed when stale, personal data stays home, egress only through the signed gate.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="770" fill="#fff"/>
+<text class="h" x="60" y="52">TWO DECISION LADDERS — START AT THE BOTTOM, CLIMB ONLY WHEN THE CONDITION IS TRUE</text>
+<text class="g" x="60" y="76">each rung up adds cost, latency or audit scope; the grey line on each rung is the condition that earns the next one</text>
+<text class="s" x="1540" y="76" text-anchor="end">Heavy box = where the record of truth lives.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="130">ORCHESTRATION · WHERE THE LOGIC RUNS</text>
+<rect class="box" x="60" y="550" width="560" height="84"/>
+<text class="bt" x="76" y="576">0 · Webflow publish</text>
+<text class="b" x="76" y="599">Pages and CMS output served from a CDN; no per-request logic</text>
+<text class="g" x="76" y="619">climb when: a request needs a decision, not a page</text>
+<rect class="box" x="97" y="450" width="560" height="84"/>
+<text class="bt" x="113" y="476">1 · Cloudflare Worker</text>
+<text class="b" x="113" y="499">Route, cache, check auth and consent at the edge</text>
+<text class="g" x="113" y="519">climb when: the decision needs memory of one subject</text>
+<path class="ln" d="M115,550V536" marker-end="url(#a)"/>
+<rect class="box" x="134" y="350" width="560" height="84"/>
+<text class="bt" x="150" y="376">2 · Durable Object</text>
+<text class="b" x="150" y="399">Per-subject state; a projection of the record, never the truth</text>
+<text class="g" x="150" y="419">climb when: the action must change the record</text>
+<path class="ln" d="M152,450V436" marker-end="url(#a)"/>
+<rect class="goal" x="171" y="250" width="560" height="84"/>
+<text class="bt" x="187" y="276">3 · Xano, the system of record</text>
+<text class="b" x="187" y="299">Postgres, business rules, an append-only ledger, one per region</text>
+<text class="g" x="187" y="319">climb when: one instance can&#x27;t meet residency or load</text>
+<path class="ln" d="M189,350V336" marker-end="url(#a)"/>
+<rect class="box" x="208" y="150" width="560" height="84"/>
+<text class="bt" x="224" y="176">4 · Hyperscaler or BYOC cluster</text>
+<text class="b" x="224" y="199">Xano Enterprise in your cloud account; warehouses, batch jobs</text>
+<text class="g" x="224" y="219">climb when: a contract or a regulator requires it</text>
+<path class="ln" d="M226,250V236" marker-end="url(#a)"/>
+<text class="sec" x="830" y="130">AI BINDING · WHERE THE MODEL RUNS, WHAT IT MAY TOUCH</text>
+<rect class="box" x="830" y="550" width="560" height="84"/>
+<text class="bt" x="846" y="576">0 · No model</text>
+<text class="b" x="846" y="599">Deterministic rules in a Worker or a Xano function</text>
+<text class="g" x="846" y="619">climb when: the input is language, images or a fuzzy match</text>
+<rect class="box" x="867" y="450" width="560" height="84"/>
+<text class="bt" x="883" y="476">1 · Workers AI binding</text>
+<text class="b" x="883" y="499">Small models at the edge through env.AI: classify, embed, moderate</text>
+<text class="g" x="883" y="519">climb when: the task needs a frontier model</text>
+<path class="ln" d="M885,550V536" marker-end="url(#a)"/>
+<rect class="box" x="904" y="350" width="560" height="84"/>
+<text class="bt" x="920" y="376">2 · AI Gateway to a hosted model</text>
+<text class="b" x="920" y="399">Claude, Gemini or GPT behind one gateway: logs, cache, limits</text>
+<text class="g" x="920" y="419">climb when: the model must read or write records</text>
+<path class="ln" d="M922,450V436" marker-end="url(#a)"/>
+<rect class="goal" x="941" y="250" width="560" height="84"/>
+<text class="bt" x="957" y="276">3 · Agent with tools on Xano</text>
+<text class="b" x="957" y="299">Tool calls hit Xano endpoints; every write passes the gate</text>
+<text class="g" x="957" y="319">climb when: hosted models fail on cost, privacy or tuning</text>
+<path class="ln" d="M959,350V336" marker-end="url(#a)"/>
+<rect class="box" x="978" y="150" width="560" height="84"/>
+<text class="bt" x="994" y="176">4 · Dedicated GPUs</text>
+<text class="b" x="994" y="199">Self-host, fine-tune or train on neocloud or hyperscaler GPUs</text>
+<text class="g" x="994" y="219">climb when: the model weights are the product</text>
+<path class="ln" d="M996,250V236" marker-end="url(#a)"/>
+<rect class="band" x="40" y="664" width="1520" height="76"/>
+<text class="sec" x="60" y="692">RULES THAT HOLD ON EVERY RUNG</text>
+<text class="b" x="60" y="720">Xano wins any disagreement  ·  fail closed when the projection is stale  ·  personal data stays in its home instance  ·  data leaves only through the signed gate</text>
+</svg>
