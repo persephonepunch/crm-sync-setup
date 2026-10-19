@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 788" role="img" aria-labelledby="t d">
+<title id="t">Bind before you allocate: what each distributed layer removes before a GPU is paid for</title>
+<desc id="d">Illustrative funnel of one million requests. The device handles 30%, leaving 700,000. The binding gate denies 10% and redacts personal fields from 12 to 3, leaving 630,000. The edge cache answers 40%, after the gate, leaving 378,000. Workers AI triage settles 70%, leaving 113,400. Only 113,400 reach GPU allocation, as redacted, signed payloads. Result: about 89% fewer GPU calls and about 97% fewer personal-field exposures. Net saving equals GPU cost avoided minus the cost of Workers, Workers AI and the cache.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="788" fill="#fff"/>
+<text class="h" x="60" y="52">BIND BEFORE YOU ALLOCATE — WHAT EACH DISTRIBUTED LAYER REMOVES BEFORE A GPU IS PAID FOR</text>
+<text class="g" x="60" y="76">illustrative rates, not measurements; the order matters: the gate runs before the cache, so a cached answer never skips consent</text>
+<text class="s" x="1540" y="76" text-anchor="end">Bar = requests still travelling. Heavy box = the GPU bill.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="130">STAGE</text>
+<text class="sec" x="330" y="130">REQUESTS STILL TRAVELLING</text>
+<text class="sec" x="1000" y="130">WHAT IT REMOVES</text>
+<text class="sec" x="1330" y="130">SECURITY EFFECT</text>
+<rect class="box" x="60" y="150" width="1480" height="64"/>
+<text class="bt" x="76" y="188">Incoming requests</text>
+<rect x="330" y="166" width="560.0" height="32" fill="#d9d9d9"/>
+<text class="b" x="900.0" y="188">1,000,000</text>
+<text class="b" x="1000" y="180">every preview, render, caption and question</text>
+<text class="b" x="1330" y="180">full payload</text>
+<text class="g" x="1330" y="200">12 personal fields</text>
+<path class="rule" d="M990,160V204M1320,160V204"/>
+<rect class="box" x="60" y="232" width="1480" height="64"/>
+<text class="bt" x="76" y="270">1 · Device</text>
+<rect x="330" y="248" width="392.0" height="32" fill="#d9d9d9"/>
+<text class="b" x="732.0" y="270">700,000</text>
+<text class="b" x="1000" y="262">previews and real-time 3D on the person&#x27;s GPU</text>
+<text class="g" x="1000" y="282">removes 30% of what arrives</text>
+<text class="b" x="1330" y="262">never sent</text>
+<path class="rule" d="M990,242V286M1320,242V286"/>
+<rect class="box" x="60" y="314" width="1480" height="64"/>
+<text class="bt" x="76" y="352">2 · Binding gate</text>
+<rect x="330" y="330" width="352.8" height="32" fill="#d9d9d9"/>
+<text class="b" x="692.8" y="352">630,000</text>
+<text class="b" x="1000" y="344">unconsented, out-of-policy, unbound: denied</text>
+<text class="g" x="1000" y="364">removes 10% of what arrives</text>
+<text class="b" x="1330" y="344">personal fields redacted, 12 to 3</text>
+<path class="rule" d="M990,324V368M1320,324V368"/>
+<rect class="box" x="60" y="396" width="1480" height="64"/>
+<text class="bt" x="76" y="434">3 · Edge cache</text>
+<rect x="330" y="412" width="211.7" height="32" fill="#d9d9d9"/>
+<text class="b" x="551.6800000000001" y="434">378,000</text>
+<text class="b" x="1000" y="426">repeat transforms and answers from cache</text>
+<text class="g" x="1000" y="446">removes 40% of what arrives</text>
+<text class="b" x="1330" y="426">served after the gate, never before</text>
+<path class="rule" d="M990,406V450M1320,406V450"/>
+<rect class="box" x="60" y="478" width="1480" height="64"/>
+<text class="bt" x="76" y="516">4 · Workers AI triage</text>
+<rect x="330" y="494" width="63.5" height="32" fill="#d9d9d9"/>
+<text class="b" x="403.504" y="516">113,400</text>
+<text class="b" x="1000" y="508">small edge models settle easy cases</text>
+<text class="g" x="1000" y="528">removes 70% of what arrives</text>
+<text class="b" x="1330" y="508">stays on the edge network</text>
+<path class="rule" d="M990,488V532M1320,488V532"/>
+<rect class="goal" x="60" y="560" width="1480" height="64"/>
+<text class="bt" x="76" y="598">5 · GPU allocation</text>
+<rect x="330" y="576" width="63.5" height="32" fill="#000"/>
+<text class="b" x="403.504" y="598">113,400</text>
+<text class="b" x="1000" y="590">only the hard cases reach a GPU</text>
+<text class="b" x="1330" y="590">redacted, signed payloads only</text>
+<path class="rule" d="M990,570V614M1320,570V614"/>
+<rect class="band" x="40" y="652" width="1520" height="96"/>
+<text class="sec" x="60" y="682">THE ILLUSTRATIVE RESULT</text>
+<text class="b" x="60" y="710">GPU calls: 1,000,000 to 113,400, about 89% fewer  ·  personal-field exposures: 12,000,000 to 340,200, about 97% fewer</text>
+<text class="g" x="60" y="732">net saving = GPU cost avoided − (Workers + Workers AI + cache cost). Measure your own pass-through rate at each stage before sizing GPUs.</text>
+</svg>

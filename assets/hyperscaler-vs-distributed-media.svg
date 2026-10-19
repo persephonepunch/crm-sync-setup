@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 774" role="img" aria-labelledby="t d">
+<title id="t">Media, 3D render and the GPU: where each step runs, and what protects it</title>
+<desc id="d">A grid of three workloads across five places. Images: client preview on the device; Cloudflare Images transforms at the edge; a private original in R2 or S3 with Xano holding the record; batch processing in C with libvips or ImageMagick pods on Kubernetes; Adobe Firefly Services as a hosted API. 3D game render: real-time render on the player&#x27;s GPU through WebGPU or native code; glTF and KTX2 asset delivery from the edge; an asset catalog in the system of record; build and bake jobs on Kubernetes with the GPU Operator; offline or streamed rendering on CoreWeave- or OCI-class GPUs. AI media: on-device models; Workers AI at the edge; consent and rights in the system of record; self-hosted models on GPU node pools; hosted generative APIs. Protection rules: base64 is not protection; Kubernetes Secrets are only base64 by default, so enable encryption at rest; lock down ImageMagick with policy.xml; strip EXIF and use signed, expiring URLs.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="774" fill="#fff"/>
+<text class="h" x="60" y="52">MEDIA, 3D RENDER AND THE GPU — WHERE EACH STEP RUNS, AND WHAT PROTECTS IT</text>
+<text class="g" x="60" y="76">left is closest to the person, right is closest to the GPU; the further right a step runs, the further the media has to travel</text>
+<text class="s" x="1540" y="76" text-anchor="end">Heavy box = the media never leaves the device. Red dashed = a common mistake.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="g" x="230" y="126">closer to the person</text>
+<text class="g" x="1540" y="126" text-anchor="end">closer to the GPU</text>
+<path class="ln" d="M360,122H1420" marker-end="url(#a)"/>
+<text class="sec" x="230" y="160">DEVICE</text>
+<text class="sec" x="494" y="160">EDGE</text>
+<text class="sec" x="758" y="160">SYSTEM OF RECORD</text>
+<text class="sec" x="1022" y="160">KUBERNETES CLUSTER</text>
+<text class="sec" x="1286" y="160">HOSTED GPU OR API</text>
+<text class="lt" x="60" y="206">Images</text>
+<rect class="goal" x="230" y="176" width="252" height="100"/>
+<text class="bt" x="246" y="204">Client preview</text>
+<text class="b" x="246" y="228">canvas or WebGPU resize</text>
+<text class="b" x="246" y="248">before upload</text>
+<rect class="box" x="494" y="176" width="252" height="100"/>
+<text class="bt" x="510" y="204">Transform on request</text>
+<text class="b" x="510" y="228">Cloudflare Images: resize,</text>
+<text class="b" x="510" y="248">format, crop; cached</text>
+<rect class="box" x="758" y="176" width="252" height="100"/>
+<text class="bt" x="774" y="204">Private original</text>
+<text class="b" x="774" y="228">R2 or S3, never public;</text>
+<text class="b" x="774" y="248">Xano holds record and key</text>
+<rect class="box" x="1022" y="176" width="252" height="100"/>
+<text class="bt" x="1038" y="204">Batch in C</text>
+<text class="b" x="1038" y="228">libvips or ImageMagick pods;</text>
+<text class="b" x="1038" y="248">policy.xml limits coders</text>
+<rect class="box" x="1286" y="176" width="252" height="100"/>
+<text class="bt" x="1302" y="204">Adobe Firefly Services</text>
+<text class="b" x="1302" y="228">Photoshop, Lightroom APIs;</text>
+<text class="b" x="1302" y="248">the file goes to Adobe</text>
+<text class="lt" x="60" y="330">3D game render</text>
+<rect class="goal" x="230" y="300" width="252" height="100"/>
+<text class="bt" x="246" y="328">Real-time render</text>
+<text class="b" x="246" y="352">WebGPU or native on the</text>
+<text class="b" x="246" y="372">player&#x27;s GPU; WGSL, SPIR-V</text>
+<rect class="box" x="494" y="300" width="252" height="100"/>
+<text class="bt" x="510" y="328">Asset delivery</text>
+<text class="b" x="510" y="352">glTF and KTX2 from cache;</text>
+<text class="b" x="510" y="372">signed URLs, no edge GPU</text>
+<rect class="box" x="758" y="300" width="252" height="100"/>
+<text class="bt" x="774" y="328">Asset catalog</text>
+<text class="b" x="774" y="352">versions, licences, owners;</text>
+<text class="b" x="774" y="372">the record decides access</text>
+<rect class="box" x="1022" y="300" width="252" height="100"/>
+<text class="bt" x="1038" y="328">Build and bake</text>
+<text class="b" x="1038" y="352">texture compression, lightmaps;</text>
+<text class="b" x="1038" y="372">GPU Operator for GPU pods</text>
+<rect class="box" x="1286" y="300" width="252" height="100"/>
+<text class="bt" x="1302" y="328">Offline or streamed</text>
+<text class="b" x="1302" y="352">render farms, pixel streaming</text>
+<text class="b" x="1302" y="372">on CoreWeave- or OCI-class</text>
+<text class="lt" x="60" y="454">AI media</text>
+<rect class="goal" x="230" y="424" width="252" height="100"/>
+<text class="bt" x="246" y="452">On-device model</text>
+<text class="b" x="246" y="476">small upscale or segment;</text>
+<text class="b" x="246" y="496">media stays on the device</text>
+<rect class="box" x="494" y="424" width="252" height="100"/>
+<text class="bt" x="510" y="452">Workers AI</text>
+<text class="b" x="510" y="476">classify, caption, moderate</text>
+<text class="b" x="510" y="496">with Cloudflare&#x27;s models</text>
+<rect class="box" x="758" y="424" width="252" height="100"/>
+<text class="bt" x="774" y="452">Consent and rights</text>
+<text class="b" x="774" y="476">is this face, voice or asset</text>
+<text class="b" x="774" y="496">cleared for this use?</text>
+<rect class="box" x="1022" y="424" width="252" height="100"/>
+<text class="bt" x="1038" y="452">Self-hosted models</text>
+<text class="b" x="1038" y="476">GPU node pools; the data</text>
+<text class="b" x="1038" y="496">stays in your account</text>
+<rect class="box" x="1286" y="424" width="252" height="100"/>
+<text class="bt" x="1302" y="452">Generative APIs</text>
+<text class="b" x="1302" y="476">Firefly, hosted image models;</text>
+<text class="b" x="1302" y="496">read retention terms</text>
+<rect class="band" x="40" y="564" width="1520" height="170"/>
+<text class="sec" x="60" y="594">PROTECTION RULES · EVERY COLUMN</text>
+<rect class="gap" x="60" y="612" width="345" height="100"/>
+<text class="bt" x="76" y="640">base64 is not protection</text>
+<text class="b" x="76" y="664">it is an encoding: about a third</text>
+<text class="b" x="76" y="684">larger, and it hides nothing</text>
+<rect class="gap" x="435" y="612" width="345" height="100"/>
+<text class="bt" x="451" y="640">Kubernetes Secrets are base64</text>
+<text class="b" x="451" y="664">turn on encryption at rest or</text>
+<text class="b" x="451" y="684">an external KMS; tighten RBAC</text>
+<rect class="box" x="810" y="612" width="345" height="100"/>
+<text class="bt" x="826" y="640">Lock down ImageMagick</text>
+<text class="b" x="826" y="664">policy.xml: disable unused coders;</text>
+<text class="b" x="826" y="684">cap memory, time and image size</text>
+<rect class="box" x="1185" y="612" width="345" height="100"/>
+<text class="bt" x="1201" y="640">Strip before egress</text>
+<text class="b" x="1201" y="664">remove EXIF GPS and device IDs;</text>
+<text class="b" x="1201" y="684">signed, expiring URLs only</text>
+</svg>

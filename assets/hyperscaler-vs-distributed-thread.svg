@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 750" role="img" aria-labelledby="t d">
 <title id="t">Hyperscaler vs distributed: the thread, and where each answer lands</title>
-<desc id="d">A spectrum from centralized to distributed: hyperscalers (AWS, Azure, Google Cloud), neoclouds (CoreWeave), edge networks (Cloudflare, Fastly, Akamai). Four questions along it: CoreWeave or Cloudflare (different layers, use both); hyperscaler or distributed (core central, edge in front); where AEM Edge Functions run (on Fastly Compute behind Adobe&#x27;s managed CDN, in beta); can Xano distribute Kubernetes (no, one instance per jurisdiction with an edge router and gate). The answers feed an orchestration ladder and an AI binding ladder, which lead to the enterprise impact.</desc>
+<desc id="d">A spectrum from centralized to distributed: hyperscalers (AWS, Azure, Google Cloud), neoclouds (CoreWeave), edge networks (Cloudflare, Fastly, Akamai), and the person&#x27;s own device. Four questions along it: CoreWeave or Cloudflare (different layers, use both); hyperscaler or distributed (core central, edge in front); where AEM Edge Functions run (on Fastly Compute behind Adobe&#x27;s managed CDN, in beta); can Xano distribute Kubernetes (no, one instance per jurisdiction with an edge router and gate). The answers feed an orchestration ladder and an AI binding ladder, which lead to the enterprise impact.</desc>
 <defs><style>
  .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
  .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
@@ -30,18 +30,22 @@
 <text class="g" x="60" y="162">CENTRALIZED</text>
 <text class="g" x="1540" y="162" text-anchor="end">DISTRIBUTED</text>
 <path class="ln" d="M160,158H1430" marker-end="url(#a)"/>
-<rect class="box" x="60" y="180" width="460" height="100"/>
+<rect class="box" x="60" y="180" width="355" height="100"/>
 <text class="bt" x="76" y="208">Hyperscaler</text>
 <text class="b" x="76" y="232">AWS, Azure, Google Cloud</text>
 <text class="b" x="76" y="252">few huge regions; heavy, stateful work</text>
-<rect class="box" x="570" y="180" width="460" height="100"/>
-<text class="bt" x="586" y="208">Neocloud (GPU cloud)</text>
-<text class="b" x="586" y="232">CoreWeave</text>
-<text class="b" x="586" y="252">dense GPU clusters; training, large models</text>
-<rect class="box" x="1080" y="180" width="460" height="100"/>
-<text class="bt" x="1096" y="208">Edge network</text>
-<text class="b" x="1096" y="232">Cloudflare, Fastly, Akamai</text>
-<text class="b" x="1096" y="252">hundreds of cities; light request logic</text>
+<rect class="box" x="435" y="180" width="355" height="100"/>
+<text class="bt" x="451" y="208">Neocloud (GPU cloud)</text>
+<text class="b" x="451" y="232">CoreWeave</text>
+<text class="b" x="451" y="252">dense GPU clusters; training, large models</text>
+<rect class="box" x="810" y="180" width="355" height="100"/>
+<text class="bt" x="826" y="208">Edge network</text>
+<text class="b" x="826" y="232">Cloudflare, Fastly, Akamai</text>
+<text class="b" x="826" y="252">hundreds of cities; light request logic</text>
+<rect class="box" x="1185" y="180" width="355" height="100"/>
+<text class="bt" x="1201" y="208">Device</text>
+<text class="b" x="1201" y="232">phones, laptops, consoles</text>
+<text class="b" x="1201" y="252">the person&#x27;s own GPU; data stays put</text>
 <text class="sec" x="60" y="330">THE THREAD · FOUR QUESTIONS</text>
 <rect class="box" x="60" y="350" width="345" height="150"/>
 <text class="bt" x="76" y="378">1 · CoreWeave or Cloudflare?</text>

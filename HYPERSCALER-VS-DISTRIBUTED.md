@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -28,15 +28,15 @@ keywords:
 **For:** teams choosing where logic, data and models run when the front end is Webflow, the edge is Cloudflare and the system of record is Xano.
 **Premise:** you don't pick a hyperscaler *or* an edge network. You pick, for each decision, the lowest rung that can make it correctly.
 **Companions:** [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/ai-ladder-escalation-and-mandates.html) for escalation and mandates; [Why Xano is the runtime as a service](https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html); [Process Management Guide](https://persephonepunch.github.io/crm-sync-setup/process-management.html) for the Webflow, Xano, Cloudflare and Shopify data layer; [Render and Runtime dictionary](https://persephonepunch.github.io/crm-sync-setup/render-runtime-dictionary.html) for terms.
-**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)).
+**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · bind before you allocate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)) · media, 3D render and the GPU ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf)).
 
 ## Challenge, solution, benefit
 
-![Task runners, data bindings and two kinds of GPU, in four rows. Task runner: jobs with no owner, spread across crons, webhooks and queue consumers, become one runner per path (a Worker cron and queues at the edge, Xano tasks for the record, idempotency keys), so every job has an owner, a retry policy and a log. Data binding: code that can reach any store becomes bindings declared in config (env.KV, env.DB, env.AI and one Xano endpoint), so the config is the access list. GPU as a place: scarce GPUs are rented as clusters from CoreWeave or Oracle OCI, giving training at scale while the data leaves your boundary. GPU as code: GPU code tied to one vendor becomes Rust compiled to SPIR-V and run through wgpu on any GPU, or to PTX for NVIDIA, so compute goes to the data.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.svg)
+![Task runners, data bindings and two kinds of GPU, in four rows. Task runner: jobs with no owner, spread across crons, webhooks and queue consumers, become one runner per path (a Worker cron and queues at the edge, Xano tasks for the record, idempotency keys), so every job has an owner, a retry policy and a log. Data binding: code that can reach any store becomes bindings declared in config (env.KV, env.DB, env.AI and one Xano endpoint), so the config is the access list. GPU as a place: scarce GPUs are rented as clusters from CoreWeave or Oracle OCI, running NVIDIA-only code such as CUDA and PTX, giving training at scale while the data leaves your boundary. GPU on the device: small GPU work sent away to a cluster becomes portable SPIR-V bytecode run through wgpu on any GPU, written in Rust or another shader language, so small GPU work stays with the data. Rows 3 and 4 split GPU work by size; they don't compete.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.svg)
 
 *[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.svg) (1600 × 744) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf).*
 
-Read each row left to right. Rows 1 and 2 decide **who may run and what it may touch**. Rows 3 and 4 decide **whether the data goes to the GPU, or the GPU code goes to the data**. The rest of this article is the consequence of those two choices.
+Read each row left to right. Rows 1 and 2 decide **who may run and what it may touch**. Rows 3 and 4 decide **whether the data goes to the GPU, or the GPU code goes to the data**. They split GPU work by size rather than competing for the same job: training and large models need a rented cluster, while previews, real-time 3D and upscaling can run on the GPU the person already has. Neither row is the goal. The goal is the gate described below, and both kinds of GPU sit under it.
 
 ### Four definitions
 
@@ -44,18 +44,75 @@ Read each row left to right. Rows 1 and 2 decide **who may run and what it may t
 |---|---|---|---|
 | **Task runner** | The thing that starts a job, retries it and records the result, as opposed to the code the job runs. | Worker cron triggers and Queues for edge jobs; Xano background tasks for jobs that change the record. Each job carries an idempotency key, so a retry can't apply twice. | Either end. Run it where the data the job changes lives. |
 | **Data binding** | A named handle to a resource, declared in configuration and handed to the code at runtime. The code can only reach what is bound; there is no URL or credential to copy. | Cloudflare bindings (`env.KV`, `env.DB`, `env.R2`, `env.AI`, a Durable Object namespace) in `wrangler.toml`; Xano endpoints reached through one bound service. | Edge. The binding list is the security boundary. |
-| **GPU as a place** (CoreWeave, Oracle OCI) | GPUs you rent by the cluster. CoreWeave is a neocloud that sells little else; Oracle Cloud Infrastructure is a hyperscaler whose Superclusters link tens of thousands of NVIDIA GPUs over RDMA. | Rung 4 of the AI ladder: training, fine-tuning, self-hosted large models. | Centralized. The data travels to the GPU, so residency and egress are part of every job. |
-| **GPU as code** (Rust to GPU bytecode) | GPU programs written in Rust and compiled to a portable GPU bytecode: SPIR-V through rust-gpu, run on any Vulkan, Metal or DirectX GPU via wgpu; or PTX through Rust CUDA, for NVIDIA only. | Kernels shipped with the application: in a native app, on a server or, after translation to WGSL, in a browser through WebGPU. | Wherever a GPU already is, so the data can stay put. |
+| **GPU as a place** (CoreWeave, Oracle OCI) | GPUs you rent by the cluster. CoreWeave is a neocloud that sells little else; Oracle Cloud Infrastructure is a hyperscaler whose Superclusters link tens of thousands of NVIDIA GPUs over RDMA. Code for them is usually NVIDIA-only: CUDA, or PTX, which Rust can also target through Rust CUDA. | Rung 4 of the AI ladder: training, fine-tuning, self-hosted large models. | Centralized. The data travels to the GPU, so residency and egress are part of every job. |
+| **GPU on the device** (portable GPU bytecode) | GPU programs compiled to SPIR-V, a portable bytecode that wgpu runs on any Vulkan, Metal or DirectX GPU. Rust (through rust-gpu) is one source language; GLSL, HLSL and WGSL also compile to it. | Kernels shipped with the application: in a native app, on your own server or, after translation to WGSL, in a browser through WebGPU. | The device, at the far distributed end, past the edge. The data stays where it already is. |
 
-**What "GPU in bytecode" does and doesn't buy.** The bytecode is to a GPU roughly what WebAssembly is to a CPU: one compiled artifact, many targets. That makes *small* parallel work portable, such as image transforms, embeddings or physics, and lets it run on the user's own device, so the data never leaves. It doesn't make a phone into a training cluster, and three limits apply:
+**What portable GPU bytecode does and doesn't buy.** SPIR-V is to a GPU roughly what WebAssembly is to a CPU: one compiled artifact, many targets. That makes *small* parallel work portable, such as image transforms, embeddings or physics, and lets it run on the user's own device, so the data never leaves. It doesn't make a phone into a training cluster, and three limits apply:
 
-- **Maturity.** rust-gpu calls itself early-stage and not yet production-ready, and Rust CUDA carries the same warning. NVIDIA is now also building cuda-oxide, a separate Rust backend for PTX.
+- **Maturity.** rust-gpu calls itself early-stage and not yet production-ready. Shader languages that already compile to SPIR-V are the safer route today.
 - **Browsers take WGSL, not SPIR-V.** WebGPU in a browser accepts only WGSL, so SPIR-V has to be translated first (wgpu's naga translator does this).
 - **The edge has no GPU for your code.** Cloudflare Workers run Rust as WebAssembly on CPUs. Workers AI runs Cloudflare's model catalogue on its GPUs, but you can't upload your own kernels to it. GPU bytecode belongs on the device, a server or a rented cluster, not inside a Worker.
 
+## The strategy: bind before you allocate
+
+Rent or buy GPUs last. Every request first passes through the cheaper distributed layers, and each layer either answers it or removes data from it. A GPU is sized only for what is left. That ordering is where both the cost saving and the security saving come from, and it can be shown with arithmetic before any GPU contract is signed.
+
+![Bind before you allocate, an illustrative funnel of one million requests. The device handles 30%, leaving 700,000. The binding gate denies 10% and redacts personal fields from 12 to 3, leaving 630,000. The edge cache answers 40%, after the gate, leaving 378,000. Workers AI triage settles 70%, leaving 113,400. Only 113,400 reach GPU allocation, as redacted, signed payloads. Result: about 89% fewer GPU calls and about 97% fewer personal-field exposures. Net saving equals GPU cost avoided minus the cost of Workers, Workers AI and the cache.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.svg) (1600 × 788) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf).*
+
+**The rates in the diagram are illustrative, not measurements.** They show the method. Replace each one with the pass-through rate you measure at that stage.
+
+### The cost case
+
+GPU spend scales with the requests that reach it:
+
+```
+requests_at_gpu = requests × (1 − device) × (1 − denied) × (1 − cached) × (1 − triaged)
+gpu_cost        = requests_at_gpu × gpu_seconds_per_request × price_per_gpu_second
+net_saving      = gpu_cost(all requests) − gpu_cost(requests_at_gpu) − (Workers + Workers AI + cache cost)
+```
+
+| Stage | Removes | Still travelling | Cost of the stage |
+|---|---|---|---|
+| Incoming | | 1,000,000 | |
+| 1 · Device | 30%: previews and real-time 3D on the person's GPU | 700,000 | None to you; the person's device does the work |
+| 2 · Binding gate | 10%: unconsented, out-of-policy or unbound requests | 630,000 | One Worker invocation and a Durable Object read |
+| 3 · Edge cache | 40%: repeat transforms and answers | 378,000 | Cache storage and reads |
+| 4 · Workers AI triage | 70%: easy cases a small model can settle | 113,400 | Workers AI inference, priced per use |
+| 5 · GPU allocation | | **113,400** | Sized for about 11% of the original demand |
+
+Two things make the saving larger than the request count suggests. GPU capacity is bought for the peak, and the device and cache stages remove the most repetitive, burst-prone traffic first. And a smaller, steadier GPU workload can often run on a few GPU pods of your own (media ladder rung 3) instead of a rented cluster (rung 4).
+
+### The security case
+
+Count the personal fields that leave each boundary, not just the requests:
+
+| | Requests reaching a GPU | Personal fields per request | Personal-field exposures |
+|---|---|---|---|
+| GPU first | 1,000,000 | 12 | 12,000,000 |
+| Bind before you allocate | 113,400 | 3, after redaction at the gate | **340,200**, about 97% fewer |
+
+The other savings don't show up in the count:
+
+- **The device stage sends nothing.** Data that never leaves the person's device has no transit, retention or processor terms to negotiate.
+- **The gate runs before the cache.** A cached answer is never served without the posture check, so caching can't become a way around consent.
+- **Triage stays on the edge network.** Easy cases are settled by small models under one data-processing agreement, not shipped to a GPU provider.
+- **What reaches the GPU is redacted and signed.** A provider breach, or a prompt injection, exposes three fields of 113,400 requests, not twelve fields of a million. Every payload is tied to the ledger state that allowed it.
+
+### What to measure before sizing GPUs
+
+1. The share of requests the device can serve: previews, real-time 3D, small on-device models.
+2. The gate's deny rate and the number of fields it redacts, per market.
+3. The cache hit rate, measured after the gate.
+4. The share of cases Workers AI settles, and how often its answer is overturned later. A triage that misroutes hard cases costs quality, not just money.
+5. GPU-seconds per remaining request, and the peak-to-average ratio of what reaches the GPU.
+
+If the remaining demand is small and steady, own a few GPU pods. If it is large or bursty, rent. Either way, the decision is made on the 11%, not on the 100%.
+
 ## The thread, in one picture
 
-![Hyperscaler vs distributed: the thread. A spectrum runs from centralized to distributed: hyperscalers (AWS, Azure, Google Cloud), neoclouds (CoreWeave), edge networks (Cloudflare, Fastly, Akamai). Four questions sit along it. CoreWeave or Cloudflare: different layers, use both. Hyperscaler or distributed: keep the core central and the edge in front. Where do AEM Edge Functions run: on Fastly Compute behind Adobe's managed CDN, in beta. Can Xano distribute Kubernetes: no, one instance per jurisdiction with an edge router and gate. The answers feed an orchestration ladder and an AI binding ladder, which lead to the enterprise impact.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.svg)
+![Hyperscaler vs distributed: the thread. A spectrum runs from centralized to distributed: hyperscalers (AWS, Azure, Google Cloud), neoclouds (CoreWeave), edge networks (Cloudflare, Fastly, Akamai), and the person's own device. Four questions sit along it. CoreWeave or Cloudflare: different layers, use both. Hyperscaler or distributed: keep the core central and the edge in front. Where do AEM Edge Functions run: on Fastly Compute behind Adobe's managed CDN, in beta. Can Xano distribute Kubernetes: no, one instance per jurisdiction with an edge router and gate. The answers feed an orchestration ladder and an AI binding ladder, which lead to the enterprise impact.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.svg)
 
 *[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.svg) (1600 × 750) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf).*
 
@@ -76,6 +133,8 @@ This article began as four questions, each asked after the one before was answer
 | Typical work | Databases, data pipelines, enterprise back ends | Training, fine-tuning, large-model serving | CDN, security, edge functions, small-model inference |
 | Data model | Centralized, strongly consistent | Centralized, job-scoped | Cached, replicated, eventually consistent |
 | You pay in | Distance from the region; egress fees | Scarcity and commitment | Depth: little room for heavy state |
+
+Past the edge sits the **device**: the person's own phone, laptop or console, and its GPU. It isn't a vendor's network, but it is the most distributed place compute can run, and the only one where data never travels.
 
 The lines are blurring. Hyperscalers sell edge products such as CloudFront, Lambda@Edge and Azure Front Door, and edge networks keep adding storage, databases and GPU inference. The model you start from still decides what is cheap and what is hard.
 
@@ -125,9 +184,36 @@ Start every decision at rung 0 and climb only when the *climb when* condition is
 | 3 | Agent with tools on Xano | Tool calls to Xano endpoints, each write passing the gate under a mandate | Hosted models fail on cost, privacy or tuning | A smaller audit scope: the model now acts |
 | 4 | Dedicated GPUs | Self-hosting, fine-tuning or training on neocloud or hyperscaler GPUs | The model weights are the product | Operational simplicity and a variable bill |
 
-Rung 4 has a sideways exit. When the work is small and parallel rather than a large model, GPU code compiled from Rust can run on the user's device or your own server instead of a rented cluster. That keeps the data where it is, at the cost of the maturity limits above.
+Rung 4 has a sideways exit. When the work is small and parallel rather than a large model, portable GPU bytecode can run on the user's device or your own server instead of a rented cluster. That keeps the data where it is, at the cost of the maturity limits above.
 
 The ladders are independent. A Webflow page (orchestration rung 0) can call an edge classifier (AI rung 1), and a Xano agent (AI rung 3) still answers to the gate at orchestration rung 1. What they share is the four rules in the band under the diagram.
+
+## Media, 3D render and the GPU
+
+![Media, 3D render and the GPU: where each step runs and what protects it. Three workloads across five places, from closest to the person to closest to the GPU. Images: client preview on the device; Cloudflare Images transforms at the edge; a private original in R2 or S3, with Xano holding the record and key; batch processing in C with libvips or ImageMagick pods on Kubernetes; Adobe Firefly Services as a hosted API. 3D game render: real-time render on the player's GPU through WebGPU or native code; glTF and KTX2 asset delivery from the edge; an asset catalog in the system of record; build and bake jobs on Kubernetes with the GPU Operator; offline or streamed rendering on CoreWeave- or OCI-class GPUs. AI media: on-device models; Workers AI at the edge; consent and rights in the system of record; self-hosted models on GPU node pools; hosted generative APIs. Protection rules: base64 is not protection; Kubernetes Secrets are only base64 by default, so enable encryption at rest; lock down ImageMagick with policy.xml; strip EXIF and use signed, expiring URLs.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.svg) (1600 × 774) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf).*
+
+Media is where the spectrum costs the most, because the payloads are large and they often carry people: faces, voices, locations. Read the grid left to right. The further right a step runs, the further the file travels and the more systems hold a copy. The heavy boxes on the left are the only places where the media never leaves the person's device.
+
+### Media ladder
+
+| Rung | Runs on | Use it for | Climb when… | What it gives up |
+|---|---|---|---|---|
+| 0 | The device | Previews, real-time 3D on the player's GPU, small on-device models | The work needs the original, or more GPU than the device has | Nothing leaves, so nothing to protect in transit |
+| 1 | The edge | Resize, format and crop on request; cached asset delivery; Workers AI captions and moderation | The job is a batch, or needs a library the edge can't run | No GPU for your own code; CPU time limits |
+| 2 | Kubernetes, CPU pods | libvips or ImageMagick batches in C; texture compression; bakes | The work is parallel enough to need a GPU | You now run the cluster and its secrets |
+| 3 | Kubernetes, GPU pods | Lightmaps, upscaling, self-hosted image models, through the NVIDIA GPU Operator | Steady demand beats a rented cluster, or the GPUs you need aren't available | Media stays in your account, but you buy the capacity |
+| 4 | Hosted GPU or API | Render farms and pixel streaming on CoreWeave- or OCI-class GPUs; Adobe Firefly Services | Only when the scale or the feature can't be had lower down | The file leaves your boundary under someone else's retention terms |
+
+### Four terms the grid relies on
+
+- **ImageMagick.** An open-source image library and toolset, written in C, from ImageMagick Studio. It isn't an Adobe product. Adobe's hosted equivalents are the Photoshop and Lightroom APIs in Firefly Services. ImageMagick reads hundreds of formats, and that breadth is its risk: a crafted file can reach a coder you never meant to use, as ImageTragick did in 2016. Run it with a `policy.xml` that allows only the formats you accept and caps memory, time and pixel count, and run it in a pod with no network access to the rest of the system.
+- **C-level render optimization.** Making the native layer do less work, rather than adding hardware. In practice: decode once and stream in tiles instead of loading whole images (libvips works this way, and for resize pipelines it is usually faster and lighter on memory than ImageMagick), keep pixels in one buffer instead of copying between libraries, encode straight to the delivery format (AVIF or WebP for images, KTX2 for textures), and never re-encode an already-compressed file. Only move work to a GPU when it is parallel enough to repay the transfer. Resizing a single image rarely is; a lightmap bake or an upscaling model usually is.
+- **base64.** A way to write bytes as text. It makes a file about a third larger and protects nothing: anyone who can read the text can decode it. Don't put media in base64 inside JSON, KV or the CMS. Store the binary in a private bucket and pass a signed, expiring URL.
+- **Kubernetes Secrets.** By default these are only base64-encoded in etcd, not encrypted. Protected data in a cluster needs encryption at rest turned on (or an external KMS provider), RBAC that limits who can read Secrets, and media credentials scoped to one bucket and one job. CoreWeave runs its GPUs as a Kubernetes service, and Oracle's OKE runs GPU node pools, so the same rule applies whether the cluster is yours or rented.
+
+**3D game render.** Real-time rendering belongs on the player's GPU. WebGPU in the browser takes WGSL shaders, and native engines take SPIR-V, which is where the Rust-to-bytecode path from the opening section is most useful. The edge delivers assets (glTF meshes, KTX2 textures) and never renders. The cluster bakes and compresses. Rented GPUs earn their place only for offline render farms, or for pixel streaming, when the player's device can't render the scene at all. The asset catalog in the system of record decides who receives which asset version under which licence, through the same gate as any other data.
 
 ## Impact on enterprise infrastructure
 
@@ -142,6 +228,7 @@ The ladders are independent. A Webflow page (orchestration rung 0) can call an e
 | AI exposure | Models sit next to all the data | Models reach records only through tools behind the gate | Prompt injection can't exfiltrate what the gate won't release |
 | Licensing | Usage-based, committed spend | Xano licence per instance (Enterprise); Workers usage | Each new jurisdiction carries a fixed cost |
 | Skills | Kubernetes, IAM, networking teams | Workers, Xano and gate design; little cluster operation | Platform headcount moves from operating clusters to writing policy |
+| Media and render | Originals, transforms and render farms sit in one account next to everything else | Previews and real-time 3D on the device; transforms at the edge; originals private; GPUs rented per job | Fewer copies of large files that contain people, and a GPU bill that follows the work |
 | Vendor concentration | One provider holds compute, data and AI | Edge, system of record and model provider are separate | No single contract can switch the whole system off |
 
 The trade is real. The distributed pattern only pays off if the gate is the single way out. A team that adds a direct database export "just for analytics" has rebuilt the hyperscaler's blast radius without its tooling.
@@ -158,6 +245,13 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Models reach records only through tools that pass the gate, never through a direct connection.
 - [ ] For every "edge" in a vendor diagram, you know whose network it runs on and under which data-processing terms.
 - [ ] Rung 4 (BYOC or dedicated GPUs) is reached only by a written contract, regulatory or cost requirement.
+- [ ] Media originals live in a private bucket, and only signed, expiring URLs leave it; no media travels as base64.
+- [ ] EXIF location and device fields are stripped before any image leaves the system of record.
+- [ ] ImageMagick runs with a restrictive `policy.xml`, in a pod with no route to the rest of the system.
+- [ ] Every cluster that holds protected data has Secrets encryption at rest (or an external KMS) turned on, and checked.
+- [ ] Each GPU job names its rung, and why the device or a CPU pod couldn't do it.
+- [ ] GPU capacity is sized on the measured demand left after the device, gate, cache and triage stages, not on raw request volume.
+- [ ] The gate runs before the cache, so no cached answer skips the posture check.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
 ## Sources
@@ -170,4 +264,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Oracle, [World's largest AI supercomputer in the cloud](https://blogs.oracle.com/cloud-infrastructure/post/worlds-largest-ai-supercomputer-in-the-cloud): OCI Superclusters with NVIDIA GPUs over RDMA networking.
 - Rust GPU, [rust-gpu](https://github.com/Rust-GPU/rust-gpu): Rust to SPIR-V, maintained by the community since 2024, early-stage.
 - [rustc_codegen_nvvm](https://lib.rs/crates/rustc_codegen_nvvm) (Rust CUDA): Rust to PTX, early development; NVIDIA, [The Rust + GPU ecosystem](https://nvidia.github.io/cuda-rust/appendix/ecosystem.html), which also covers cuda-oxide.
+- Kubernetes, [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) (stored unencrypted in etcd by default) and [Encrypting confidential data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/).
+- ImageMagick, [Security policy](https://imagemagick.org/script/security-policy.php): `policy.xml` coder, resource and path limits.
+- [libvips](https://www.libvips.org/): a demand-driven, streaming image library in C.
+- Cloudflare, [Images](https://developers.cloudflare.com/images/): transformations at the edge.
+- Adobe, [Firefly Services](https://developer.adobe.com/firefly-services/): Photoshop, Lightroom and Firefly APIs.
+- NVIDIA, [GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html): GPU drivers and scheduling on Kubernetes.
 - CNCF, [From data residency to digital sovereignty](https://cncf.io/blog/2026/06/16/from-data-residency-to-digital-sovereignty-architectural-patterns-for-cloud-native-platforms): a shared Kubernetes control plane still centralizes administrative authority.
