@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then why Kubernetes and VMs limit reach but not what a model may weigh, how AWS, Google Cloud and Azure each control data moving between workloads, what an enterprise has to add on top, and policy management as a service: rules authored in Webflow and Xano, enforced by Cloudflare above every cloud, worked through one order that reaches Salesforce and Klaviyo on AWS, SAP or Dynamics on Azure, Google Ads on Google Cloud and a Shopify Function. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then why Kubernetes and VMs limit reach but not what a model may weigh, how AWS, Google Cloud and Azure each control data moving between workloads, what an enterprise has to add on top, and policy management as a service: rules authored in Webflow and Xano, enforced by Cloudflare above every cloud, worked through one order that reaches Salesforce and Klaviyo on AWS, SAP or Dynamics on Azure, Google Ads on Google Cloud and a Shopify Function; and one Worker behind any theme, a Webflow export or a Shopify theme through the App Proxy, with an allowlist that mirrors Kakao Pay's registered domains. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -471,6 +471,74 @@ When marketing consent is withdrawn, one rule record changes in Xano, a new bund
 
 The platforms themselves already work this way. `shopify.dev` and the Shopify Dev Dashboard answer from Cloudflare (`server: cloudflare`), while Shopify's DNS steers other hosts, such as the Partner Dashboard, to a Google edge in front of its Google Cloud core. Hydrogen storefronts on Oxygen run on Cloudflare: [Shopify's own write-up](https://shopify.engineering/how-we-built-oxygen) describes a gateway Worker that routes each request with Workers for Platforms' dynamic dispatch. Webflow Cloud apps run on the [Cloudflare Workers runtime](https://developers.webflow.com/webflow-cloud/environment). Cloudflare on top of a hyperscaler isn't an add-on to this stack; it is how the stack's own vendors are built.
 
+### One Worker, any theme: a Webflow export and a Shopify theme with the same permissions
+
+Because the gate is its own origin with one contract, the page in front of it is interchangeable. A vanilla Webflow export (HTML, CSS and JavaScript, with no Webflow CMS or form backend behind it) can be served from `webflow.io`, a custom domain, a `.kr` domain, or rebuilt as a Shopify native theme, and it behaves identically. The page holds no token, no rule and no reasoning. It loads one component and calls the Worker; the Worker and Xano decide what that visitor may see and do. Moving the page to another domain changes one allowlist row, not the code.
+
+There are two doors into the same Worker, and both end at the same subject in Xano and the same rules:
+
+| Door | Used by | How the Worker knows who is calling |
+|---|---|---|
+| **CORS** | The Webflow export on any domain; a Shopify theme calling the Worker's own domain | The `Origin` header, matched against the published allowlist; the visitor's session token |
+| **Shopify App Proxy** | A Shopify theme calling `/apps/crm/...` on the store's own domain | Shopify's HMAC `signature` on the query string, and `logged_in_customer_id` |
+
+**The allowlist is a policy record, not a config file.** It lives in Xano with the other rules and ships in the same signed bundle. Each row says what one origin may do:
+
+```json
+{ "origins": [
+  { "origin": "https://example.webflow.io", "host": "webflow",         "consent": "crm-sync-banner",          "region": "US", "kakao_registered": false },
+  { "origin": "https://shop.example.com",   "host": "shopify-proxy",   "path": "/apps/crm", "consent": "shopify-customer-privacy", "region": "US", "kakao_registered": true },
+  { "origin": "https://www.example.kr",     "host": "webflow-export",  "consent": "crm-sync-banner",          "region": "KR", "kakao_registered": true }
+] }
+```
+
+- **`consent`** names where the visitor's choice comes from: your own banner on a Webflow page, or Shopify's Customer Privacy API in a theme. The gate reads the right one per origin, so the same rule sees the same answer.
+- **`region`** routes the subject to its home Xano instance. A Korean origin goes to the Seoul instance, with consent to the cross-border transfer captured before anything leaves it.
+- **`kakao_registered`** mirrors a list the Worker doesn't control. Kakao Pay checks that the `approval_url`, `cancel_url` and `fail_url` it redirects to are on a domain registered for the merchant in the [Kakao Pay developer center](https://developers.kakaopay.com/). The gate builds those URLs only from rows marked `true`, so an unregistered domain is refused the Kakao Pay rail at the gate, with a clear reason, instead of failing at Kakao mid-payment. Adding a domain is a two-place change: the Xano row and Kakao's console.
+
+```js
+// CORS door: an exact match from the bundle. Never reflect an Origin that isn't listed.
+const entry = bundle.origins.find((o) => o.origin === request.headers.get("Origin"));
+if (!entry) return new Response(null, { status: 403 });
+const cors = { "Access-Control-Allow-Origin": entry.origin, "Vary": "Origin" };
+
+// Kakao Pay redirects go only to a domain Kakao has on file for the merchant.
+if (rail === "kakaopay" && !entry.kakao_registered) return deny("kakao_domain_not_registered");
+const kakaoBase = entry.origin + (entry.path || "");
+```
+
+**The App Proxy door, verified in the Worker.** A Shopify theme can call `https://shop.example.com/apps/crm/...` on its own domain; Shopify forwards it to the Worker and [signs the query string](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies). The Worker recomputes the signature with the app's secret before anything else:
+
+```js
+// Shopify App Proxy: drop `signature`, join repeated keys with commas, sort the "k=v" pairs,
+// concatenate with no separator, HMAC-SHA256 with the app secret, compare in constant time.
+async function verifyAppProxy(url, secret) {
+  const q = new URLSearchParams(url.search);
+  const sig = q.get("signature") || "";
+  q.delete("signature");
+  const vals = {};
+  for (const [k, v] of q) (vals[k] ??= []).push(v);
+  const msg = Object.keys(vals).map((k) => `${k}=${vals[k].join(",")}`).sort().join("");
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const mac = [...new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(msg)))]
+    .map((b) => b.toString(16).padStart(2, "0")).join("");
+  const fresh = Math.abs(Date.now() / 1000 - Number(q.get("timestamp"))) < 300;
+  const a = enc.encode(mac), b = enc.encode(sig);
+  return fresh && a.byteLength === b.byteLength && crypto.subtle.timingSafeEqual(a, b);
+}
+```
+
+A valid signature proves Shopify sent the request, not that the customer owns the data asked for: the Worker still checks that `logged_in_customer_id` maps to the subject whose records it returns. Three App Proxy facts shape the design. Shopify strips `Set-Cookie` from proxy responses, so the session is the signed parameters, not a cookie. A response sent as `Content-Type: application/liquid` is rendered inside the store's theme. And merchants can rename the proxy path, so links are built from the `path_prefix` parameter, never hard-coded.
+
+What this keeps constant, whichever page is in front:
+
+- **Permissions.** Every request is decided by the gate against the same bundle. The theme can't grant itself anything.
+- **Data reasoning.** Eligibility, ranking and model calls run in the Worker and Xano. The page receives decisions and allowed fields, never the records the decision was made from.
+- **Audit.** Every door writes the same signed decision, with the bundle version and the ledger head hash, to the same ledger.
+
+See [Fragments for any frontend](https://persephonepunch.github.io/crm-sync-setup/fragments-any-frontend.html) for the component side of the same idea.
+
 ## The decision ladders
 
 ![Two decision ladders. Orchestration, bottom to top: Webflow publish; Cloudflare Worker; Durable Object; Xano as the system of record; hyperscaler or BYOC cluster. AI binding, bottom to top: no model; Workers AI binding; AI Gateway to a hosted model; agent with tools on Xano; dedicated GPUs. Each rung names the condition that earns the next. Rules on every rung: Xano wins disagreements, fail closed when the projection is stale, personal data stays home, data leaves only through the signed gate.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.svg)
@@ -581,6 +649,9 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Data moving between clusters or clouds carries a signed, short-lived label (purpose, consent, region, ledger head), and the receiver checks it again.
 - [ ] Each cloud's perimeter (SCPs and RCPs, VPC Service Controls, Azure Policy and network security perimeter) refuses access that didn't come through the gate.
 - [ ] Policy rules live as versioned, tested, two-person-approved records in Xano, and the gate denies on a stale bundle.
+- [ ] Allowed origins are rows in the signed policy bundle; the Worker never reflects an unlisted `Origin`.
+- [ ] Shopify App Proxy requests are verified by HMAC and timestamp in the Worker, and `logged_in_customer_id` is checked against the data returned.
+- [ ] Kakao Pay redirect URLs are built only from origins also registered in Kakao's console; an unregistered domain is refused at the gate.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
 ## Sources
@@ -614,6 +685,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - AWS, [Resource control policies](https://aws.amazon.com/about-aws/whats-new/2024/11/resource-control-policies-restrict-access-aws-resources) and [Building a data perimeter on AWS](https://docs.aws.amazon.com/whitepapers/latest/building-a-data-perimeter-on-aws/perimeter-overview.html); [Amazon Verified Permissions](https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/what-is-avp.html); [AWS App Mesh](https://docs.aws.amazon.com/app-mesh/latest/userguide/what-is-app-mesh.html) (support ended 30 September 2026).
 - Google Cloud, [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview) and [Model Armor with Vertex AI](https://docs.cloud.google.com/model-armor/model-armor-vertex-integration).
 - Microsoft, [Azure Policy](https://learn.microsoft.com/en-us/azure/governance/policy/overview), [Network security perimeter](https://learn.microsoft.com/en-us/azure/private-link/network-security-perimeter-concepts) and [Prompt Shields](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/jailbreak-detection).
+- Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
+- Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Shopify Engineering, [How we built Oxygen](https://shopify.engineering/how-we-built-oxygen): a gateway Worker in Cloudflare routing to storefront Workers through Workers for Platforms' dynamic dispatch.
 - Cloudflare, [Workers VPC](https://developers.cloudflare.com/workers-vpc/) (beta), [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/), [AI Gateway DLP](https://developers.cloudflare.com/ai-gateway/features/dlp/) and the [Data Localization Suite](https://developers.cloudflare.com/data-localization/).
 - MDN, [WebAssembly.compileStreaming()](https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static): compiling while the module downloads.
