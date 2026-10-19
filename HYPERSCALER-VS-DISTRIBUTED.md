@@ -6,6 +6,8 @@ category: "Specs"
 date: 2026-10-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/HYPERSCALER-VS-DISTRIBUTED.md
 licence: CC-BY-4.0
+ogImage: https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-og.png
+ogImageAlt: "Hyperscaler vs Distributed: an illustrative funnel where one million requests shrink to 113,400 GPU calls, 89% fewer, when data and AI binding run before GPU allocation; a spectrum from hyperscaler to neocloud, edge network and device."
 tags:
   - architecture
   - edge

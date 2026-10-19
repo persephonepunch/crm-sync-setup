@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1200 630" role="img" aria-labelledby="t d">
+<title id="t">Hyperscaler vs Distributed: Webflow, Xano and Cloudflare decision ladders</title>
+<desc id="d">Share card. An illustrative funnel: one million requests, 700,000 after the device, 630,000 after the gate, 378,000 after the cache, 113,400 reach a GPU. 89% fewer GPU calls and 97% fewer personal-field exposures when data and AI binding run before GPU allocation. A spectrum from centralized to distributed: hyperscaler, neocloud, edge network, device.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1200" height="630" fill="#fff"/>
+<rect x="0" y="0" width="1200" height="8" fill="#000"/>
+<text class="sec" x="60" y="62">CRM SYNC · KNOWLEDGE BASE · SPECS</text>
+<text x="60" y="132" style="font:700 58px Helvetica,Arial,sans-serif;fill:#000">Hyperscaler vs Distributed</text>
+<text x="60" y="178" style="font:400 28px Helvetica,Arial,sans-serif;fill:#000">Webflow, Xano and Cloudflare decision ladders</text>
+<path class="rule" d="M60,212H1140"/>
+<text class="sec" x="60" y="252">BIND BEFORE YOU ALLOCATE · ILLUSTRATIVE FUNNEL</text>
+<text x="60" y="290" style="font:400 15px Helvetica,Arial,sans-serif;fill:#767676">requests</text>
+<rect x="210" y="274" width="420.0" height="22" fill="#d9d9d9"/>
+<text x="640.0" y="291" style="font:400 15px Helvetica,Arial,sans-serif;fill:#000">1,000,000</text>
+<text x="60" y="324" style="font:400 15px Helvetica,Arial,sans-serif;fill:#767676">after the device</text>
+<rect x="210" y="308" width="294.0" height="22" fill="#d9d9d9"/>
+<text x="514.0" y="325" style="font:400 15px Helvetica,Arial,sans-serif;fill:#000">700,000</text>
+<text x="60" y="358" style="font:400 15px Helvetica,Arial,sans-serif;fill:#767676">after the gate</text>
+<rect x="210" y="342" width="264.6" height="22" fill="#d9d9d9"/>
+<text x="484.6" y="359" style="font:400 15px Helvetica,Arial,sans-serif;fill:#000">630,000</text>
+<text x="60" y="392" style="font:400 15px Helvetica,Arial,sans-serif;fill:#767676">after the cache</text>
+<rect x="210" y="376" width="158.8" height="22" fill="#d9d9d9"/>
+<text x="378.76" y="393" style="font:400 15px Helvetica,Arial,sans-serif;fill:#000">378,000</text>
+<text x="60" y="426" style="font:700 15px Helvetica,Arial,sans-serif;fill:#000">GPU, after triage</text>
+<rect x="210" y="410" width="47.6" height="22" fill="#000"/>
+<text x="267.628" y="427" style="font:700 15px Helvetica,Arial,sans-serif;fill:#000">113,400</text>
+<path class="rule" d="M720,260V430"/>
+<text x="760" y="340" style="font:700 96px Helvetica,Arial,sans-serif;fill:#000">−89%</text>
+<text x="760" y="378" style="font:400 20px Helvetica,Arial,sans-serif;fill:#000">GPU calls, when data and AI binding</text>
+<text x="760" y="404" style="font:400 20px Helvetica,Arial,sans-serif;fill:#000">run before any GPU is allocated</text>
+<text x="760" y="430" style="font:400 14px Helvetica,Arial,sans-serif;fill:#767676">−97% personal-field exposures · illustrative rates</text>
+<text class="g" x="60" y="478">centralized</text>
+<text class="g" x="1140" y="478" text-anchor="end">distributed</text>
+<path class="ln" d="M150,474H1048" marker-end="url(#a)"/>
+<rect class="box" x="60" y="494" width="252" height="54"/>
+<text x="186" y="528" text-anchor="middle" style="font:700 18px Helvetica,Arial,sans-serif;fill:#000">Hyperscaler</text>
+<rect class="box" x="336" y="494" width="252" height="54"/>
+<text x="462" y="528" text-anchor="middle" style="font:700 18px Helvetica,Arial,sans-serif;fill:#000">Neocloud</text>
+<rect class="box" x="612" y="494" width="252" height="54"/>
+<text x="738" y="528" text-anchor="middle" style="font:700 18px Helvetica,Arial,sans-serif;fill:#000">Edge network</text>
+<rect class="goal" x="888" y="494" width="252" height="54"/>
+<text x="1014" y="528" text-anchor="middle" style="font:700 18px Helvetica,Arial,sans-serif;fill:#000">Device</text>
+<text x="60" y="600" style="font:400 18px Helvetica,Arial,sans-serif;fill:#767676">crm-sync.dev/docs/hyperscaler-vs-distributed</text>
+<text x="1140" y="600" text-anchor="end" style="font:700 18px Helvetica,Arial,sans-serif;fill:#000">CRM Sync</text>
+</svg>
