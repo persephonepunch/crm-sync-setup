@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, and how Shopify Functions already run Wasm as a security boundary inside checkout. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -27,6 +27,8 @@ keywords:
   - AI weighting
   - retrieval ranking
   - context assembly before tokenization
+  - Shopify Functions WebAssembly
+  - Wasm sandbox security
 ---
 # Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
 
@@ -100,6 +102,23 @@ A WebAssembly bundle moves work from every run to a single build:
 4. **Predictable runtime.** Rust compiled to Wasm has no garbage collector and no JIT warm-up, so a frame or a request costs the same the first time as the hundredth.
 
 The limits: Wasm reaches the DOM and the GPU only through JavaScript bindings (WebGPU for the GPU, which is how wgpu runs in a browser), a large bundle can cost more to download than it saves at runtime, and Workers cap bundle size. Measure the bundle like a frame: if it doesn't fit, it isn't done.
+
+### Shopify Functions: Wasm as a checkout security boundary
+
+Shopify already runs this model in production, inside cart and checkout. A Shopify Function is a WebAssembly module that Shopify runs for discount, delivery, payment and validation logic, in place of the Ruby Scripts that came before it. The format is what makes it safe to run third-party code on the path where money changes hands:
+
+| Wasm property | What Shopify enforces | Security benefit |
+|---|---|---|
+| **No ambient access** | The module reads its input only through imported API functions and returns operations. No filesystem; no network, except a fetch target limited to custom apps on Enterprise stores, where Shopify makes the HTTP call on the function's behalf | The code has no outbound path of its own, so it can't send cart or customer data anywhere, and a prompt or payload injected into the cart has nowhere to go |
+| **Declared input** | An input query names the fields the function receives | Data minimisation by schema: a field not in the query never reaches the code. This is the gate's redaction, done by Shopify |
+| **Deterministic** | No randomness and no clock | The same input gives the same output, so a decision can be replayed for audit, and there is no timing channel to probe |
+| **Hard budget** | 256 kB binary, 10,000 kB linear memory, 512 kB stack, and for carts up to 200 lines, 11 million instructions, 128 kB input and 20 kB output | A runaway or hostile module is stopped by an instruction count, not a timeout, so one bad function can't stall checkout for everyone |
+| **No URL** | Shopify Functions are never invoked directly by URL | There is no public endpoint to scan, authenticate or rate-limit |
+| **Server-side** | The module runs on Shopify, not in the browser | A price computed in the browser can be edited in the browser; a price computed in a Function can't |
+
+This is bind before you allocate, at checkout scale: Shopify sizes the sandbox, the function reads only the fields it declared, decides, and hands back operations for Shopify to apply. Nothing is allocated to it beyond the budget, and nothing leaves it.
+
+The limits: Wasm isolates the function, it doesn't make the function correct; a wrong discount rule is applied to every cart, so test it like any other release. Shopify strongly recommends Rust, because a JavaScript Function carries a JavaScript engine inside its module and spends the instruction budget faster, which is how large carts fail. Custom apps that use the Function APIs need Shopify Plus. See [October 1: script tags, Functions, the cart](https://www.crm-sync.dev/pages/knowledge-base#shopify-october-1-scripts-cart-catalog) for the migration and the language choice.
 
 ## The strategy: bind before you allocate
 
@@ -368,6 +387,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Rung 4 (BYOC or dedicated GPUs) is reached only by a written contract, regulatory or cost requirement.
 - [ ] Untrusted files (SVG, SWF, images) are parsed by memory-safe renderers, or by C renderers isolated in a locked-down pod.
 - [ ] Wasm bundles have a size budget, measured on each build, like a frame budget.
+- [ ] Checkout logic (prices, discounts, delivery, payment, validation) runs as a Shopify Function, in Rust, with an input query that names only the fields it needs and an instruction count measured against the largest cart you sell to.
 - [ ] Media originals live in a private bucket, and only signed, expiring URLs leave it; no media travels as base64.
 - [ ] EXIF location and device fields are stripped before any image leaves the system of record.
 - [ ] ImageMagick runs with a restrictive `policy.xml`, in a pod with no route to the rest of the system.
@@ -405,5 +425,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Adobe, [Flash Player end of life](https://www.adobe.com/products/flashplayer/end-of-life.html), 31 December 2020; [Ruffle](https://ruffle.rs/), a Flash Player emulator written in Rust.
 - [librsvg](https://gitlab.gnome.org/GNOME/librsvg), the GNOME SVG library, now written in Rust; [resvg](https://github.com/linebender/resvg), an SVG renderer in Rust.
 - NVIDIA, [Corporate timeline](https://www.nvidia.com/en-us/about-nvidia/corporate-timeline/); Krizhevsky, Sutskever and Hinton, [ImageNet classification with deep convolutional neural networks](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), NeurIPS 2012 (trained on two GTX 580 GPUs).
+- Shopify, [Function APIs: limitations and resource limits](https://shopify.dev/docs/api/functions): binary, memory, instruction, input and output limits; no randomness or clock; fetch limited to custom apps on Enterprise stores.
+- Shopify, [About Shopify Functions](https://shopify.dev/docs/apps/build/functions) and [WebAssembly for Functions](https://shopify.dev/docs/apps/build/functions/programming-languages/webassembly-for-functions): never invoked by URL; input read through imported API functions; Rust strongly recommended.
 - MDN, [WebAssembly.compileStreaming()](https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static): compiling while the module downloads.
 - CNCF, [From data residency to digital sovereignty](https://cncf.io/blog/2026/06/16/from-data-residency-to-digital-sovereignty-architectural-patterns-for-cloud-native-platforms): a shared Kubernetes control plane still centralizes administrative authority.
