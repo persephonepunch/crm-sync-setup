@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 744" role="img" aria-labelledby="t d">
+<title id="t">From product.csv to consented conversions: challenge, solution, benefit</title>
+<desc id="d">Four rows. Source: a product.csv snapshot goes stale; Shopify webhooks keep a live PIM record; feeds match the store. Feeds: the Google Content API and Amazon XML feeds are retired; the Merchant API v1 and JSON_LISTINGS_FEED replace them; feeds keep flowing. Joins: ERP, CRM and PIM matched by spreadsheet row; one shared key, shopify_variant_id plus market; clear ownership, with only the CRM holding people data. Consent: unconsented conversions are dropped; consent is attached to every event through Consent Mode v2 and Amazon ACS or TCF vendor 793; conversions count.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="744" fill="#fff"/>
+<text class="h" x="60" y="52">FROM PRODUCT.CSV TO CONSENTED CONVERSIONS — CHALLENGE, SOLUTION, BENEFIT</text>
+<text class="g" x="60" y="76">each row reads left to right; the consent row is the goal, the other three make sure the data reaching it is current and joined</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = a gap in the old data layer. Heavy box = the outcome.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="130">CHALLENGE · OLD DATA LAYER</text>
+<text class="sec" x="590" y="130">SOLUTION · CONNECTED PIM</text>
+<text class="sec" x="1120" y="130">BENEFIT</text>
+<text class="lt" x="60" y="156">1 · Source</text>
+<rect class="gap" x="60" y="168" width="420" height="96"/>
+<text class="bt" x="76" y="196">Snapshot data layer</text>
+<text class="b" x="76" y="220">product.csv goes stale between</text>
+<text class="b" x="76" y="240">imports; prices and titles drift</text>
+<rect class="box" x="590" y="168" width="420" height="96"/>
+<text class="bt" x="606" y="196">Live record of truth</text>
+<text class="b" x="606" y="220">Shopify webhooks update the PIM</text>
+<text class="b" x="606" y="240">record as each change happens</text>
+<rect class="box" x="1120" y="168" width="420" height="96"/>
+<text class="bt" x="1136" y="196">Feeds match the store</text>
+<text class="b" x="1136" y="220">No re-import to fix a price</text>
+<text class="b" x="1136" y="240">or a title</text>
+<path class="ln" d="M480,216.0L588,216.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,216.0L1118,216.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="296">2 · Feeds</text>
+<rect class="gap" x="60" y="308" width="420" height="96"/>
+<text class="bt" x="76" y="336">Retired feed channels</text>
+<text class="b" x="76" y="360">Google Content API sunset Aug 18, 2026;</text>
+<text class="b" x="76" y="380">Amazon XML and flat-file feeds gone</text>
+<rect class="box" x="590" y="308" width="420" height="96"/>
+<text class="bt" x="606" y="336">Current APIs</text>
+<text class="b" x="606" y="360">Google Merchant API v1 and</text>
+<text class="b" x="606" y="380">Amazon JSON_LISTINGS_FEED</text>
+<rect class="box" x="1120" y="308" width="420" height="96"/>
+<text class="bt" x="1136" y="336">Feeds keep flowing</text>
+<text class="b" x="1136" y="360">No HTTP 410 errors; new spec fields</text>
+<text class="b" x="1136" y="380">such as video_link are carried</text>
+<path class="ln" d="M480,356.0L588,356.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,356.0L1118,356.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="436">3 · Joins</text>
+<rect class="gap" x="60" y="448" width="420" height="96"/>
+<text class="bt" x="76" y="476">Systems joined by hand</text>
+<text class="b" x="76" y="500">ERP, CRM and PIM matched by</text>
+<text class="b" x="76" y="520">spreadsheet row or lookup</text>
+<rect class="box" x="590" y="448" width="420" height="96"/>
+<text class="bt" x="606" y="476">One shared key</text>
+<text class="b" x="606" y="500">shopify_variant_id + market;</text>
+<text class="b" x="606" y="520">PIM never reads CRM data at runtime</text>
+<rect class="box" x="1120" y="448" width="420" height="96"/>
+<text class="bt" x="1136" y="476">Clear ownership</text>
+<text class="b" x="1136" y="500">PIM runs on its own; only the CRM</text>
+<text class="b" x="1136" y="520">holds data about people</text>
+<path class="ln" d="M480,496.0L588,496.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,496.0L1118,496.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="576">4 · Consent</text>
+<rect class="gap" x="60" y="588" width="420" height="96"/>
+<text class="bt" x="76" y="616">Unconsented conversions</text>
+<text class="b" x="76" y="640">Google and Amazon drop events</text>
+<text class="b" x="76" y="660">that carry no consent signal</text>
+<rect class="box" x="590" y="588" width="420" height="96"/>
+<text class="bt" x="606" y="616">Consent on every event</text>
+<text class="b" x="606" y="640">Consent Mode v2, plus Amazon ACS</text>
+<text class="b" x="606" y="660">or a TCF string with vendor 793</text>
+<rect class="goal" x="1120" y="588" width="420" height="96"/>
+<text class="bt" x="1136" y="616">Conversions that count</text>
+<text class="b" x="1136" y="640">UK, EEA and Swiss events are</text>
+<text class="b" x="1136" y="660">used, not discarded</text>
+<path class="ln" d="M480,636.0L588,636.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,636.0L1118,636.0" marker-end="url(#a)"/>
+</svg>

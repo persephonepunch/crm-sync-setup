@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 848" role="img" aria-labelledby="t d">
+<title id="t">The PIM keeps the catalog; the CRM attaches consent to every conversion</title>
+<desc id="d">Before: ERP and Shopify exports are joined by row into product.csv, uploaded by hand or through the retired Content API, while browser tags fire with no consent signal; both reach Google and Amazon. After: Shopify and ERP changes arrive by webhook, keyed by SKU and variant, into PIM Sync, which feeds the Google Merchant API v1 and Amazon JSON listings feed. Separately the shopper&#x27;s consent banner sets Consent Mode v2 and ACS, CRM Sync stores the consent record, and server events carry consent state and a dedupe ID to Google and Amazon. The PIM and CRM paths are joined only offline, by shopify_variant_id and market.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="848" fill="#fff"/>
+<text class="h" x="60" y="52">THE PIM KEEPS THE CATALOG; THE CRM ATTACHES CONSENT TO EVERY CONVERSION</text>
+<text class="g" x="60" y="76">before: one snapshot feeds everything and nothing carries consent · after: two paths, joined only offline by a shared key</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = a gap. Heavy box = the outcome.</text>
+<path class="rule" d="M60,96H1540"/>
+<rect class="band" x="40" y="116" width="1520" height="300"/>
+<text class="sec" x="60" y="148">BEFORE · A PRODUCT.CSV SNAPSHOT</text>
+<rect class="box" x="60" y="172" width="300" height="92"/>
+<text class="bt" x="76" y="200">Exports</text>
+<text class="b" x="76" y="224">ERP and Shopify, by hand</text>
+<text class="b" x="76" y="244">or on a schedule</text>
+<rect class="gap" x="440" y="172" width="300" height="92"/>
+<text class="bt" x="456" y="200">product.csv</text>
+<text class="b" x="456" y="224">joined by row; stale</text>
+<text class="b" x="456" y="244">between imports</text>
+<rect class="gap" x="820" y="172" width="300" height="92"/>
+<text class="bt" x="836" y="200">Manual upload</text>
+<text class="b" x="836" y="224">file upload or the</text>
+<text class="b" x="836" y="244">retired Content API</text>
+<rect class="gap" x="820" y="300" width="300" height="92"/>
+<text class="bt" x="836" y="328">Browser tags</text>
+<text class="b" x="836" y="352">fire with no consent</text>
+<text class="b" x="836" y="372">signal attached</text>
+<rect class="box" x="1200" y="172" width="300" height="220"/>
+<text class="bt" x="1216" y="200">Google and Amazon</text>
+<text class="b" x="1216" y="224">feeds and ads</text>
+<path class="ln" d="M360,218.0L438,218.0" marker-end="url(#a)"/>
+<path class="ln" d="M740,218.0L818,218.0" marker-end="url(#a)"/>
+<path class="ln" d="M1120,218.0L1198,218.0" marker-end="url(#a)"/>
+<path class="ln" d="M1120,346.0L1198,346.0" marker-end="url(#a)"/>
+<rect x="40" y="436" width="1520" height="372" fill="none" stroke="#000" stroke-width=".8" stroke-dasharray="4 4"/>
+<text class="sec" x="60" y="468">AFTER · CONNECTED AND CONSENTED</text>
+<rect class="box" x="60" y="492" width="300" height="112"/>
+<text class="bt" x="76" y="520">Shopify + ERP</text>
+<text class="b" x="76" y="544">webhooks, keyed by SKU</text>
+<text class="b" x="76" y="564">and variant, never by row</text>
+<rect class="box" x="440" y="492" width="300" height="112"/>
+<text class="bt" x="456" y="520">PIM Sync</text>
+<text class="b" x="456" y="544">the product record of truth</text>
+<text class="b" x="456" y="564">(PIM-owned tables only)</text>
+<rect class="box" x="820" y="492" width="300" height="112"/>
+<text class="bt" x="836" y="520">Catalog feeds</text>
+<text class="b" x="836" y="544">Google Merchant API v1</text>
+<text class="b" x="836" y="564">Amazon JSON_LISTINGS_FEED</text>
+<rect class="box" x="60" y="664" width="300" height="112"/>
+<text class="bt" x="76" y="692">Shopper</text>
+<text class="b" x="76" y="716">the consent banner sets</text>
+<text class="b" x="76" y="736">Consent Mode v2 and ACS</text>
+<rect class="box" x="440" y="664" width="300" height="112"/>
+<text class="bt" x="456" y="692">CRM Sync</text>
+<text class="b" x="456" y="716">stores each consent record</text>
+<text class="b" x="456" y="736">(CRM-owned tables only)</text>
+<rect class="goal" x="820" y="664" width="300" height="112"/>
+<text class="bt" x="836" y="692">Consented events</text>
+<text class="b" x="836" y="716">server events carry consent</text>
+<text class="b" x="836" y="736">state and a dedupe ID</text>
+<rect class="box" x="1200" y="492" width="300" height="284"/>
+<text class="bt" x="1216" y="520">Google and Amazon</text>
+<text class="b" x="1216" y="544">feeds, ads, and the</text>
+<text class="b" x="1216" y="564">conversions they can use</text>
+<path class="ln" d="M360,548.0L438,548.0" marker-end="url(#a)"/>
+<path class="ln" d="M360,720.0L438,720.0" marker-end="url(#a)"/>
+<path class="ln" d="M740,548.0L818,548.0" marker-end="url(#a)"/>
+<path class="ln" d="M740,720.0L818,720.0" marker-end="url(#a)"/>
+<path class="ln" d="M1120,548.0L1198,548.0" marker-end="url(#a)"/>
+<path class="ln" d="M1120,720.0L1198,720.0" marker-end="url(#a)"/>
+<path class="dash" d="M590.0,604V664"/>
+<text class="g" x="604.0" y="638.0">join key: shopify_variant_id + market, reconciled offline only</text>
+</svg>
