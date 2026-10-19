@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1100" role="img" aria-labelledby="t d">
+<title id="t">Incremental knowledge vs boil the ocean, and what AI weighting weighs</title>
+<desc id="d">Six comparisons. Boiling the ocean starts from a model trained or tuned on everything; incremental knowledge reads only what is retrieved for the question. Adding knowledge: retrain with GPU hours versus add one row in minutes. Fixing a wrong answer: retrain versus correct or demote the source. Erasure: the fact stays in the weights versus delete the row. Citations: none versus every answer cites its rows and weights. GPU need: up front versus only for cases weighting can&#x27;t settle. AI weighting: score equals authority times freshness times eligibility times relevance, with eligibility zero when consent or rights don&#x27;t allow the use. Illustrative authority tiers: system of record 1.0, reviewed spec 0.8, knowledge base 0.6, inbox and tickets 0.4, open web 0.2. Rank first, fall back last: rank the data; if the top score clears the threshold, a small model answers from the ranked rows and the answer is cited; if not, a larger token model answers with more context, tokens and cost and a higher error risk, and the answer is flagged for the record or a person to confirm.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="1100" fill="#fff"/>
+<text class="h" x="60" y="52">INCREMENTAL KNOWLEDGE VS BOIL THE OCEAN — AND WHAT AI WEIGHTING ACTUALLY WEIGHS</text>
+<text class="g" x="60" y="76">boiling the ocean changes model weights with GPUs; incremental knowledge changes evidence weights with rows, and climbs to a GPU only when it must</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = the costly path. Heavy box = the record, and the answer it can prove.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="280" y="130">BOIL THE OCEAN · GENERAL PURPOSE</text>
+<text class="sec" x="940" y="130">INCREMENTAL KNOWLEDGE</text>
+<text class="lt" x="60" y="176">Starting point</text>
+<rect class="gap" x="280" y="146" width="600" height="48"/><text class="b" x="296" y="176">a model trained or tuned on everything you have</text>
+<rect class="box" x="940" y="146" width="600" height="48"/><text class="b" x="956" y="176">a general model that reads only what is retrieved for this question</text>
+<path class="ln" d="M880,170.0L938,170.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="234">Adding knowledge</text>
+<rect class="gap" x="280" y="204" width="600" height="48"/><text class="b" x="296" y="234">retrain or fine-tune: GPU hours, weeks, a new model version</text>
+<rect class="box" x="940" y="204" width="600" height="48"/><text class="b" x="956" y="234">add one document to the index: one row, minutes, no GPU</text>
+<path class="ln" d="M880,228.0L938,228.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="292">Fixing a wrong answer</text>
+<rect class="gap" x="280" y="262" width="600" height="48"/><text class="b" x="296" y="292">retrain, or prompt around it and hope</text>
+<rect class="box" x="940" y="262" width="600" height="48"/><text class="b" x="956" y="292">correct or demote the source; the next answer changes</text>
+<path class="ln" d="M880,286.0L938,286.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="350">Erasure</text>
+<rect class="gap" x="280" y="320" width="600" height="48"/><text class="b" x="296" y="350">the fact stays in the weights until the next retrain</text>
+<rect class="box" x="940" y="320" width="600" height="48"/><text class="b" x="956" y="350">delete the row; it is gone from the next answer</text>
+<path class="ln" d="M880,344.0L938,344.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="408">Citations and audit</text>
+<rect class="gap" x="280" y="378" width="600" height="48"/><text class="b" x="296" y="408">the model can&#x27;t say where a fact came from</text>
+<rect class="box" x="940" y="378" width="600" height="48"/><text class="b" x="956" y="408">every answer cites the rows it used, with their weights</text>
+<path class="ln" d="M880,402.0L938,402.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="466">GPU need</text>
+<rect class="gap" x="280" y="436" width="600" height="48"/><text class="b" x="296" y="466">up front, before the first answer</text>
+<rect class="box" x="940" y="436" width="600" height="48"/><text class="b" x="956" y="466">only for the cases weighting can&#x27;t settle</text>
+<path class="ln" d="M880,460.0L938,460.0" marker-end="url(#a)"/>
+<rect class="band" x="40" y="508" width="1520" height="246"/>
+<text class="sec" x="60" y="538">AI WEIGHTING · EVIDENCE, NOT PARAMETERS</text>
+<text class="bt" x="60" y="568">score = authority × freshness × eligibility × relevance</text>
+<text class="g" x="560" y="568">eligibility is 0 when consent or rights don&#x27;t allow this use · answer when the top score clears the threshold; otherwise climb one AI rung</text>
+<rect class="goal" x="60" y="592" width="280" height="100"/>
+<text class="bt" x="76" y="620">System of record · 1.0</text>
+<text class="b" x="76" y="644">the Xano record and its ledger;</text>
+<text class="b" x="76" y="664">the truth, when it answers</text>
+<rect class="box" x="360" y="592" width="280" height="100"/>
+<text class="bt" x="376" y="620">Reviewed spec · 0.8</text>
+<text class="b" x="376" y="644">signed-off docs, the book;</text>
+<text class="b" x="376" y="664">true when last reviewed</text>
+<rect class="box" x="660" y="592" width="280" height="100"/>
+<text class="bt" x="676" y="620">Knowledge base · 0.6</text>
+<text class="b" x="676" y="644">articles and FAQs;</text>
+<text class="b" x="676" y="664">useful, may lag the record</text>
+<rect class="box" x="960" y="592" width="280" height="100"/>
+<text class="bt" x="976" y="620">Inbox and tickets · 0.4</text>
+<text class="b" x="976" y="644">what people said;</text>
+<text class="b" x="976" y="664">unverified until joined</text>
+<rect class="box" x="1260" y="592" width="280" height="100"/>
+<text class="bt" x="1276" y="620">Open web · 0.2</text>
+<text class="b" x="1276" y="644">context only;</text>
+<text class="b" x="1276" y="664">never the sole source</text>
+<text class="g" x="60" y="724">authority values are illustrative; freshness decays at a half-life set per tier (a price in hours, a policy in months)</text>
+<text class="sec" x="60" y="814">RANK FIRST, FALL BACK LAST · ERROR RISK GROWS LEFT TO RIGHT AND TOP TO BOTTOM</text>
+<rect class="box" x="60" y="894" width="320" height="96"/>
+<text class="bt" x="76" y="922">1 · Rank the data</text>
+<text class="b" x="76" y="946">score every candidate row;</text>
+<text class="b" x="76" y="966">keep the top few, with weights</text>
+<rect class="box" x="440" y="894" width="300" height="96"/>
+<text class="bt" x="456" y="922">2 · Clears the threshold?</text>
+<text class="b" x="456" y="946">the top score, and enough</text>
+<text class="b" x="456" y="966">agreement between rows</text>
+<rect class="box" x="820" y="834" width="340" height="96"/>
+<text class="bt" x="836" y="862">3a · Answer from ranked rows</text>
+<text class="b" x="836" y="886">a small model phrases what the</text>
+<text class="b" x="836" y="906">rows say; low tokens, low error risk</text>
+<rect class="goal" x="1200" y="834" width="340" height="96"/>
+<text class="bt" x="1216" y="862">Cited answer</text>
+<text class="b" x="1216" y="886">every claim traces to a row;</text>
+<text class="b" x="1216" y="906">fix a row and the answer changes</text>
+<rect class="gap" x="820" y="954" width="340" height="96"/>
+<text class="bt" x="836" y="982">3b · Larger token model</text>
+<text class="b" x="836" y="1006">more context, tokens and cost; fills</text>
+<text class="b" x="836" y="1026">gaps from its own weights: higher risk</text>
+<rect class="box" x="1200" y="954" width="340" height="96"/>
+<text class="bt" x="1216" y="982">Flagged answer</text>
+<text class="b" x="1216" y="1006">marked low confidence; the record</text>
+<text class="b" x="1216" y="1026">or a person confirms before use</text>
+<path class="ln" d="M380,942.0L438,942.0" marker-end="url(#a)"/>
+<path class="ln" d="M740,942.0H780V882.0H818" marker-end="url(#a)"/>
+<path class="ln" d="M780,942.0V1002.0H818" marker-end="url(#a)"/>
+<text class="g" x="788" y="874.0">yes</text>
+<text class="g" x="788" y="994.0">no</text>
+<path class="ln" d="M1160,882.0L1198,882.0" marker-end="url(#a)"/>
+<path class="ln" d="M1160,1002.0L1198,1002.0" marker-end="url(#a)"/>
+</svg>

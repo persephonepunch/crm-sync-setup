@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -22,13 +22,16 @@ keywords:
   - system of record data gating
   - Workers AI binding
   - decision ladder
+  - AI weighting
+  - retrieval ranking
+  - context assembly before tokenization
 ---
 # Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
 
 **For:** teams choosing where logic, data and models run when the front end is Webflow, the edge is Cloudflare and the system of record is Xano.
 **Premise:** you don't pick a hyperscaler *or* an edge network. You pick, for each decision, the lowest rung that can make it correctly.
 **Companions:** [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/ai-ladder-escalation-and-mandates.html) for escalation and mandates; [Why Xano is the runtime as a service](https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html); [Process Management Guide](https://persephonepunch.github.io/crm-sync-setup/process-management.html) for the Webflow, Xano, Cloudflare and Shopify data layer; [Render and Runtime dictionary](https://persephonepunch.github.io/crm-sync-setup/render-runtime-dictionary.html) for terms.
-**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · bind before you allocate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)) · media, 3D render and the GPU ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf)).
+**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · bind before you allocate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf)) · incremental knowledge and AI weighting ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.pdf)) · directional streams ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)) · media, 3D render and the GPU ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf)).
 
 ## Challenge, solution, benefit
 
@@ -109,6 +112,79 @@ The other savings don't show up in the count:
 5. GPU-seconds per remaining request, and the peak-to-average ratio of what reaches the GPU.
 
 If the remaining demand is small and steady, own a few GPU pods. If it is large or bursty, rent. Either way, the decision is made on the 11%, not on the 100%.
+
+## Incremental knowledge vs boil the ocean
+
+There are two ways to make AI know your business. **Boiling the ocean** means putting everything you have into a general-purpose model, by training or fine-tuning it, and hoping the answers come out right. **Incremental knowledge** means leaving the model general and giving it, for each question, only the ranked evidence that question needs. The first changes *model weights* with GPUs. The second changes *evidence weights* with rows, and reaches a GPU only when it must. That makes it the knowledge side of "bind before you allocate".
+
+![Incremental knowledge vs boil the ocean, and what AI weighting weighs. Six comparisons. Starting point: a model trained or tuned on everything, versus a general model that reads only what is retrieved. Adding knowledge: retraining with GPU hours, versus one new row in minutes. Fixing a wrong answer: retraining, versus correcting or demoting the source. Erasure: the fact stays in the weights, versus deleting the row. Citations: none, versus every answer citing its rows and weights. GPU need: up front, versus only for cases weighting can't settle. AI weighting: score equals authority times freshness times eligibility times relevance, with eligibility zero when consent or rights don't allow the use. Illustrative authority tiers: system of record 1.0, reviewed spec 0.8, knowledge base 0.6, inbox and tickets 0.4, open web 0.2. Rank first, fall back last: rank the data; if the top score clears the threshold, a small model answers from the ranked rows and the answer is cited; if not, a larger token model answers with more context, tokens and cost and a higher error risk, and the answer is flagged for the record or a person to confirm.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.svg) (1600 × 1100) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.pdf).*
+
+| | Boil the ocean (general purpose) | Incremental knowledge |
+|---|---|---|
+| Adding a fact | Retrain or fine-tune: GPU hours and a new model version | Add one row to the index: minutes, no GPU |
+| Fixing a wrong answer | Retrain, or prompt around it | Correct or demote the source; the next answer changes |
+| Erasure requests | The fact stays in the weights until the next retrain | Delete the row; it is gone from the next answer |
+| Audit | The model can't say where a fact came from | Every answer cites its rows and their weights |
+| GPU spend | Up front, before the first answer | Only for the cases ranking can't settle |
+
+This knowledge base works the incremental way. A new article is one line in the book's summary, and it is listed and searchable after the next index run. No model is retrained.
+
+Fine-tuning still has a place: tone, output format, and narrow classification tasks a small model must do fast. It is the wrong tool for facts, because facts change, and a fact held in the weights can't be cited, corrected or erased on its own.
+
+### AI weighting: evidence, not parameters
+
+*Weighting* here means how strongly an answer favours a piece of evidence, not a model's parameters. It matches the definition in [AI enabled forms with LLM weighting](https://persephonepunch.github.io/crm-sync-setup/ai-enabled-forms.html): a weight is set by what the corpus can prove, not by the model alone.
+
+```
+score = authority × freshness × eligibility × relevance
+```
+
+| Factor | What it measures | How it is set |
+|---|---|---|
+| Authority | How much the source can be trusted | By tier (illustrative): system of record 1.0, reviewed spec 0.8, knowledge base 0.6, inbox and tickets 0.4, open web 0.2 |
+| Freshness | How recently the source was true | Decays at a half-life set per tier: hours for a price, months for a policy |
+| Eligibility | Whether this use is allowed at all | 1 or 0, from the gate: consent, rights, market. Never a fraction |
+| Relevance | How well the source matches the question | Retrieval similarity, the only factor a model computes |
+
+Because eligibility multiplies, a source that the gate doesn't allow scores zero however relevant it is. The model never sees it, so it can't leak it.
+
+### Rank first, fall back to a larger token model last
+
+1. **Rank the data.** Score every candidate row and keep the top few, with their weights.
+2. **Check the threshold.** The top score must clear it, and the top rows must broadly agree with each other.
+3. **If it clears:** a small model phrases what the rows say. It uses few tokens and has a low error risk, and every claim cites a row. To fix the answer, fix the row.
+4. **If it doesn't:** fall back to a larger token model, with more context, more tokens and a higher cost per answer. It fills the gaps from its own weights, which is exactly where the error risk lives. Its answer is flagged as low confidence, and the record or a person confirms it before anyone acts on it.
+
+The fallback is a deliberate trade, not a failure: you accept a bigger error risk in exchange for an answer, and you label it as such. Count how often it fires. A rising fallback rate means the evidence is missing, not that the model is too small, and the fix is a row, not a GPU.
+
+## Context and data streams: scale by direction, tokenize last
+
+Everything above happens before a model reads a single token. This section names that boundary. Context reaches a model from two streams that run in opposite directions and scale in opposite ways, and both should be finished (typed, gated and ranked) before the person's *intent* is turned into tokens or vectors.
+
+![Context and data streams: scale by direction, tokenize intent last. Outbound: catalog and content from the system of record fan out through the edge cache into typed outbound context with tier, freshness and market. Inbound: events, forms and questions from people and agents fan in through the gate and a queue partitioned per subject and region, into typed inbound context holding one subject's consented state. Both meet in context assembly, which joins by key, ranks by weight, drops ineligible rows and caps the token budget. Only then is the intent, with the assembled context, tokenized or vectorized. Rules: direction sets the scaling; filter while typed; gate before embedding; tokens are the bill.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.svg) (1600 × 660) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.pdf).*
+
+| | Outbound stream | Inbound stream |
+|---|---|---|
+| Carries | What you publish: products, prices, policies, articles | What people and agents send: events, forms, questions, consent |
+| Shape | Fans out: one source, many readers | Fans in: many sources, one record per subject |
+| Scales by | Cache: more readers cost almost nothing at the edge | Partition: per subject and per region (Durable Objects, queues, one Xano instance per jurisdiction) |
+| Arrives as | Claims with tier, freshness and market attached | One subject's consented state, and nothing about anyone else |
+| Fails | Stale: serve the last good copy, marked with its age | Closed: no posture means no context |
+
+**Why direction matters.** Each stream scales in its own way. Scaling the outbound stream means adding cache, not compute. Scaling the inbound stream means adding partitions, not making one database bigger. A design that sends both streams through the same pipe, such as one vector store holding catalog and customer text together, has to scale both the expensive way and loses the boundary between them.
+
+**Why tokenize last.** *Intent* is what the person wants, and it only becomes tokens (for a model to read) or vectors (for a similarity search) at the end. Before that line the context is typed: every field still has a name, a source tier, a market and a consent state, so it can be filtered, joined and capped. After the line it is text and numbers:
+
+- **Fields can't be filtered after they become text.** A model can be told to ignore a field, but it can't be prevented from reading it. Only typed data can be removed.
+- **A vector of personal data is still personal data.** Research has shown that text embeddings can be partly inverted back to the original text. Gate before embedding, and keep each subject's vectors in their home region, never in a shared index.
+- **Tokens are the bill.** Every token past the line is paid for, on every call. Context assembly caps the budget, and the ranking from the previous section decides what fits.
+- **Context assembly is cheap; the model is not.** Joining by key, ranking and dropping ineligible rows run in a Worker on typed data. Doing the same work inside a prompt costs tokens and can't be audited.
+
+Read with the funnel above: the device, gate, cache and triage stages all sit before the tokenization line. "Bind before you allocate" and "tokenize last" are the same rule seen from the cost side and from the data side.
 
 ## The thread, in one picture
 
@@ -252,6 +328,12 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Each GPU job names its rung, and why the device or a CPU pod couldn't do it.
 - [ ] GPU capacity is sized on the measured demand left after the device, gate, cache and triage stages, not on raw request volume.
 - [ ] The gate runs before the cache, so no cached answer skips the posture check.
+- [ ] Facts live in ranked, cited rows, not in fine-tuned weights; fine-tuning is kept for tone, format and narrow classification.
+- [ ] Eligibility is a 0-or-1 factor set by the gate, so a disallowed source can't be retrieved however relevant it is.
+- [ ] Answers from the larger-model fallback are flagged as low confidence and confirmed before use, and the fallback rate is tracked.
+- [ ] Outbound and inbound context run as separate streams: outbound scaled by cache, inbound by partition per subject and region.
+- [ ] Context is typed, gated and ranked before tokenization; no personal field is filtered by prompt instruction alone.
+- [ ] Embeddings of personal data are made only after the gate, and kept in the subject's home region, never in a shared index.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
 ## Sources
@@ -270,4 +352,5 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Cloudflare, [Images](https://developers.cloudflare.com/images/): transformations at the edge.
 - Adobe, [Firefly Services](https://developer.adobe.com/firefly-services/): Photoshop, Lightroom and Firefly APIs.
 - NVIDIA, [GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html): GPU drivers and scheduling on Kubernetes.
+- Morris et al., [Text Embeddings Reveal (Almost) As Much As Text](https://arxiv.org/abs/2310.06816), EMNLP 2023: embeddings can be inverted to recover much of the input text.
 - CNCF, [From data residency to digital sovereignty](https://cncf.io/blog/2026/06/16/from-data-residency-to-digital-sovereignty-architectural-patterns-for-cloud-native-platforms): a shared Kubernetes control plane still centralizes administrative authority.

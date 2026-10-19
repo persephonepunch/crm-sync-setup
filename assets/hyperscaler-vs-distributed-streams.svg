@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 660" role="img" aria-labelledby="t d">
+<title id="t">Context and data streams: scale by direction, tokenize intent last</title>
+<desc id="d">Outbound: catalog and content from the system of record fan out through the edge cache, which scales by cache, into typed outbound context with tier, freshness and market. Inbound: events, forms and questions from people and agents fan in through the gate and a queue partitioned per subject and region, into typed inbound context holding one subject&#x27;s consented state. Both streams meet in context assembly, which joins by key, ranks by weight, drops ineligible rows and caps the token budget. Only then is the intent, with the assembled context, tokenized or vectorized. Rules: direction sets the scaling; filter while typed; gate before embedding; tokens are the bill.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="660" fill="#fff"/>
+<text class="h" x="60" y="52">CONTEXT AND DATA STREAMS — SCALE BY DIRECTION, TOKENIZE INTENT LAST</text>
+<text class="g" x="60" y="76">outbound fans out and scales by cache; inbound fans in and scales by partition; both are typed, gated and ranked before anything becomes tokens or vectors</text>
+<text class="s" x="1540" y="76" text-anchor="end">Dashed line = the tokenization line. Heavy box = where intent becomes tokens.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="136">OUTBOUND · FANS OUT · SCALES BY CACHE</text>
+<rect class="box" x="60" y="152" width="280" height="100"/>
+<text class="bt" x="76" y="180">Catalog and content</text>
+<text class="b" x="76" y="204">products, prices, policies;</text>
+<text class="b" x="76" y="224">the system of record publishes</text>
+<rect class="box" x="380" y="152" width="280" height="100"/>
+<text class="bt" x="396" y="180">Edge cache</text>
+<text class="b" x="396" y="204">one copy per city;</text>
+<text class="b" x="396" y="224">more readers cost almost nothing</text>
+<rect class="box" x="700" y="152" width="280" height="100"/>
+<text class="bt" x="716" y="180">Typed context, outbound</text>
+<text class="b" x="716" y="204">claims with tier, freshness</text>
+<text class="b" x="716" y="224">and market attached</text>
+<text class="sec" x="60" y="316">INBOUND · FANS IN · SCALES BY PARTITION</text>
+<rect class="box" x="60" y="332" width="280" height="100"/>
+<text class="bt" x="76" y="360">People and agents</text>
+<text class="b" x="76" y="384">events, forms, questions;</text>
+<text class="b" x="76" y="404">many sources, one subject each</text>
+<rect class="box" x="380" y="332" width="280" height="100"/>
+<text class="bt" x="396" y="360">Gate and queue</text>
+<text class="b" x="396" y="384">consent, region, eligibility;</text>
+<text class="b" x="396" y="404">partitioned per subject and region</text>
+<rect class="box" x="700" y="332" width="280" height="100"/>
+<text class="bt" x="716" y="360">Typed context, inbound</text>
+<text class="b" x="716" y="384">this subject&#x27;s consented state,</text>
+<text class="b" x="716" y="404">and nothing about anyone else</text>
+<path class="ln" d="M340,202L378,202" marker-end="url(#a)"/>
+<path class="ln" d="M660,202L698,202" marker-end="url(#a)"/>
+<path class="ln" d="M340,382L378,382" marker-end="url(#a)"/>
+<path class="ln" d="M660,382L698,382" marker-end="url(#a)"/>
+<rect class="box" x="1030" y="152" width="240" height="280"/>
+<text class="bt" x="1046" y="180">Context assembly</text>
+<text class="b" x="1046" y="204">join by key;</text>
+<text class="b" x="1046" y="224">rank by weight;</text>
+<text class="b" x="1046" y="244">drop ineligible rows;</text>
+<text class="b" x="1046" y="264">cap the token budget</text>
+<path class="ln" d="M980,202H1005V262H1028" marker-end="url(#a)"/>
+<path class="ln" d="M980,382H1005V322H1028" marker-end="url(#a)"/>
+<rect class="goal" x="1310" y="152" width="230" height="280"/>
+<text class="bt" x="1326" y="180">Tokenize or vectorize</text>
+<text class="b" x="1326" y="204">only now does the</text>
+<text class="b" x="1326" y="224">intent, with the</text>
+<text class="b" x="1326" y="244">assembled context,</text>
+<text class="b" x="1326" y="264">become tokens or</text>
+<text class="b" x="1326" y="284">vectors</text>
+<path class="ln" d="M1270,292L1308,292" marker-end="url(#a)"/>
+<path class="dash" d="M1290,120V460"/>
+<text class="g" x="1290" y="480" text-anchor="middle">the tokenization line</text>
+<text class="sec" x="60" y="492">BEFORE THE LINE: TYPED, FILTERABLE, CHEAP · AFTER IT: TEXT AND VECTORS, PAID PER TOKEN</text>
+<rect class="box" x="60" y="512" width="345" height="100"/>
+<text class="bt" x="76" y="540">Direction sets the scaling</text>
+<text class="b" x="76" y="564">outbound: add cache, not compute;</text>
+<text class="b" x="76" y="584">inbound: add partitions, not size</text>
+<rect class="box" x="435" y="512" width="345" height="100"/>
+<text class="bt" x="451" y="540">Filter while typed</text>
+<text class="b" x="451" y="564">fields, consent and market can be</text>
+<text class="b" x="451" y="584">filtered only before they are text</text>
+<rect class="box" x="810" y="512" width="345" height="100"/>
+<text class="bt" x="826" y="540">Gate before embedding</text>
+<text class="b" x="826" y="564">a vector of personal data is still</text>
+<text class="b" x="826" y="584">personal data, and can leak</text>
+<rect class="box" x="1185" y="512" width="345" height="100"/>
+<text class="bt" x="1201" y="540">Tokens are the bill</text>
+<text class="b" x="1201" y="564">every token past the line is paid</text>
+<text class="b" x="1201" y="584">for; assemble less, not more</text>
+</svg>
