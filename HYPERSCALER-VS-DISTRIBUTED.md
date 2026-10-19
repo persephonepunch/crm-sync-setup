@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -33,7 +33,7 @@ keywords:
 **For:** teams choosing where logic, data and models run when the front end is Webflow, the edge is Cloudflare and the system of record is Xano.
 **Premise:** you don't pick a hyperscaler *or* an edge network. You pick, for each decision, the lowest rung that can make it correctly.
 **Companions:** [The AI ladder](https://persephonepunch.github.io/crm-sync-setup/ai-ladder-escalation-and-mandates.html) for escalation and mandates; [Why Xano is the runtime as a service](https://persephonepunch.github.io/crm-sync-setup/why-xano-runtime-as-a-service.html); [Process Management Guide](https://persephonepunch.github.io/crm-sync-setup/process-management.html) for the Webflow, Xano, Cloudflare and Shopify data layer; [Render and Runtime dictionary](https://persephonepunch.github.io/crm-sync-setup/render-runtime-dictionary.html) for terms.
-**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · bind before you allocate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf)) · incremental knowledge and AI weighting ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.pdf)) · directional streams ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)) · media, 3D render and the GPU ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf)).
+**Download:** diagrams as image or PDF: challenge, solution, benefit ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-csb.pdf)) · the frame-budget origin ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.pdf)) · bind before you allocate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-funnel.pdf)) · incremental knowledge and AI weighting ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-weighting.pdf)) · directional streams ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-streams.pdf)) · the thread ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-thread.pdf)) · the two ladders ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.pdf)) · the system-of-record gate ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-gate.pdf)) · media, 3D render and the GPU ([image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.jpg), [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-media.pdf)).
 
 ## Challenge, solution, benefit
 
@@ -57,6 +57,49 @@ Read each row left to right. Rows 1 and 2 decide **who may run and what it may t
 - **Maturity.** rust-gpu calls itself early-stage and not yet production-ready. Shader languages that already compile to SPIR-V are the safer route today.
 - **Browsers take WGSL, not SPIR-V.** WebGPU in a browser accepts only WGSL, so SPIR-V has to be translated first (wgpu's naga translator does this).
 - **The edge has no GPU for your code.** Cloudflare Workers run Rust as WebAssembly on CPUs. Workers AI runs Cloudflare's model catalogue on its GPUs, but you can't upload your own kernels to it. GPU bytecode belongs on the device, a server or a rented cluster, not inside a Worker.
+
+## The frame-budget origin
+
+The GPU started out rationed. NVIDIA was founded in 1993 to make 3D graphics for games, and a game engine has a fixed budget, about 16.6 ms per frame at 60 frames per second, on whatever GPU the player happens to own. It can't buy more GPU, so it removes everything it doesn't need before it shades a single pixel. Data-center AI dropped that discipline, reserving GPUs by contract before demand was known. "Bind before you allocate" brings it back.
+
+![The frame-budget origin. Two paired pipelines. Game engine, on a 16.6 ms frame budget: frame budget, culling, level of detail, streaming and mipmaps, batching, the player's GPU, and a render farm only for cinematics and lightmaps. Bind before you allocate, on a GPU and token budget: GPU budget, the gate, rank then fall back, edge cache, queues, device first, and a rented GPU cluster only for what is left. Renderers: Flash Player in C++ is replaced by Ruffle in Rust compiled to Wasm; SVG renderers in C by librsvg in Rust and resvg; ImageMagick in C by Rust image decoders that can run as Wasm at the edge; a native renderer isolated in a cluster pod becomes a safe renderer moved to the device or edge. Compile once, render cheap: Rust source is optimized at build into a compact Wasm bundle, compiled while it downloads, and run without JIT warm-up or GC pauses, with WebGPU for the GPU part. Timeline: 1993 NVIDIA founded for 3D games; 1999 GeForce 256 sold as the first GPU; 2006 to 2007 CUDA; 2012 AlexNet trained on two gaming cards; late 2010s mining GPUs turn into GPU clouds; 2020s GPUs reserved by contract.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.svg) (1600 × 1186) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-frame.pdf).*
+
+| Game engine, under a frame budget | Bind before you allocate, under a GPU budget |
+|---|---|
+| **Frame budget**: 16.6 ms is fixed, and the work fits the budget | **GPU and token budget**: context assembly caps what reaches a model |
+| **Culling**: off-screen or hidden objects are never drawn | **The gate**: ineligible or unconsented data is never sent |
+| **Level of detail**: distant objects get simpler meshes | **Rank, then fall back**: a small model first, a larger token model only below the threshold |
+| **Streaming and mipmaps**: reuse loaded textures at the size needed | **Edge cache**: reuse answers and transforms, after the gate |
+| **Batching**: group draw calls so the GPU isn't interrupted | **Queues and task runners**: group jobs per subject and region |
+| **The player's GPU** renders the frame | **Device first**: previews and real-time 3D stay on the person's device |
+| **Render farm**: only cinematics and lightmaps that can't be real-time | **Rented GPU cluster**: only what is left after the funnel |
+
+**How the GPU left the player's desk.** NVIDIA sold the GeForce 256 in 1999 as the first "GPU". CUDA (2006–07) opened the same parallel hardware to any workload. AlexNet, the 2012 network that started modern deep learning, was trained on two gaming cards. GPUs bought for crypto mining later became the stock of the first GPU clouds. Each step moved the GPU further from the person who owned it and closer to a balance sheet that has to borrow to buy it.
+
+### The renderers: C and C++ parsers, and what Rust fixes
+
+The renderers that sit next to the GPU have their own history, and most of it was written in C and C++. Those languages leave memory management to the programmer, so a crafted file can overflow a buffer and run code. Microsoft and the Chromium project have each reported that about 70% of their serious security bugs are memory-safety bugs.
+
+| C or C++ renderer | What went wrong | Rust replacement | What changes |
+|---|---|---|---|
+| **Flash Player** (C++) | A browser plugin that parsed untrusted SWF files, with years of exploits; Adobe ended it on 31 December 2020 | **Ruffle**, a Flash emulator in Rust compiled to WebAssembly | The same SWF files play inside the browser's sandbox, with memory safety |
+| **SVG renderers** in C | librsvg began in C; a crafted SVG could reach memory bugs in the parser | **librsvg**, rewritten in Rust, and **resvg** | Memory-safety bugs are designed out of the parser and renderer |
+| **ImageMagick** (C) | Hundreds of format coders; ImageTragick in 2016 | Rust image decoders | Memory-safe decoding that can run as Wasm inside a Worker |
+
+This is an allocation point, not only a security one. A C renderer that parses untrusted files has to be isolated: a locked-down pod in a cluster, far from the data and paid for separately. A memory-safe renderer can run on the device or at the edge, next to the data. Safety moves the render to the left of the spectrum, which is where "bind before you allocate" wants it. Rust removes memory-safety bugs; it doesn't remove logic bugs, and code marked `unsafe` still needs review. See [SVG, Rust and Elm: the security gaps](https://persephonepunch.github.io/crm-sync-setup/svg-rust-elm-security-gaps.html) for the wider picture.
+
+### Compile once, render cheap: the Wasm bundle
+
+A WebAssembly bundle moves work from every run to a single build:
+
+1. **Optimized at build.** A release build with link-time optimization, then `wasm-opt`, is paid for once, by the developer, not on every page load or request.
+2. **A size budget, like a frame budget.** The bundle is downloaded before it runs, so it gets a budget. Split it, and load what isn't needed on first render later.
+3. **Streamed compile.** Browsers compile WebAssembly while it is still downloading, and decoding it is faster than parsing the equivalent JavaScript.
+4. **Predictable runtime.** Rust compiled to Wasm has no garbage collector and no JIT warm-up, so a frame or a request costs the same the first time as the hundredth.
+
+The limits: Wasm reaches the DOM and the GPU only through JavaScript bindings (WebGPU for the GPU, which is how wgpu runs in a browser), a large bundle can cost more to download than it saves at runtime, and Workers cap bundle size. Measure the bundle like a frame: if it doesn't fit, it isn't done.
 
 ## The strategy: bind before you allocate
 
@@ -323,6 +366,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Models reach records only through tools that pass the gate, never through a direct connection.
 - [ ] For every "edge" in a vendor diagram, you know whose network it runs on and under which data-processing terms.
 - [ ] Rung 4 (BYOC or dedicated GPUs) is reached only by a written contract, regulatory or cost requirement.
+- [ ] Untrusted files (SVG, SWF, images) are parsed by memory-safe renderers, or by C renderers isolated in a locked-down pod.
+- [ ] Wasm bundles have a size budget, measured on each build, like a frame budget.
 - [ ] Media originals live in a private bucket, and only signed, expiring URLs leave it; no media travels as base64.
 - [ ] EXIF location and device fields are stripped before any image leaves the system of record.
 - [ ] ImageMagick runs with a restrictive `policy.xml`, in a pod with no route to the rest of the system.
@@ -355,4 +400,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Adobe, [Firefly Services](https://developer.adobe.com/firefly-services/): Photoshop, Lightroom and Firefly APIs.
 - NVIDIA, [GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html): GPU drivers and scheduling on Kubernetes.
 - Morris et al., [Text Embeddings Reveal (Almost) As Much As Text](https://arxiv.org/abs/2310.06816), EMNLP 2023: embeddings can be inverted to recover much of the input text.
+- Microsoft Security Response Center, [A proactive approach to more secure code](https://msrc.microsoft.com/blog/2019/07/a-proactive-approach-to-more-secure-code/): about 70% of Microsoft's security bugs are memory-safety issues.
+- Chromium, [Memory safety](https://www.chromium.org/Home/chromium-security/memory-safety/): about 70% of serious Chromium security bugs are memory-safety problems.
+- Adobe, [Flash Player end of life](https://www.adobe.com/products/flashplayer/end-of-life.html), 31 December 2020; [Ruffle](https://ruffle.rs/), a Flash Player emulator written in Rust.
+- [librsvg](https://gitlab.gnome.org/GNOME/librsvg), the GNOME SVG library, now written in Rust; [resvg](https://github.com/linebender/resvg), an SVG renderer in Rust.
+- NVIDIA, [Corporate timeline](https://www.nvidia.com/en-us/about-nvidia/corporate-timeline/); Krizhevsky, Sutskever and Hinton, [ImageNet classification with deep convolutional neural networks](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), NeurIPS 2012 (trained on two GTX 580 GPUs).
+- MDN, [WebAssembly.compileStreaming()](https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static): compiling while the module downloads.
 - CNCF, [From data residency to digital sovereignty](https://cncf.io/blog/2026/06/16/from-data-residency-to-digital-sovereignty-architectural-patterns-for-cloud-native-platforms): a shared Kubernetes control plane still centralizes administrative authority.

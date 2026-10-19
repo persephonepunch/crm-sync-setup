@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 1186" role="img" aria-labelledby="t d">
+<title id="t">The frame-budget origin: game engines already bind before they allocate</title>
+<desc id="d">Two paired pipelines. Game engine, on a 16.6 ms frame budget: frame budget, culling, level of detail, streaming and mipmaps, batching, the player&#x27;s GPU, and a render farm only for cinematics and lightmaps. Bind before you allocate, on a GPU and token budget: GPU budget, the gate, rank then fall back, edge cache, queues, device first, and a rented GPU cluster only for what is left. Shared ideas: fix the budget first; don&#x27;t draw what isn&#x27;t seen or send what isn&#x27;t allowed; less detail where it matters less; reuse what&#x27;s loaded; group the work; use the GPU already there; rent only the remainder. Renderers: Flash Player in C++ is replaced by Ruffle in Rust compiled to Wasm; SVG renderers in C by librsvg in Rust and resvg; ImageMagick in C by Rust image decoders that can run as Wasm at the edge; a native renderer isolated in a cluster pod becomes a safe renderer moved to the device or edge, near the data. Compile once, render cheap: Rust source is optimized at build with LTO and wasm-opt into a compact bundle with a size budget, compiled while it downloads, and runs with no JIT warm-up or GC pauses, using WebGPU for the GPU part. Timeline: 1993 NVIDIA founded for 3D games; 1999 GeForce 256 sold as the first GPU; 2006 to 2007 CUDA opens the GPU to any workload; 2012 AlexNet trained on two gaming cards; late 2010s mining GPUs turn into GPU clouds; 2020s GPUs reserved by contract, centrally.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="1186" fill="#fff"/>
+<text class="h" x="60" y="52">THE FRAME-BUDGET ORIGIN — GAME ENGINES ALREADY BIND BEFORE THEY ALLOCATE</text>
+<text class="g" x="60" y="76">the GPU was born rationed: a game spends it only on what the player can see; AI allocation by contract dropped that discipline, this article restores it</text>
+<text class="s" x="1540" y="76" text-anchor="end">Columns pair by role. Red dashed = a C or C++ renderer. Heavy box = where the work ends up.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="130">GAME ENGINE · A 16.6 MS FRAME BUDGET ON THE PLAYER&#x27;S GPU</text>
+<rect class="box" x="60" y="146" width="196" height="126"/>
+<text class="bt" x="76" y="174">Frame budget</text>
+<text class="b" x="76" y="198">16.6 ms at 60 fps;</text>
+<text class="b" x="76" y="218">the work fits the</text>
+<text class="b" x="76" y="238">budget, not reverse</text>
+<rect class="box" x="274" y="146" width="196" height="126"/>
+<text class="bt" x="290" y="174">Culling</text>
+<text class="b" x="290" y="198">off-screen or hidden</text>
+<text class="b" x="290" y="218">objects are never</text>
+<text class="b" x="290" y="238">drawn</text>
+<path class="ln" d="M256,209L272,209" marker-end="url(#a)"/>
+<rect class="box" x="488" y="146" width="196" height="126"/>
+<text class="bt" x="504" y="174">Level of detail</text>
+<text class="b" x="504" y="198">distant objects get</text>
+<text class="b" x="504" y="218">simpler meshes</text>
+<path class="ln" d="M470,209L486,209" marker-end="url(#a)"/>
+<rect class="box" x="702" y="146" width="196" height="126"/>
+<text class="bt" x="718" y="174">Streaming, mipmaps</text>
+<text class="b" x="718" y="198">reuse loaded textures</text>
+<text class="b" x="718" y="218">at the size needed</text>
+<path class="ln" d="M684,209L700,209" marker-end="url(#a)"/>
+<rect class="box" x="916" y="146" width="196" height="126"/>
+<text class="bt" x="932" y="174">Batching</text>
+<text class="b" x="932" y="198">group draw calls so</text>
+<text class="b" x="932" y="218">the GPU isn&#x27;t</text>
+<text class="b" x="932" y="238">interrupted</text>
+<path class="ln" d="M898,209L914,209" marker-end="url(#a)"/>
+<rect class="box" x="1130" y="146" width="196" height="126"/>
+<text class="bt" x="1146" y="174">Player&#x27;s GPU</text>
+<text class="b" x="1146" y="198">the frame renders on</text>
+<text class="b" x="1146" y="218">hardware the player</text>
+<text class="b" x="1146" y="238">already owns</text>
+<path class="ln" d="M1112,209L1128,209" marker-end="url(#a)"/>
+<rect class="box" x="1344" y="146" width="196" height="126"/>
+<text class="bt" x="1360" y="174">Render farm</text>
+<text class="b" x="1360" y="198">only cinematics and</text>
+<text class="b" x="1360" y="218">lightmaps that can&#x27;t</text>
+<text class="b" x="1360" y="238">be real-time</text>
+<path class="ln" d="M1326,209L1342,209" marker-end="url(#a)"/>
+<path class="dash" d="M158.0,272V294M158.0,346V368"/>
+<text class="g" x="158.0" y="314" text-anchor="middle">fix the budget first</text>
+<path class="dash" d="M372.0,272V294M372.0,346V368"/>
+<text class="g" x="372.0" y="314" text-anchor="middle">don&#x27;t draw what isn&#x27;t seen</text>
+<text class="g" x="372.0" y="332" text-anchor="middle">or send what isn&#x27;t allowed</text>
+<path class="dash" d="M586.0,272V294M586.0,346V368"/>
+<text class="g" x="586.0" y="314" text-anchor="middle">less detail where it</text>
+<text class="g" x="586.0" y="332" text-anchor="middle">matters less</text>
+<path class="dash" d="M800.0,272V294M800.0,346V368"/>
+<text class="g" x="800.0" y="314" text-anchor="middle">reuse what&#x27;s loaded</text>
+<path class="dash" d="M1014.0,272V294M1014.0,346V368"/>
+<text class="g" x="1014.0" y="314" text-anchor="middle">group the work</text>
+<path class="dash" d="M1228.0,272V294M1228.0,346V368"/>
+<text class="g" x="1228.0" y="314" text-anchor="middle">use the GPU already there</text>
+<path class="dash" d="M1442.0,272V294M1442.0,346V368"/>
+<text class="g" x="1442.0" y="314" text-anchor="middle">rent only the remainder</text>
+<text class="sec" x="60" y="404">BIND BEFORE YOU ALLOCATE · A GPU AND TOKEN BUDGET</text>
+<rect class="box" x="60" y="420" width="196" height="126"/>
+<text class="bt" x="76" y="448">GPU budget</text>
+<text class="b" x="76" y="472">context assembly caps</text>
+<text class="b" x="76" y="492">what reaches a model</text>
+<rect class="box" x="274" y="420" width="196" height="126"/>
+<text class="bt" x="290" y="448">The gate</text>
+<text class="b" x="290" y="472">ineligible or</text>
+<text class="b" x="290" y="492">unconsented data is</text>
+<text class="b" x="290" y="512">never sent</text>
+<path class="ln" d="M256,483L272,483" marker-end="url(#a)"/>
+<rect class="box" x="488" y="420" width="196" height="126"/>
+<text class="bt" x="504" y="448">Rank, fall back</text>
+<text class="b" x="504" y="472">small model first;</text>
+<text class="b" x="504" y="492">larger token model</text>
+<text class="b" x="504" y="512">below the threshold</text>
+<path class="ln" d="M470,483L486,483" marker-end="url(#a)"/>
+<rect class="box" x="702" y="420" width="196" height="126"/>
+<text class="bt" x="718" y="448">Edge cache</text>
+<text class="b" x="718" y="472">reuse answers and</text>
+<text class="b" x="718" y="492">transforms, after</text>
+<text class="b" x="718" y="512">the gate</text>
+<path class="ln" d="M684,483L700,483" marker-end="url(#a)"/>
+<rect class="box" x="916" y="420" width="196" height="126"/>
+<text class="bt" x="932" y="448">Queues</text>
+<text class="b" x="932" y="472">group jobs per</text>
+<text class="b" x="932" y="492">subject and region</text>
+<path class="ln" d="M898,483L914,483" marker-end="url(#a)"/>
+<rect class="box" x="1130" y="420" width="196" height="126"/>
+<text class="bt" x="1146" y="448">Device first</text>
+<text class="b" x="1146" y="472">previews and 3D stay</text>
+<text class="b" x="1146" y="492">on the person&#x27;s</text>
+<text class="b" x="1146" y="512">device</text>
+<path class="ln" d="M1112,483L1128,483" marker-end="url(#a)"/>
+<rect class="goal" x="1344" y="420" width="196" height="126"/>
+<text class="bt" x="1360" y="448">Rented GPU cluster</text>
+<text class="b" x="1360" y="472">only what is left</text>
+<text class="b" x="1360" y="492">after the funnel</text>
+<path class="ln" d="M1326,483L1342,483" marker-end="url(#a)"/>
+<text class="sec" x="60" y="600">THE RENDERERS · C AND C++ PARSERS ON THE LEFT, THEIR RUST REPLACEMENTS ON THE RIGHT</text>
+<rect class="gap" x="60" y="618" width="345" height="96"/>
+<text class="bt" x="76" y="646">Flash Player (C++)</text>
+<text class="b" x="76" y="670">a browser plugin parsing untrusted SWF;</text>
+<text class="b" x="76" y="690">years of exploits; ended in 2020</text>
+<path class="ln" d="M405,666L443,666" marker-end="url(#a)"/>
+<rect class="box" x="445" y="618" width="345" height="96"/>
+<text class="bt" x="461" y="646">Ruffle (Rust to Wasm)</text>
+<text class="b" x="461" y="670">plays the same SWF files inside the</text>
+<text class="b" x="461" y="690">browser sandbox, memory-safe</text>
+<rect class="gap" x="810" y="618" width="345" height="96"/>
+<text class="bt" x="826" y="646">SVG renderers in C</text>
+<text class="b" x="826" y="670">librsvg began in C; a crafted file</text>
+<text class="b" x="826" y="690">can overflow a parser&#x27;s buffer</text>
+<path class="ln" d="M1155,666L1193,666" marker-end="url(#a)"/>
+<rect class="box" x="1195" y="618" width="345" height="96"/>
+<text class="bt" x="1211" y="646">librsvg in Rust, resvg</text>
+<text class="b" x="1211" y="670">parser and renderer rewritten in Rust;</text>
+<text class="b" x="1211" y="690">memory-safety bugs designed out</text>
+<rect class="gap" x="60" y="730" width="345" height="96"/>
+<text class="bt" x="76" y="758">ImageMagick (C)</text>
+<text class="b" x="76" y="782">hundreds of coders; ImageTragick in</text>
+<text class="b" x="76" y="802">2016; needs a locked-down pod</text>
+<path class="ln" d="M405,778L443,778" marker-end="url(#a)"/>
+<rect class="box" x="445" y="730" width="345" height="96"/>
+<text class="bt" x="461" y="758">Rust image decoders</text>
+<text class="b" x="461" y="782">memory-safe decoding that can run</text>
+<text class="b" x="461" y="802">as Wasm in a Worker, at the edge</text>
+<rect class="gap" x="810" y="730" width="345" height="96"/>
+<text class="bt" x="826" y="758">Native renderer, isolated</text>
+<text class="b" x="826" y="782">C code is sandboxed in a cluster pod,</text>
+<text class="b" x="826" y="802">far from the data, paid for apart</text>
+<path class="ln" d="M1155,778L1193,778" marker-end="url(#a)"/>
+<rect class="goal" x="1195" y="730" width="345" height="96"/>
+<text class="bt" x="1211" y="758">Safe renderer, moved left</text>
+<text class="b" x="1211" y="782">memory safety lets the render run on</text>
+<text class="b" x="1211" y="802">the device or edge, near the data</text>
+<text class="sec" x="60" y="882">COMPILE ONCE, RENDER CHEAP · THE WASM BUNDLE MOVES WORK FROM EVERY RUN TO ONE BUILD</text>
+<rect class="box" x="60" y="900" width="280" height="96"/>
+<text class="bt" x="76" y="928">Rust source</text>
+<text class="b" x="76" y="952">renderer, decoder or game</text>
+<text class="b" x="76" y="972">logic, memory-safe</text>
+<rect class="box" x="360" y="900" width="280" height="96"/>
+<text class="bt" x="376" y="928">Optimized at build</text>
+<text class="b" x="376" y="952">release build, LTO, wasm-opt;</text>
+<text class="b" x="376" y="972">paid once, by the developer</text>
+<path class="ln" d="M340,948L358,948" marker-end="url(#a)"/>
+<rect class="box" x="660" y="900" width="280" height="96"/>
+<text class="bt" x="676" y="928">Compact bundle</text>
+<text class="b" x="676" y="952">a size budget like a frame</text>
+<text class="b" x="676" y="972">budget; split and lazy-load</text>
+<path class="ln" d="M640,948L658,948" marker-end="url(#a)"/>
+<rect class="box" x="960" y="900" width="280" height="96"/>
+<text class="bt" x="976" y="928">Streamed compile</text>
+<text class="b" x="976" y="952">compiled while it downloads;</text>
+<text class="b" x="976" y="972">decoded faster than JS parses</text>
+<path class="ln" d="M940,948L958,948" marker-end="url(#a)"/>
+<rect class="box" x="1260" y="900" width="280" height="96"/>
+<text class="bt" x="1276" y="928">Predictable runtime</text>
+<text class="b" x="1276" y="952">no JIT warm-up, no GC pauses;</text>
+<text class="b" x="1276" y="972">WebGPU for the GPU part</text>
+<path class="ln" d="M1240,948L1258,948" marker-end="url(#a)"/>
+<text class="sec" x="60" y="1046">FROM THE PLAYER&#x27;S DESK TO THE DATA CENTER</text>
+<path class="ln" d="M60,1076H1520" marker-end="url(#a)"/>
+<path class="rule" d="M60,1068V1084"/>
+<text class="lt" x="60" y="1108">1993</text>
+<text class="b" x="60" y="1128">NVIDIA founded</text>
+<text class="g" x="60" y="1146">for 3D games</text>
+<path class="rule" d="M328,1068V1084"/>
+<text class="lt" x="328" y="1108">1999</text>
+<text class="b" x="328" y="1128">GeForce 256,</text>
+<text class="g" x="328" y="1146">sold as the first GPU</text>
+<path class="rule" d="M596,1068V1084"/>
+<text class="lt" x="596" y="1108">2006–07</text>
+<text class="b" x="596" y="1128">CUDA opens the GPU</text>
+<text class="g" x="596" y="1146">to any workload</text>
+<path class="rule" d="M864,1068V1084"/>
+<text class="lt" x="864" y="1108">2012</text>
+<text class="b" x="864" y="1128">AlexNet trained on</text>
+<text class="g" x="864" y="1146">two gaming cards</text>
+<path class="rule" d="M1132,1068V1084"/>
+<text class="lt" x="1132" y="1108">late 2010s</text>
+<text class="b" x="1132" y="1128">mining GPUs turn</text>
+<text class="g" x="1132" y="1146">into GPU clouds</text>
+<path class="rule" d="M1400,1068V1084"/>
+<text class="lt" x="1400" y="1108">2020s</text>
+<text class="b" x="1400" y="1128">GPUs reserved by</text>
+<text class="g" x="1400" y="1146">contract, centrally</text>
+</svg>
