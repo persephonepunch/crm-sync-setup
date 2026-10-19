@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, and how Shopify Functions already run Wasm as a security boundary inside checkout. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -29,6 +29,8 @@ keywords:
   - context assembly before tokenization
   - Shopify Functions WebAssembly
   - Wasm sandbox security
+  - Rust Wasm Webflow Xano
+  - Workers Builds Rust
 ---
 # Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
 
@@ -119,6 +121,58 @@ Shopify already runs this model in production, inside cart and checkout. A Shopi
 This is bind before you allocate, at checkout scale: Shopify sizes the sandbox, the function reads only the fields it declared, decides, and hands back operations for Shopify to apply. Nothing is allocated to it beyond the budget, and nothing leaves it.
 
 The limits: Wasm isolates the function, it doesn't make the function correct; a wrong discount rule is applied to every cart, so test it like any other release. Shopify strongly recommends Rust, because a JavaScript Function carries a JavaScript engine inside its module and spends the instruction budget faster, which is how large carts fail. Custom apps that use the Function APIs need Shopify Plus. See [October 1: script tags, Functions, the cart](https://www.crm-sync.dev/pages/knowledge-base#shopify-october-1-scripts-cart-catalog) for the migration and the language choice.
+
+### The Rust path: a Webflow page, a Cloudflare compile, a Xano record
+
+Ruffle keeps old SWF files playable. New interactive work doesn't need the SWF format or an emulator: write it in Rust, compile it to Wasm once, and nest it in the stack this article already uses. Each system keeps one job, and none of them takes on another's:
+
+| Layer | Its job | What it holds | What it never does |
+|---|---|---|---|
+| **Webflow** | The page | Layout, CMS copy, a `<canvas>` and one module script tag; or a Webflow Cloud app mounted at a path such as `my-site.webflow.io/my-app` | Compile code, hold the binary, or hold personal data |
+| **Cloudflare** | The compile, the serve and the gate | Workers Builds turns a git push into a `.wasm` bundle; Workers static assets serve it; the gate Worker signs R2 URLs and checks posture | Hold the truth |
+| **Xano** | The record | Sign-in, entitlements, consent, saved state, signed media URLs | Run the Wasm, or parse an untrusted file |
+| **The device** | The render | The compiled module, run with WebGPU and a WebGL2 fallback | Send anything the gate didn't allow |
+
+**The compile happens once, on Cloudflare.** Rust isn't preinstalled in the Workers Builds image, so the build command installs it. Trunk then fetches `wasm-bindgen` and `wasm-opt` itself, and the size check makes the frame budget a build failure rather than a guideline:
+
+```bash
+# Workers Builds › build command
+curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --target wasm32-unknown-unknown
+. "$HOME/.cargo/env"
+cargo install --locked trunk          # compiles from source: cache it, or fetch the release binary
+trunk build --release --dist dist     # with filehash = false in Trunk.toml, so the Webflow tag never changes
+find dist -name '*.wasm' -size +3M | grep -q . && { echo "wasm over budget"; exit 1; } || true
+```
+
+```jsonc
+// wrangler.jsonc — the deploy command stays `npx wrangler deploy`
+{ "name": "rust-app", "compatibility_date": "2026-10-19", "assets": { "directory": "./dist" } }
+```
+
+Wrangler sets each file's `Content-Type` from its extension, so `.wasm` is served as `application/wasm`, and the default `ETag` revalidation means a new build is picked up without renaming the file.
+
+**The page only loads it.** In a Webflow custom code embed:
+
+```html
+<canvas id="app"></canvas>
+<script type="module">
+  import init from "https://app.example.com/rust-app.js";
+  init();
+</script>
+```
+
+Module scripts and streamed Wasm are fetched with CORS, so a Worker on a subdomain needs a `_headers` file in `dist` that sends `Access-Control-Allow-Origin` for the Webflow domain, and `www` and the bare domain count as different origins. A Webflow Cloud app at a mount path avoids that: it runs on the Workers runtime under the site's own domain. If the site sets a Content Security Policy, `script-src` needs `'wasm-unsafe-eval'`.
+
+**Xano is reached through the gate.** The module calls the gate Worker with `fetch`, the gate checks posture and forwards to Xano, and Xano answers with data and signed, expiring R2 URLs. Results go back the same way. Xano never sees the binary, and the device never sees a field the gate removed.
+
+What the path buys, against the rest of this article:
+
+- **Memory safety where the file is parsed.** The parser is Rust, inside the browser's sandbox. There is no plugin, and no C renderer to isolate in a pod.
+- **The device stage of the funnel.** Rendering on the person's GPU is the first 30% the illustrative funnel removes before anything reaches the edge, let alone a GPU cluster.
+- **Cost paid at build, not per request.** Optimization, `wasm-opt` and the size check run once per push, in Workers Builds.
+- **A system of record that only decides.** Xano holds the truth and grants access; it doesn't execute or parse anything the person supplied.
+
+The limits: Wasm reaches the page and the GPU only through JavaScript bindings; a bundle over budget costs more to download than it saves; and Rust removes memory-safety bugs, not logic bugs. Keep Ruffle for the SWF files you already have, with the same hosting rules (`application/wasm`, `'wasm-unsafe-eval'`, CORS on the file's origin).
 
 ## The strategy: bind before you allocate
 
@@ -387,6 +441,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Rung 4 (BYOC or dedicated GPUs) is reached only by a written contract, regulatory or cost requirement.
 - [ ] Untrusted files (SVG, SWF, images) are parsed by memory-safe renderers, or by C renderers isolated in a locked-down pod.
 - [ ] Wasm bundles have a size budget, measured on each build, like a frame budget.
+- [ ] New interactive work is Rust compiled to Wasm by Workers Builds and loaded by the Webflow page; Ruffle plays only existing SWF files; Xano parses neither.
 - [ ] Checkout logic (prices, discounts, delivery, payment, validation) runs as a Shopify Function, in Rust, with an input query that names only the fields it needs and an instruction count measured against the largest cart you sell to.
 - [ ] Media originals live in a private bucket, and only signed, expiring URLs leave it; no media travels as base64.
 - [ ] EXIF location and device fields are stripped before any image leaves the system of record.
@@ -427,5 +482,9 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - NVIDIA, [Corporate timeline](https://www.nvidia.com/en-us/about-nvidia/corporate-timeline/); Krizhevsky, Sutskever and Hinton, [ImageNet classification with deep convolutional neural networks](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), NeurIPS 2012 (trained on two GTX 580 GPUs).
 - Shopify, [Function APIs: limitations and resource limits](https://shopify.dev/docs/api/functions): binary, memory, instruction, input and output limits; no randomness or clock; fetch limited to custom apps on Enterprise stores.
 - Shopify, [About Shopify Functions](https://shopify.dev/docs/apps/build/functions) and [WebAssembly for Functions](https://shopify.dev/docs/apps/build/functions/programming-languages/webassembly-for-functions): never invoked by URL; input read through imported API functions; Rust strongly recommended.
+- Cloudflare, [Workers Builds build image](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/) (Ubuntu 24.04; Rust is not among the preinstalled tools) and [Static assets headers](https://developers.cloudflare.com/workers/static-assets/headers/) (`Content-Type` from the file extension; `ETag` revalidation).
+- Webflow, [Webflow Cloud](https://developers.webflow.com/webflow-cloud/intro): apps deploy from GitHub and are served at a path on the site's domain, on the Workers runtime.
+- [Trunk](https://trunkrs.dev/): builds Rust to Wasm for the browser, fetching `wasm-bindgen` and `wasm-opt`.
+- Ruffle, [Using Ruffle](https://github.com/ruffle-rs/ruffle/wiki/Using-Ruffle): self-hosting, `application/wasm`, `'wasm-unsafe-eval'`, CORS and network options.
 - MDN, [WebAssembly.compileStreaming()](https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static): compiling while the module downloads.
 - CNCF, [From data residency to digital sovereignty](https://cncf.io/blog/2026/06/16/from-data-residency-to-digital-sovereignty-architectural-patterns-for-cloud-native-platforms): a shared Kubernetes control plane still centralizes administrative authority.
