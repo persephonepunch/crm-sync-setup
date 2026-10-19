@@ -26,6 +26,7 @@ keywords:
 **For:** teams whose catalog still reaches Google and Amazon as an exported spreadsheet.
 **Premise:** the spreadsheet isn't wrong, it's late. Everything below replaces the lateness, not the catalog.
 **Companions:** [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) for why a record matters; [AI Trust Framework Requirements](https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-requirements.html) for the REST layer; [Global compliance harness checklist](https://crm-sync.dev/docs/global-compliance-harness-checklist) for the wider release gate.
+**Download:** [`CONSENTED-DATA-LAYER-TEST-HARNESS.md`](https://crm-sync.dev/docs/raw?f=CONSENTED-DATA-LAYER-TEST-HARNESS.md&download=1), the eighteen-test harness · diagrams as [image](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.jpg) or [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.pdf) (challenge, solution, benefit) and [image](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.jpg) or [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.pdf) (before and after).
 
 ## The gap, in one sentence
 
@@ -49,7 +50,7 @@ None of these is a ban on spreadsheets. Each one moves a decision from the file 
 
 ![From product.csv to consented conversions, in four rows. Source: a product.csv snapshot goes stale between imports; Shopify webhooks keep a live PIM record; feeds match the store. Feeds: the Google Content API and Amazon XML feeds are retired; the Merchant API v1 and JSON_LISTINGS_FEED replace them; feeds keep flowing. Joins: ERP, CRM and PIM are matched by spreadsheet row; one shared key, shopify_variant_id plus market, replaces the row; ownership is clear and only the CRM holds people data. Consent: Google and Amazon drop conversions with no signal; Consent Mode v2 and Amazon ACS or TCF vendor 793 travel with every event; UK, EEA and Swiss conversions count.](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.svg)
 
-*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.svg) (1600 × 744).*
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.svg) (1600 × 744) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-csb.pdf).*
 
 Read each row left to right. The consent row is the goal. The other three make sure the data that reaches it is current, joined by key and owned by one system.
 
@@ -62,7 +63,7 @@ Read each row left to right. The consent row is the goal. The other three make s
 
 ![Before and after. Before: ERP and Shopify exports are joined by row into product.csv, uploaded by hand or through the retired Content API, while browser tags fire with no consent signal; both reach Google and Amazon. After: Shopify and ERP changes arrive by webhook, keyed by SKU and variant, into PIM Sync, which feeds the Google Merchant API v1 and the Amazon JSON listings feed. Separately the shopper's consent banner sets Consent Mode v2 and ACS, CRM Sync stores the consent record, and server events carry consent state and a dedupe ID to Google and Amazon. The PIM and CRM paths are joined only offline, by shopify_variant_id and market.](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.svg)
 
-*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.svg) (1600 × 848).*
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.svg) (1600 × 848) · [Download the image](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.jpg) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/consented-data-layer-architecture.pdf).*
 
 The catalog and consent take separate paths, and that separation is the design, not a gap.
 
