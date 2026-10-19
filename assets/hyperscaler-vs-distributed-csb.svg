@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 744" role="img" aria-labelledby="t d">
+<title id="t">Task runners, data bindings and two kinds of GPU: challenge, solution, benefit</title>
+<desc id="d">Four rows. Task runner: jobs with no owner become one runner per path (Worker cron and queues at the edge, Xano tasks for the record) so every job is accountable. Data binding: code that can reach anything becomes bindings declared in config, so the config is the access list. GPU as a place: scarce GPUs are rented as clusters from CoreWeave or Oracle OCI, giving training at scale while data leaves your boundary. GPU as code: vendor-tied GPU code becomes Rust compiled to SPIR-V and run through wgpu on any GPU, or to PTX for NVIDIA, so compute goes to the data.</desc>
+<defs><style>
+ .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
+ .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
+ .bt{font:700 15px Helvetica,Arial,sans-serif;fill:#000}
+ .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
+ .b{font:13px Helvetica,Arial,sans-serif;fill:#000}
+ .g{font:12px Helvetica,Arial,sans-serif;fill:#767676}
+ .s{font:11px Helvetica,Arial,sans-serif;fill:#767676}
+ .box{fill:#fff;stroke:#000;stroke-width:1.5}
+ .goal{fill:#fff;stroke:#000;stroke-width:3}
+ .gap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .band{fill:#f4f4f4;stroke:none}
+ .rule{stroke:#000;stroke-width:.8;fill:none}
+ .ln{stroke:#767676;stroke-width:1.2;fill:none}
+ .dash{stroke:#767676;stroke-width:1.2;fill:none;stroke-dasharray:4 4}
+ .ah{fill:#767676}
+</style>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
+</defs>
+<rect width="1600" height="744" fill="#fff"/>
+<text class="h" x="60" y="52">TASK RUNNERS, DATA BINDINGS AND TWO KINDS OF GPU — CHALLENGE, SOLUTION, BENEFIT</text>
+<text class="g" x="60" y="76">rows 1 and 2 decide who may run and what it may touch; rows 3 and 4 decide whether data goes to the GPU or the GPU code goes to the data</text>
+<text class="s" x="1540" y="76" text-anchor="end">Red dashed = the challenge. Heavy box = the outcome this article builds toward.</text>
+<path class="rule" d="M60,96H1540"/>
+<text class="sec" x="60" y="130">CHALLENGE</text>
+<text class="sec" x="590" y="130">SOLUTION</text>
+<text class="sec" x="1120" y="130">BENEFIT</text>
+<text class="lt" x="60" y="156">1 · Task runner</text>
+<rect class="gap" x="60" y="168" width="420" height="96"/>
+<text class="bt" x="76" y="196">Jobs with no owner</text>
+<text class="b" x="76" y="220">crons, webhooks and queue consumers</text>
+<text class="b" x="76" y="240">spread across tools; retries collide</text>
+<rect class="box" x="590" y="168" width="420" height="96"/>
+<text class="bt" x="606" y="196">One runner per path</text>
+<text class="b" x="606" y="220">Worker cron and queues at the edge;</text>
+<text class="b" x="606" y="240">Xano tasks for the record; idempotency keys</text>
+<rect class="box" x="1120" y="168" width="420" height="96"/>
+<text class="bt" x="1136" y="196">Every job is accountable</text>
+<text class="b" x="1136" y="220">an owner, a retry policy and a log</text>
+<text class="b" x="1136" y="240">for each job</text>
+<path class="ln" d="M480,216.0L588,216.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,216.0L1118,216.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="296">2 · Data binding</text>
+<rect class="gap" x="60" y="308" width="420" height="96"/>
+<text class="bt" x="76" y="336">Code that can reach anything</text>
+<text class="b" x="76" y="360">credentials and URLs in code, so any</text>
+<text class="b" x="76" y="380">function can read any store</text>
+<rect class="box" x="590" y="308" width="420" height="96"/>
+<text class="bt" x="606" y="336">Bindings declared in config</text>
+<text class="b" x="606" y="360">env.KV, env.DB, env.AI and one Xano</text>
+<text class="b" x="606" y="380">endpoint; nothing else is reachable</text>
+<rect class="box" x="1120" y="308" width="420" height="96"/>
+<text class="bt" x="1136" y="336">The config is the access list</text>
+<text class="b" x="1136" y="360">an audit reads one file,</text>
+<text class="b" x="1136" y="380">not the whole codebase</text>
+<path class="ln" d="M480,356.0L588,356.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,356.0L1118,356.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="436">3 · GPU as a place</text>
+<rect class="gap" x="60" y="448" width="420" height="96"/>
+<text class="bt" x="76" y="476">GPUs are scarce and heavy</text>
+<text class="b" x="76" y="500">owning them means capacity planning</text>
+<text class="b" x="76" y="520">and long commitments</text>
+<rect class="box" x="590" y="448" width="420" height="96"/>
+<text class="bt" x="606" y="476">Rent a cluster</text>
+<text class="b" x="606" y="500">CoreWeave (neocloud) or Oracle OCI</text>
+<text class="b" x="606" y="520">(hyperscaler); data travels to the GPU</text>
+<rect class="box" x="1120" y="448" width="420" height="96"/>
+<text class="bt" x="1136" y="476">Training at scale</text>
+<text class="b" x="1136" y="500">big models trained and served, but the</text>
+<text class="b" x="1136" y="520">data leaves your boundary to get there</text>
+<path class="ln" d="M480,496.0L588,496.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,496.0L1118,496.0" marker-end="url(#a)"/>
+<text class="lt" x="60" y="576">4 · GPU as code</text>
+<rect class="gap" x="60" y="588" width="420" height="96"/>
+<text class="bt" x="76" y="616">GPU code tied to one vendor</text>
+<text class="b" x="76" y="640">kernels written for one toolchain</text>
+<text class="b" x="76" y="660">and one data center</text>
+<rect class="box" x="590" y="588" width="420" height="96"/>
+<text class="bt" x="606" y="616">Rust compiled to GPU bytecode</text>
+<text class="b" x="606" y="640">SPIR-V (rust-gpu) through wgpu on any GPU,</text>
+<text class="b" x="606" y="660">or PTX (Rust CUDA) on NVIDIA only</text>
+<rect class="goal" x="1120" y="588" width="420" height="96"/>
+<text class="bt" x="1136" y="616">Compute goes to the data</text>
+<text class="b" x="1136" y="640">one source runs on a device, a server</text>
+<text class="b" x="1136" y="660">or a cluster; data can stay put</text>
+<path class="ln" d="M480,636.0L588,636.0" marker-end="url(#a)"/>
+<path class="ln" d="M1010,636.0L1118,636.0" marker-end="url(#a)"/>
+</svg>
