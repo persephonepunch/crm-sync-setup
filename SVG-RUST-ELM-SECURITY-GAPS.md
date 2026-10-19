@@ -1,9 +1,9 @@
 ---
 title: "SVG, Rust and Elm: the security gaps illustration"
-description: "One diagram that follows a single SVG file from source to base64 to the browser, through an Elm client, TLS, Cloudflare, Xano and a Rust service, two TLS pipelines, JVM, iPaaS and Wasm stacks, and VM, Docker and Kubernetes isolation — with 31 numbered gaps and their fixes, a second illustration of browser, machine and agent callers, the assumptions that break as a system adds commerce, goes global and becomes AI-legible, and a list of known foot guns."
+description: "One diagram that follows a single SVG file from source to base64 to the browser, through an Elm client, TLS, Cloudflare, Xano and a Rust service, two TLS pipelines, JVM, iPaaS and Wasm stacks, and VM, Docker and Kubernetes isolation — with 31 numbered gaps and their fixes, a second illustration of browser, machine and agent callers, the assumptions that break as a system adds commerce, goes global and becomes AI-legible, how Rust keeps an SVG renderer memory-safe and what it still leaves to limits, how to make an SVG tell a model what it shows a person, and a list of known foot guns."
 canonical: https://persephonepunch.github.io/crm-sync-setup/svg-rust-elm-security-gaps.html
 category: "Security"
-date: 2026-10-13
+date: 2026-10-19
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SVG-RUST-ELM-SECURITY-GAPS.md
 licence: CC-BY-4.0
 ogImage: https://persephonepunch.github.io/crm-sync-setup/og/svg-rust-elm-security-gaps.png
@@ -39,6 +39,11 @@ keywords:
   - PCI DSS
   - PHI
   - prompt injection
+  - librsvg
+  - resvg
+  - usvg
+  - visible text extraction
+  - hidden text in SVG
   - excessive agency
   - MCP token passthrough
   - AP2 mandate
@@ -132,6 +137,26 @@ An SVG is XML. Besides shapes it can carry `<script>`, `onload=` handlers, `<for
 
 Treat an exported chart as the data it shows. An SVG of patient results is PHI, wherever it is cached or shared — the same point [What Survives the Transform](https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html) makes about XMP inside media files.
 
+### Read by a model: what the eye sees and what the model reads
+
+An SVG is text, which is why a crawler or a language model can read one without a vision model guessing at pixels. The `<title>` and `<desc>` inside each diagram on this site tell the whole story in words for that reason. The same property is the risk: **what a model reads and what a person sees can be two different messages.** Text a reviewer never sees still reaches the model:
+
+| Hidden from the eye | How |
+| --- | --- |
+| Invisible text | `fill` the same as the background, `opacity="0"`, or a font a fraction of a pixel high |
+| Text off the canvas | Placed outside the `viewBox`, or inside a `<clipPath>` or `<mask>` that hides it |
+| Text that is never drawn | Inside `<defs>`, `<symbol>` or `<metadata>`, with no `<use>` that renders it |
+| A description that disagrees | A `<title>` or `<desc>` that claims what the picture doesn't show |
+
+Each one is a ready-made prompt injection: an instruction the person approving the file can't see and the agent reading it can. The fix is to give the model only what the eye gets:
+
+1. **Normalize before reading.** Parse with [usvg](https://docs.rs/usvg/latest/usvg/), the Rust parser behind resvg. It resolves CSS, expands `<use>`, and drops scripts and unknown elements into one simple tree. Check that tree, not the raw markup.
+2. **Extract only visible text.** Keep text that sits inside the canvas, isn't clipped or masked away, has real opacity and size, and contrasts with what is behind it.
+3. **Compare the words with the picture.** When `<title>` or `<desc>` says something the visible text doesn't, flag the file instead of passing it on.
+4. **Hand it over as data.** The extracted text goes to the model inside a marked, untrusted document block, never next to its instructions — typed, gated and ranked before it is tokenized, as [Hyperscaler vs Distributed](https://www.crm-sync.dev/pages/knowledge-base#hyperscaler-vs-distributed) puts it. [OWASP](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) lists this indirect route under LLM01, prompt injection.
+
+The goal is one message: **the file tells a person and a model the same thing.**
+
 ## Rust: ownership as access control
 
 Rust appears three times in the diagram. Each idea maps to a chapter of [The Rust Book](https://doc.rust-lang.org/book/):
@@ -187,6 +212,26 @@ Three consequences for security:
 - **AI writes more code than people review.** Generated C and C++ repeat the classic memory bugs at volume. In a memory-safe language, the compiler is the reviewer that never gets tired.
 
 **Is a garbage collector like Redis or a cache?** Only in that both decide when something is removed. A garbage collector reclaims memory **inside one process**, and only what nothing refers to any more, so it never removes something in use. A cache such as Redis or Workers KV is **a separate store of copies**, shared across processes, that removes entries by policy (expiry, least recently used) even if someone will ask for them again. Neither one erases securely: memory freed by a garbage collector keeps its bytes until it is reused, and an expired cache entry may survive in snapshots and replicas. A cache is also one more copy of the data — sessions and PII in a cache need [the same access controls](https://redis.io/docs/latest/operate/oss_and_stack/management/security/) as the database (gaps 6 and 11).
+
+### Parsing an untrusted SVG: what the compiler catches, and what it doesn't
+
+An uploaded SVG is a stranger's instructions, and every number in it can be a trap: a width of four billion, a path that claims more points than it holds, a reference to an element that doesn't exist, groups nested a hundred thousand deep. A C renderer depends on the programmer to check each one; miss one and memory gets written past its end. [librsvg](https://gitlab.gnome.org/GNOME/librsvg), the SVG library used by GNOME, ImageMagick, libvips and Wikipedia's thumbnails, began in C and was rewritten in Rust for this reason; [resvg](https://github.com/linebender/resvg) was written in Rust from the start. The Rust compiler turns each check into a rule:
+
+| What Rust enforces | The SVG trap it stops |
+| --- | --- |
+| **Bounds checks:** indexing is checked, and a bad index stops the program instead of reading past the end | A path whose point count is larger than its data |
+| **Ownership:** each value has one owner and is freed exactly once | An element freed while a `<use>` still points at it (use-after-free) |
+| **Borrowing:** many readers or one writer, never both | Style or gradient data changed while the renderer reads it |
+| **No null:** a reference that may be missing is an `Option`, and the code must handle `None` | `href="#doesnotexist"` crashing the parser |
+| **Checked arithmetic:** `checked_mul` turns overflow into an error to handle | `width × height × 4` wrapping to a small number, a buffer too small, and a write past its end |
+
+Most of this is decided before the program runs: code that could break memory does not compile, so that class of bug never ships.
+
+What the compiler does not catch:
+
+- **Exhaustion.** A billion copies of one element through nested `<use>`, a 100,000-pixel canvas, a filter chain that never finishes. All memory-safe; all able to stop a server. Set explicit limits on depth, element count, canvas size and reference loops, with a timeout around the render, whatever the language.
+- **SVG working as designed.** `<script>`, `onload=` and `<foreignObject>` are dangerous because they run, not because memory breaks. They are stripped by a sanitizer (gap 3), not by a compiler.
+- **Code under the parser.** `unsafe` blocks, and the C font, image and compression libraries a renderer may link to.
 
 ## Elm: no hidden side effects
 
@@ -693,6 +738,8 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 | Workers KV as the idempotency store | [Eventually consistent](https://developers.cloudflare.com/kv/concepts/how-kv-works/): two retries both see "not seen yet" (gap 21) | A Durable Object or a database unique constraint |
 | `#[derive(Debug, Serialize)]` on a struct holding PII | PII prints in logs and ships in JSON | A `Pii<T>` wrapper with a redacting `Debug` and no `Serialize` |
 | `unsafe` in a file parser "for speed" | One malformed upload corrupts memory | Safe Rust; measure before reaching for `unsafe` |
+| Rendering an uploaded SVG with no size, depth or time limit | Memory-safe code still exhausts the server | Caps on canvas size, nesting, element count and render time |
+| Passing an SVG's raw markup to a model | Hidden text the reviewer never saw becomes an instruction | Normalize, extract only visible text, hand it over as untrusted data |
 | An Elm port that sends the whole model to JavaScript | Every field crosses into code Elm can't protect | Ports that carry only the fields the JS needs |
 | Consent Mode with defaults left at `granted` | Tags collect before the visitor chooses (B4) | Default `denied`; update after the choice |
 | An agent tool that fetches any URL it is given | Prompt injection turns it into an exfiltration channel (A5) | An allowlisted fetch, or no fetch tool at all |
@@ -709,5 +756,6 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 - [GUIs when you still ship JavaScript](https://persephonepunch.github.io/crm-sync-setup/gui-options-js-to-machine-code.html) — Webflow, Elm, Javy, Tauri and Rust down to machine code
 - [Dark Factory Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html) — one architecture, two trust models
 - [Where Your Code Runs Is a Business Decision](https://persephonepunch.github.io/crm-sync-setup/where-code-runs.html) — VMs, containers and isolates
+- [Hyperscaler vs Distributed](https://www.crm-sync.dev/pages/knowledge-base#hyperscaler-vs-distributed) — C and C++ renderers, their Rust replacements, and why a safe renderer can move to the device
 - [What Survives the Transform](https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html) — metadata, re-encodes and where media should live
 - Also published on the game11ty reference site: [SVG/Rust/Elm: The Security Gaps Illustration](https://persephonepunch.github.io/game11ty/svg-rust-elm/) and [Machine Code/Rust/WASM, SVG/Native, Server/Client](https://persephonepunch.github.io/game11ty/machine-code-rust-wasm/)
