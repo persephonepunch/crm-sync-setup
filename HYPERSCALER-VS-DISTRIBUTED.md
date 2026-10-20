@@ -985,6 +985,53 @@ The same claims and extras rules apply to each:
 - **The bus carries thin events.** Subscribe with `include_fields` so the payload holds IDs and timestamps, not addresses, and use `filter` to drop deliveries you don't need. The consumer fetches the rest through the gate. A full payload on a retained bus is an escape: a copy of personal data with no row gate and no owner.
 - **Treat every event as possibly late or repeated.** Shopify doesn't guarantee order or single delivery. Ignore duplicates by `X-Shopify-Webhook-Id`, order by `X-Shopify-Triggered-At` or `updated_at`, and run a periodic reconciliation, because some deliveries are missed.
 
+### Wait for consent, key every action: agents and customer service
+
+Consent, events and agent permissions all arrive asynchronously, and an agent or a chatbot acts in milliseconds. Two requirements keep the speed from outrunning the permission: **wait for a confirmed consent posture**, and **give every action an idempotency key**. They apply to agentic answer-engine matching (an AI agent matching a shopper's question to the catalog), to agents that act, and equally to chatbot and customer service data collection.
+
+**Wait for consent: Consent Mode v2.** Google's Consent Mode v2 sets four signals: `ad_storage`, `analytics_storage`, `ad_user_data` and `ad_personalization`. The page sets them to denied by default, before any tag loads, and `wait_for_update` holds the tags for a set time while the consent banner, OneTrust or Shopify's Customer Privacy API resolves:
+
+```js
+gtag("consent", "default", {
+  ad_storage: "denied", analytics_storage: "denied",
+  ad_user_data: "denied", ad_personalization: "denied",
+  wait_for_update: 500, // milliseconds to wait for the banner before tags run as denied
+});
+```
+
+The same wait belongs at the gate. Until a person's posture is confirmed, signed and recorded in the ledger, the Worker treats it as denied, never as granted-until-told-otherwise:
+
+| Posture | Answer-engine match | Personalized match or ads | Chatbot and customer service | Agent actions |
+|---|---|---|---|---|
+| **Pending** | Yes: public catalog data needs no personal consent | No | Answer from public content; collect nothing beyond the question | Nothing that changes a record |
+| **Denied** | Yes | No | Collect only what the request needs (an order number to answer "where is my order"), under the contract, not consent; no marketing extras | Only transactional actions the person asked for |
+| **Granted, signed** | Yes | Yes, within the purposes and region granted | Collect profile extras for the purposes granted, with a retention date | Within the mandate, each with an idempotency key |
+
+**Key every action.** Agents retry, networks drop, and webhooks arrive twice. An action without a key can run twice: two refunds, two customers, two tickets. The caller generates one key per intended action and sends it as an `Idempotency-Key` header, the convention Stripe's API uses. The Worker runs the action once per key and returns the stored result to any repeat; a repeat with the same key but a different body is refused. Keys live in a Durable Object or Xano, not KV, because two copies of the same request must get one answer.
+
+```js
+const key = request.headers.get("Idempotency-Key");
+if (!key) return new Response("Idempotency-Key required", { status: 400 });
+const id = env.ACTIONS.idFromName(`${subject}:${key}`); // one Durable Object per subject and key
+return env.ACTIONS.get(id).fetch(request); // runs once; a repeat gets the stored result
+```
+
+**TLS confirms the channel, not the permission.** TLS proves the connection is encrypted and that the server is who it claims to be. It says nothing about whether the person consented, or whether the agent on the other end may act. Three separate confirmations are needed:
+
+- **The agent's identity:** a signed request, using HTTP Message Signatures (the basis of Cloudflare's Web Bot Auth for verified agents), or mutual TLS with a client certificate the gate recognizes.
+- **The person's consent:** the signed posture, bound to the ledger head, so the gate can prove which consent state allowed the call.
+- **The agent's authority:** a mandate for this task, with its own cap and expiry, never the person's sign-in.
+
+The agent's request carries all three, plus the idempotency key. The gate checks each and fails closed if any is missing or stale.
+
+**Customer service collects the most and is gated the least.** A chat transcript gathers names, emails, addresses and order details in free text, often before anyone has looked at consent. The same rules apply:
+
+- **Notice before collection.** Show what the chat collects and why before the first message, and record the posture the chat started under.
+- **Verify before revealing.** Order details come back only after the person's claims match the order's owner through the row gate, not because someone typed an order number.
+- **Separate the purposes.** Support rests on the contract; marketing rests on consent. A transcript collected for support doesn't feed a marketing segment or a training set unless consent covers it.
+- **Give the transcript an owner and an end date.** It is heap data: personal, free-text and long-lived. Redact identifiers that support no longer needs, route it to the subject's home region, and include it in data-request and redaction handling.
+- **Key the actions the bot takes.** A refund, a return or a ticket created from a chat carries an idempotency key like any other agent action.
+
 ### OneTrust is a session log for one domain
 
 A consent banner such as OneTrust works like a hosted key-value session log: it records what this browser chose on this site, in the `OptanonConsent` cookie and, with consent logging turned on, in OneTrust's cloud. That suits one website. It doesn't stretch across many:
@@ -1248,6 +1295,9 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Gate thresholds (allowed fields, policy age, bundle budget) are Rust tests that run on save through a watcher and always before the compile in the build, so a failure stops the deploy.
 - [ ] Shared in-memory values (`Arc`, `Rc`, module-level caches) hold only versioned data no person owns; claims, extras, status and entitlements are read per request through the row gate.
 - [ ] Functions declare the fewest input fields; flows refer to extras by ID and never copy them into tags; Flow HTTP requests carry a secret to the Worker; bus events are thin (`include_fields`, `filter`), deduplicated by webhook ID and reconciled on a schedule.
+- [ ] Consent defaults to denied, with a bounded wait for the banner; the gate treats a pending posture as denied, and agents and chatbots work only from public data until a signed posture arrives.
+- [ ] Every agent, chatbot and customer-service action carries an idempotency key held in a Durable Object or Xano; agent requests also carry a signed identity, the consent posture reference and a mandate, checked separately from TLS.
+- [ ] Chat transcripts have a notice, a purpose, an owner, a region and a retention date; order details are revealed only after the requester's claims match the order through the row gate.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1312,6 +1362,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [Subscribe to webhooks](https://shopify.dev/docs/apps/build/webhooks/subscribe) and [Webhook best practices](https://shopify.dev/docs/apps/build/webhooks/best-practices): HTTPS, Pub/Sub and EventBridge delivery, `filter` and `include_fields`, no ordering guarantee, `X-Shopify-Webhook-Id`, reconciliation.
 - Shopify Help Center, [Send HTTP request](https://help.shopify.com/en/manual/shopify-flow/reference/actions/send-http-request): Flow's HTTP action and the plans that include it.
 - Klaviyo, [How to enable onsite tracking for Shopify](https://help.klaviyo.com/hc/en-us/articles/4425956184731) and [How to create a browse abandonment flow](https://help.klaviyo.com/hc/en-us/articles/115002775252): Viewed Product and Active on Site come from the app embed, which must be re-enabled on a new theme.
+- Google, [Consent mode](https://developers.google.com/tag-platform/security/guides/consent): the four v2 signals, defaults and `wait_for_update`.
+- Shopify, [Customer Privacy API](https://shopify.dev/docs/api/customer-privacy): reading and setting visitor consent on the storefront.
+- Stripe, [Idempotent requests](https://docs.stripe.com/api/idempotent_requests): the `Idempotency-Key` header and the stored-result convention.
+- IETF, [RFC 9421: HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421), and Cloudflare, [Web Bot Auth](https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/): signed requests that identify an agent.
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Cloudflare, [Queues pull consumers](https://developers.cloudflare.com/queues/configuration/pull-consumers/), [Queues limits](https://developers.cloudflare.com/queues/platform/limits/) (128 KB messages), [R2 object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and [restricting API tokens](https://developers.cloudflare.com/fundamentals/api/how-to/restrict-tokens/) by client IP and expiry.
