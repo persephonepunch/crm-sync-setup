@@ -3,7 +3,7 @@ title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladder
 description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then why Kubernetes and VMs limit reach but not what a model may weigh, how AWS, Google Cloud and Azure each control data moving between workloads, what an enterprise has to add on top, and policy management as a service: rules authored in Webflow and Xano, enforced by Cloudflare above every cloud, worked through one order that reaches Salesforce and Klaviyo on AWS, SAP or Dynamics on Azure, Google Ads on Google Cloud and a Shopify Function; and one Worker behind any theme, a Webflow export or a Shopify theme through the App Proxy, with an allowlist that mirrors Kakao Pay's registered domains; a sandbox that restricts outside data before it reaches on-prem; and why an AI strategy is not a JVM: security for AI as permissions as architecture, with the stack and the heap as a model for which data and grants may outlive a call; immutable and dynamic data in KV; claims and extras as layered permissions for people; and why a one-domain consent banner such as OneTrust has to fold into the data design that AI services read. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
-date: 2026-10-19
+date: 2026-10-20
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/HYPERSCALER-VS-DISTRIBUTED.md
 licence: CC-BY-4.0
 ogImage: https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-og-csb.png
@@ -61,13 +61,36 @@ Read each row left to right. Rows 1 and 2 decide **who may run and what it may t
 | **Task runner** | The thing that starts a job, retries it and records the result, as opposed to the code the job runs. | Worker cron triggers and Queues for edge jobs; Xano background tasks for jobs that change the record. Each job carries an idempotency key, so a retry can't apply twice. | Either end. Run it where the data the job changes lives. |
 | **Data binding** | A named handle to a resource, declared in configuration and handed to the code at runtime. The code can only reach what is bound; there is no URL or credential to copy. | Cloudflare bindings (`env.KV`, `env.DB`, `env.R2`, `env.AI`, a Durable Object namespace) in `wrangler.toml`; Xano endpoints reached through one bound service. | Edge. The binding list is the security boundary. |
 | **GPU as a place** (CoreWeave, Oracle OCI) | GPUs you rent by the cluster. CoreWeave is a neocloud that sells little else; Oracle Cloud Infrastructure is a hyperscaler whose Superclusters link tens of thousands of NVIDIA GPUs over RDMA. Code for them is usually NVIDIA-only: CUDA, or PTX, which Rust can also target through Rust CUDA. | Rung 4 of the AI ladder: training, fine-tuning, self-hosted large models. | Centralized. The data travels to the GPU, so residency and egress are part of every job. |
-| **GPU on the device** (portable GPU bytecode) | GPU programs compiled to SPIR-V, a portable bytecode that wgpu runs on any Vulkan, Metal or DirectX GPU. Rust (through rust-gpu) is one source language; GLSL, HLSL and WGSL also compile to it. | Kernels shipped with the application: in a native app, on your own server or, after translation to WGSL, in a browser through WebGPU. | The device, at the far distributed end, past the edge. The data stays where it already is. |
+| **GPU on the device** (portable GPU bytecode) | GPU programs compiled to SPIR-V, a portable bytecode that wgpu translates for any Vulkan, Metal or DirectX GPU. Rust (through rust-gpu) is one source language; GLSL, HLSL and WGSL also compile to it. | Kernels shipped with the application: in a native app, on your own server or, after translation to WGSL, in a browser through WebGPU. | The device, at the far distributed end, past the edge. The data stays where it already is. |
 
 **What portable GPU bytecode does and doesn't buy.** SPIR-V is to a GPU roughly what WebAssembly is to a CPU: one compiled artifact, many targets. That makes *small* parallel work portable, such as image transforms, embeddings or physics, and lets it run on the user's own device, so the data never leaves. It doesn't make a phone into a training cluster, and three limits apply:
 
 - **Maturity.** rust-gpu calls itself early-stage and not yet production-ready. Shader languages that already compile to SPIR-V are the safer route today.
 - **Browsers take WGSL, not SPIR-V.** WebGPU in a browser accepts only WGSL, so SPIR-V has to be translated first (wgpu's naga translator does this).
 - **The edge has no GPU for your code.** Cloudflare Workers run Rust as WebAssembly on CPUs. Workers AI runs Cloudflare's model catalogue on its GPUs, but you can't upload your own kernels to it. GPU bytecode belongs on the device, a server or a rented cluster, not inside a Worker.
+
+**In business terms: SPIR-V is the `.wasm` of the GPU.** The pipeline has the same shape as the Rust-to-Wasm path below: write in a source language, compile once to a portable file, and let each platform do the last step for its own hardware.
+
+| GPU layer | What it is | The Rust-to-Wasm parallel |
+|---|---|---|
+| Rust (rust-gpu), GLSL, HLSL, WGSL | The source languages teams write in | Rust or TypeScript source |
+| rust-gpu, glslang, DXC, naga | The compilers | Trunk and wasm-bindgen |
+| **SPIR-V** | The portable program, owned by no single vendor | The `.wasm` file |
+| **wgpu** | The runtime adapter. Each time the app runs, it finds the GPU, translates the program for it, and hands it work and data | The Workers runtime, or a browser |
+| Vulkan, Metal, DirectX | The platform APIs. Only Vulkan runs SPIR-V directly; for Metal and DirectX, naga translates first | The browser engines: V8, WebKit |
+| **Driver** | Vendor software on the operating system. It does the final compile into the chip's own instructions | The engine's JIT compiler |
+| **Firmware** | Vendor software on the chip itself, such as NVIDIA's GSP firmware and VBIOS. It schedules work, manages power and enforces memory isolation | CPU microcode and BIOS |
+| **GPU** | The silicon | The CPU |
+
+The data doesn't travel inside the program. It moves separately, into *buffers*, and the result lands in a *render target*: the frame, or viewport, the person sees. The program is the recipe; the buffers are the ingredients.
+
+**Below every sandbox: firmware and drivers.** The bottom two software layers belong to the vendor and run beneath anything you build. wgpu's validation and Rust's memory safety protect the layers above them; a flaw in a driver or in firmware can only be fixed by a vendor patch. The NVIDIA container escape, explained in the neocloud section below, was in the Container Toolkit, not the firmware, but the lesson is the same: the fix is the vendor's to ship, and your job is to know you need it.
+
+**The MPN: the part number that ties a GPU to its patches.** An MPN (manufacturer part number) names the exact hardware model, the same way it names a product in a PIM. On a GPU it is the join key between the physical card and everything the vendor publishes about it: which driver and firmware branches support it, which security bulletins apply, and when it reaches end of life. Vendor bulletins list affected product families and software versions, so the MPN is how you find out which of them is yours.
+
+- **Inventory each GPU you run or rent** as a record: MPN, firmware version, driver version and container toolkit version. A bulletin then becomes a query, not a hunt.
+- **Ask a neocloud for the same record.** On rented capacity you can't read the firmware yourself, so the MPN, firmware and driver versions, and the patch window belong in the contract and its audit rights.
+- **Don't collect it from people's devices.** On the device rung the GPU model is a fingerprinting signal. WebGPU deliberately gives a page only coarse adapter information, so code there should adapt to what the adapter can do, not to its part number.
 
 ## The frame-budget origin
 
@@ -888,6 +911,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] KV holds only immutable or write-rarely values, named by version; consent, entitlements, counters and personal data live in Durable Objects or Xano.
 - [ ] Sign-in tokens carry identity only; account status is checked before any write; entitlements reach the page as hints, and the gate decides.
 - [ ] Consent from every banner and platform is normalized into one posture per subject, which pages, agents and model calls all read.
+- [ ] Every GPU you run or rent has an inventory record (MPN, firmware, driver and container toolkit versions) checked against vendor security bulletins; rented capacity gets the same record and a patch window by contract.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -899,6 +923,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Xano, [Enterprise-grade multi-tenant control](https://community.xano.com/release-announcements/post/new-enterprise-grade-multi-tenant-control-2DNxiHH69FITNmt): Kubernetes-level tenant isolation and regional clusters in the Tenant Center add-on.
 - Webflow, [About the Webflow Cloud edge environment](https://developers.webflow.com/webflow-cloud/environment) and [configuration](https://developers.webflow.com/webflow-cloud/environment/configuration): Webflow Cloud apps run on the Cloudflare Workers runtime and deploy with Wrangler.
 - Oracle, [World's largest AI supercomputer in the cloud](https://blogs.oracle.com/cloud-infrastructure/post/worlds-largest-ai-supercomputer-in-the-cloud): OCI Superclusters with NVIDIA GPUs over RDMA networking.
+- Khronos Group, [SPIR-V](https://www.khronos.org/spirv/): the portable intermediate language for GPU programs.
+- wgpu, [wgpu.rs](https://wgpu.rs/) and [naga](https://github.com/gfx-rs/wgpu/tree/trunk/naga): the Rust GPU runtime over Vulkan, Metal, DirectX and WebGPU, and its shader translator.
+- W3C, [WebGPU: GPUAdapterInfo](https://www.w3.org/TR/webgpu/#gpuadapterinfo): adapter details limited to reduce fingerprinting.
+- NVIDIA, [Product Security](https://www.nvidia.com/en-us/security/): security bulletins by product and software version.
 - Rust GPU, [rust-gpu](https://github.com/Rust-GPU/rust-gpu): Rust to SPIR-V, maintained by the community since 2024, early-stage.
 - [rustc_codegen_nvvm](https://lib.rs/crates/rustc_codegen_nvvm) (Rust CUDA): Rust to PTX, early development; NVIDIA, [The Rust + GPU ecosystem](https://nvidia.github.io/cuda-rust/appendix/ecosystem.html), which also covers cuda-oxide.
 - Kubernetes, [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) (stored unencrypted in etcd by default) and [Encrypting confidential data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/).
