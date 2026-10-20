@@ -618,6 +618,28 @@ The rules that follow:
 
 For AI the mapping is direct. A model's context window is stack: assembled for one call, from what the gate allowed, and gone when the call ends. Long-term memory, fine-tuning data and embeddings are heap: they outlive the conversation, so each needs an owner, a region, the consent it was made under and a way to delete it. Most AI data leaks are escapes, where something placed in one call's context ends up in a store that outlives it.
 
+#### In business terms: who clears the file room
+
+Picture a company handling paperwork.
+
+- **The stack is a meeting whiteboard.** Everything on it is for one meeting, one function call. When the meeting ends the board is wiped, automatically and completely. It is fast and private, and nothing on it survives the meeting.
+- **The heap is the shared file room.** Anything that has to outlast the meeting goes into a folder there, and people across the company can be handed a slip saying where it is. The hard questions all live in the file room: who may open a folder, who may change it, and who throws it away, and when.
+- **Ownership answers "who throws it away?"** Every folder has exactly one accountable owner, and it is shredded when the owner is done. Others can be lent access: many people may read, or one may edit, never both at once.
+
+Each language runs the file room differently:
+
+| Language | Who clears the file room | In business terms | What goes wrong |
+|---|---|---|---|
+| **C** | The programmer, folder by folder | No records policy: every employee shreds their own files | Forget, and storage fills up (a leak). Shred too early, and someone works from a destroyed file, which is how most serious security bugs are exploited. |
+| **Java** | A garbage collector sweeps periodically, removing what nobody refers to | Facilities staff dispose of files on their own schedule | Nothing in use is shredded, so that class of bug is gone. Cleanup costs extra space and occasional pauses, and a secret can't be guaranteed destroyed on time: the crew may have copied it while tidying. |
+| **Python** | Each object counts who uses it and is freed at zero; a collector handles circular cases | A sign-out sheet on every folder | Safe for ordinary code, but much of Python's speed comes from libraries written in C, such as NumPy and image and model loaders, so C's risks sit underneath. |
+| **JavaScript and Next.js** | A garbage collector in V8, like Java's | The same facilities crew | Memory corruption isn't the main business risk; data lifetime is. A long-running server keeps anything stored outside a request alive across requests, so one customer's data can reach the next, and data rendered on the server is copied into the page sent to the browser. Both are escapes. |
+| **Rust** | Nobody sweeps; the ownership rules are checked before the software ships | An auditor approves the records plan before the company opens | Every folder has one owner and is shredded the moment the owner is done. A plan that could shred a file in use, or keep a slip to a wiped whiteboard, is rejected at build time rather than found in production. |
+
+The trade, for a business: C is fast and cheap to run and expensive when it fails, because its mistakes surface as breaches. Java, Python and JavaScript buy safety at runtime, paid for in memory and pauses, and give up control over *when* data is destroyed. Rust buys safety at build time: more effort up front, then no cleanup overhead, predictable disposal, and secrets wiped exactly when their owner finishes.
+
+Most organizations run their data the Java way: a retention job sweeps eventually. Permissions as architecture runs it the Rust way. Each record has an owner, a lifetime and access rules decided before it is stored, and the system enforces them instead of people remembering to.
+
 ### Immutable and dynamic data: what goes in KV, and what doesn't
 
 Workers KV is built for data that is read constantly and written rarely. A write is visible at once in the location that made it, and [can take up to 60 seconds](https://developers.cloudflare.com/kv/api/write-key-value-pairs/) (or the reader's `cacheTtl`) to appear everywhere else; two writes to the same key race, and the last one wins. KV also has no [jurisdiction restriction](https://developers.cloudflare.com/data-localization/compatibility/) for where its values are stored. So the dividing line is whether the value changes, and whether a reader acting on the old value causes harm:
