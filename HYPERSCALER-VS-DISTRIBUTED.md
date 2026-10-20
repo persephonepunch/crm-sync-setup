@@ -810,6 +810,45 @@ Media is where the spectrum costs the most, because the payloads are large and t
 
 **3D game render.** Real-time rendering belongs on the player's GPU. WebGPU in the browser takes WGSL shaders, and native engines take SPIR-V, which is where the Rust-to-bytecode path from the opening section is most useful. The edge delivers assets (glTF meshes, KTX2 textures) and never renders. The cluster bakes and compresses. Rented GPUs earn their place only for offline render farms, or for pixel streaming, when the player's device can't render the scene at all. The asset catalog in the system of record decides who receives which asset version under which licence, through the same gate as any other data.
 
+### The 3D viewport: load out of sight, show only finished frames
+
+A 3D viewport in a page works like the gate: the data is prepared out of sight and released to the visible layer only when it is complete. The person sees finished frames, never the work.
+
+**Step 1: compress for the trip.** Three kinds of compression save bytes in three different places:
+
+| Layer | Standard | What it saves | Still compressed on the GPU? |
+|---|---|---|---|
+| Mesh geometry | Draco (Google's library) or meshopt, carried inside glTF through Khronos extensions | Download size, often 5 to 10 times smaller | No. It is decoded to plain vertex buffers first |
+| Textures | KTX2 with Basis Universal (Khronos) | Download size and GPU memory | Yes. It is converted into formats the GPU reads directly (BC7, ASTC, ETC2) |
+| The program | SPIR-V or WGSL | Portability | It is compiled, not compressed |
+
+Draco helps the download, not the drawing: the GPU never sees it. It is also lossy, since it rounds coordinates to fewer bits. That is fine for showing a product or a room, and wrong for engineering data. Use it on the display copy of a CAD model, and keep the STEP or native CAD file as the system of record.
+
+**Step 2: load out of sight, show finished.** A 3D frame passes through five stages, and only the last is visible:
+
+1. **Fetch** the glTF, Draco and KTX2 files from the edge.
+2. **Decode** off the main thread: Three.js's `DRACOLoader` runs a Wasm decoder in a Web Worker, so the page keeps responding.
+3. **Upload** the decoded buffers and textures to the GPU.
+4. **Draw** into a *back buffer*, an off-screen frame. With `OffscreenCanvas`, a worker can do this away from the page's main thread.
+5. **Present.** On the display's beat, the finished back buffer swaps to the front and the compositor layers it into the page.
+
+**Shadow DOM is the boundary, not the backstage.** A *Shadow DOM* is a web component's private subtree: page styles and scripts can't rearrange what's inside by accident, which is how Google's `<model-viewer>` packages its canvas. It does not hide or delay anything; a component's shadow content renders like any other. The off-screen staging is the back buffer and the worker. Two cautions: a closed shadow root is encapsulation, not security, since other scripts on the page can still reach it; and what is hidden from the eye is not hidden from a machine reader. Shadow content is in the accessibility tree, and an agent reading the page reads it.
+
+**The same pattern in a browser, an app and an operating system.** *Code* computes what the next frame should be; *animation* is the frames changing over time; the *frame rate* is how often the visible layer is allowed to change.
+
+| | Browser | Native app | Operating system |
+|---|---|---|---|
+| The sealed component | A web component with a Shadow DOM | A view or scene with its own state | A process, isolated from other processes |
+| Off-screen work | Web Worker, `OffscreenCanvas`, the WebGL or WebGPU back buffer | Background and render threads, the swap chain's back buffer (Metal, Vulkan, DirectX) | Each app's window drawn to its own off-screen surface |
+| The beat that releases a frame | `requestAnimationFrame` | `CADisplayLink` on iOS, `Choreographer` on Android | The compositor (Windows DWM, macOS WindowServer, a Wayland compositor) on the display's refresh |
+| The visible layer | The page's composited layers | The app's window | The screen |
+
+The frame rate sets the budget. At 60 Hz each frame has 16.7 ms; at 120 Hz, 8.3 ms. In a browser, JavaScript, layout and drawing all share that budget on the main thread, so decoding a large mesh there misses frames, which the person sees as stutter. Moving the work to a worker, compressing what crosses the network, and drawing into a back buffer keeps the visible layer on the beat.
+
+In business terms: a theater. The crew sets the next scene backstage (the worker and the back buffer) while the audience watches the current one. The stage manager calls the change on the beat (the display refresh), and the curtain opens only on a finished set. A Shadow DOM is a set piece built by its own crew, which the rest of the production can't rearrange. It isn't locked against the audience. The frame rate is how many scene changes the show promises each second.
+
+The same rule runs through this article: prepare and check out of sight, release only finished and permitted work to the visible layer, and keep the budget for each release small enough to hit.
+
 ### Strip before egress
 
 The media grid's last box is one rule: **clean the file before it leaves, and hand it out only through a link that expires.** *Egress* is data leaving your system: a photo sent to a customer, a partner, a CDN, a model or a social platform.
@@ -948,6 +987,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Every GPU you run or rent has an inventory record (MPN, firmware, driver and container toolkit versions) checked against vendor security bulletins; rented capacity gets the same record and a patch window by contract.
 - [ ] Bytecode for people has a size and frame budget checked in the build; bytecode for models is compiled per GPU, tested against a reference output, and rebuilt when the GPU model or driver changes.
 - [ ] Every base model, language adapter and data set has a manifest row (version, region, training data, consent basis, license, retirement date); only weights trained on public material ship to devices, and the Worker serves each audience only its own bundle.
+- [ ] 3D assets ship as glTF with compressed meshes and KTX2 textures; decoding runs off the main thread, frames are drawn off-screen and presented on the display's beat, and lossy display copies never replace the CAD source.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -968,6 +1008,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - WebAssembly, [Binaryen](https://github.com/WebAssembly/binaryen): the toolkit behind `wasm-opt`.
 - ONNX Runtime, [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/): running models in the browser through WebGPU or Wasm.
 - NVIDIA, [Product Security](https://www.nvidia.com/en-us/security/): security bulletins by product and software version.
+- Google, [Draco](https://github.com/google/draco), and Khronos, [KHR_draco_mesh_compression](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_draco_mesh_compression): mesh compression and its glTF extension.
+- Khronos, [KTX](https://www.khronos.org/ktx/) and [KHR_texture_basisu](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_texture_basisu): textures that stay compressed on the GPU.
+- MDN, [Using shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM), [OffscreenCanvas](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas) and [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame).
+- Google, [`<model-viewer>`](https://modelviewer.dev/): a 3D viewport packaged as a web component.
 - Rust GPU, [rust-gpu](https://github.com/Rust-GPU/rust-gpu): Rust to SPIR-V, maintained by the community since 2024, early-stage.
 - [rustc_codegen_nvvm](https://lib.rs/crates/rustc_codegen_nvvm) (Rust CUDA): Rust to PTX, early development; NVIDIA, [The Rust + GPU ecosystem](https://nvidia.github.io/cuda-rust/appendix/ecosystem.html), which also covers cuda-oxide.
 - Kubernetes, [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) (stored unencrypted in etcd by default) and [Encrypting confidential data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/).
