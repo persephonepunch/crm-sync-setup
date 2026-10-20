@@ -227,6 +227,18 @@ The review checked the code the app shipped; it couldn't check what that code fe
 
 So the calendar and the breach answer different questions. The calendar fixes *how app code gets onto the page*: through a slot the merchant can see and switch off. It doesn't govern *what that code fetches once it's running*. Migrating to app embeds is necessary, and it isn't sufficient; the configuration path needs its own gate.
 
+**The same gap applies to any executable, and most of all to firmware.** A review, a scan or a signature proves what was delivered at one moment. What matters is what runs later, and what it loads after the check. The NVIDIA container escape was this gap at a smaller scale: a time-of-check, time-of-use flaw.
+
+| Executable | Checked when | What can change after the check | The gate |
+|---|---|---|---|
+| Shopify app embed | At App Store review | The configuration it fetches at runtime | Signed configuration, no code fields |
+| Browser Wasm bundle | At build | Anything it fetches or is told to load | A content security policy that allowlists where it may connect |
+| Shopify Function | At every deploy | Nothing: no network, declared input only | Already gated. This is the model the others aim for |
+| Container image | At build and scan | A tag that points to a new image; what the runtime mounts into it | Pin images by digest, sign them, and keep the GPU toolkit patched |
+| Driver and firmware | Signed by the vendor at release | The update channel, its configuration, and anything below the operating system | Accept only signed images, verify at boot, attest the device, roll out in stages |
+
+Firmware is the hardest case. It runs below every sandbox in this article, survives a reinstall of the operating system, and few tools can inspect it. One firmware image ships to every unit of a part number, so a bad update reaches the whole fleet at once: the castle vault again. A signature doesn't settle it either. If the vendor's update channel is compromised, the malicious update arrives signed, as in the 2019 ShadowHammer attack on ASUS's Live Update tool. The defenses are the same rules applied lower down: an inventory by MPN and firmware version, updates only from the vendor's channel and rolled out in stages, measured boot, and device attestation where the hardware offers it. On rented GPUs, NVIDIA's attestation for confidential computing lets a job check what it is running on before it receives data.
+
 One more check to run: a third-party tracker's snapshot marks 126 apps delisted, 89 of them dated 15 October 2026, with every cause unverified. Some may be fallout from the hijack and some from the 2025-10 retirement, but those dates come a day before the 16 October cutoff, so the versioning rule alone doesn't explain them. Shopify publishes no list of delisted apps; trackers diff the App Store over time. If you run a public app, check its listing status in the Partner Dashboard.
 
 **The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
@@ -1068,6 +1080,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] The Shopify app uses only current slots (Functions, UI extensions, app embeds, web pixels); no script tag remains after 1 March 2027, and the API version in use is checked against the response header each quarter.
 - [ ] The three compliance webhooks are verified by HMAC, routed to the subject's home region and completed within 30 days; the Partner account has a named owner and a response deadline for Shopify review emails.
 - [ ] Every app the store runs fetches only signed configuration with no code fields; inserted text never goes through `innerHTML`; checkout links resolve only to allowlisted origins, and a scheduled checkout test fails on any off-domain redirect.
+- [ ] Every executable is gated after its check as well as before: config signed, images pinned by digest, firmware accepted only signed, rolled out in stages, and attested before a job receives data.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1120,6 +1133,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
 - Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
 - Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- Kaspersky, [Operation ShadowHammer](https://securelist.com/operation-shadowhammer-a-high-profile-supply-chain-attack/90380/): a signed, malicious update delivered through ASUS Live Update.
+- NVIDIA, [Attestation](https://docs.nvidia.com/attestation/index.html): verifying GPU state for confidential computing.
 - Roman Zipp, [Shopify shops hit with ongoing Checkout Hijack attack](https://romanzipp.com/blog/shopify-hit-with-phishing-attack): the `advanced_users.custom_js` field, the checkout-button handler and the lookalike domains.
 - Proactivo Commerce, [Was Shopify Hacked? The October 2026 Checkout Hijack](https://proactivocommerce.com/blogs/insights/was-shopify-hacked-checkout-hijack), and Tech Business News, [Shopify stores caught in fake checkout attack](https://www.techbusinessnews.com.au/news/shopify-stores-caught-in-fake-checkout-attack-as-hijacked-apps-redirect-shoppers/): timeline, Selleasy's statement, Shopify's response.
 - Shopify Developer Community, [No new legacy custom apps from January 1, 2026](https://community.shopify.dev/t/starting-january-1-2026-you-will-not-be-able-to-create-new-legacy-custom-apps-this-will-not-impact-any-existing-apps/26798), and developer reports of delisting after a missed governance email ([one](https://community.shopify.dev/t/my-app-has-been-temporarily-delisted/38502), [portfolio-wide](https://community.shopify.com/t/our-entire-app-portfolio-was-delisted-due-to-one-app-10-apps-offline-merchants-impacted-need-guidance/689638)): anecdotal.
