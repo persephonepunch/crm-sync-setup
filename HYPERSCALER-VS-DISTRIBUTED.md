@@ -1,6 +1,6 @@
 ---
 title: "Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders"
-description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then why Kubernetes and VMs limit reach but not what a model may weigh, how AWS, Google Cloud and Azure each control data moving between workloads, what an enterprise has to add on top, and policy management as a service: rules authored in Webflow and Xano, enforced by Cloudflare above every cloud, worked through one order that reaches Salesforce and Klaviyo on AWS, SAP or Dynamics on Azure, Google Ads on Google Cloud and a Shopify Function; and one Worker behind any theme, a Webflow export or a Shopify theme through the App Proxy, with an allowlist that mirrors Kakao Pay's registered domains; a sandbox that restricts outside data before it reaches on-prem; and why an AI strategy is not a JVM: security for AI as permissions as architecture, with the stack and the heap as a model for which data and grants may outlive a call. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
+description: "Where compute should live, from hyperscalers and GPU neoclouds to edge networks. Opens with task runners, data bindings, and GPUs as a rented place (CoreWeave, Oracle OCI) versus GPU code compiled from Rust to bytecode. Then the frame-budget origin: how game engines already ration the GPU, why C and C++ renderers such as Flash and SVG parsers forced isolation that Rust and Wasm remove, how Shopify Functions already run Wasm as a security boundary inside checkout, and the Rust path for new work: a Webflow page, a Cloudflare compile and a Xano record. Then the strategy: bind before you allocate, with the cost and security case for running distributed data and AI binding before any GPU is allocated. Then incremental knowledge against general-purpose AI: evidence weighting, ranking, and falling back to a larger token model only when the ranked data can't answer. Then context and data streams that scale by direction before intent is tokenized or vectorized. Then why Kubernetes and VMs limit reach but not what a model may weigh, how AWS, Google Cloud and Azure each control data moving between workloads, what an enterprise has to add on top, and policy management as a service: rules authored in Webflow and Xano, enforced by Cloudflare above every cloud, worked through one order that reaches Salesforce and Klaviyo on AWS, SAP or Dynamics on Azure, Google Ads on Google Cloud and a Shopify Function; and one Worker behind any theme, a Webflow export or a Shopify theme through the App Proxy, with an allowlist that mirrors Kakao Pay's registered domains; a sandbox that restricts outside data before it reaches on-prem; and why an AI strategy is not a JVM: security for AI as permissions as architecture, with the stack and the heap as a model for which data and grants may outlive a call; immutable and dynamic data in KV; claims and extras as layered permissions for people; and why a one-domain consent banner such as OneTrust has to fold into the data design that AI services read. Then two decision ladders, for orchestration and for AI binding, across Webflow, Cloudflare and Xano, plus what each rung does to residency, latency, cost, audit scope and failure modes in enterprise infrastructure."
 canonical: https://crm-sync.dev/docs/hyperscaler-vs-distributed
 category: "Specs"
 date: 2026-10-19
@@ -618,6 +618,60 @@ The rules that follow:
 
 For AI the mapping is direct. A model's context window is stack: assembled for one call, from what the gate allowed, and gone when the call ends. Long-term memory, fine-tuning data and embeddings are heap: they outlive the conversation, so each needs an owner, a region, the consent it was made under and a way to delete it. Most AI data leaks are escapes, where something placed in one call's context ends up in a store that outlives it.
 
+### Immutable and dynamic data: what goes in KV, and what doesn't
+
+Workers KV is built for data that is read constantly and written rarely. A write is visible at once in the location that made it, and [can take up to 60 seconds](https://developers.cloudflare.com/kv/api/write-key-value-pairs/) (or the reader's `cacheTtl`) to appear everywhere else; two writes to the same key race, and the last one wins. KV also has no [jurisdiction restriction](https://developers.cloudflare.com/data-localization/compatibility/) for where its values are stored. So the dividing line is whether the value changes, and whether a reader acting on the old value causes harm:
+
+| Data | Changes | Where it belongs | Why |
+|---|---|---|---|
+| A published policy bundle, keyed by version (`policy:v42`) | Never; a new version gets a new key | KV | Immutable: every location agrees, however late it reads |
+| The pointer to the current version (`policy:current`) | Rarely | KV, with the stale-bundle threshold in the gate | A reader that lags a minute uses the previous version, which was also signed and valid |
+| Allowlists, translations, the docs index | Rarely | KV | Read on every request; a short lag is harmless |
+| Revoked tokens (a denylist that expires with the token) | Write once | KV | Each entry is written once and never edited; the up-to-60-second gap between locations is a known, stated window |
+| Consent, entitlements, a checkout in progress, idempotency keys, counters | Constantly | A Durable Object per subject, or Xano | Needs one consistent answer now; KV's last-write-wins and lag would let two requests both pass |
+| Personal data | Varies | Xano in the subject's region, or a Durable Object restricted to a jurisdiction | KV can't be pinned to a jurisdiction |
+
+The rule: in KV, write new keys instead of changing old ones, and name them by version. Anything that must be current, per person, or kept in a region goes to a Durable Object or to Xano.
+
+### Claims and extras: layered permissions for people
+
+Signing in proves who someone is. It shouldn't decide everything they may do. CRM Sync's `/auth/me` keeps identity, profile and permission in separate layers, and each layer can only narrow what the one before it allows:
+
+| Layer | Holds | Changes | Lives in |
+|---|---|---|---|
+| **Token** | The subject ID and an expiry, signed | Never during its life; revoked on logout | The JWT, checked by the Worker; revocations in a KV denylist |
+| **Account status** | Active or deleted | Rarely | Xano, checked before anything else runs |
+| **Claims** | Identity links: the Google subject, the Shopify customer ID | Rarely; reconciled at sign-in | Xano, `user_claims` |
+| **Extras** | Profile and preference fields | Often; cleared when marketing consent is withdrawn | Xano, `user_extras` |
+| **Entitlement** | What this person may use: roles and capability caps | When they buy, are granted or lose access | Xano, returned to the page as a hint only |
+| **The decision** | Whether this call, for this purpose, is allowed | Every request | The gate Worker |
+
+Four design rules come out of it:
+
+- **The token proves identity, nothing more.** Roles and preferences aren't baked into it, because a seven-day token can't take back a permission withdrawn on day two.
+- **Check status before any write.** A deleted account is refused before any identity reconciliation runs. On 31 August 2026 the order was reversed, and a stale token for a deleted account created a real Shopify customer on every call.
+- **Extras follow consent.** Profile fields that exist for marketing are cleared when marketing consent is withdrawn. Transactional records stay, because they rest on the contract, not on consent.
+- **The page hides; the Worker decides.** Entitlements reach the page so it can hide controls a person can't use. Hiding is a convenience. Every request is still decided at the gate.
+
+Agents get none of this by default. An agent acts under a mandate issued for a task, with its own cap and expiry, never under the person's sign-in.
+
+### OneTrust is a session log for one domain
+
+A consent banner such as OneTrust works like a hosted key-value session log: it records what this browser chose on this site, in the `OptanonConsent` cookie and, with consent logging turned on, in OneTrust's cloud. That suits one website. It doesn't stretch across many:
+
+- **Each domain is configured separately.** Every domain loads its own OneTrust script with its own domain ID, and an anonymous visitor's choice stays with that domain.
+- **Sharing needs a known person.** [Cross-domain consent](https://developer.onetrust.com/onetrust/docs/cross-domain-cross-device) works only once the visitor is identified: your team passes a user ID, signs a JWT with that ID as its subject, uploads the public key to OneTrust, creates a Consent Group, and turns on records of consent in the geolocation rule.
+- **Some callers have no browser.** An App Proxy request, a server-to-server feed, an agent or a model call never shows a banner or carries its cookie.
+
+So horizontal scale (more domains, more storefronts, more agents) can't rest on the banner. Consent has to become part of the data design that the AI services read:
+
+1. **Treat the banner as one input.** OneTrust on one site, Shopify's Customer Privacy API in a theme, your own banner on a Webflow export: each origin's allowlist row names its source.
+2. **Normalize into the subject's posture.** The gate records every choice in Xano with its source, time and region, and projects the result into the subject's Durable Object.
+3. **Read posture, not cookies.** Pages, agents, feeds and model calls all ask the same posture, so a choice made on one domain applies on every other once the person is known.
+4. **Withdrawals apply everywhere.** A withdrawal from any source takes effect across all of them on the next request.
+
+The identity layer above already signs JWTs, so the same subject ID can be passed to OneTrust when its own cross-domain profile is wanted. OneTrust then mirrors the posture; it doesn't replace it.
+
 ## The decision ladders
 
 ![Two decision ladders. Orchestration, bottom to top: Webflow publish; Cloudflare Worker; Durable Object; Xano as the system of record; hyperscaler or BYOC cluster. AI binding, bottom to top: no model; Workers AI binding; AI Gateway to a hosted model; agent with tools on Xano; dedicated GPUs. Each rung names the condition that earns the next. Rules on every rung: Xano wins disagreements, fail closed when the projection is stale, personal data stays home, data leaves only through the signed gate.](https://persephonepunch.github.io/crm-sync-setup/assets/hyperscaler-vs-distributed-ladders.svg)
@@ -756,6 +810,9 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] The token vault is kept apart from tokenized data, and rejected records stay in the sandbox with a reason and an owner.
 - [ ] No model or agent platform holds standing access to a system of record; every capability is a separate grant, checked outside the model.
 - [ ] Request-scoped data (decrypted fields, consent decisions, a model's assembled context) is dropped at the end of the call; anything written to a lasting store goes through the gate with an owner, an expiry and a reader list.
+- [ ] KV holds only immutable or write-rarely values, named by version; consent, entitlements, counters and personal data live in Durable Objects or Xano.
+- [ ] Sign-in tokens carry identity only; account status is checked before any write; entitlements reach the page as hints, and the gate decides.
+- [ ] Consent from every banner and platform is normalized into one posture per subject, which pages, agents and model calls all read.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
 ## Sources
@@ -792,6 +849,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Cloudflare, [Queues pull consumers](https://developers.cloudflare.com/queues/configuration/pull-consumers/), [Queues limits](https://developers.cloudflare.com/queues/platform/limits/) (128 KB messages), [R2 object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and [restricting API tokens](https://developers.cloudflare.com/fundamentals/api/how-to/restrict-tokens/) by client IP and expiry.
+- Cloudflare, [Write key-value pairs](https://developers.cloudflare.com/kv/api/write-key-value-pairs/) (visibility across locations, last write wins) and [Data Localization Suite compatibility](https://developers.cloudflare.com/data-localization/compatibility/) (no jurisdiction restriction for KV storage).
+- OneTrust, [Cross domain and cross device consent](https://developer.onetrust.com/onetrust/docs/cross-domain-cross-device): a known user ID, a customer-signed JWT, an uploaded public key, a Consent Group and records of consent.
 - The Rust Programming Language, [The stack and the heap](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#the-stack-and-the-heap); Rust error [E0597](https://doc.rust-lang.org/error_codes/E0597.html), a borrowed value that does not live long enough.
 - OpenJDK, [JEP 411: Deprecate the Security Manager for Removal](https://openjdk.org/jeps/411) and [JEP 486: Permanently Disable the Security Manager](https://openjdk.org/jeps/486), delivered in JDK 24.
 - Shopify Engineering, [How we built Oxygen](https://shopify.engineering/how-we-built-oxygen): a gateway Worker in Cloudflare routing to storefront Workers through Workers for Platforms' dynamic dispatch.
