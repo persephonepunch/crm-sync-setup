@@ -954,6 +954,37 @@ The rule that joins them: **an `Arc` may hold only data that every reader would 
 
 In business terms: the `Arc` is the rules posted on the wall, which everyone may read and nobody signs out. Claims are the badge that says who you are. Extras are the preferences card inside your own folder. Row gating is the clerk who checks your badge every time you ask for a folder. Post only rules on the wall; anything with a person's name on it goes through the clerk.
 
+### Functions, flows and the event bus: where each one gates
+
+Commerce stacks run logic in three other shapes, usually wired together by an event bus. Each has a different place where access is checked, which is what decides what it may safely see.
+
+- **Shopify Functions** run as Wasm on Shopify's servers, in the middle of cart and checkout. They are synchronous, stateless and declared: the input query names every field the function receives. Their configuration comes from a metafield on the function's owner, such as the discount, read through that same input query.
+- **Flows** are event-triggered automations that run afterwards, asynchronously. *Shopify Flow* runs in the Shopify admin (trigger, condition, action) with the store's own admin permissions over whole orders and customers. *Klaviyo flows* are marketing journeys triggered by events, lists or segments, with delays and branches, acting on full Klaviyo profiles.
+- **Edge Wasm** is the Worker in this article: Rust compiled to Wasm, running on Cloudflare in front of every page, deciding each request before it reaches anything else.
+- **The event bus** carries the events between them: Shopify webhooks delivered over HTTPS, or straight to Google Cloud Pub/Sub or Amazon EventBridge, or into Cloudflare Queues.
+
+| | Runs when | Sees | Access checked by | State | Theme-dependent? | Carries over to |
+|---|---|---|---|---|---|---|
+| `Arc` in a service | Inside one process | One shared, read-only value | Nobody, after it is loaded | In memory until the last handle drops | No | Wherever the service runs |
+| Row gate (Xano) | Every request | The rows the caller may read | The query filter on `$auth.id` | The system of record | No | Any front end that calls the API |
+| **Shopify Function** | Synchronously, in cart and checkout | Only the fields its input query declares | Shopify: the declared query and hard limits | None | **No.** It runs in checkout, so any theme, and headless storefronts, get the same logic | Any Shopify storefront; not other platforms |
+| **Shopify Flow** | After an admin event, asynchronously | Whole orders, customers and products | Store-wide admin permission; no per-row gate | Workflow history | **No.** Its triggers are admin events, not theme code | Shopify only |
+| **Klaviyo flow** | After an event, a list or segment change, or a date | The full Klaviyo profile | Klaviyo account permissions | Profiles and event history | **Partly.** Order and customer events come from the integration; *Viewed Product* and *Active on Site* come from the Klaviyo app embed in the theme, which must be turned on again after a theme change | Any platform that sends Klaviyo events |
+| **Edge Wasm (the Worker)** | Every request, before anything else | The request, plus what the gate fetches | The Worker itself: HMAC, origin allowlist, signed policy | None, or a Durable Object | **No.** It sits in front of the page | Any front end: a Webflow export, a Shopify theme through the App Proxy, a headless app |
+| **Event bus** | After the event, at least once, in no guaranteed order | Whatever the payload carries; by default the whole object | Cloud permissions on the topic, or the HMAC on HTTPS | Retained, and replayable on some buses | No | Any consumer subscribed to it |
+
+**Theme dependence, corrected.** Shopify Flow isn't theme-dependent: it runs on admin events and keeps working through a theme change. What depends on the theme is anything injected into the page: app embeds, theme app extensions, and the onsite tracking that feeds Klaviyo's browse triggers. Shopify Functions and AEM Edge Functions both carry over, but each only within its own platform: a Function applies to any storefront on that Shopify store, and an AEM Edge Function to anything served through Adobe's CDN. Only the edge Worker carries across platforms, because it sits in front of all of them.
+
+**Flows against Functions, in business terms.** A Function is the cashier's rulebook at the register: fixed rules, applied in the moment, looking only at the receipt. A flow is the back-office assistant with a master key, doing the follow-up after the sale: tag the customer, send the email, create the task. The edge Worker is the front door, checking everyone before they reach either one. The event bus is the building's announcement system: everyone subscribed hears every message, and some buses keep the recordings.
+
+The same claims and extras rules apply to each:
+
+- **Functions: declare the least.** Ask the input query for a boolean or a tag test, such as whether the customer has a given tag, never for the email address or the profile. A field not in the query never reaches the code.
+- **Flows: don't copy extras into tags.** Flow commonly writes customer tags and metafields. Extras copied into tags are readable by every app with customer access, and are not cleared when consent is withdrawn. Keep extras in Xano and let the flow refer to them by ID.
+- **Flow's HTTP request goes to the gate.** Shopify Flow's *Send HTTP request* action (on the Grow, Advanced and Plus plans) doesn't sign its requests the way webhooks are signed, so send it to the Worker with a secret header, and let the Worker decide.
+- **The bus carries thin events.** Subscribe with `include_fields` so the payload holds IDs and timestamps, not addresses, and use `filter` to drop deliveries you don't need. The consumer fetches the rest through the gate. A full payload on a retained bus is an escape: a copy of personal data with no row gate and no owner.
+- **Treat every event as possibly late or repeated.** Shopify doesn't guarantee order or single delivery. Ignore duplicates by `X-Shopify-Webhook-Id`, order by `X-Shopify-Triggered-At` or `updated_at`, and run a periodic reconciliation, because some deliveries are missed.
+
 ### OneTrust is a session log for one domain
 
 A consent banner such as OneTrust works like a hosted key-value session log: it records what this browser chose on this site, in the `OptanonConsent` cookie and, with consent logging turned on, in OneTrust's cloud. That suits one website. It doesn't stretch across many:
@@ -1216,6 +1247,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] AI-proposed bindings (field mappings, labels, allowlist rows) are data until the schema allowlist, the tests and a person approve them; the model holds no credentials and sees only gated data.
 - [ ] Gate thresholds (allowed fields, policy age, bundle budget) are Rust tests that run on save through a watcher and always before the compile in the build, so a failure stops the deploy.
 - [ ] Shared in-memory values (`Arc`, `Rc`, module-level caches) hold only versioned data no person owns; claims, extras, status and entitlements are read per request through the row gate.
+- [ ] Functions declare the fewest input fields; flows refer to extras by ID and never copy them into tags; Flow HTTP requests carry a secret to the Worker; bus events are thin (`include_fields`, `filter`), deduplicated by webhook ID and reconciled on a schedule.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1276,6 +1308,10 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Roman Zipp, [Shopify shops hit with ongoing Checkout Hijack attack](https://romanzipp.com/blog/shopify-hit-with-phishing-attack): the `advanced_users.custom_js` field, the checkout-button handler and the lookalike domains.
 - Proactivo Commerce, [Was Shopify Hacked? The October 2026 Checkout Hijack](https://proactivocommerce.com/blogs/insights/was-shopify-hacked-checkout-hijack), and Tech Business News, [Shopify stores caught in fake checkout attack](https://www.techbusinessnews.com.au/news/shopify-stores-caught-in-fake-checkout-attack-as-hijacked-apps-redirect-shoppers/): timeline, Selleasy's statement, Shopify's response.
 - Shopify Developer Community, [No new legacy custom apps from January 1, 2026](https://community.shopify.dev/t/starting-january-1-2026-you-will-not-be-able-to-create-new-legacy-custom-apps-this-will-not-impact-any-existing-apps/26798), and developer reports of delisting after a missed governance email ([one](https://community.shopify.dev/t/my-app-has-been-temporarily-delisted/38502), [portfolio-wide](https://community.shopify.com/t/our-entire-app-portfolio-was-delisted-due-to-one-app-10-apps-offline-merchants-impacted-need-guidance/689638)): anecdotal.
+- Shopify, [Function configuration](https://shopify.dev/docs/api/functions/configuration) and [Use variables in input queries](https://shopify.dev/docs/apps/build/functions/input-queries/use-variables-input-queries): configuration from metafields on the function's owner.
+- Shopify, [Subscribe to webhooks](https://shopify.dev/docs/apps/build/webhooks/subscribe) and [Webhook best practices](https://shopify.dev/docs/apps/build/webhooks/best-practices): HTTPS, Pub/Sub and EventBridge delivery, `filter` and `include_fields`, no ordering guarantee, `X-Shopify-Webhook-Id`, reconciliation.
+- Shopify Help Center, [Send HTTP request](https://help.shopify.com/en/manual/shopify-flow/reference/actions/send-http-request): Flow's HTTP action and the plans that include it.
+- Klaviyo, [How to enable onsite tracking for Shopify](https://help.klaviyo.com/hc/en-us/articles/4425956184731) and [How to create a browse abandonment flow](https://help.klaviyo.com/hc/en-us/articles/115002775252): Viewed Product and Active on Site come from the app embed, which must be re-enabled on a new theme.
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Cloudflare, [Queues pull consumers](https://developers.cloudflare.com/queues/configuration/pull-consumers/), [Queues limits](https://developers.cloudflare.com/queues/platform/limits/) (128 KB messages), [R2 object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and [restricting API tokens](https://developers.cloudflare.com/fundamentals/api/how-to/restrict-tokens/) by client IP and expiry.
