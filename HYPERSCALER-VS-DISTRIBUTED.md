@@ -279,6 +279,8 @@ A `custom_js` field injected upstream never reaches the page: the allowlist drop
 
 For a public, immutable bundle, `Access-Control-Allow-Origin: *` is fine, because there is nothing to protect in reading it. For an API that returns store or customer data, list the origins and never echo the request's `Origin` back unchecked.
 
+**Nothing secret runs in the client: anything visible on inspect is safe to show. Script injection is contained: the page runs only pinned code, and receives only signed data, never code.** Contained, not eliminated: what remains is a compromised signing tool, a bug in your own code, or a malicious extension on the shopper's device.
+
 One more check to run: a third-party tracker's snapshot marks 126 apps delisted, 89 of them dated 15 October 2026, with every cause unverified. Some may be fallout from the hijack and some from the 2025-10 retirement, but those dates come a day before the 16 October cutoff, so the versioning rule alone doesn't explain them. Shopify publishes no list of delisted apps; trackers diff the App Store over time. If you run a public app, check its listing status in the Partner Dashboard.
 
 **The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
