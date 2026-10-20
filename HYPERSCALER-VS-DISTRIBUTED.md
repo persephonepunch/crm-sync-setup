@@ -774,6 +774,36 @@ Two cautions:
 - **Strip the copy that leaves, and check it.** Removing metadata in an editor doesn't clean copies made earlier, and some image services keep metadata unless told not to. Inspect the output, for example with `exiftool`, as part of the release check.
 - **Expiry limits the link, not the copy.** Anyone who fetched the file while the link worked still has it. That is why stripping comes first: whatever does get saved has nothing in it you didn't mean to share.
 
+### Why a GPU neocloud is too big to bind tightly
+
+Two terms first, because the contrast is the point:
+
+| | What it is | In business terms | What you send it |
+|---|---|---|---|
+| **Microservice** | A small service with one job and its own API, owned by one team: price a cart, check consent, resize an image | A specialist department with a service window: you hand over one form, it hands back one answer, and it only ever sees that form | A request: small, labeled, checked by the gate, gone when it is answered |
+| **Neocloud** | A cloud provider that mostly rents GPUs for AI, such as CoreWeave, Lambda, Crusoe or Nebius, as opposed to a hyperscaler that sells everything | A heavy-equipment yard: you rent its machines by the hour or on a long contract, and bring your materials to its site | Your materials: whole datasets, long-running jobs, and the credentials to reach them |
+
+Everything in this article works because each request is small, short-lived, labeled and checked. A microservice fits that shape. A neocloud dependency breaks all four:
+
+1. **It needs bulk data, not a request.** Training and batch inference need whole datasets copied into the provider's storage ahead of time. A dataset can't carry a per-request consent label, and once copied it can't be recalled.
+2. **It needs standing access, not a per-call grant.** Jobs run for hours or weeks with credentials to datasets, checkpoints and model registries. In stack-and-heap terms, everything about it is heap.
+3. **Your perimeter doesn't reach it.** SCPs and RCPs, VPC Service Controls and Azure Policy govern your own cloud accounts. A neocloud has its own identity system, control plane, administrators and logs; you rely on its operations and a contract.
+4. **Its fast path skips the usual controls.** GPU clusters link machines with RDMA networking, InfiniBand or RoCE, to move data between GPUs outside the normal network stack. Network policy, service-mesh mTLS and egress gateways are built for ordinary IP traffic.
+5. **Its software is large, native and privileged.** Drivers, CUDA libraries and container runtimes are C and C++ running with high privilege. In [CVE-2024-0132](https://wiz.io/blog/nvidia-ai-vulnerability-deep-dive-cve-2024-0132), a malicious container image could escape the NVIDIA Container Toolkit to the host; the first patch was incomplete and a second CVE followed, fixed in version 1.17.4. On a shared GPU cluster, an escape crosses tenants.
+6. **Its outputs are derived data without a clean owner.** Checkpoints and weights can memorize training data, and embeddings can be inverted to recover text. A deletion request can't reach inside trained weights.
+7. **Its economics keep data there.** Capacity is reserved by long contract, and egress fees discourage moving data back out.
+
+So the answer isn't a tighter leash on the neocloud. It is sending it less, later and already reduced:
+
+- **Send the remainder.** The device, the gate, the cache and triage remove most requests before a GPU sees them: about 89% in the illustrative funnel.
+- **Minimize the dataset in the sandbox.** Pseudonymize and redact before export; no direct identifiers unless a contract and a legal basis require them.
+- **Give each job its own short-lived credentials,** scoped to one bucket prefix and expiring with the job.
+- **Isolate the tenancy.** Dedicated nodes or bring-your-own-cloud, and confidential GPU computing where the provider offers it.
+- **Write the contract as a control.** Residency, deletion on exit, no reuse of your data for the provider's models, audit rights and breach notice.
+- **Own the outputs.** Every checkpoint and model gets an owner, a lineage back to its datasets and their consent basis, and a retirement date.
+
+A microservice is bound by the gate on every call. A neocloud is bound by what you choose to send it, which is why it belongs on the top rung and only for the work nothing lower can do.
+
 ## Impact on enterprise infrastructure
 
 | Concern | Hyperscaler-centred | Distributed, with a system-of-record gate | What changes for the enterprise |
@@ -835,6 +865,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] KV holds only immutable or write-rarely values, named by version; consent, entitlements, counters and personal data live in Durable Objects or Xano.
 - [ ] Sign-in tokens carry identity only; account status is checked before any write; entitlements reach the page as hints, and the gate decides.
 - [ ] Consent from every banner and platform is normalized into one posture per subject, which pages, agents and model calls all read.
+- [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
 ## Sources
@@ -871,6 +902,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Cloudflare, [Queues pull consumers](https://developers.cloudflare.com/queues/configuration/pull-consumers/), [Queues limits](https://developers.cloudflare.com/queues/platform/limits/) (128 KB messages), [R2 object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and [restricting API tokens](https://developers.cloudflare.com/fundamentals/api/how-to/restrict-tokens/) by client IP and expiry.
+- Wiz Research, [CVE-2024-0132](https://wiz.io/blog/nvidia-ai-vulnerability-deep-dive-cve-2024-0132): a container escape in the NVIDIA Container Toolkit; with its follow-up CVE-2025-23359, fixed in 1.17.4.
 - Cloudflare, [Write key-value pairs](https://developers.cloudflare.com/kv/api/write-key-value-pairs/) (visibility across locations, last write wins) and [Data Localization Suite compatibility](https://developers.cloudflare.com/data-localization/compatibility/) (no jurisdiction restriction for KV storage).
 - OneTrust, [Cross domain and cross device consent](https://developer.onetrust.com/onetrust/docs/cross-domain-cross-device): a known user ID, a customer-signed JWT, an uploaded public key, a Consent Group and records of consent.
 - The Rust Programming Language, [The stack and the heap](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#the-stack-and-the-heap); Rust error [E0597](https://doc.rust-lang.org/error_codes/E0597.html), a borrowed value that does not live long enough.
