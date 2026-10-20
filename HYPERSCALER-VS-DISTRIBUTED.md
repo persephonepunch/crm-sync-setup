@@ -281,6 +281,61 @@ For a public, immutable bundle, `Access-Control-Allow-Origin: *` is fine, becaus
 
 **Nothing secret runs in the client: anything visible on inspect is safe to show. Script injection is contained: the page runs only pinned code, and receives only signed data, never code.** Contained, not eliminated: what remains is a compromised signing tool, a bug in your own code, or a malicious extension on the shopper's device.
 
+**Once the gates pass: AI-assisted data binding.** The gates aren't only a cost. Data that has passed them is typed, minimized, labeled with its consent and region, signed, and stripped of code. That is the shape a model handles well, so the work that usually goes into hand-written glue code can be assisted:
+
+- **Mapping fields.** A model proposes how a vendor's fields map onto the Xano schema (`option_title` to `label`, a size chart to `max_options`) instead of someone writing each mapping by hand.
+- **Classifying and labeling.** It suggests a consent purpose, a region or a sensitivity level for a new field, and flags one that looks personal.
+- **Drafting the binding.** It writes the allowlist row, the schema entry and the test that goes with them.
+- **Reconciling.** It matches records across Shopify, the CRM and the ERP when identifiers disagree, and explains each match.
+
+The rule that keeps this safe: **the model proposes, the gate decides.** A proposal is data, not an action. It holds no credentials and binds nothing on its own; it becomes a change only after the same schema allowlist, the tests below and a person's approval have passed it. Because the model sees only what already passed the gates, a wrong proposal costs a failed test, not a leak. The benefit is speed with a paper trail: bindings are written faster, every one is a reviewed diff with a test, and there is less hand-written glue code, which is where bugs like a label rendered through `innerHTML` come from.
+
+**Tests are the thresholds, and Rust runs them as you work.** In Rust, tests are part of the language and the toolchain: a `#[test]` function sits next to the code it checks, and `cargo test` runs it with no extra framework. The gate's thresholds become tests, so a change that breaks one can't ship:
+
+```rust
+use serde_json::{Map, Value};
+
+const ALLOWED: [&str; 3] = ["label", "badge", "max_options"];
+const MAX_POLICY_AGE_SECS: u64 = 300;
+
+/// Keeps only allowlisted fields that hold plain values; code never passes.
+pub fn allow(raw: &Map<String, Value>) -> Map<String, Value> {
+    ALLOWED
+        .iter()
+        .filter_map(|k| match raw.get(*k) {
+            Some(v @ (Value::String(_) | Value::Number(_) | Value::Bool(_))) => Some((k.to_string(), v.clone())),
+            _ => None,
+        })
+        .collect()
+}
+
+/// Fail closed: a policy older than the threshold denies.
+pub fn policy_fresh(age_secs: u64) -> bool {
+    age_secs <= MAX_POLICY_AGE_SECS
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn code_fields_never_pass() {
+        let raw = json!({ "label": "Size", "custom_js": "hijack()", "badge": { "html": "<img onerror>" } });
+        let cfg = allow(raw.as_object().unwrap());
+        assert_eq!(Value::Object(cfg), json!({ "label": "Size" }));
+    }
+
+    #[test]
+    fn stale_policy_denies() {
+        assert!(policy_fresh(300));
+        assert!(!policy_fresh(301));
+    }
+}
+```
+
+Two layers run at different moments. On every save, the editor's rust-analyzer runs `cargo check` by default, so type and ownership errors appear as you type. The tests run on every save too when a watcher such as `bacon test` is running, and they always run in the build: put `cargo test` before the compile in the Workers Builds command, so a failed threshold stops the deploy. The same tests judge every AI-proposed binding, which is what makes accepting AI help safe: the threshold doesn't care who wrote the change.
+
 One more check to run: a third-party tracker's snapshot marks 126 apps delisted, 89 of them dated 15 October 2026, with every cause unverified. Some may be fallout from the hijack and some from the 2025-10 retirement, but those dates come a day before the 16 October cutoff, so the versioning rule alone doesn't explain them. Shopify publishes no list of delisted apps; trackers diff the App Store over time. If you run a public app, check its listing status in the Partner Dashboard.
 
 **The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
@@ -1124,6 +1179,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Every app the store runs fetches only signed configuration with no code fields; inserted text never goes through `innerHTML`; checkout links resolve only to allowlisted origins, and a scheduled checkout test fails on any off-domain redirect.
 - [ ] Every executable is gated after its check as well as before: config signed, images pinned by digest, firmware accepted only signed, rolled out in stages, and attested before a job receives data.
 - [ ] The theme holds no secret, admin URL or vendor configuration endpoint; remote configuration reaches the page only through the App Proxy and a schema allowlist in the Worker, and every Wasm or JavaScript bundle is pinned by version and integrity hash.
+- [ ] AI-proposed bindings (field mappings, labels, allowlist rows) are data until the schema allowlist, the tests and a person approve them; the model holds no credentials and sees only gated data.
+- [ ] Gate thresholds (allowed fields, policy age, bundle budget) are Rust tests that run on save through a watcher and always before the compile in the build, so a failure stops the deploy.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1176,6 +1233,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
 - Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
 - Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- The Rust Book, [How to Write Tests](https://doc.rust-lang.org/book/ch11-01-writing-tests.html); rust-analyzer, [check on save](https://rust-analyzer.github.io/book/configuration.html); [bacon](https://dystroy.org/bacon/): a background checker and test runner.
 - MDN, [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS), [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP).
 - Kaspersky, [Operation ShadowHammer](https://securelist.com/operation-shadowhammer-a-high-profile-supply-chain-attack/90380/): a signed, malicious update delivered through ASUS Live Update.
 - NVIDIA, [Attestation](https://docs.nvidia.com/attestation/index.html): verifying GPU state for confidential computing.
