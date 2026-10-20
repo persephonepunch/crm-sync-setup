@@ -650,6 +650,27 @@ Media is where the spectrum costs the most, because the payloads are large and t
 
 **3D game render.** Real-time rendering belongs on the player's GPU. WebGPU in the browser takes WGSL shaders, and native engines take SPIR-V, which is where the Rust-to-bytecode path from the opening section is most useful. The edge delivers assets (glTF meshes, KTX2 textures) and never renders. The cluster bakes and compresses. Rented GPUs earn their place only for offline render farms, or for pixel streaming, when the player's device can't render the scene at all. The asset catalog in the system of record decides who receives which asset version under which licence, through the same gate as any other data.
 
+### Strip before egress
+
+The media grid's last box is one rule: **clean the file before it leaves, and hand it out only through a link that expires.** *Egress* is data leaving your system: a photo sent to a customer, a partner, a CDN, a model or a social platform.
+
+**Remove EXIF GPS and device IDs.** Phones and cameras write hidden metadata, EXIF, into every photo. It doesn't show in the picture, but anyone can read it from the file:
+
+- **GPS coordinates:** where the photo was taken, often someone's home or a warehouse.
+- **Device identifiers:** the camera or phone model, and sometimes a serial number that ties many photos to one person or device.
+- **Timestamps and software:** when it was taken and what edited it.
+
+Stripping deletes those fields and keeps the image. A product photo shot at someone's house and published unstripped publishes the house's location to everyone who downloads it.
+
+**Signed, expiring URLs only.** Instead of a permanent public link such as `…/photos/1234.jpg`, the system issues a link with a signature and an expiry built in: this one file, for the next few minutes. Changing any part of the link breaks the signature, and after the expiry it stops working. A link that is forwarded, scraped or left in a log goes dead on its own, and no one can guess the next file's address.
+
+The two halves cover different things. Stripping controls *what* is in the file when it leaves; signed URLs control *who* can fetch it, and for how long. The original stays in the private bucket, as the system of record; only a cleaned copy travels, briefly.
+
+Two cautions:
+
+- **Strip the copy that leaves, and check it.** Removing metadata in an editor doesn't clean copies made earlier, and some image services keep metadata unless told not to. Inspect the output, for example with `exiftool`, as part of the release check.
+- **Expiry limits the link, not the copy.** Anyone who fetched the file while the link worked still has it. That is why stripping comes first: whatever does get saved has nothing in it you didn't mean to share.
+
 ## Impact on enterprise infrastructure
 
 | Concern | Hyperscaler-centred | Distributed, with a system-of-record gate | What changes for the enterprise |
