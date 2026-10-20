@@ -920,6 +920,40 @@ Four design rules come out of it:
 
 Agents get none of this by default. An agent acts under a mandate issued for a task, with its own cap and expiry, never under the person's sign-in.
 
+### `Arc`, row gating, claims and extras: who may share what
+
+Rust's `Arc<T>` (*atomically reference counted*) lets many parts of a program share one value in memory. `Arc::clone` doesn't copy the data; it hands out another handle and adds one to a counter. When the last handle is dropped, the counter reaches zero and the value is freed, with no garbage collector. An `Arc` is read-only by default; changing the value needs a lock, `Arc<Mutex<T>>`, so only one holder writes at a time, and the compiler won't let you skip it. (Rust Workers run as single-threaded Wasm, where the non-atomic `Rc` is usually enough; `Arc` matters when threads really share data.)
+
+In the file-room picture, an `Arc` is one master document with a sign-out sheet: everyone gets a handle to the same copy, the sheet counts who still holds one, and the last one to hand it back shreds it. What an `Arc` doesn't have is a clerk. Holding a handle *is* the permission. That is the whole difference from the system of record.
+
+**`Arc` against row-based gating.** Row-based gating checks every read: in Xano, an endpoint that requires authentication and filters each query on `$auth.id`; in Postgres, a row-level security policy. Each row comes back only to its owner or to a role allowed to see it.
+
+| | `Arc` (shared in memory) | Row-based gating (Xano, Postgres) |
+|---|---|---|
+| When access is checked | Once, before the value is shared | On every read |
+| Granularity | The whole value | Per row, and per field through the response shape |
+| Who can read | Anyone holding a handle | Only the row's owner, or a role allowed to read it |
+| How long it lasts | Until the last handle is dropped, or the process stops | Until a rule or a person deletes it |
+| History | None: an overwritten value is gone | Ledger and audit log |
+| Right for | Data that is the same for every request: the verified policy bundle, the field allowlist, the public keys that verify tokens, a parsed schema | Data that belongs to someone: orders, consent, profiles |
+| How it fails | A handle in the wrong place exposes the whole value | A query that forgets the filter returns everyone's rows. Keep the filter in one shared function, and test it |
+
+The rule that joins them: **an `Arc` may hold only data that every reader would pass the row gate for**, which means data no person owns. Load it once, verify it, share it, and replace it with a new version rather than editing it, the same rule KV follows.
+
+**`Arc` against claims and extras.** Each layer of `/auth/me` has a different owner and lifetime, so each belongs in a different kind of memory:
+
+| Layer | Shared in an `Arc`? | Where it belongs instead | Why |
+|---|---|---|---|
+| Policy bundle, allowlist, token-verifying keys | **Yes** | Loaded once per version | The same for everyone, and immutable |
+| The verified token | No | The request: stack-shaped, dropped at the end of the call | It belongs to one caller and expires |
+| Account status | No | Read fresh from Xano before any write | A cached status is how a deleted account kept creating customers on 31 August 2026 |
+| Claims (`user_claims`) | No | The request, after the gate reads them from Xano | Identity links are personal data |
+| Extras (`user_extras`) | No | Xano, read per request through the row gate | Personal, change often, and are cleared when consent is withdrawn; a shared copy would outlive the withdrawal |
+| Entitlement | No | A per-subject Durable Object, as a projection of Xano | Must reflect a revocation now, not when the last handle is dropped |
+| The decision | No | The request, signed, then gone | It answers one call, for one purpose |
+
+In business terms: the `Arc` is the rules posted on the wall, which everyone may read and nobody signs out. Claims are the badge that says who you are. Extras are the preferences card inside your own folder. Row gating is the clerk who checks your badge every time you ask for a folder. Post only rules on the wall; anything with a person's name on it goes through the clerk.
+
 ### OneTrust is a session log for one domain
 
 A consent banner such as OneTrust works like a hosted key-value session log: it records what this browser chose on this site, in the `OptanonConsent` cookie and, with consent logging turned on, in OneTrust's cloud. That suits one website. It doesn't stretch across many:
@@ -1181,6 +1215,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] The theme holds no secret, admin URL or vendor configuration endpoint; remote configuration reaches the page only through the App Proxy and a schema allowlist in the Worker, and every Wasm or JavaScript bundle is pinned by version and integrity hash.
 - [ ] AI-proposed bindings (field mappings, labels, allowlist rows) are data until the schema allowlist, the tests and a person approve them; the model holds no credentials and sees only gated data.
 - [ ] Gate thresholds (allowed fields, policy age, bundle budget) are Rust tests that run on save through a watcher and always before the compile in the build, so a failure stops the deploy.
+- [ ] Shared in-memory values (`Arc`, `Rc`, module-level caches) hold only versioned data no person owns; claims, extras, status and entitlements are read per request through the row gate.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1233,6 +1268,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
 - Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
 - Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- Rust standard library, [`std::sync::Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html); PostgreSQL, [Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 - The Rust Book, [How to Write Tests](https://doc.rust-lang.org/book/ch11-01-writing-tests.html); rust-analyzer, [check on save](https://rust-analyzer.github.io/book/configuration.html); [bacon](https://dystroy.org/bacon/): a background checker and test runner.
 - MDN, [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS), [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP).
 - Kaspersky, [Operation ShadowHammer](https://securelist.com/operation-shadowhammer-a-high-profile-supply-chain-attack/90380/): a signed, malicious update delivered through ASUS Live Update.
