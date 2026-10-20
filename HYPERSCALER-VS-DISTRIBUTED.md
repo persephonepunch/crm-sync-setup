@@ -239,6 +239,46 @@ So the calendar and the breach answer different questions. The calendar fixes *h
 
 Firmware is the hardest case. It runs below every sandbox in this article, survives a reinstall of the operating system, and few tools can inspect it. One firmware image ships to every unit of a part number, so a bad update reaches the whole fleet at once: the castle vault again. A signature doesn't settle it either. If the vendor's update channel is compromised, the malicious update arrives signed, as in the 2019 ShadowHammer attack on ASUS's Live Update tool. The defenses are the same rules applied lower down: an inventory by MPN and firmware version, updates only from the vendor's channel and rolled out in stages, measured boot, and device attestation where the hardware offers it. On rented GPUs, NVIDIA's attestation for confidential computing lets a job check what it is running on before it receives data.
 
+**What a remote load through Cloudflare protects, and what CORS doesn't.** Everything in the Hulk attack was visible in the browser. The app's script, on every storefront, called `productoption.hulkapps.com/api/v2/store/get_all_relationships` and ran whatever came back in `advanced_users.custom_js`. That visibility is how a developer found the attack in the browser's developer tools, and it is also why it worked: the page trusted a third-party endpoint to send code, and nothing between the two checked it.
+
+**Hard-code nothing in the theme you wouldn't publish.** Whatever a client-side render needs is readable by anyone: the theme's Liquid output, its JavaScript, app embed settings, and every network call the page makes. Never put these in a theme: API keys or tokens (other than ones designed to be public, such as a Storefront API token with read-only scopes), internal tool or admin URLs, third-party configuration endpoints keyed by shop domain, pricing or discount logic (that belongs in a Function), or switches that unlock behavior. The theme should carry only a proxy path, a version number, a content hash and public IDs.
+
+**Load remote code and configuration through the Worker, not straight from a vendor.** The page calls the store's own App Proxy path. Shopify signs the request; the Worker verifies the HMAC, fetches the configuration from Xano with a server-side secret, checks its signature, keeps only the fields the schema allows, and returns data, never code. Wasm and JavaScript bundles are named by version, served immutable, and pinned in the theme by hash.
+
+```html
+<!-- In the theme: a path, a version and a hash. Nothing secret. -->
+<script type="module">
+  const cfg = await (await fetch("/apps/crm/config?v=42")).json(); // App Proxy: same origin, signed by Shopify
+  const { instance } = await WebAssembly.instantiateStreaming(
+    fetch("https://assets.example.com/app-42.wasm", { integrity: "sha384-..." }), {} // bytes must match
+  );
+  document.querySelector("#option-label").textContent = cfg.label; // text, never innerHTML
+</script>
+```
+
+```js
+// In the Worker, behind the App Proxy: data fields only, whatever the source contains.
+const ALLOWED = ["label", "badge", "max_options"];
+if (!(await verifyAppProxy(url, env.SHOPIFY_APP_SECRET))) return new Response("", { status: 401 });
+const raw = await getSignedConfig(env, shop); // fetched with a server secret; throws on a bad signature
+const cfg = {};
+for (const k of ALLOWED) if (["string", "number", "boolean"].includes(typeof raw[k])) cfg[k] = raw[k];
+return Response.json(cfg, { headers: { "Cache-Control": "no-store" } });
+```
+
+A `custom_js` field injected upstream never reaches the page: the allowlist drops it, and the theme has no code path that would run it. Each control covers one part of the path, and none covers it alone:
+
+| Control | What it protects | What it doesn't |
+|---|---|---|
+| **CORS allowlist** on the Worker: reflect only listed origins, with `Vary: Origin` | Which other sites' pages can read your API's responses in a browser | It isn't authentication: `curl` ignores it, and a plain `<script src>` needs no CORS. It can't stop an allowed origin from receiving bad data, which is exactly the Hulk case |
+| **App Proxy with HMAC** | The request came through Shopify, for that shop, on the store's own domain; no vendor endpoint appears in the theme | What the response contains |
+| **Server-side secret and signed configuration** | Only your pipeline can change configuration; tampering in transit or in storage fails the signature | A compromised signing tool, as with Selleasy's internal tool. That needs two-person approval and an audit log |
+| **Schema allowlist in the Worker** | Code fields are dropped even if they were injected upstream | A malicious value inside an allowed text field, which is why the page inserts text with `textContent` |
+| **Integrity hash on Wasm and JavaScript** | The bytes that run are the version you pinned | What that version does with its inputs. Cross-origin fetches need the asset to send CORS headers for the check to run |
+| **Content security policy**, where you control the page's headers (a Webflow export served by the Worker) | Where page code may load scripts from and send data to; a lookalike checkout domain is refused | Pages whose headers the platform sets for you |
+
+For a public, immutable bundle, `Access-Control-Allow-Origin: *` is fine, because there is nothing to protect in reading it. For an API that returns store or customer data, list the origins and never echo the request's `Origin` back unchecked.
+
 One more check to run: a third-party tracker's snapshot marks 126 apps delisted, 89 of them dated 15 October 2026, with every cause unverified. Some may be fallout from the hijack and some from the 2025-10 retirement, but those dates come a day before the 16 October cutoff, so the versioning rule alone doesn't explain them. Shopify publishes no list of delisted apps; trackers diff the App Store over time. If you run a public app, check its listing status in the Partner Dashboard.
 
 **The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
@@ -1081,6 +1121,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] The three compliance webhooks are verified by HMAC, routed to the subject's home region and completed within 30 days; the Partner account has a named owner and a response deadline for Shopify review emails.
 - [ ] Every app the store runs fetches only signed configuration with no code fields; inserted text never goes through `innerHTML`; checkout links resolve only to allowlisted origins, and a scheduled checkout test fails on any off-domain redirect.
 - [ ] Every executable is gated after its check as well as before: config signed, images pinned by digest, firmware accepted only signed, rolled out in stages, and attested before a job receives data.
+- [ ] The theme holds no secret, admin URL or vendor configuration endpoint; remote configuration reaches the page only through the App Proxy and a schema allowlist in the Worker, and every Wasm or JavaScript bundle is pinned by version and integrity hash.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1133,6 +1174,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
 - Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
 - Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- MDN, [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS), [Subresource Integrity](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) and [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP).
 - Kaspersky, [Operation ShadowHammer](https://securelist.com/operation-shadowhammer-a-high-profile-supply-chain-attack/90380/): a signed, malicious update delivered through ASUS Live Update.
 - NVIDIA, [Attestation](https://docs.nvidia.com/attestation/index.html): verifying GPU state for confidential computing.
 - Roman Zipp, [Shopify shops hit with ongoing Checkout Hijack attack](https://romanzipp.com/blog/shopify-hit-with-phishing-attack): the `advanced_users.custom_js` field, the checkout-button handler and the lookalike domains.
