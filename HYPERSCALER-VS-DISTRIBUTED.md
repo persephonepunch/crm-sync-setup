@@ -172,6 +172,57 @@ This is bind before you allocate, at checkout scale: Shopify sizes the sandbox, 
 
 The limits: Wasm isolates the function, it doesn't make the function correct; a wrong discount rule is applied to every cart, so test it like any other release. Shopify strongly recommends Rust, because a JavaScript Function carries a JavaScript engine inside its module and spends the instruction budget faster, which is how large carts fail. Custom apps that use the Function APIs need Shopify Plus. See [October 1: script tags, Functions, the cart](https://www.crm-sync.dev/pages/knowledge-base#shopify-october-1-scripts-cart-catalog) for the migration and the language choice.
 
+### Shopify apps: where the Wasm sits, the security rules, and the deprecation calendar
+
+**The Wasm bundle is one slot in a Shopify app, not the whole app layer.** A Shopify app has several parts, and only Shopify Functions run as Wasm:
+
+| Part of a Shopify app | Where it runs | What it's made of |
+|---|---|---|
+| **Shopify Functions** | Shopify's servers, during cart and checkout | **Wasm**, compiled from Rust, or from JavaScript through Javy. Deterministic, no network, hard limits. Discounts, delivery and payment rules, validation, bundles |
+| Checkout and customer account UI extensions | The buyer's browser, in a sandboxed Web Worker | JavaScript or TypeScript drawing Shopify's own components. Not Wasm |
+| Theme app extensions (app blocks and app embeds) | The storefront theme, turned on by the merchant in the theme editor | Liquid, JavaScript and CSS |
+| Web pixels | A sandbox on the storefront and checkout, gated by the customer's privacy choices | JavaScript, for analytics and conversion events only |
+| Embedded admin app | An iframe in the Shopify admin, using App Bridge and session tokens | Your web app, hosted wherever you choose |
+| App backend: webhooks, App Proxy, APIs | Your own servers, such as a Worker in front of Xano | Any language |
+
+The same Rust source can build two different artifacts: a **Shopify Function**, Wasm on Shopify's servers that decides prices and rules, and a **browser bundle**, Wasm on the device that draws and computes on the page. The browser bundle reaches a storefront through an app embed block or through the App Proxy described below. It runs like any page script; it gets neither the Function's checkout privileges nor its limits.
+
+**The security rules a public app must meet.** These are Shopify's App Store requirements and data rules, and each one is permissions as architecture:
+
+| Rule | What Shopify requires | What it binds |
+|---|---|---|
+| Encryption in transit | A valid TLS certificate; all traffic between client and app server encrypted, with no certificate errors (requirement 3.1.1) | The wire |
+| Least-privilege scopes | Request only the access scopes the app needs, and be ready to justify them; sensitive scopes such as `read_all_orders` need approval (3.2) | What the app may reach |
+| OAuth first | Authorize through OAuth immediately on install and on reinstall, before any other step (2.3) | Who granted the access |
+| Session tokens | Embedded apps authenticate with session tokens, without third-party cookies or local storage (1.1.1) | Each admin request |
+| Mandatory compliance webhooks | Subscribe to `customers/data_request`, `customers/redact` and `shop/redact`; answer with a 2xx, reject a bad HMAC with `401`, and complete the action within 30 days, even if the app stores no personal data | Data subject rights |
+| Protected customer data | Level 1 for any customer data: minimize, encrypt at rest and in transit, set retention. Level 2 adds name, address, email and phone: encrypted backups, limited staff access, access logs that are reviewed, and data protection reviews if selected | Personal fields, field by field |
+| Current APIs only | New public apps must use the GraphQL Admin API (since 1 April 2025); an app using APIs deprecated within 90 days can't be submitted | Time: no new code on a dying surface |
+
+In this architecture the Worker carries most of these rules once, for every theme: it checks the App Proxy HMAC, holds the session, answers the compliance webhooks and routes them to the subject's home Xano instance, and Xano's ledger records that each request was completed within 30 days.
+
+**Delisting.** Shopify doesn't publish an inactivity or install-count rule for removing apps. Its requirements say the review team may reject an app at its discretion, and that breaking the rules can lead to "removal of reviews, demotion or delisting of your app, or termination of your Partner account" (requirement 1.3). An app whose core functionality has changed since it was listed must be resubmitted for a full review. Developers report delistings after missing the response window on a Shopify governance email, and in some cases every app under the same Partner account was delisted at once. Those reports are anecdotal, but the pattern is familiar: one account is one perimeter. Three practices follow:
+
+- **Give the Partner account a named owner and a response deadline** shorter than Shopify's, and route Shopify's review and governance emails to a shared inbox, not one person.
+- **Keep the listing true.** Re-check the listing against the app before each release, so the claims and the scopes match what the app does.
+- **Don't let the app hold the data.** If the listing goes down, merchants lose the app's interface, not their records: the system of record stays in Xano, and the Worker can serve a merchant directly while the listing is restored.
+
+**The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
+
+| Date | Change | Replacement | Status |
+|---|---|---|---|
+| 1 Oct 2024 | REST Admin API becomes legacy | GraphQL Admin API | Done |
+| 1 Apr 2025 | New public apps must use GraphQL | GraphQL Admin API | Done |
+| 28 Aug 2025 | Plus stores: `checkout.liquid` and script tags on the Thank you and Order status pages turned off | Checkout and customer account UI extensions, web pixels | Done |
+| 1 Jan 2026 | No new legacy custom apps created in the Shopify admin | Apps created in the Dev Dashboard, with a client credentials grant for tokens | Done |
+| 15 Apr 2026 | Shopify Scripts can no longer be edited or published | Shopify Functions | Done |
+| 30 Jun 2026 | Shopify Scripts stop running | Shopify Functions | Done |
+| 26 Aug 2026 | Non-Plus stores: Thank you and Order status script tags turned off | Customer account UI extensions, web pixels | Done |
+| 1 Oct 2026 | `scriptTagCreate` and `scriptTagUpdate` return errors on every API version; existing storefront script tags keep running | App embed blocks in a theme app extension; web pixels for analytics | Done |
+| 1 Mar 2027 | Shopify stops injecting script tags into storefronts | App embed blocks; web pixels | **Next** |
+
+Read the calendar as one direction of travel. Each deprecation moves code out of open page scripts, which could read and change anything on the page, into a slot with a declared boundary: Ruby Scripts into Wasm Functions, `checkout.liquid` into sandboxed UI extensions, script tags into app embeds the merchant can see and switch off, and tracking into web pixels that respect consent. Shopify is applying permissions as architecture to its own platform. An app built on those slots from the start has much less to migrate.
+
 ### The Rust path: a Webflow page, a Cloudflare compile, a Xano record
 
 Ruffle keeps old SWF files playable. New interactive work doesn't need the SWF format or an emulator: write it in Rust, compile it to Wasm once, and nest it in the stack this article already uses. Each system keeps one job, and none of them takes on another's:
@@ -988,6 +1039,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Bytecode for people has a size and frame budget checked in the build; bytecode for models is compiled per GPU, tested against a reference output, and rebuilt when the GPU model or driver changes.
 - [ ] Every base model, language adapter and data set has a manifest row (version, region, training data, consent basis, license, retirement date); only weights trained on public material ship to devices, and the Worker serves each audience only its own bundle.
 - [ ] 3D assets ship as glTF with compressed meshes and KTX2 textures; decoding runs off the main thread, frames are drawn off-screen and presented on the display's beat, and lossy display copies never replace the CAD source.
+- [ ] The Shopify app uses only current slots (Functions, UI extensions, app embeds, web pixels); no script tag remains after 1 March 2027, and the API version in use is checked against the response header each quarter.
+- [ ] The three compliance webhooks are verified by HMAC, routed to the subject's home region and completed within 30 days; the Partner account has a named owner and a response deadline for Shopify review emails.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1035,6 +1088,12 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - AWS, [Resource control policies](https://aws.amazon.com/about-aws/whats-new/2024/11/resource-control-policies-restrict-access-aws-resources) and [Building a data perimeter on AWS](https://docs.aws.amazon.com/whitepapers/latest/building-a-data-perimeter-on-aws/perimeter-overview.html); [Amazon Verified Permissions](https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/what-is-avp.html); [AWS App Mesh](https://docs.aws.amazon.com/app-mesh/latest/userguide/what-is-app-mesh.html) (support ended 30 September 2026).
 - Google Cloud, [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview) and [Model Armor with Vertex AI](https://docs.cloud.google.com/model-armor/model-armor-vertex-integration).
 - Microsoft, [Azure Policy](https://learn.microsoft.com/en-us/azure/governance/policy/overview), [Network security perimeter](https://learn.microsoft.com/en-us/azure/private-link/network-security-perimeter-concepts) and [Prompt Shields](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/jailbreak-detection).
+- Shopify, [App Store requirements](https://shopify.dev/docs/apps/launch/shopify-app-store/app-store-requirements) and [App requirements checklist](https://shopify.dev/docs/apps/launch/app-requirements-checklist): TLS, scopes, OAuth, session tokens, consequences including delisting (1.3), the 90-day deprecated-API rule.
+- Shopify, [Privacy law compliance](https://shopify.dev/docs/apps/build/compliance/privacy-law-compliance) and [Protected customer data](https://shopify.dev/docs/apps/launch/protected-customer-data): the three mandatory webhooks, the 30-day deadline, level 1 and level 2 requirements.
+- Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
+- Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
+- Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- Shopify Developer Community, [No new legacy custom apps from January 1, 2026](https://community.shopify.dev/t/starting-january-1-2026-you-will-not-be-able-to-create-new-legacy-custom-apps-this-will-not-impact-any-existing-apps/26798), and developer reports of delisting after a missed governance email ([one](https://community.shopify.dev/t/my-app-has-been-temporarily-delisted/38502), [portfolio-wide](https://community.shopify.com/t/our-entire-app-portfolio-was-delisted-due-to-one-app-10-apps-offline-merchants-impacted-need-guidance/689638)): anecdotal.
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
 - Cloudflare, [Queues pull consumers](https://developers.cloudflare.com/queues/configuration/pull-consumers/), [Queues limits](https://developers.cloudflare.com/queues/platform/limits/) (128 KB messages), [R2 object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) and [restricting API tokens](https://developers.cloudflare.com/fundamentals/api/how-to/restrict-tokens/) by client IP and expiry.
