@@ -201,11 +201,29 @@ The same Rust source can build two different artifacts: a **Shopify Function**, 
 
 In this architecture the Worker carries most of these rules once, for every theme: it checks the App Proxy HMAC, holds the session, answers the compliance webhooks and routes them to the subject's home Xano instance, and Xano's ledger records that each request was completed within 30 days.
 
-**Delisting.** Shopify doesn't publish an inactivity or install-count rule for removing apps. Its requirements say the review team may reject an app at its discretion, and that breaking the rules can lead to "removal of reviews, demotion or delisting of your app, or termination of your Partner account" (requirement 1.3). An app whose core functionality has changed since it was listed must be resubmitted for a full review. Developers report delistings after missing the response window on a Shopify governance email, and in some cases every app under the same Partner account was delisted at once. Those reports are anecdotal, but the pattern is familiar: one account is one perimeter. Three practices follow:
+**Delisting.** Shopify publishes one automatic rule, in its API versioning policy: "If your app continues to use unsupported resources after the upgrade deadline, it's delisted from the Shopify App Store." Merchants are also blocked from installing it for at least seven days, and see warnings in the admin until seven days after the last use of an unsupported resource. The Partner Dashboard's API health report lists which calls need changing. Shopify doesn't publish an inactivity or install-count rule. Beyond the versioning rule, its requirements say the review team may reject an app at its discretion, and that breaking the rules can lead to "removal of reviews, demotion or delisting of your app, or termination of your Partner account" (requirement 1.3). An app whose core functionality has changed since it was listed must be resubmitted for a full review. Developers report delistings after missing the response window on a Shopify governance email, and in some cases every app under the same Partner account was delisted at once. Those reports are anecdotal, but the pattern is familiar: one account is one perimeter. Three practices follow:
 
 - **Give the Partner account a named owner and a response deadline** shorter than Shopify's, and route Shopify's review and governance emails to a shared inbox, not one person.
 - **Keep the listing true.** Re-check the listing against the app before each release, so the claims and the scopes match what the app does.
 - **Don't let the app hold the data.** If the listing goes down, merchants lose the app's interface, not their records: the system of record stays in Xano, and the Worker can serve a merchant directly while the listing is restored.
+
+**Case: the October 2026 checkout hijack.** Between 10 and 14 October 2026, attackers used a few third-party Shopify apps to send some shoppers to fake payment pages. Shopify's own checkout wasn't breached; what the apps sent to stores was changed.
+
+- **Hulk Product Options.** The app's script loaded from Shopify's CDN, then fetched its configuration from the developer's own API. One field, `advanced_users.custom_js`, was meant to hold custom JavaScript, and it had been replaced with about 22.7 KB of attack code. The code attached a handler to the checkout button, sent the shopper once to a lookalike domain that collected card and billing details, then passed them on to the real checkout, so the order looked normal in the admin. Shopify temporarily disabled the app's theme extension.
+- **Selleasy.** Its developer, Logbase, said an unauthorized party reached one of its internal tools and added a script to store settings, live from 07:47 to 15:00 UTC on 13 October.
+- **Swym Wishlist Plus** was named by merchants. Swym hasn't confirmed it, and one report says a value meant to be a plain text label carried HTML with an event handler. The three apps were reported missing from the App Store afterwards.
+
+The review checked the code the app shipped; it couldn't check what that code fetched later. Remote configuration can change without a release, which is why it is useful, and that is also why a compromised configuration system reaches every store that reads it. In this article's terms the slot was the right shape, but the gate was missing on the app's own config path:
+
+| The question | What went wrong | The rule in this design |
+|---|---|---|
+| What runs first? | Reviewed code, delivered from Shopify's CDN | Keep it. App embeds are visible and can be switched off |
+| What does it fetch afterwards? | Unsigned configuration from the developer's API | Sign config bundles and verify them before applying, like the policy bundle; deny on a bad or stale signature |
+| How is that content handled? | A data field executed as code | No code fields in remote configuration. Insert text with `textContent`, never `innerHTML` |
+| Who can change it? | An internal tool that reached many stores at once | Two-person approval and an audit log for any change that reaches more than one store |
+| Where can checkout go? | Off-domain, to a lookalike | Checkout links are built only from allowlisted origins, and a synthetic test fails on any off-domain redirect |
+
+One more check to run: a third-party tracker's snapshot marks 126 apps delisted, 89 of them dated 15 October 2026, with every cause unverified. Some may be fallout from the hijack and some from the 2025-10 retirement, but those dates come a day before the 16 October cutoff, so the versioning rule alone doesn't explain them. Shopify publishes no list of delisted apps; trackers diff the App Store over time. If you run a public app, check its listing status in the Partner Dashboard.
 
 **The deprecation calendar.** Shopify releases a new API version every quarter, on the first day of the quarter at 17:00 UTC, and supports each version for at least 12 months. A request for a retired version *falls forward* to the oldest supported version, so old code keeps receiving answers in a newer shape. Read the `X-Shopify-API-Version` response header to see which version actually answered. The dated changes that matter here, as of October 2026:
 
@@ -219,7 +237,11 @@ In this architecture the Worker carries most of these rules once, for every them
 | 30 Jun 2026 | Shopify Scripts stop running | Shopify Functions | Done |
 | 26 Aug 2026 | Non-Plus stores: Thank you and Order status script tags turned off | Customer account UI extensions, web pixels | Done |
 | 1 Oct 2026 | `scriptTagCreate` and `scriptTagUpdate` return errors on every API version; existing storefront script tags keep running | App embed blocks in a theme app extension; web pixels for analytics | Done |
-| 1 Mar 2027 | Shopify stops injecting script tags into storefronts | App embed blocks; web pixels | **Next** |
+| 16 Oct 2026, 15:00 UTC | API version 2025-10 stops being accessible; apps still using unsupported resources are delisted | 2026-01 or later | Done |
+| 16 Jan 2027, 15:00 UTC | API version 2026-01 stops being accessible | 2026-04 or later | **Next** |
+| 1 Mar 2027 | Shopify stops injecting script tags into storefronts | App embed blocks; web pixels | Coming |
+
+After that, a version retires every quarter on the 16th at 15:00 UTC: 2026-04 in April 2027, 2026-07 in July 2027, 2026-10 in October 2027. Shopify CLI refuses to deploy UI extensions that target a version more than 12 months old, so the tooling blocks a stale app before the cutoff does. Fields can also be removed between versions: something deprecated in one release can be gone in the next.
 
 Read the calendar as one direction of travel. Each deprecation moves code out of open page scripts, which could read and change anything on the page, into a slot with a declared boundary: Ruby Scripts into Wasm Functions, `checkout.liquid` into sandboxed UI extensions, script tags into app embeds the merchant can see and switch off, and tracking into web pixels that respect consent. Shopify is applying permissions as architecture to its own platform. An app built on those slots from the start has much less to migrate.
 
@@ -1041,6 +1063,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] 3D assets ship as glTF with compressed meshes and KTX2 textures; decoding runs off the main thread, frames are drawn off-screen and presented on the display's beat, and lossy display copies never replace the CAD source.
 - [ ] The Shopify app uses only current slots (Functions, UI extensions, app embeds, web pixels); no script tag remains after 1 March 2027, and the API version in use is checked against the response header each quarter.
 - [ ] The three compliance webhooks are verified by HMAC, routed to the subject's home region and completed within 30 days; the Partner account has a named owner and a response deadline for Shopify review emails.
+- [ ] Every app the store runs fetches only signed configuration with no code fields; inserted text never goes through `innerHTML`; checkout links resolve only to allowlisted origins, and a scheduled checkout test fails on any off-domain redirect.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1093,6 +1116,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Shopify, [API versioning](https://shopify.dev/docs/api/usage/versioning): quarterly releases, 12 months of support, falling forward.
 - Shopify, [Shopify Scripts will be deprecated on June 30, 2026](https://shopify.dev/changelog/shopify-scripts-will-be-deprecated-on-june-30-2026) and [Script tags will stop running on March 1, 2027](https://shopify.dev/changelog/online-store-script-tags-deprecation).
 - Shopify, [checkout.liquid](https://shopify.dev/docs/storefronts/themes/architecture/layouts/checkout-liquid) and [Order status script tags](https://shopify.dev/docs/apps/build/online-store/script-tag-deprecation/order-status): Thank you and Order status cutoffs for Plus (28 August 2025) and non-Plus (26 August 2026) stores.
+- Roman Zipp, [Shopify shops hit with ongoing Checkout Hijack attack](https://romanzipp.com/blog/shopify-hit-with-phishing-attack): the `advanced_users.custom_js` field, the checkout-button handler and the lookalike domains.
+- Proactivo Commerce, [Was Shopify Hacked? The October 2026 Checkout Hijack](https://proactivocommerce.com/blogs/insights/was-shopify-hacked-checkout-hijack), and Tech Business News, [Shopify stores caught in fake checkout attack](https://www.techbusinessnews.com.au/news/shopify-stores-caught-in-fake-checkout-attack-as-hijacked-apps-redirect-shoppers/): timeline, Selleasy's statement, Shopify's response.
 - Shopify Developer Community, [No new legacy custom apps from January 1, 2026](https://community.shopify.dev/t/starting-january-1-2026-you-will-not-be-able-to-create-new-legacy-custom-apps-this-will-not-impact-any-existing-apps/26798), and developer reports of delisting after a missed governance email ([one](https://community.shopify.dev/t/my-app-has-been-temporarily-delisted/38502), [portfolio-wide](https://community.shopify.com/t/our-entire-app-portfolio-was-delisted-due-to-one-app-10-apps-offline-merchants-impacted-need-guidance/689638)): anecdotal.
 - Shopify, [About app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies) (prefix and subpath, `path_prefix`, `application/liquid`, stripped `Set-Cookie`) and [Authenticate app proxies](https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies) (HMAC-SHA256 over sorted parameters).
 - Kakao Pay, [Developer center](https://developers.kakaopay.com/): online payment API, with redirect URLs on the merchant's registered domains.
