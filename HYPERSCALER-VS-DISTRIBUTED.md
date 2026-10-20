@@ -785,6 +785,33 @@ What this keeps constant, whichever page is in front:
 
 See [Fragments for any frontend](https://persephonepunch.github.io/crm-sync-setup/fragments-any-frontend.html) for the component side of the same idea.
 
+### Hydrogen and Oxygen: the storefront code and where it runs, with no plugins required
+
+**Hydrogen is the code; Oxygen is where it runs.** Hydrogen is Shopify's framework for a custom storefront, built on React Router 7 (Remix before 2025). Oxygen is Shopify's hosting for it: edge Workers on Cloudflare's `workerd` runtime, the same layer as the gate in this article. In business terms, Hydrogen is the storefront you build and own; Oxygen is the building Shopify lends you on paid plans, next to its own checkout and data.
+
+| | Hydrogen | Oxygen |
+|---|---|---|
+| What it is | A framework for a headless Shopify storefront | Shopify's hosting for that storefront |
+| Built on | React Router 7, reading the Storefront API and Customer Account API | Storefront Workers behind a gateway Worker on Cloudflare |
+| You control | Routes, components, queries, which events are sent and when | Environments (production, a preview per branch), variables, domains |
+| Run it with | `npm run dev` locally, with Mini Oxygen as the stand-in host | `shopify hydrogen deploy`, or a GitHub push through the Hydrogen sales channel |
+| Replaceable? | Yes: any framework can call the Storefront API (the Headless sales channel issues its tokens) | Yes: Hydrogen also runs on Vercel, Netlify or your own Cloudflare Worker |
+
+**Hydrogen is always headless, but not all or nothing.** It renders no Liquid theme, so there is no theme mode. It can still be one route or one subdomain (a configurator, a market microsite, an agent-facing page) while the theme serves the rest, with a Worker in front routing paths. The cart ID and the consent state must carry across both sides, and every buyer still ends at Shopify checkout, where checkout extensions and Functions run unchanged.
+
+**No plugin requirement.** A Hydrogen storefront needs no app from the App Store to run. The only install is Shopify's own Hydrogen or Headless sales channel, which issues the API tokens; it is not a third-party plugin. Theme app extensions, app embeds and script tags have nowhere to load, because there is no theme for them to inject into:
+
+| What a theme gets through a plugin | What Hydrogen does instead |
+|---|---|
+| App embeds and theme app extensions (reviews, product options, Klaviyo onsite tracking) | The team calls the vendor's API or SDK from its own code, pinned to a version and reviewed like any dependency |
+| Script tags and `custom_js` fields fetched at runtime | Nothing is fetched as code; data arrives as JSON through the gate and is rendered as text |
+| Web pixels added by apps | Hydrogen's analytics components send the events the team chooses, after the Customer Privacy API says yes |
+| Theme editor sections | Metaobjects or a CMS, read through the Storefront API |
+
+That is the security case in one line: **no plugin means no injection path.** The October 2026 checkout hijack ran through an app's theme extension loading attacker-edited JavaScript; a Hydrogen storefront has no such door, because only code the team built and deployed runs on the page. The cost is ownership: each integration a plugin would have installed in a click becomes code the team writes, tests and keeps current, and merchandisers lose the visual theme editor unless a CMS replaces it.
+
+What doesn't change: Hydrogen renders on the server by default, so the consent rule in this article applies there too. A loader can send customer data to a third party before the visitor answers the banner; gate those calls on the consent signal the same way the Worker does. And Hydrogen replaces no checkout logic: discounts, delivery and payment rules still run as Shopify Functions inside Shopify.
+
 ### Sandbox before on-prem: a smaller perimeter, owned privately
 
 Data from outside (a partner feed, an agent's output, an upload, a SaaS export) shouldn't land on-prem as it arrives. It lands first in a sandbox that can reach nothing, is restricted there, and only the reduced, labeled result is let in. The on-prem perimeter shrinks because less data, from fewer systems, ever reaches it, and what does arrive is managed privately by the internal teams that own it.
@@ -1298,6 +1325,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Consent defaults to denied, with a bounded wait for the banner; the gate treats a pending posture as denied, and agents and chatbots work only from public data until a signed posture arrives.
 - [ ] Every agent, chatbot and customer-service action carries an idempotency key held in a Durable Object or Xano; agent requests also carry a signed identity, the consent posture reference and a mandate, checked separately from TLS.
 - [ ] Chat transcripts have a notice, a purpose, an owner, a region and a retention date; order details are revealed only after the requester's claims match the order through the row gate.
+- [ ] A Hydrogen storefront runs no App Store plugin: each vendor integration is pinned code calling an API, analytics wait for the Customer Privacy API, and the cart ID and consent state carry across any theme/Hydrogen split.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -1374,6 +1402,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - OneTrust, [Cross domain and cross device consent](https://developer.onetrust.com/onetrust/docs/cross-domain-cross-device): a known user ID, a customer-signed JWT, an uploaded public key, a Consent Group and records of consent.
 - The Rust Programming Language, [The stack and the heap](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#the-stack-and-the-heap); Rust error [E0597](https://doc.rust-lang.org/error_codes/E0597.html), a borrowed value that does not live long enough.
 - OpenJDK, [JEP 411: Deprecate the Security Manager for Removal](https://openjdk.org/jeps/411) and [JEP 486: Permanently Disable the Security Manager](https://openjdk.org/jeps/486), delivered in JDK 24.
+- Shopify, [Hydrogen and Oxygen](https://shopify.dev/docs/storefronts/headless/hydrogen) (framework, hosting, deploys) and [Hydrogen analytics](https://shopify.dev/docs/storefronts/headless/hydrogen/analytics) (consent-aware events).
 - Shopify Engineering, [How we built Oxygen](https://shopify.engineering/how-we-built-oxygen): a gateway Worker in Cloudflare routing to storefront Workers through Workers for Platforms' dynamic dispatch.
 - Cloudflare, [Workers VPC](https://developers.cloudflare.com/workers-vpc/) (beta), [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/), [AI Gateway DLP](https://developers.cloudflare.com/ai-gateway/features/dlp/) and the [Data Localization Suite](https://developers.cloudflare.com/data-localization/).
 - MDN, [WebAssembly.compileStreaming()](https://developer.mozilla.org/en-US/docs/WebAssembly/Reference/JavaScript_interface/compileStreaming_static): compiling while the module downloads.
