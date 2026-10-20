@@ -813,6 +813,20 @@ So the answer isn't a tighter leash on the neocloud. It is sending it less, late
 
 A microservice is bound by the gate on every call. A neocloud is bound by what you choose to send it, which is why it belongs on the top rung and only for the work nothing lower can do.
 
+**The castle vault and the pockets of coins.** A neocloud is a castle vault: everything in one place, behind one huge wall that must never fail, trusting anyone already inside. The Webflow, Cloudflare and Xano design is coins in small pockets, carried between people who know each other.
+
+| | Castle vault (a neocloud) | Pockets of coins (Webflow, Cloudflare, Xano) |
+|---|---|---|
+| What's held | Everything, in one place | A little in each place |
+| Perimeter | One huge wall that must never fail | Many small walls, each easy to see around |
+| One breach costs | The whole vault | One pocket |
+| Who is trusted | Anyone inside the walls | Only parties who know each other: signed labels, allowlists, mutual TLS, the gate |
+| Built for | Bulk storage and heavy machinery | Small amounts moving quickly between known parties |
+
+Two things keep the image honest. Smaller is not risk-free: each pocket is still someone's, since Cloudflare's edge sees traffic in plaintext, Webflow serves the page and Xano holds the record. The risk is bounded, not gone. And there is still a vault, only a smaller one kept close to home: one Xano instance per region holding what that region needs, while the coins in circulation are the reduced, signed, short-lived payloads. Many pockets mean many small configurations to keep consistent, which is why the allowlists and rules live in one versioned policy bundle instead of being set up place by place.
+
+A neocloud is a vault that is only as safe as its biggest wall. This design keeps small vaults near home and moves small, signed pockets of coins between parties who know each other.
+
 ## Impact on enterprise infrastructure
 
 | Concern | Hyperscaler-centred | Distributed, with a system-of-record gate | What changes for the enterprise |
