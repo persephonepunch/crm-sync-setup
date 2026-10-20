@@ -400,6 +400,20 @@ The lines are blurring. Hyperscalers sell edge products such as CloudFront, Lamb
 
 Xano suits the system-of-record role: deterministic, auditable logic in Postgres with its own API layer. It is a poor fit for the gate itself, because it lives in a few regions and would add latency to every request. Keep the hot path in Workers and Durable Objects, and keep Xano as the slower, authoritative write path.
 
+### Regional language weights: loaded by audience and data set, selectively to native
+
+The same split applies to the model itself. Instead of one large model that knows every language and every market, ship a small base model plus regional pieces: a *language adapter* (a small set of extra weights, such as a LoRA, that tunes the base model for Korean or English) and a *data set* for that audience, such as a market's catalog and glossary. The edge chooses which pieces a person gets; the system of record decides which pieces may exist and who may receive them. *Native* here means the person's own device: a browser through WebGPU or Wasm, or a native app.
+
+- **Weights are records with an owner.** Each base model, adapter and data set has a manifest row in Xano: version, language, region, the data sets it was trained on, their consent basis and license, and a retirement date. The files are immutable, named by version and hash, and stored in object storage in their home region. KV holds only the pointer to the current manifest version.
+- **The audience picks the bundle.** The Worker already knows the subject's region, locale and consent posture. It resolves those to one bundle, for example base model, Korean adapter and Korean catalog, and returns signed, expiring URLs for exactly those files.
+- **Load only what native needs.** An adapter is megabytes; a base model is hundreds of megabytes or more. The device downloads the base once and swaps small regional pieces, chosen by what the GPU can do, not by its part number. A device that can't run it falls back to the edge or a server.
+- **What may ship to native, and what may not.** Weights trained only on public material (catalogs, translations, glossaries, product copy) can ship to any device. Weights trained on personal data can memorize it, so they are treated as personal data: they stay in their home region on the server and never ship to a device, because a download can't be recalled. A person's own context isn't baked into weights at all; it is fetched through the gate at request time and dropped at the end of the call.
+- **Fail closed.** A stale manifest, a failed signature or an unclear posture means the base model with no regional data set, or no model.
+
+A Korean shopper on `www.example.kr` gets the Korean adapter and the Korean catalog, served from the Seoul-region bucket. A US shopper on the same build gets the English adapter and the US catalog, and never receives the Korean pieces. Cloudflare R2 offers enforced jurisdictions only for the EU and FedRAMP; elsewhere, such as Asia-Pacific, a location hint is a preference, not a guarantee, so weights tied to Korean data belong in the Seoul Xano instance's own storage.
+
+In business terms: one chain of stores, with signage and shelves stocked by market. Head office (the system of record) decides what each market may stock, the trucks (the edge) deliver it, and each store (the device) keeps only its own market's stock. A customer's personal file never goes on the shelf.
+
 ### Kubernetes and VMs limit reach, not what a model may weigh
 
 A common assumption is that a model running in Kubernetes inside a VM can only weigh the data on that VM. It can weigh whatever it can **reach**, and the VM doesn't decide that:
@@ -933,6 +947,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Consent from every banner and platform is normalized into one posture per subject, which pages, agents and model calls all read.
 - [ ] Every GPU you run or rent has an inventory record (MPN, firmware, driver and container toolkit versions) checked against vendor security bulletins; rented capacity gets the same record and a patch window by contract.
 - [ ] Bytecode for people has a size and frame budget checked in the build; bytecode for models is compiled per GPU, tested against a reference output, and rebuilt when the GPU model or driver changes.
+- [ ] Every base model, language adapter and data set has a manifest row (version, region, training data, consent basis, license, retirement date); only weights trained on public material ship to devices, and the Worker serves each audience only its own bundle.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -947,6 +962,8 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Khronos Group, [SPIR-V](https://www.khronos.org/spirv/): the portable intermediate language for GPU programs.
 - wgpu, [wgpu.rs](https://wgpu.rs/) and [naga](https://github.com/gfx-rs/wgpu/tree/trunk/naga): the Rust GPU runtime over Vulkan, Metal, DirectX and WebGPU, and its shader translator.
 - W3C, [WebGPU: GPUAdapterInfo](https://www.w3.org/TR/webgpu/#gpuadapterinfo): adapter details limited to reduce fingerprinting.
+- Hu et al., [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685): small adapter weights that tune a frozen base model.
+- Cloudflare, [R2 data location](https://developers.cloudflare.com/r2/reference/data-location/): enforced jurisdictions (EU, FedRAMP) versus location hints.
 - NVIDIA, [TensorRT support matrix](https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/support-matrix.html): supported GPUs, precisions and software versions for compiled inference engines.
 - WebAssembly, [Binaryen](https://github.com/WebAssembly/binaryen): the toolkit behind `wasm-opt`.
 - ONNX Runtime, [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/): running models in the browser through WebGPU or Wasm.
