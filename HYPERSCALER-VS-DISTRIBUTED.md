@@ -92,6 +92,26 @@ The data doesn't travel inside the program. It moves separately, into *buffers*,
 - **Ask a neocloud for the same record.** On rented capacity you can't read the firmware yourself, so the MPN, firmware and driver versions, and the patch window belong in the contract and its audit rights.
 - **Don't collect it from people's devices.** On the device rung the GPU model is a fingerprinting signal. WebGPU deliberately gives a page only coarse adapter information, so code there should adapt to what the adapter can do, not to its part number.
 
+**Optimizing the bytecode: a frame for a person, or throughput for a model.** The same compile step serves two very different customers, and each is optimized for a different finish line.
+
+| | Browser render, for people | AI work, for models |
+|---|---|---|
+| The goal | Every frame on time: about 16.7 ms at 60 Hz. A missed frame is a visible stutter | The most results per dollar and per watt: inferences, tokens or embeddings per second |
+| What gets optimized | Size and startup. Shrink the Wasm (`opt-level = "z"`, `wasm-opt`; the demo build in this article is 32 KB), compile while downloading, keep shaders small, and prepare pipelines before the first frame | Math and memory. Lower precision (FP16, INT8), fused kernels that make one pass over the data instead of several, memory layouts that keep the GPU fed, and large batches |
+| Precision | An eye can't see a one-bit color error, so 8 bits per channel is enough | Models often tolerate lower precision too, but it changes outputs, so every reduction is measured against a reference |
+| Where the final compile happens | On the person's device, at load time, for whatever GPU is there | Usually ahead of time, for one known GPU: an NVIDIA TensorRT engine, for example, is built for a specific GPU model and software version |
+| Portability vs peak speed | Portable first: one Wasm or WGSL file for every device | Peak speed first: CUDA and per-GPU engines, which tie the work to one vendor |
+| What "done" means | The page looks right and feels smooth to a person | The output matches the reference within a set tolerance |
+| The security risk | Untrusted code from the web running on someone's device, so the browser validates and sandboxes it | The data. The optimized kernels are native and privileged, and a model reads what a person never sees, such as hidden SVG text |
+
+In business terms: a browser render is a print shop making one poster while the customer waits, so speed to the first copy and a small file matter most. AI work is a factory line producing a million units, so the cost per unit matters most, and the line is retooled for one specific machine.
+
+Three rules follow for this stack:
+
+- **Bytecode for people ships small and portable, to the device.** Wasm and WGSL, budgeted like a frame, with nothing personal leaving the device.
+- **Bytecode for models is compiled per GPU, on the top rung, and tracked by part number.** An engine built for one GPU model and driver must be rebuilt when either changes, which is one more reason to keep the MPN, firmware and driver record above.
+- **Small models can use the people path.** Runtimes such as ONNX Runtime Web run a model in the browser through WebGPU or Wasm. It is slower than a tuned server engine but portable, and the data stays on the device, which is often the better trade for personal data.
+
 ## The frame-budget origin
 
 The GPU started out rationed. NVIDIA was founded in 1993 to make 3D graphics for games, and a game engine has a fixed budget, about 16.6 ms per frame at 60 frames per second, on whatever GPU the player happens to own. It can't buy more GPU, so it removes everything it doesn't need before it shades a single pixel. Data-center AI dropped that discipline, reserving GPUs by contract before demand was known. "Bind before you allocate" brings it back.
@@ -912,6 +932,7 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - [ ] Sign-in tokens carry identity only; account status is checked before any write; entitlements reach the page as hints, and the gate decides.
 - [ ] Consent from every banner and platform is normalized into one posture per subject, which pages, agents and model calls all read.
 - [ ] Every GPU you run or rent has an inventory record (MPN, firmware, driver and container toolkit versions) checked against vendor security bulletins; rented capacity gets the same record and a patch window by contract.
+- [ ] Bytecode for people has a size and frame budget checked in the build; bytecode for models is compiled per GPU, tested against a reference output, and rebuilt when the GPU model or driver changes.
 - [ ] Data sent to a GPU neocloud is minimized in the sandbox first; each job has its own expiring, prefix-scoped credentials; every checkpoint and model has an owner, a lineage and a retirement date.
 - [ ] Before committing to Enterprise, Xano has confirmed region placement for BYOC on your timeline and whether direct Postgres access is available for verifying the ledger.
 
@@ -926,6 +947,9 @@ The trade is real. The distributed pattern only pays off if the gate is the sing
 - Khronos Group, [SPIR-V](https://www.khronos.org/spirv/): the portable intermediate language for GPU programs.
 - wgpu, [wgpu.rs](https://wgpu.rs/) and [naga](https://github.com/gfx-rs/wgpu/tree/trunk/naga): the Rust GPU runtime over Vulkan, Metal, DirectX and WebGPU, and its shader translator.
 - W3C, [WebGPU: GPUAdapterInfo](https://www.w3.org/TR/webgpu/#gpuadapterinfo): adapter details limited to reduce fingerprinting.
+- NVIDIA, [TensorRT support matrix](https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/support-matrix.html): supported GPUs, precisions and software versions for compiled inference engines.
+- WebAssembly, [Binaryen](https://github.com/WebAssembly/binaryen): the toolkit behind `wasm-opt`.
+- ONNX Runtime, [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/): running models in the browser through WebGPU or Wasm.
 - NVIDIA, [Product Security](https://www.nvidia.com/en-us/security/): security bulletins by product and software version.
 - Rust GPU, [rust-gpu](https://github.com/Rust-GPU/rust-gpu): Rust to SPIR-V, maintained by the community since 2024, early-stage.
 - [rustc_codegen_nvvm](https://lib.rs/crates/rustc_codegen_nvvm) (Rust CUDA): Rust to PTX, early development; NVIDIA, [The Rust + GPU ecosystem](https://nvidia.github.io/cuda-rust/appendix/ecosystem.html), which also covers cuda-oxide.
