@@ -1,6 +1,6 @@
 ---
 title: "Dark Factory Entitlement Security"
-description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
+description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, the PHP, JVM and plugin estates runtime by runtime, four cloud data transports (ERP on Azure, CRM plugins, EDI on AWS, the GCP audience bus) with their AI challenge, AI task binding across Cloudflare, Xano and Rust, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
 canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html
 category: "Security"
 date: 2026-07-19
@@ -36,6 +36,14 @@ citation:
     url: https://docs.rs/image/latest/image/struct.Limits.html
   - name: "resvg / usvg"
     url: https://github.com/linebender/resvg
+  - name: "Google Threat Intelligence — data theft from Salesforce instances via Salesloft Drift"
+    url: https://cloud.google.com/blog/topics/threat-intelligence/data-theft-salesforce-instances-via-salesloft-drift
+  - name: "AWS B2B Data Interchange"
+    url: https://aws.amazon.com/b2b-data-interchange/
+  - name: "Google Merchant API"
+    url: https://developers.google.com/merchant/api
+  - name: "Hyperscaler vs Distributed (companion)"
+    url: https://crm-sync.dev/docs/hyperscaler-vs-distributed
   - name: "Shopify Storefront Web Components"
     url: https://shopify.dev/docs/api/storefront-web-components
   - name: "Data Layer — WordPress, Astro, Headless (companion)"
@@ -478,6 +486,30 @@ provenance in your own ledger rather than in the file. **An isolate caps memory*
 128 MB will not decode a very large image, so route oversize files to a container sandbox under
 the same rules — no credentials, no network route worth having, a hard timeout.
 
+## Runtime by runtime: where the trust breaks
+
+The receipts name products. Underneath they are runtimes, and the AI question is the same for
+each one: **when an agent touches this estate, what does it inherit?**
+
+A note on grouping. Strictly, only some of these are JVMs: Salesforce runs Apex on its own
+multitenant Java platform and AEM is Java on Apache Sling. Cityworks is .NET, and Unity ships C#
+through Mono or IL2CPP. They share the trait that matters here — a managed runtime that rebuilds
+objects and trusts whatever is already inside the process. That is the "JVM is a runtime, not a
+boundary" point from the JSON section, and the .NET and Mono cousins inherit it whole.
+
+| Estate | Runtime | Where trust breaks | AI challenge | Cloudflare · Xano · Rust benefit |
+|---|---|---|---|---|
+| **WordPress** | PHP, Imagick → ImageMagick → Ghostscript | Every upload is parsed by C code running with the site's privileges | Agents that draft posts or import media trigger the same parse at machine speed, and plugin REST routes hand them admin-shaped capabilities | The Rust stage re-encodes before WordPress sees the file; edge rules on `/wp-content/uploads/*`; agent writes go through a Worker that holds the application password, so the agent never does |
+| **Adobe Commerce (Magento)** | PHP, GD2 or ImageMagick, inside PCI scope | Customer file uploads and the on-request resize cache, served from the checkout origin | One admin integration token reaches orders, customers and the cardholder environment together | Media off-origin to R2 behind a Worker; Rust re-encode; a Xano grant scopes an agent to one order, not to the integration |
+| **Adobe Experience Manager** | JVM — Sling, OSGi, the JCR | The DAM Update Asset workflow shells out for EPS, PS, PSD and AI | The repository is one tree under one ACL model, so an agent's service user tends to get a broad path | Renditions built from re-encoded bytes; content leaves as typed JSON records, one grant per path |
+| **Salesforce** | Apex on Salesforce's Java platform; connected apps and managed packages | A plugin's OAuth token acts with the plugin's whole scope | In August 2025 OAuth tokens stolen from the Salesloft Drift integration were used to export Salesforce data from many organisations. An agent on a connected app is that same shape | The token stays in the Worker; the agent gets a per-task grant naming objects and fields; every query is ledgered |
+| **Trimble Cityworks** | .NET on IIS, on-premises | Deserialisation of attacker-shaped objects — CVE-2025-0994 | A municipality's whole asset graph sits behind one application identity, and an agent reading it inherits that identity | Records leave as typed JSON through a Worker, where a payload can only become data; the silo stays the system of record |
+| **Unity** | C# on Mono or IL2CPP, shipped to the client | The bundle is the runtime — CVE-2025-59489 needed a rebuild | AI unpacks a bundle in minutes, so anything inside it is published | The bundle rule: derivatives only, entitlement checked at the Worker, masters in R2 behind per-grant URLs |
+| **Shopify apps** | Apps on their own hosts with Admin API tokens; theme app extensions in the storefront; Functions in Wasm | An app's token carries every scope it was granted until it is revoked | One app's `read_customers` is every customer, and an agent acting through the app holds all of it | Functions are already the target model. For the rest, the Worker holds the token and answers the agent with one cart or one order, under a Xano grant |
+
+Read down the last column and it says one thing three ways. **Cloudflare decides what can be
+reached. Xano records who was granted it. Rust decides what the bytes can become.**
+
 ## Nobody supports 3D files securely
 
 Say it plainly, because the market has not: **there is no platform today that accepts a 3D or CAD
@@ -562,6 +594,88 @@ The gap has a measurable signature: **the 24-hour/15-minute inheritance.** The e
 The full wound map and its heal are diagrammed in the companion piece — [BIM Fortress Exposure vs the Event-Socket Heal](https://crm-sync.dev/share/bim-fortress-event-socket) — drawn A+-respectful for Trimble estates: the record stays theirs; the gate and the receipts are the more.
 
 That bridge is what the entitlement substrate is for, and it is a coexistence layer by construction: the envelope gives the leaders' functional data a searchable, inert, warehouse-joinable head without touching the system of record; healing per-row encryption lets that data move to AI consumers at real-time speed while possession stays separated from access; the grant engine scopes every AI tool-call to an entitlement boundary; and the ledger hands Insights Hub, FactoryTalk, and the auditors behind them the evidence trail regulation now demands. The substrate has no batch core to upgrade from — an event lands as a consent-stamped, grant-scoped row in the same cycle it happened in, because rows-with-grants were the unit of exchange from the start, and real-time is the default physics rather than the premium tier. The leaders keep the factory. The substrate keeps the gate and the receipts — and feeds everything back into the platforms the operation already trusts.
+
+## Four clouds, four data transports
+
+The bridge problem has four common transports, and in most enterprises each one lives on a
+different cloud. None of them is replaced. Each gets the same three additions at its edge.
+
+| Transport | Where it usually runs | How data moves | AI challenge | Cloudflare · Xano · Rust benefit |
+|---|---|---|---|---|
+| **ERP — SAP S/4HANA, Dynamics 365** | Azure: RISE with SAP or SAP on Azure; Dynamics on Dataverse | IDocs, OData and BAPI calls; Dataverse events to Service Bus | ERP copilots run as service principals with ERP-wide roles, and batch IDoc windows mean the agent answers from last night | A Worker takes the event and carries IDs, not documents; Xano holds the grant; the agent asks for one material or one purchase order |
+| **CRM plugins — Klaviyo, Salesforce** | Each vendor's SaaS, each with its own copy | Shopify app sync, connected-app OAuth, scheduled exports | Every plugin keeps a full copy of the customer, every copy needs its own consent state, and each plugin token is ambient authority over its copy | Xano is the source of truth for identity and consent; the Worker forwards IDs and consent flags under one narrow key per interface; a suppression travels as an event, not a nightly job |
+| **EDI on AWS — X12, EDIFACT** | AWS Transfer Family (AS2, SFTP) and B2B Data Interchange, into S3 | Positional files on trading-partner windows: 850 order, 856 ship notice, 810 invoice | An agent needs one shipment's state now. The file holds a batch, lands in S3 as a full payload copy, and an LLM reading raw X12 guesses at segment positions | B2B Data Interchange emits JSON; EventBridge notifies a Worker; a Rust parser types each transaction set into a record with a published schema; the agent reads the record, never the file |
+| **Audience event bus — Google Merchant Center, BigQuery** | GCP: Pub/Sub, BigQuery, the Merchant API | Product feeds out; GA4 and conversion exports in; audiences joined in BigQuery | BigQuery is where everything joins, and an agent querying it runs as a service account that can read the whole dataset. The Merchant feed is published to Shopping and AI surfaces as written | The Worker's egress gate checks consent before anything is published; Xano carries consent per row; feed items are validated against schema before the Merchant API; agents get aggregates through clean-room templates, never rows |
+
+The pattern in the last column is the [owned-event binding](https://persephonepunch.github.io/crm-sync-setup/svg-rust-elm-security-gaps.html#binding-owned-events-vs-latent-ipaas-and-the-clean-room-for-ai)
+from the companion piece: a signed event, a gate at the edge, IDs on the queue, an idempotent
+writer, and a ledger row for every yes and no. Each cloud keeps its own controls as the floor.
+The [Hyperscaler vs Distributed](https://crm-sync.dev/docs/hyperscaler-vs-distributed) comparison
+covers what those controls are, and where each one stops at its own edge.
+
+## AI task binding: Cloudflare binds, Xano grants, Rust checks
+
+Every row in the last two tables ends on the same requirement. **An agent should receive one
+task, not one platform.** Task binding is how that gets enforced rather than requested:
+
+1. **The event arrives signed** — a webhook, an EventBridge or Pub/Sub delivery, a Service Bus
+   message. The Worker checks the signature on the raw body and takes an idempotency key from
+   the event ID.
+2. **Xano issues the grant**: one task, the record IDs it covers, the purpose, the region and an
+   expiry. The grant is a row, so revoking it is a write and auditing it is a read.
+3. **The Worker holds every credential.** The ERP service principal, the Salesforce token, the
+   Shopify Admin token and the BigQuery service account are bindings on the Worker. The agent
+   never sees one.
+4. **Rust checks the shape** of what the agent asks for and of what comes back, inside the
+   isolate. A tool the program does not declare cannot be constructed.
+5. **The ledger records the call** — the grant that allowed it, the task, the bytes returned.
+
+The check in step 4 is small enough to read in full:
+
+```rust
+#![forbid(unsafe_code)]
+use serde::Deserialize;
+
+// The only tasks an agent can ask for. A tool name or field not declared here
+// is a parse error, not a request.
+#[derive(Debug, PartialEq, Deserialize)]
+#[serde(tag = "tool", deny_unknown_fields)]
+pub enum Task {
+    ReorderMaterial { material: String, qty: u32 },  // ERP: one requisition
+    ReadShipment { asn: String },                    // EDI: one 856
+    SuppressProfile { profile: String },             // CRM: one consent change
+    PublishOffer { offer_id: String },               // GCP: one Merchant offer
+}
+
+// Issued by Xano, held by the Worker, never by the agent.
+pub struct Grant { pub task: Task, pub purpose: &'static str, pub expires: u64 }
+
+#[derive(Debug, PartialEq)]
+pub enum Denied { Malformed, Expired, OutOfScope }
+
+pub fn authorize(grant: &Grant, now: u64, tool_call: &str) -> Result<Task, Denied> {
+    let asked: Task = serde_json::from_str(tool_call).map_err(|_| Denied::Malformed)?;
+    if now >= grant.expires { return Err(Denied::Expired); }
+    if asked != grant.task { return Err(Denied::OutOfScope); }
+    Ok(asked)
+}
+```
+
+`{"tool":"ExportAllCustomers"}` is malformed, not denied — there is no such value to deny. An
+extra `"all": true` is malformed too. The right tool aimed at a different shipment is out of
+scope. That is the iced `Message` enum from earlier, moved to the network edge, and it is the
+gate the [AI-strategy-is-not-a-JVM](https://crm-sync.dev/docs/hyperscaler-vs-distributed) argument asks for: deterministic,
+memory-safe, and outside the model.
+
+| Task | Bound to | Never reaches |
+|---|---|---|
+| Reorder one material | One SAP or Dynamics purchase requisition, one plant, under a spend cap | The ERP role the service principal holds |
+| Read one shipment | One 856 record, typed | The S3 bucket of raw EDI files |
+| Suppress one profile | One consent change, propagated as an event to Klaviyo and Salesforce | Either CRM's customer export |
+| Publish one offer | One validated Merchant API item | BigQuery rows, or any other offer |
+
+The model can be as capable as you like behind that line. **Capability is not authority**, and in
+a bound task the authority is a row in Xano, a binding on a Worker and a type in Rust.
 
 ## The asymmetry, stated once
 
