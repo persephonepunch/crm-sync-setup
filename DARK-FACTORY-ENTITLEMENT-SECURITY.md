@@ -54,6 +54,8 @@ citation:
     url: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
   - name: "Socket — LiteLLM PyPI package and Docker images compromised"
     url: https://socket.dev/blog/litellm-compromise
+  - name: "RFC 9116 — A File Format to Aid in Security Vulnerability Disclosure"
+    url: https://www.rfc-editor.org/rfc/rfc9116
   - name: "Shopify Storefront Web Components"
     url: https://shopify.dev/docs/api/storefront-web-components
   - name: "Data Layer — WordPress, Astro, Headless (companion)"
@@ -277,6 +279,26 @@ the same principle down to the stack you actually have. The order matters: shrin
 parser may do, then take work away from it, then make sure the controls in front cannot be
 walked around.
 
+**Policy at 1,000 feet.** Before any one file, see them all. An estate's security policy is not a
+document; it is a stack of small files and rules, each read by a different program, each owned
+by someone different, and each failing in its own quiet way. From the outside in:
+
+| Altitude | Policy | What it governs | Read by | Fails quietly when |
+|---|---|---|---|---|
+| **Public contract** | `/.well-known/security.txt`, `robots.txt`, `llms.txt` | Who to tell about a flaw; what crawlers and models may take | Researchers, scanners, crawlers | It expires, or points at an inbox nobody reads |
+| **Edge** | Cloudflare WAF custom rules, Managed Ruleset, transform rules, Access | Which hosts, methods and paths reach the origin at all | Cloudflare | A DNS record is grey-clouded, or the origin answers on its own address |
+| **Browser** | Content-Security-Policy, `nosniff`, `Permissions-Policy`, cookie attributes | What a page may run, load and share | The visitor's browser | A plugin adds a wildcard to it |
+| **Deployment** | `wrangler.toml` bindings and the platform's own app config | What the running code can reach | The platform at deploy | A secret sits in `[vars]`, or the wrong file is deployed |
+| **Runtime** | `php.ini`, the Node version, the Workers compatibility date | What the language runtime allows, and which runtime it is | PHP, Node, workerd | Nobody patches it — php2shell and the Node Brotli fix |
+| **Parser** | ImageMagick `policy.xml`, Ghostscript `-dSAFER`, decoder `Limits` | What a file is allowed to make the parser do | ImageMagick, Ghostscript, the Rust stage | It is not the file the binary loads |
+| **Build** | `Cargo.toml`, `pyproject.toml`, `package.json`, lockfiles, `cargo-deny` | What code becomes "ours" | The build tools — which run code while they read it | A dependency or a build setting changes and nobody reads the diff |
+| **Record** | Xano grants, claims, extras and consent rows | Who may have what, for which purpose | The gate Worker, on every request | A query forgets its filter |
+| **Ledger** | The append-only record of every yes and no | What actually happened | Auditors, regulators, incident response | Nothing was written, so nothing can be answered |
+
+Read the last column as the audit plan. Every row has a check you can run this week, and the
+two most often skipped are at opposite ends: the public contract nobody published, and the
+build files nobody treats as policy.
+
 **Start with the file almost nobody has opened.** ImageMagick reads a `policy.xml` —
 usually `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml` — and ships
 permissive by default on most distributions. Deny the coders that exist to reference other
@@ -309,6 +331,59 @@ For ImageMagick 7, the core of it is a dozen lines:
 
 The `path` line is the one the sidebar implies without naming. It refuses the `@` indirection,
 which is how `label:@/etc/passwd` turns a thumbnail into the exfiltration channel.
+
+**Publish a `security.txt`.** The cheapest policy in the stack is the one that tells a researcher
+where to send what they found. [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) puts it at
+`/.well-known/security.txt`, served as plain text over HTTPS, with two required fields — `Contact`
+and `Expires` — and an expiry less than a year out, so a stale file announces itself. The CRA
+makes the same demand in law: manufacturers need a coordinated vulnerability disclosure policy
+and a contact address for reports, and from 11 September 2026 they must report actively exploited
+vulnerabilities — which starts with someone being able to tell you.
+
+```
+Contact: mailto:security@brand.com
+Contact: https://brand.com/security/report
+Expires: 2027-10-21T00:00:00.000Z
+Encryption: https://brand.com/.well-known/pgp-key.txt
+Policy: https://brand.com/security/disclosure
+Acknowledgments: https://brand.com/security/thanks
+Preferred-Languages: en, fr
+Canonical: https://uk.brand.com/.well-known/security.txt
+Canonical: https://ca.brand.com/.well-known/security.txt
+Canonical: https://fr.brand.com/.well-known/security.txt
+```
+
+Serve the same file on every country host and list them all under `Canonical`, so the per-site
+estate has one disclosure contract rather than three. Sign it with an OpenPGP cleartext signature
+if you can, so a copy on a compromised host cannot quietly redirect reports. A hosted storefront
+on Shopify or Webflow will not let you place an arbitrary file under `/.well-known/`, so serve it
+from the edge: Cloudflare's dashboard can publish one for a zone, or a small Worker route can
+return the file. And put a calendar reminder a month before `Expires`.
+
+**Read your TOML as policy.** Configuration files are where policy hides in plain sight, and
+TOML is the format of the ones that decide what runs. Four precautions:
+
+- **`wrangler.toml` is a capability list.** Every `[[kv_namespaces]]`, `[[r2_buckets]]` and
+  `[[services]]` entry is something the Worker can reach, so review a new binding the way you
+  would review a new permission. `[vars]` is committed plain text — secrets go in with
+  `wrangler secret put` and never into the file. Bindings do not carry over into `[env.*]`
+  sections, so a staging environment can silently reach a production bucket if someone copied
+  the block. And always deploy with an explicit `--config`: a bare deploy picks up whatever
+  config file it finds first, and a deploy to the wrong Worker reports success just the same.
+- **`Cargo.toml` decides what code runs at build time.** A `build.rs` in any dependency runs on
+  the build machine; `[patch]` sections and `git = "…"` dependencies bypass the registry entirely;
+  and `default-features = false` with an explicit feature list is the compile-time allow-list the
+  Rust stage relies on. Commit `Cargo.lock`, build with `--locked`, and let `cargo-deny` refuse
+  wildcard versions, unknown registries and licences you have not approved.
+- **`pyproject.toml` runs its build backend.** Installing from source executes the backend the
+  file names, and a single setting can change what a wheel installs. The LiteLLM 1.107.0
+  compromise rode in on exactly that: one Maturin `data` line in the build configuration put a
+  payload directory into every wheel, alongside a `.pth` file that runs on every Python start.
+  Review build-section diffs as code, and prefer pinned, hashed, prebuilt wheels.
+- **Scan every TOML file for secrets before it lands.** A token in `netlify.toml`, a
+  `config.toml` or a tool section of `pyproject.toml` is as public as the repository. Run a
+  secret scanner in pre-commit and in CI, and treat a hit as a rotation, not a deletion — the
+  history already has it.
 
 **Treat Ghostscript as its own decision.** The PDF, EPS and PS delegates hand the file to
 Ghostscript, which is a language interpreter with its own history of sandbox escapes; `-dSAFER`
