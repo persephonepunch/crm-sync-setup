@@ -450,7 +450,115 @@ In order:
 4. **Make the edge the only way in.** The rules above protect only traffic that passes through
    them. An origin still answering on its own address is unprotected, which is why
    [closing that door](#hardening-what-you-already-run) — authenticated origin pulls or a tunnel
-   with no listening port — is the step that decides whether step 2 counts.
+   with no listening port — is the step that decides whether step 2 counts. Two wildcards
+   quietly reopen it. A **wildcard DNS record** (`*.brand.com`) left as DNS-only — the grey
+   cloud rather than the orange — sends every invented subdomain straight to the origin, around
+   the WAF and its php2shell rules; proxy it or delete it, and check forgotten records for the
+   same thing. And the **catch-all rewrite** that WordPress, Drupal, Magento and Laravel all use
+   sends every unknown URL to one `index.php`, so every path anyone invents is a request into
+   the vulnerable runtime and a way to push its workers toward the memory pressure the first
+   CVE needs. Neither wildcard is the vulnerability. Both decide how much of the internet can
+   reach it.
+
+#### A layered setup: allow list, Rust boundary, claims and extras
+
+The steps above are a response. The setup below is the shape that makes the next runtime flaw
+smaller before anyone has heard of it. Each layer can only narrow what the one before it let
+through, and each is owned somewhere different:
+
+| Layer | Where it runs | What it decides | What it does to php2shell |
+|---|---|---|---|
+| **1 · Cloudflare allow list** | WAF custom rules and the Managed Ruleset, on the zone | Only known hosts, methods and paths get in; known attack signatures are blocked | Invented subdomains, direct `.php` calls and the published payloads never reach the origin |
+| **2 · Rust boundary** | A Worker on the route, compiled to Wasm | The request must parse into a declared market and route, under a size cap | The catch-all rewrite only ever sees routes the site actually serves, and no oversized body arrives |
+| **3 · Xano claims and extras** | The system of record, read by the Worker | Who the caller is, what they may do, and what personal data exists | PHP never holds identity or profile data, so stale state has much less to expose |
+| **Origin lock** | Authenticated origin pulls or a tunnel | That layers 1–3 are the only way in | No path around the stack |
+
+**Layer 1 — the Cloudflare allow list.** A positive model rather than a list of known-bad: say
+what is allowed and block the rest. Three custom rules in Block, ahead of the Managed Ruleset
+(also in Block):
+
+```
+# Rule 1 — only the hosts this origin serves; a wildcard subdomain ends here
+not http.host in {"uk.brand.com" "ca.brand.com" "fr.brand.com"}
+
+# Rule 2 — only the methods the site uses
+not http.request.method in {"GET" "HEAD" "POST"}
+
+# Rule 3 — nothing calls a PHP file by name; the front controller is reached by rewrite
+http.request.uri.path contains ".php"
+```
+
+Rule 3 is a WordPress problem as written, because `wp-admin` and `wp-login.php` are PHP files
+by name. Move them to their own hostname behind Cloudflare Access, which the hardening section
+already asks for, and the rule holds. Add rate limiting on the routes that accept bodies.
+
+**Layer 2 — the Rust boundary.** The allow list knows hosts and paths as strings. The boundary
+knows them as types. A Worker in front of the origin parses every request into a declared
+market and a declared route, with a size cap per route, and refuses anything that does not
+parse. The catch-all rewrite behind it stops being a wildcard, because nothing undeclared ever
+arrives:
+
+```rust
+#![forbid(unsafe_code)]
+
+#[derive(Debug, PartialEq)]
+pub enum Market { Uk, Ca, Fr }
+
+// The only routes the PHP origin serves. Anything else is refused here, so a
+// catch-all rewrite to index.php never sees it.
+#[derive(Debug, PartialEq)]
+pub enum Route { Home, Page(String), Product(String), Cart, MediaUpload }
+
+#[derive(Debug, PartialEq)]
+pub enum Refused { UnknownHost, Method, UnknownRoute, TooLarge }
+
+const MAX_BODY: u64 = 64 * 1024;          // pages and cart posts
+const MAX_UPLOAD: u64 = 8 * 1024 * 1024;  // the one route that takes a file
+
+pub fn admit(host: &str, method: &str, path: &str, body_len: u64) -> Result<(Market, Route), Refused> {
+    let market = match host {
+        "uk.brand.com" => Market::Uk,
+        "ca.brand.com" => Market::Ca,
+        "fr.brand.com" => Market::Fr,
+        _ => return Err(Refused::UnknownHost),          // *.brand.com stops here
+    };
+    let slug = |s: &str| !s.is_empty() && s.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-');
+    let parts: Vec<&str> = path.trim_matches('/').split('/').collect();
+    let route = match (method, parts.as_slice()) {
+        ("GET", [""]) => Route::Home,
+        ("GET", ["pages", p]) if slug(p) => Route::Page(p.to_string()),
+        ("GET", ["products", p]) if slug(p) => Route::Product(p.to_string()),
+        ("GET" | "POST", ["cart"]) => Route::Cart,
+        ("POST", ["media", "upload"]) => Route::MediaUpload,
+        ("GET" | "POST", _) => return Err(Refused::UnknownRoute), // includes any *.php
+        _ => return Err(Refused::Method),
+    };
+    let cap = if route == Route::MediaUpload { MAX_UPLOAD } else { MAX_BODY };
+    if body_len > cap { return Err(Refused::TooLarge); }  // memory pressure starts at the edge
+    Ok((market, route))
+}
+```
+
+`promo.brand.com` is an unknown host. `/wp-content/x.php` and `/random/../../etc` are unknown
+routes. A 10 MB post to the cart is too large. None of them reaches PHP, and the `Market` that
+comes out is the same type the consent check further down uses — so the market a request was
+admitted under is the market its data is allowed to feed. The media upload route is the one
+place a file arrives, and it goes to the [Rust stage](#rust-in-the-loop-re-encode-before-anything-parses),
+not to PHP.
+
+**Layer 3 — Xano claims and extras.** The first two layers decide what may reach the origin.
+This one decides what the origin ever holds. Following the [claims-and-extras model](https://crm-sync.dev/docs/hyperscaler-vs-distributed),
+the Worker reads, in order: the token, which proves identity and nothing more; the account
+status, checked before any write; the **claims** in `user_claims`, the identity links to Google
+and Shopify; the **extras** in `user_extras`, profile and preference fields that are cleared when
+marketing consent is withdrawn; and the entitlement. The decision is made at the gate, and the
+PHP origin renders pages and takes cart posts without ever being handed a claim or an extra.
+
+That is what changes the second CVE. CVE-2026-109619 lets a later request read state an earlier
+one left behind in the same worker. If identity, profile and consent live in Xano and are read
+at the gate, there is far less in a PHP worker's memory for that stale state to expose: no
+customer profile, no consent record, no linked account. The flaw is unchanged. What it can
+reach is not.
 
 The structural reading is the same as everywhere else in this article. **Media ingest that has
 already moved to a Worker and the Rust stage below never hands a hostile body to a PHP process
