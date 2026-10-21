@@ -1,6 +1,6 @@
 ---
 title: "Dark Factory Entitlement Security"
-description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, the PHP, JVM and plugin estates runtime by runtime, four cloud data transports (ERP on Azure, CRM plugins, EDI on AWS, the GCP audience bus) with their AI challenge, AI task binding across Cloudflare, Xano and Rust, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
+description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, the PHP, JVM and plugin estates runtime by runtime, four cloud data transports (ERP on Azure, CRM plugins, EDI on AWS, the GCP audience bus) with their AI challenge, AI task binding across Cloudflare, Xano and Rust, one subject across every channel when the CMP is a per-site browser cookie, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
 canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html
 category: "Security"
 date: 2026-07-19
@@ -56,6 +56,10 @@ citation:
 **Status:** Living reference · **Scope:** Where the vulnerability actually lives in modern business operations — IoT firmware, game platforms, 3D/BIM assets — and the entitlement architecture that survives it. Written from production experience shipping commerce on Roblox/Shopify rails and 3D asset pipelines against PIM/BIM systems.
 
 **Tags:** [#CRA](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) · [#Art-14 — 11 September 2026](https://eur-lex.europa.eu/eli/reg/2024/2847/oj) · #firmware · [#CRA-checklist](https://www.crm-sync.dev/pages/pim-sync#cra-checklist)
+
+![One subject, every channel. A strip across the top: OneTrust's CDN, Shopify storefronts and Webflow hosting all answer through Cloudflare, so the brand's namespace sits where the traffic already is. Left, today: uk.brand.com, ca.brand.com and fr.brand.com each keep consent in a browser cookie under different rules, with four red gaps — cookie scope across markets, a dangling subdomain that can forge consent, plugin wildcards readable in the theme, and a session ID instead of a subject — and four clouds feeding the Google Merchant and Shopify audiences through a JVM bus polled every 15 minutes. Right, the fix: web, mobile, POS, chatbot, IoT and firmware reach a Cloudflare Worker, the Buy app, which checks market, purpose and freshness with Rust types; Xano is the system of record, a KV namespace holds the projection, and an event socket feeds Azure, CRM SaaS, AWS and GCP only when the posture allows, with a Rust gRPC writer stamping posture onto BigQuery and Merchant rows so both audiences are socketed to the same answer.](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.svg)
+
+*[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.svg) (1600 × 920) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.jpg). Gaps are marked in red; the walkthrough is [One subject, every channel](#one-subject-every-channel-when-consent-is-a-browser-cookie) below.*
 
 ---
 
@@ -676,6 +680,154 @@ memory-safe, and outside the model.
 
 The model can be as capable as you like behind that line. **Capability is not authority**, and in
 a bound task the authority is a row in Xano, a binding on a Worker and a type in Rust.
+
+## One subject, every channel: when consent is a browser cookie
+
+Every enterprise has the same three facts, and the figure at the top of this article draws them.
+**The CMP is per site** — each country domain loads its own banner and keeps its own answer.
+**Four clouds sit behind a JVM bus** that moves data on a schedule, when the business now needs
+it in real time. And **the Google Merchant audience and the Shopify audience both need the same
+answer** about the same person, so they have to plug into the same socket, not two exports.
+
+### The example breach
+
+This is a composite, not a reported incident, and none of it is a defect in OneTrust or any other
+CMP. It is what a browser-only deployment of any consent banner records, at enterprise scale.
+
+A brand runs `uk.brand.com`, `ca.brand.com` and `fr.brand.com`. Each theme loads the CMP script
+with its own domain ID, and each choice lands in an `OptanonConsent` cookie and, with consent
+logging on, in the vendor's cloud. The three markets do not share rules:
+
+| Site | Regime | What differs |
+|---|---|---|
+| `uk.brand.com` | UK GDPR and PECR | Consent for non-essential cookies, with the Data (Use and Access) Act 2025 relaxing some low-risk analytics cookies as its provisions commence |
+| `ca.brand.com` | PIPEDA, and Québec's Law 25 | Law 25 requires privacy by default: anything that identifies, locates or profiles a person starts switched off |
+| `fr.brand.com` | GDPR as applied by the CNIL | Refusing must be as easy as accepting, and the CNIL recommends keeping a choice for six months before asking again |
+
+Four things break, and each is numbered in red in the figure:
+
+1. **Cookie scope across markets.** Scope the cookie to `.brand.com` and a choice made under UK
+   rules is replayed on `fr.brand.com`, where it was never valid. Scope it per host instead and a
+   withdrawal on one site never reaches the other two. Neither setting is right, because the
+   cookie was never the right place for the record. With separate country domains — `brand.co.uk`,
+   `brand.ca`, `brand.fr` — nothing can be shared at all.
+2. **A dangling subdomain.** Any host under `brand.com` may set a cookie for `.brand.com`. A
+   forgotten campaign site, `promo.brand.com`, still CNAMEd to a service nobody pays for, can be
+   claimed by someone else and used to write "accept all" into every market's consent cookie.
+3. **Plugin wildcards in the visible theme.** The theme source is public, so it is a map. See the
+   table below.
+4. **A session ID, not a subject.** The record is keyed to a browser identifier held in the
+   vendor's log. The till, the app, the chatbot and the devices never present that cookie, so they
+   cannot read the answer and cannot write one. Sharing across domains needs a known person — the
+   vendor's own [cross-domain consent](https://developer.onetrust.com/onetrust/docs/cross-domain-cross-device)
+   works once you pass a signed user ID — which is the same thing as saying the brand needs its own
+   subject record first.
+
+Then the data moves. GA4 exports events to BigQuery, an audience job builds segments, and a JVM
+service bus (MuleSoft, webMethods, TIBCO — whichever the estate grew up with) carries ERP, CRM and
+EDI records across four clouds, typically on a 15-minute poll. A withdrawal on `fr.brand.com`
+reaches the Google Merchant and Ads audience after the next poll and the next refresh, reaches
+the Shopify audience through a separate marketing-consent field on its own schedule, and never
+reaches the till, the app or the device at all. Every minute in between is a send without
+consent, and nothing in the estate can say which ones.
+
+### Plugin wildcards in the visible theme
+
+| Wildcard | Where it shows | What it exposes | Fix |
+|---|---|---|---|
+| `Domain=.brand.com` on a consent or session cookie | Plugin config in the theme, or the `Set-Cookie` header | Every subdomain can read and overwrite it — the forging path in break 2 | Host-only cookies; the `__Host-` prefix makes the browser enforce it |
+| `Access-Control-Allow-Origin: *` | App proxy and plugin endpoints the theme calls | Any site can read the response from a visitor's browser | An explicit origin list; never reflect `null` |
+| `postMessage(msg, "*")` | Inline plugin and widget scripts | Consent state and tokens posted to any frame that asks | The exact target origin, and check `event.origin` on receipt |
+| `script-src *` or `https:` | The CSP, if there is one | Any script from anywhere runs beside the checkout | Nonces or hashes, as the per-request section says |
+| `*.brand.com` in a plugin's allowed origins | CMP and widget config objects | Trust extended to every subdomain, dangling ones included | Name the hosts; remove DNS records that point at nothing |
+
+AI reads this table faster than any person. Theme source, response headers and DNS are all public,
+and an agent given a domain will enumerate subdomains and pull every wildcard out of the theme in
+seconds.
+
+### The fix: Xano decides, the Cloudflare namespace carries it
+
+There is a reason the fix belongs on Cloudflare. **OneTrust's CDN and geolocation endpoint,
+Shopify storefronts and Webflow hosting all already answer through Cloudflare** — every one of
+them returns a `cf-ray` header. Each vendor owns its own zone on that network, and the brand cannot
+run code in theirs. The brand's own namespace is the one place on that shared network the brand
+controls, so the fix sits where the traffic already is rather than adding a hop.
+
+1. **Xano is the system of record.** Every choice is a row: subject, market, purpose, source, time.
+   The CMP is one source among several, and its cookie becomes an input, not the answer.
+2. **The "Buy" app is a Worker per brand** in a Workers for Platforms dispatch namespace, in front
+   of the storefront. It verifies the signature on every event, checks market, purpose and
+   freshness, and fails closed.
+3. **A KV namespace holds the projection**, keyed `consent:{market}:{subject}` and stamped with the
+   ledger version it came from. Pages read it on every request. It is never the truth.
+4. **The event socket replaces the bus in the middle.** A Cloudflare Queue fans each event out to
+   Azure Service Bus, AWS EventBridge, GCP Pub/Sub and the CRM vendors over their own HTTPS publish
+   APIs — but only on the links the posture allows. Each cloud keeps its own bus; nothing sits
+   between them polling.
+5. **A Rust writer speaks gRPC next to the data.** The BigQuery Storage Write API and the Merchant
+   API both take gRPC. A Worker's outbound fetch is not a gRPC client, so a small `tonic` service on
+   Cloud Run receives from Pub/Sub and writes rows and offers with the posture version on each one.
+6. **Both audiences are socketed.** The Shopify audience reads the same posture through the
+   customer's marketing consent, written by the socket, and the Google Merchant and Ads audience
+   reads rows that carry the same version. Two audiences, one answer, seconds apart.
+
+### Every device, one record
+
+| Channel | Identity it presents | How the choice arrives | What Rust checks |
+|---|---|---|---|
+| **Web — uk, ca, fr** | An anonymous ID, then a subject once signed in | The CMP choice, recorded with its site and rules as the source | The market of the site matches the market of the posture |
+| **Mobile app** | The app user's JWT | The in-app consent screen writes straight to Xano | The event's schema and the posture version |
+| **POS** | A staff session plus the customer's ID | Marketing opt-in at the till, against the store's market | The store's market, not the customer's last web visit |
+| **Chatbot or agent** | `crm_jwt` under a mandate | Asked in the conversation, written as a row | The `Task` enum from the previous section |
+| **IoT device** | Device attestation | The owner's account link; service telemetry is not marketing | Telemetry purpose: service, never ads |
+| **Firmware fetch** | Device attestation plus the SBOM hash | The entitlement, not a banner | The manifest type and the published hash |
+
+None of these channels ever had a cookie to read. All of them can read a row.
+
+### Binding the market into the type
+
+The check that makes break 1 impossible is a few lines, and it runs inside the Worker before
+anything leaves for a bus, an audience or a feed:
+
+```rust
+#![forbid(unsafe_code)]
+use serde::Deserialize;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+pub enum Market { Uk, Ca, Fr }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+pub enum Purpose { Analytics, Ads, Personalisation }
+
+// Projected from Xano into the KV namespace; `version` is the ledger row it came from.
+#[derive(Debug, Deserialize)]
+pub struct Posture { pub market: Market, pub granted: Vec<Purpose>, pub version: u64 }
+
+#[derive(Debug, PartialEq)]
+pub enum Denied { Stale, WrongMarket, NotGranted }
+
+// Called before any event leaves for a bus, an audience or a feed.
+pub fn may_send(p: &Posture, dest: Market, purpose: Purpose, ledger_head: u64) -> Result<(), Denied> {
+    if p.version < ledger_head { return Err(Denied::Stale); }   // projection behind the record: fail closed
+    if p.market != dest { return Err(Denied::WrongMarket); }    // a fr choice never feeds a uk audience
+    if !p.granted.contains(&purpose) { return Err(Denied::NotGranted); }
+    Ok(())
+}
+```
+
+A French choice cannot feed a UK audience, because `Market::Fr != Market::Uk` is decided before the
+send, not discovered in an audit. A projection that is behind the ledger is refused rather than
+trusted. A market the program does not declare cannot be deserialised at all.
+
+Three honest limits. **KV is eventually consistent** — a write can take up to about a minute to
+reach every location — so the `Stale` check compares against the ledger head on anything that
+leaves, and a withdrawal is enforced from the moment it is written to Xano, not when KV catches
+up. **Anonymous visitors stay per site** until they are known; that is the law working, not a gap,
+and the banner still does that job. **Rust makes the check exact, not the policy right** — which
+purposes each market allows is a legal decision, and it lives as rows that legal can change, not
+in the code.
+
+## The asymmetry, stated once
 
 ## The asymmetry, stated once
 
