@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 920" role="img" aria-labelledby="t d">
-<title id="t">One subject, every channel: consent is per TLD, data moves in real time</title>
+<title id="t">One subject, every channel: consent, permissions and security are per TLD, data moves in real time</title>
 <desc id="d">A strip across the top notes that OneTrust, Shopify and Webflow all already answer through Cloudflare, so the brand namespace sits on the network the traffic already uses. Two panels. Left, today: uk.brand.com, ca.brand.com and fr.brand.com each run their own consent banner and keep the choice in a browser cookie under different rules (UK GDPR and PECR; PIPEDA and Quebec Law 25; GDPR as applied by the CNIL). Four gaps are marked in red: a cookie scoped to the parent domain replays one market's choice under another market's rules; a dangling subdomain can forge that cookie; plugin wildcards are readable in the theme source; and the record is keyed to a browser session ID, not a subject. Four clouds (Azure ERP, CRM SaaS, AWS EDI, GCP Merchant and BigQuery) move data through a JVM service bus polled every 15 minutes into the Google Merchant and Ads audience and the Shopify audience. Right, the fix: web, mobile, POS, chatbot, IoT and firmware all reach a Cloudflare Worker, the Buy app in a per-brand dispatch namespace, which checks signature, market and purpose with a Rust type check and fails closed. Xano is the system of record for each subject's posture and ledger; a KV namespace holds a projection keyed by market and subject. An event socket sends to Azure Service Bus, CRM SaaS, AWS EventBridge and GCP Pub/Sub only when market, purpose and freshness allow. A Rust gRPC writer stamps posture onto BigQuery rows and Merchant API items, and both the Google Merchant and Ads audience and the Shopify audience are socketed to the same answer.</desc>
 <defs><style>
  .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
@@ -26,7 +26,7 @@
 <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0L10,5L0,10z"/></marker>
 </defs>
 <rect width="1600" height="920" fill="#fff"/>
-<text class="h" x="60" y="52">ONE SUBJECT, EVERY CHANNEL: CONSENT IS PER TLD, DATA MOVES IN REAL TIME</text>
+<text class="h" x="60" y="52">ONE SUBJECT, EVERY CHANNEL: CONSENT, PERMISSIONS AND SECURITY ARE PER TLD, DATA MOVES IN REAL TIME</text>
 <text class="g" x="60" y="76">every enterprise runs a CMP per country site, four clouds behind a JVM bus, and two audiences that need the same answer</text>
 <path class="rule" d="M60,96H1540"/>
 <rect class="box" x="60" y="108" width="1480" height="44"/>
