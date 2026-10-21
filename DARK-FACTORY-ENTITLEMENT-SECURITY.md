@@ -1,6 +1,6 @@
 ---
 title: "Entitlement Security"
-description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, the PHP, JVM and plugin estates runtime by runtime, four cloud data transports (ERP on Azure, CRM plugins, EDI on AWS, the GCP audience bus) with their AI challenge, AI task binding across Cloudflare, Xano and Rust, one subject across every channel when the CMP is a per-site browser cookie, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
+description: "Updated for php2shell (CVE-2026-109618 and CVE-2026-109619): patch PHP and keep the Cloudflare WAF rules in Block. Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, the PHP, JVM and plugin estates runtime by runtime, four cloud data transports (ERP on Azure, CRM plugins, EDI on AWS, the GCP audience bus) with their AI challenge, AI task binding across Cloudflare, Xano and Rust, one subject across every channel when the CMP is a per-site browser cookie, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
 canonical: https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html
 category: "Security"
 date: 2026-07-19
