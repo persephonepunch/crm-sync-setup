@@ -596,6 +596,25 @@ setups need different steps:
 Adobe Experience Manager is Java, not PHP, so php2shell does not touch it. Its DAM process steps
 and their ImageMagick and Ghostscript calls remain the risk the hardening section describes.
 
+**Across Adobe's products, the two exposures stack.** ImageMagick reaches Adobe estates by two
+different doors, and in Commerce it opens inside the same PHP process php2shell attacks:
+
+| Adobe product | Runtime | Where ImageMagick enters | php2shell | What to do |
+|---|---|---|---|---|
+| **Adobe Commerce on cloud infrastructure** | PHP | The ImageMagick image adapter, when selected, with the `imagick` extension enabled in `.magento.app.yaml` | Yes | Use the GD2 adapter unless you need ImageMagick; confirm the patched PHP and redeploy; ask Adobe about Fastly WAF coverage |
+| **Magento Open Source and self-hosted Commerce** | PHP | The same adapter, through the PHP `Imagick` extension | Yes | Everything in this section, plus a hardened `policy.xml` on the host |
+| **AEM 6.5 and Managed Services** | Java | A command-line process step in the DAM Update Asset workflow, calling ImageMagick and Ghostscript for EPS, PS, PSD and AI | No | Audit which renditions need the step, remove it where they do not, `policy.xml` on any host that keeps it |
+| **AEM as a Cloud Service** | Java | Asset processing runs in Adobe's isolated asset compute, not on the author tier | No | Nothing on the host to patch — the parser holds nothing, the Shopify Functions bargain reached from Adobe's side |
+
+The Commerce rows are the worst case in this article. With the ImageMagick adapter on, a
+customer's upload or an unauthenticated request for an uncached product image size is decoded
+by C code **inside a PHP worker**: two parsers that have each produced remote code execution,
+in one process, in PCI scope, reachable without an account. A crash or a takeover in either is
+a crash or a takeover of the other. Switching to GD2 removes one of the two. Patching PHP fixes
+the other. Moving media ingest to the [Rust stage](#rust-in-the-loop-re-encode-before-anything-parses)
+in a Worker, and catalog images to an origin outside the commerce stack, takes both out of the
+request path.
+
 The structural reading is the same as everywhere else in this article. **Media ingest that has
 already moved to a Worker and the Rust stage below never hands a hostile body to a PHP process
 at all**, and a storefront that serves from Shopify or Webflow has no PHP runtime of its own to
