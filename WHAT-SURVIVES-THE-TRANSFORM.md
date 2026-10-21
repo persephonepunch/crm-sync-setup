@@ -226,7 +226,7 @@ as ImageTragick.
 | **AEM** | The DAM Update Asset workflow can shell out for EPS, PS and some PSD paths | Audit which renditions require it; Adobe's own Cloud Service direction moved processing off the author runtime |
 
 The full hardening detail — `policy.xml`, the Ghostscript decision, the edge and origin controls —
-is in [Dark Factory Entitlement Security](https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security),
+is in [Entitlement Security](https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security),
 which also explains **why we don't use Flash**: the format was not killed by a better codec, it
 was killed by the realisation that content should not carry capability. Every argument in this
 section is that one applied to a file your brand team uploaded.
@@ -910,6 +910,6 @@ you already keep.
 
 ---
 
-*Companion: [Dark Factory Entitlement Security](https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security)
+*Companion: [Entitlement Security](https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security)
 — why content should not carry capability, and the full parser-hardening detail. This document is
 the media manager's half of the same argument.*

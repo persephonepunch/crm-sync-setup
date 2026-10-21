@@ -40,7 +40,7 @@ about:
   - name: Entitlement revocation and key rotation
   - name: Latency and security trade-offs
 citation:
-  - name: "Dark Factory Entitlement Security (the model this operationalises)"
+  - name: "Entitlement Security (the model this operationalises)"
     url: https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security
   - name: "Capability, not perimeter"
     url: https://www.crm-sync.dev/pages/knowledge-base#capability-not-perimeter

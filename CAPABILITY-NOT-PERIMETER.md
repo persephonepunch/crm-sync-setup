@@ -51,7 +51,7 @@ citation:
     url: https://crm-sync.dev/demo/prosthetics
   - name: "Building-inspection demo (geo-verified BIM)"
     url: https://crm-sync.dev/demo/inspection
-  - name: "Dark Factory Entitlement Security (companion)"
+  - name: "Entitlement Security (companion)"
     url: https://www.crm-sync.dev/pages/knowledge-base#dark-factory-entitlement-security
 video:
   name: "Agentic Checkout Needs More Than RBAC — permissions for AI agents (Next.js)"

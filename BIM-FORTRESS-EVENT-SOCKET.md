@@ -21,7 +21,7 @@ alternativeHeadline: "You need more is a different sentence than you need differ
 citation:
   - name: "CISA ICS Advisory — Trimble Cityworks (CVE-2025-0994)"
     url: https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-04
-  - name: "Dark Factory Entitlement Security (companion)"
+  - name: "Entitlement Security (companion)"
     url: https://crm-sync.dev/share/dark-factory-entitlement-security
   - name: "Data Layer — WordPress, Astro, Headless (delivery companion)"
     url: https://crm-sync.dev/share/wordpress-web-components
@@ -30,7 +30,7 @@ citation:
 ---
 # BIM Fortress Exposure vs the Event-Socket Heal
 
-**Status:** Companion diagram to [Dark Factory Entitlement Security](https://crm-sync.dev/share/dark-factory-entitlement-security) · **Scope:** One picture of where the fortress *model* bleeds — an era's architecture, not any vendor's failing — and one picture of the event-socket layer that heals each wound, feeding AI consumers in real time under entitlement boundaries.
+**Status:** Companion diagram to [Entitlement Security](https://crm-sync.dev/share/dark-factory-entitlement-security) · **Scope:** One picture of where the fortress *model* bleeds — an era's architecture, not any vendor's failing — and one picture of the event-socket layer that heals each wound, feeding AI consumers in real time under entitlement boundaries.
 
 **Read this the way it is meant:** Trimble is an A+ platform — the system of record for the physical world's assets, earned over decades. This is not "Trimble is exposed, use something else." This is "the A+ system of record is now being asked for things no silo-era architecture can be asked to provide — real-time AI addressability, warehouse-joinable evidence, plaintext-free sharing — and *you need more* is a different sentence than *you need different*." The diagrams below show the more.
 
@@ -135,4 +135,4 @@ The engagement shape is deliberately small: one asset class enveloped, one wareh
 
 The fortress keeps its job as the system of record — Trimble, the WMS, the ERP stay exactly where they are. The event socket doesn't replace them; it stands at their door: stamping, gating, enveloping, and ledgering everything that moves in or out, so the data those platforms hold becomes safely addressable by AI at the speed AI actually asks. The leaders keep the factory. The socket keeps the gate and the receipts.
 
-*Architecture and receipts in full: [Dark Factory Entitlement Security](https://crm-sync.dev/share/dark-factory-entitlement-security) · Delivery-side companion: [File System Agnostic Publishing](https://crm-sync.dev/share/universal) · Setup: [CRM Sync Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide)*
+*Architecture and receipts in full: [Entitlement Security](https://crm-sync.dev/share/dark-factory-entitlement-security) · Delivery-side companion: [File System Agnostic Publishing](https://crm-sync.dev/share/universal) · Setup: [CRM Sync Setup Reference](https://www.crm-sync.dev/pages/knowledge-base#setup-guide)*

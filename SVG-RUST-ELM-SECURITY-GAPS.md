@@ -754,7 +754,7 @@ A **foot gun** is a feature, API or default that makes it unusually easy to shoo
 
 - [Safe SVG for Webflow and UIkit](https://persephonepunch.github.io/crm-sync-setup/safe-svg.html) — inline SVG without inheriting the upload's privileges
 - [GUIs when you still ship JavaScript](https://persephonepunch.github.io/crm-sync-setup/gui-options-js-to-machine-code.html) — Webflow, Elm, Javy, Tauri and Rust down to machine code
-- [Dark Factory Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html) — one architecture, two trust models
+- [Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html) — one architecture, two trust models
 - [Where Your Code Runs Is a Business Decision](https://persephonepunch.github.io/crm-sync-setup/where-code-runs.html) — VMs, containers and isolates
 - [Hyperscaler vs Distributed](https://www.crm-sync.dev/pages/knowledge-base#hyperscaler-vs-distributed) — C and C++ renderers, their Rust replacements, and why a safe renderer can move to the device
 - [What Survives the Transform](https://persephonepunch.github.io/crm-sync-setup/what-survives-the-transform.html) — metadata, re-encodes and where media should live

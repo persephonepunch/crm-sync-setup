@@ -27,7 +27,7 @@ chapters:
       - docs/KEY-MANAGEMENT-LIFECYCLE.md   # 2026-07-03 · CRM Sync — Key Management Lifecycle
       - CISO-DPO-FAQ.md   # 2026-07-14 · Security & Privacy — Questions from CISOs and DPOs
       - BIM-FORTRESS-EVENT-SOCKET.md   # 2026-07-18 · BIM Fortress vs Event-Socket
-      - DARK-FACTORY-ENTITLEMENT-SECURITY.md   # 2026-07-19 · Dark Factory Entitlement Security
+      - DARK-FACTORY-ENTITLEMENT-SECURITY.md   # 2026-07-19 · Entitlement Security
       - ENTITLEMENT-STRATEGY.md   # 2026-07-20 · Entitlement Strategy — RBAC, ABAC, RuBAC & Permissions for AI Agents
       - FIRMWARE-SBOM-CRA.md   # 2026-07-20 · CRM Sync — Firmware, SBOM & the Cyber Resilience Act
       - CYBERSECURITY-FOR-AI.md   # 2026-07-25 · Cybersecurity for AI — CISO · CTO · DPO
