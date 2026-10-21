@@ -46,6 +46,10 @@ citation:
     url: https://developers.google.com/merchant/api
   - name: "Hyperscaler vs Distributed (companion)"
     url: https://crm-sync.dev/docs/hyperscaler-vs-distributed
+  - name: "PHP security advisory — CVE-2026-109618 and CVE-2026-109619 (21 October 2026)"
+    url: https://www.php.net/archive/2026.php#2026-10-21-5
+  - name: "Cloudflare — protections against the php2shell vulnerability"
+    url: https://blog.cloudflare.com/php-vulnerabilities-waf-protection/
   - name: "Shopify Storefront Web Components"
     url: https://shopify.dev/docs/api/storefront-web-components
   - name: "Data Layer — WordPress, Astro, Headless (companion)"
@@ -377,7 +381,7 @@ containing.
 | **WordPress** | `/wp-content/uploads/*` | Response header transform forcing `nosniff`, and `Content-Disposition: attachment` for anything not a known image type; WAF custom rule refusing `.php` under the uploads prefix; rate limit on `admin-ajax.php` and the media REST route; Access on `/wp-login.php` and `/wp-admin` | Script executing on your own origin from the media library; the upload-to-RCE classic; brute force against the one door most exploitation needs |
 | **Drupal** | `/sites/default/files/*`, and especially `/sites/default/files/styles/*` | The same header transform and `.php` refusal on the files prefix; **cache rule plus rate limit on the `styles` prefix**, so a derivative is generated once and a varying URL cannot mint parses on demand; Access on `/user/login` | An anonymous request stream that turns image styles into a parser DoS, and an image style request that reaches the origin at all after the first |
 | **Magento** | `/media/*`, and `/media/catalog/product/cache/*` | Header transform on `/media/*` first, because this origin also serves checkout; cache rule and rate limit on the resize cache prefix; WAF and rate limit on customizable-option upload endpoints; Access on the admin path; **origin rule moving `/media/*` to object storage** | The stored-file-to-script chain that becomes card skimming on the payment page, and — with the origin rule — the parser's presence in PCI scope at all |
-| **Any PHP origin** | Every writable directory | Refuse execution of `.php` under any upload or cache prefix; enable the managed ruleset covering ImageMagick and PHP exploitation patterns; normalise the URL in a transform rule before anything downstream interprets it | The gap between what the application thinks a path is and what the filesystem resolves it to |
+| **Any PHP origin** | Every writable directory | Refuse execution of `.php` under any upload or cache prefix; enable the managed ruleset covering ImageMagick and PHP exploitation patterns, in Block — it carries the php2shell rules since 21 October 2026; normalise the URL in a transform rule before anything downstream interprets it | The gap between what the application thinks a path is and what the filesystem resolves it to |
 
 Two honest limits on all of it. The managed ruleset matches known patterns, so it is detection
 and not a boundary — the format is decided by content, and a novel payload is still a parse. And
@@ -395,6 +399,57 @@ None of this makes the parser safe. It makes the parser less useful to reach: fe
 will touch, less work sent to it, less it can do when it succeeds, and no path to it that
 bypasses the things in front. That is the same sentence as the section above, written for an
 estate that cannot be rebuilt this quarter.
+
+### Update, 21 October 2026: php2shell is the runtime, not the plugin
+
+Everything above treats PHP as the host that *calls* a dangerous parser. On 21 October 2026 the
+host itself became the parser pole. Two flaws disclosed together as **php2shell** —
+[CVE-2026-109618 and CVE-2026-109619](https://www.php.net/archive/2026.php#2026-10-21-5) — let
+an unauthenticated request reach remote code execution in the PHP runtime. The first turns
+out-of-memory handling into corruption: PHP is interrupted while request data is half
+initialised, and cleanup treats it as valid. The second leaves request state alive after its
+memory is freed, so **a later request handled by the same worker can use it** — on a commerce
+origin, one shopper's request reading what another's left behind. PHP's own advisory lists
+PHP-FPM, Apache with `mod_php`, `php-cgi`, FrankenPHP and LiteSpeed as affected, and says
+plainly that there is no complete mitigation short of updating.
+
+This is the sidebar's argument arriving from the other side. **No `policy.xml`, plugin update or
+theme change touches it** — as [Cloudflare put it](https://blog.cloudflare.com/php-vulnerabilities-waf-protection/),
+these flaws are in the PHP runtime, so updating website code or a plugin alone does not fix
+them. Every WordPress, Drupal, Magento and Laravel estate in the table above is in scope
+whether or not it ever touched ImageMagick.
+
+In order:
+
+1. **Patch the runtime.** The fixed releases are **PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35**. If
+   a host manages PHP for you, the update is theirs to apply and yours to confirm. An estate on
+   a branch older than 8.2 has no release to install, which turns an end-of-life PHP version
+   from technical debt into an open incident.
+2. **Confirm the edge is blocking.** Cloudflare shipped rules for php2shell about nine hours
+   before disclosure, after the flaw leaked and attack traffic appeared, and has been
+   protecting WAF-enabled zones by default since 03:02 UTC on 21 October — on every plan,
+   Free included. Free zones get them through the Cloudflare Managed Free Ruleset with nothing
+   to switch on. On Pro, Business and Enterprise, check that the **Cloudflare Managed Ruleset**
+   is deployed and its "Anomalous Execution" rules are in **Block**, not Log. Then filter
+   Security › Security Analytics › Events by the rule IDs in Cloudflare's post to see whether
+   you were already being probed. Attackers were mutating payloads to get past the first
+   signatures, so this is detection that buys time, not a boundary.
+3. **Shrink what reaches a PHP worker.** Large requests are one way to drive PHP into memory
+   pressure. Cap upload sizes, refuse uploads on routes that do not need them, and rate limit
+   the endpoints the table names — `admin-ajax.php`, the media REST route, customizable-option
+   uploads, the on-request resize caches. Cloudflare is clear these reduce exposure and do not
+   replace the fix.
+4. **Make the edge the only way in.** The rules above protect only traffic that passes through
+   them. An origin still answering on its own address is unprotected, which is why
+   [closing that door](#hardening-what-you-already-run) — authenticated origin pulls or a tunnel
+   with no listening port — is the step that decides whether step 2 counts.
+
+The structural reading is the same as everywhere else in this article. **Media ingest that has
+already moved to a Worker and the Rust stage below never hands a hostile body to a PHP process
+at all**, and a storefront that serves from Shopify or Webflow has no PHP runtime of its own to
+patch. php2shell does not change the architecture this article argues for. It is what that
+architecture is for: a flaw in someone else's runtime, on an ordinary Wednesday, with the patch measured in
+hours and the exposure measured in whatever the runtime could reach.
 
 ## Rust in the loop: re-encode before anything parses
 
