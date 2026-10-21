@@ -560,6 +560,42 @@ at the gate, there is far less in a PHP worker's memory for that stale state to 
 customer profile, no consent record, no linked account. The flaw is unchanged. What it can
 reach is not.
 
+#### Where else PHP hides: Shopify apps and Adobe Commerce
+
+**Shopify apps.** Shopify's own platform is not PHP, so a Shopify storefront has no PHP runtime
+to patch. Its apps are another matter. Many run on PHP — Laravel, or Shopify's own PHP API
+library — on servers their developers host, and Shopify sends traffic to them: **App Proxy**
+forwards storefront requests under `/apps/…` to the app's server, and **webhooks** post order and
+customer events to it. Two things make that sharper than a single site. An app server holds
+Admin API tokens for every store that installed it, so code execution there is a breach of
+every merchant at once. And checking the App Proxy signature or the webhook HMAC *in PHP* does
+not help, because php2shell fires while PHP is processing the request, before the app's own
+code runs.
+
+- **If you build the app:** patch PHP, put the App Proxy and webhook endpoints behind the same
+  allow list, and verify the HMAC in a Worker — over the raw body for webhooks, over the query
+  string for App Proxy — so an unsigned request never reaches PHP. That is layer 2 above, with
+  Shopify's signature as one of the types.
+- **If you run the store:** list the installed apps that take App Proxy traffic or hold broad
+  scopes, ask each vendor whether their backend is PHP and patched, and remove the ones that
+  cannot answer. The theme wildcard table applies to their storefront scripts as well.
+
+**Adobe Commerce and Magento.** These are PHP end to end, and the Magento row of the edge table
+already puts the image pipeline inside PCI scope; php2shell puts the whole runtime there. Two
+setups need different steps:
+
+- **Self-hosted Magento or Magento Open Source behind Cloudflare:** everything in this section
+  applies as written — patch, Managed Ruleset in Block, the allow list, the boundary, the
+  origin lock. Keep the admin URL on its own hostname behind Access.
+- **Adobe Commerce on cloud infrastructure:** the edge is Fastly with Adobe's WAF, not
+  Cloudflare, so Cloudflare's rules never see the traffic unless you have deliberately put a
+  Cloudflare zone in front. Ask Adobe whether its WAF carries php2shell protection, and confirm
+  the patched PHP release is in your environment. The PHP branch is set in `.magento.app.yaml`,
+  and a redeploy is how a new platform image reaches the store.
+
+Adobe Experience Manager is Java, not PHP, so php2shell does not touch it. Its DAM process steps
+and their ImageMagick and Ghostscript calls remain the risk the hardening section describes.
+
 The structural reading is the same as everywhere else in this article. **Media ingest that has
 already moved to a Worker and the Rust stage below never hands a hostile body to a PHP process
 at all**, and a storefront that serves from Shopify or Webflow has no PHP runtime of its own to
