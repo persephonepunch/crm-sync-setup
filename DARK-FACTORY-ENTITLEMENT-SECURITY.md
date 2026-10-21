@@ -50,6 +50,10 @@ citation:
     url: https://www.php.net/archive/2026.php#2026-10-21-5
   - name: "Cloudflare — protections against the php2shell vulnerability"
     url: https://blog.cloudflare.com/php-vulnerabilities-waf-protection/
+  - name: "Node.js — October 21, 2026 security releases (CVE-2026-111497)"
+    url: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
+  - name: "Socket — LiteLLM PyPI package and Docker images compromised"
+    url: https://socket.dev/blog/litellm-compromise
   - name: "Shopify Storefront Web Components"
     url: https://shopify.dev/docs/api/storefront-web-components
   - name: "Data Layer — WordPress, Astro, Headless (companion)"
@@ -70,6 +74,9 @@ citation:
 > Its WAF rules are on by default for every plan, Free included; paid plans should confirm they
 > are in Block. Then patch to PHP 8.5.12, 8.4.27, 8.3.36 or 8.2.35 — a plugin update does not fix
 > it. [What to do, in order](#update-21-october-2026-php2shell-is-the-runtime-not-the-plugin).
+> **The same day:** Node.js fixed a Brotli out-of-bounds write that permits remote code execution
+> (CVE-2026-111497), and a poisoned LiteLLM 1.107.0 shipped a credential stealer through PyPI and
+> Docker. [Both, and what to do](#the-same-day-nodejs-cve-2026-111497-and-the-litellm-release).
 
 ![One subject, every channel. A strip across the top: OneTrust's CDN, Shopify storefronts and Webflow hosting all answer through Cloudflare, so the brand's namespace sits where the traffic already is. Left, today: uk.brand.com, ca.brand.com and fr.brand.com each keep consent in a browser cookie under different rules, with four red gaps — cookie scope across markets, a dangling subdomain that can forge consent, plugin wildcards readable in the theme, and a session ID instead of a subject — and four clouds feeding the Google Merchant and Shopify audiences through a JVM bus polled every 15 minutes. Right, the fix: web, mobile, POS, chatbot, IoT and firmware reach a Cloudflare Worker, the Buy app, which checks market, purpose and freshness with Rust types; Xano is the system of record, a KV namespace holds the projection, and an event socket feeds Azure, CRM SaaS, AWS and GCP only when the posture allows, with a Rust gRPC writer stamping posture onto BigQuery and Merchant rows so both audiences are socketed to the same answer.](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.svg)
 
@@ -614,6 +621,55 @@ a crash or a takeover of the other. Switching to GD2 removes one of the two. Pat
 the other. Moving media ingest to the [Rust stage](#rust-in-the-loop-re-encode-before-anything-parses)
 in a Worker, and catalog images to an origin outside the commerce stack, takes both out of the
 request path.
+
+#### The same day: Node.js CVE-2026-111497 and the LiteLLM release
+
+PHP was not the only runtime with a bad Wednesday.
+
+**Node.js — CVE-2026-111497.** The [October 2026 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases)
+fixes an out-of-bounds write in Node's Brotli decoder that permits remote code execution, rated
+high, on the 22.x, 24.x and 26.x lines, alongside three other high-severity fixes for TLS
+hostname checks and DNS. The fixed releases are **22.23.4, 24.22.1 and 26.12.1**, and Node's own
+note is blunt: end-of-life versions are always affected, so an odd-numbered or retired line has
+no patch at all. The reach is wider than code that calls `zlib`: `fetch()` decompresses Brotli
+responses on its own, so any Node service that fetches from a server it does not control can
+hand that server's bytes to the decoder. The fix is a cherry-pick of an upstream Brotli commit,
+which is worth watching in anything else that bundles the library.
+
+*Is Node managed?* It depends where it runs, and it is the same question as PHP's — the runtime,
+not the package, so `npm update` does not fix it:
+
+| Where the JavaScript runs | Who patches the runtime | What to do |
+|---|---|---|
+| Cloudflare Workers, and Shopify Oxygen, which runs on Cloudflare's open-source Workers runtime | The platform. These are not Node.js processes, and there is no runtime version for you to set | Nothing to install. Your `nodejs_compat` code runs on the platform's implementation, updated by the platform |
+| A managed functions platform | Usually the platform, within the major version you selected | Confirm the patch has rolled, and move off any end-of-life major |
+| Your own servers and containers — a Shopify app on Node, a self-hosted Next.js or Remix app | You | Install 22.23.4, 24.22.1 or 26.12.1 and rebuild images; the base image tag pins the runtime |
+| Developer machines and CI runners | You | Same versions. Build tools such as Vite and Wrangler run on Node and fetch from the network |
+
+**LiteLLM 1.107.0 — a poisoned AI gateway.** At 11:39 UTC on 21 October a malicious LiteLLM
+1.107.0 was [published to PyPI](https://socket.dev/blog/litellm-compromise), with matching
+container images on GitHub's registry and Docker Hub — and for a time the floating `latest`,
+`main-latest` and `main-stable` tags resolved to the same image. The wheels drop a `cook.pth`
+file and a `sitecustomize.py` into the Python environment, so the payload runs on **any** Python
+start, not only when LiteLLM is imported. It collects cloud and Kubernetes credentials, SSH and
+signing keys, `.env` files, browser data and AI tool tokens — and, where `DATABASE_URL` is set,
+LiteLLM's own stored provider keys — and sends them to a lookalike domain. The release
+provenance names a source owner one hyphen away from the real one. It is the project's second
+supply-chain compromise this year.
+
+- Block 1.107.0 and stop deploying the affected tags or digests, floating tags included. Pin
+  `1.106.2` (the version investigators point to) by digest, not by tag.
+- If Python ran anywhere 1.107.0 was installed, treat every secret that environment could read
+  as exposed. Rotate from a clean machine, and do not run the affected `pip` or `python` to clean
+  up — starting Python re-runs the payload.
+
+This is the trust-by-compile section happening live: the package resolved and installed, so it
+was treated as ours, and the install put code in the path of every interpreter start. It is also
+the "AI strategy is not a JVM" argument in one incident. An AI gateway is built to hold every
+model provider's key in one process, which makes it the most valuable thing an attacker can
+poison. The [task binding](#ai-task-binding-cloudflare-binds-xano-grants-rust-checks) model keeps
+provider keys as bindings on a Worker, issues each agent call a grant for one task, and ledgers
+the call — so a compromised component in the request path finds no master key to take.
 
 The structural reading is the same as everywhere else in this article. **Media ingest that has
 already moved to a Worker and the Rust stage below never hands a hostile body to a PHP process
