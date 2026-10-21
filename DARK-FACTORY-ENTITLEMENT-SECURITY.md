@@ -7,6 +7,8 @@ date: 2026-07-19
 modified: 2026-10-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
 licence: CC-BY-4.0
+ogImage: https://persephonepunch.github.io/crm-sync-setup/og/dark-factory-entitlement-security.png
+ogImageAlt: "Entitlement Security: one subject, every channel. Left, today: uk, ca and fr country sites each keep consent in a browser cookie, with four red gaps and a JVM bus polled every 15 minutes feeding the Google Merchant and Shopify audiences. Right, the fix: every device reaches a Cloudflare Worker, Xano is the system of record, and an event socket feeds four clouds and both audiences the same answer."
 tags:
   - entitlement
   - security
