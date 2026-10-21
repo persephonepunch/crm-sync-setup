@@ -1,9 +1,10 @@
 ---
 title: "Dark Factory Entitlement Security"
-description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
+description: "Where the vulnerability lives — IoT firmware, game bundles, 3D/BIM assets — with the Unity, Trimble and ImageMagick receipts, Rust in the loop so no C parser ever sees the sender's bytes, why no platform yet handles 3D securely, and the entitlement architecture that survives AI-speed extraction."
 canonical: https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html
 category: "Security"
 date: 2026-07-19
+modified: 2026-10-21
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/DARK-FACTORY-ENTITLEMENT-SECURITY.md
 licence: CC-BY-4.0
 tags:
@@ -29,6 +30,12 @@ citation:
     url: https://www.cisa.gov/news-events/ics-advisories/icsa-25-037-04
   - name: "CISA alert — Trimble Cityworks security updates"
     url: https://www.cisa.gov/news-events/alerts/2025/02/07/trimble-releases-security-updates-address-vulnerability-cityworks-software
+  - name: "ImageMagick — Security Policy"
+    url: https://imagemagick.org/script/security-policy.php
+  - name: "image crate — Limits"
+    url: https://docs.rs/image/latest/image/struct.Limits.html
+  - name: "resvg / usvg"
+    url: https://github.com/linebender/resvg
   - name: "Shopify Storefront Web Components"
     url: https://shopify.dev/docs/api/storefront-web-components
   - name: "Data Layer — WordPress, Astro, Headless (companion)"
@@ -123,7 +130,7 @@ This is not a hypothetical argument. Two documented 2025 events mark the two end
 
 What makes the parser pole distinct is the trigger. Unity's flaw needs you to have shipped something. Trimble's needs you to run the silo. **The parser is invoked by the act of receiving a file at all** — accepting an upload is sufficient. An organisation that ships nothing and runs no monolith still has this surface the moment it lets a partner send it a model, a document or an image.
 
-It also reframes what custody can and cannot do. Encrypting an asset, granting it to a named recipient and ledgering every served byte is a containment and attribution control: it proves what was delivered, to whom, and when, and a rotated key heals a suspected leak without a recall. **It does not make a hostile file safe to open.** That is a validation problem, and it belongs on the way in — reject external resource references, cap decompression ratios, determine the type from the bytes rather than the declaration, parse in isolation with a hard timeout, and where possible re-serialise so what you store is your own output rather than the sender's input. Custody and validation are two controls, and a vendor claiming the first has not delivered the second.
+It also reframes what custody can and cannot do. Encrypting an asset, granting it to a named recipient and ledgering every served byte is a containment and attribution control: it proves what was delivered, to whom, and when, and a rotated key heals a suspected leak without a recall. **It does not make a hostile file safe to open.** That is a validation problem, and it belongs on the way in — reject external resource references, cap decompression ratios, determine the type from the bytes rather than the declaration, parse in isolation with a hard timeout, and where possible re-serialise so what you store is your own output rather than the sender's input. That last step needs something to do the re-serialising, and [Rust in the loop](#rust-in-the-loop-re-encode-before-anything-parses) below names it. Custody and validation are two controls, and a vendor claiming the first has not delivered the second.
 
 Between those two poles sits everything a modern operation ships and stores: **IoT and device firmware** (expanding EXEs with embedded secrets), **game and metaverse distribution** (Roblox and Unity bundles carrying your product's 3D twins), **3D/BIM assets in business operations** (models locked in PIM/BIM silos, exchanged as executable-adjacent XML). The vulnerability does not live in your network perimeter. It lives in your artifacts and your silos — the two places perimeter security cannot reach.
 
@@ -249,6 +256,27 @@ that the file you edited is the file the binary loads; multiple installs and a s
 `MAGICK_CONFIGURE_PATH` are the usual reason a correct policy does nothing. And read it as
 ImageMagick does — an earlier permissive entry can shadow the restriction you added below it.
 
+For ImageMagick 7, the core of it is a dozen lines:
+
+```xml
+<policymap>
+  <policy domain="delegate" rights="none" pattern="*" />
+  <policy domain="coder" rights="none" pattern="{MVG,MSL,PS,EPS,PDF,XPS,URL,HTTP,HTTPS,FTP,SVG}" />
+  <policy domain="path" rights="none" pattern="@*" />
+  <policy domain="resource" name="memory" value="256MiB" />
+  <policy domain="resource" name="map" value="512MiB" />
+  <policy domain="resource" name="area" value="128MP" />
+  <policy domain="resource" name="width" value="16KP" />
+  <policy domain="resource" name="height" value="16KP" />
+  <policy domain="resource" name="disk" value="1GiB" />
+  <policy domain="resource" name="time" value="30" />
+  <policy domain="resource" name="list-length" value="32" />
+</policymap>
+```
+
+The `path` line is the one the sidebar implies without naming. It refuses the `@` indirection,
+which is how `label:@/etc/passwd` turns a thumbnail into the exfiltration channel.
+
 **Treat Ghostscript as its own decision.** The PDF, EPS and PS delegates hand the file to
 Ghostscript, which is a language interpreter with its own history of sandbox escapes; `-dSAFER`
 has been the default since 9.50 but has been bypassed before. If nothing in the product needs
@@ -353,6 +381,102 @@ None of this makes the parser safe. It makes the parser less useful to reach: fe
 will touch, less work sent to it, less it can do when it succeeds, and no path to it that
 bypasses the things in front. That is the same sentence as the section above, written for an
 estate that cannot be rebuilt this quarter.
+
+## Rust in the loop: re-encode before anything parses
+
+Everything above shrinks what ImageMagick may do. The structural step is to stop handing it, or
+any C parser, the sender's bytes at all. Put a small Rust stage first in every ingest loop:
+determine the type from the bytes, check it against an allow-list, decode under hard limits,
+and re-encode. Everything downstream — the CMS, the thumbnailer, the DAM, an agent — only ever
+sees bytes your own code wrote. That is the re-serialisation the custody paragraph asked for,
+with a name on it.
+
+**1 · The stage.** The `image` crate's decoders for PNG, JPEG, WebP and GIF are pure Rust, and
+building it with only those features is itself an allow-list: a format that was not compiled in
+cannot be parsed.
+
+```toml
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif"] }
+```
+
+```rust
+#![forbid(unsafe_code)]
+use image::{ImageError, ImageFormat, ImageReader, Limits};
+use std::io::Cursor;
+
+#[derive(Debug)]
+pub enum Rejected { Format, Image(ImageError) }
+impl From<ImageError> for Rejected { fn from(e: ImageError) -> Self { Rejected::Image(e) } }
+impl From<std::io::Error> for Rejected { fn from(e: std::io::Error) -> Self { Rejected::Image(e.into()) } }
+
+pub fn sanitize(bytes: &[u8]) -> Result<Vec<u8>, Rejected> {
+    // Type from the magic bytes, never from the filename or the declared MIME type.
+    let mut r = ImageReader::new(Cursor::new(bytes)).with_guessed_format()?;
+    match r.format() {
+        Some(ImageFormat::Png | ImageFormat::Jpeg | ImageFormat::WebP | ImageFormat::Gif) => {}
+        _ => return Err(Rejected::Format),
+    }
+    let mut lim = Limits::default();
+    lim.max_image_width = Some(8192);
+    lim.max_image_height = Some(8192);
+    lim.max_alloc = Some(64 << 20);          // decompression-bomb ceiling, inside a 128 MB isolate
+    r.limits(lim);
+    let img = r.decode()?;                   // trailers, polyglots, metadata and scripts gone
+    let mut out = Cursor::new(Vec::new());
+    img.write_to(&mut out, ImageFormat::Png)?; // what you store is your output
+    Ok(out.into_inner())
+}
+```
+
+Decoding produces a typed `DynamicImage`: pixels, dimensions, a colour type, and nothing else.
+That is the iced comparison above, moved to the edge — a malformed file cannot become anything
+except an error, because there is no other value the decoder can return.
+
+**2 · SVG goes through usvg.** Same idea, with the tools this article already named. usvg parses
+an SVG into a tree of paths, paint and text; it has no model for scripts, event handlers or
+`foreignObject`, so they do not survive the round trip. Give it an image-href resolver that
+refuses external files, then either rasterise with resvg or write the normalised tree back out
+with `Tree::to_string`. Either way the stored SVG is one usvg wrote.
+
+**3 · Run it where a crash costs nothing.** Compile the stage to `wasm32` and run it inside a
+Worker, or under wasmtime with fuel metering and a memory cap. That is the Shopify Functions
+bargain applied to your own ingest: no filesystem, no network, bytes in, bytes out, a hard
+ceiling on time and memory. A decoder bug, should one exist, panics inside a sandbox that holds
+nothing worth reaching.
+
+**4 · Route only re-encoded output downstream.** WordPress, Drupal image styles, Magento's resize
+cache and AEM renditions then process your PNG, not the sender's file. ImageMagick can stay
+installed, policy and all, but it never parses hostile input. The on-request derivative problem
+from the PHP estates shrinks with it: a GET that mints a thumbnail is now parsing a file you
+authored.
+
+**5 · Gate the Rust supply chain too.** The trust-by-compile section already flagged `build.rs`
+as code that runs at install. `#![forbid(unsafe_code)]` covers your crate, not its
+dependencies, so add `cargo-deny` and `cargo-audit` in CI, `cargo-vet` for the decoder crates,
+and a CycloneDX SBOM from `cargo-cyclonedx`. The SBOM ties the stage back to the CRA evidence
+this article ends on.
+
+| | ImageMagick in the loop | Rust in the loop |
+|---|---|---|
+| Memory-corruption class | Present — a decade of CVEs | Removed at compile time in safe code |
+| Shell-out / delegates | Possible by design | No delegate mechanism exists |
+| Format coverage | Every coder that shipped | Only the features compiled in |
+| What is stored | The sender's bytes | Your re-encoded output |
+| Safety depends on | A `policy.xml` someone remembers | The runtime and the type system |
+| Runs in | A host process with ambient privilege | A Wasm sandbox with no filesystem or network |
+| Trust model | Single bundle — trusted once installed | Per request — every file earns it |
+| AI-speed access | Every agent-triggered parse reaches C | Agents only read sanitised output |
+
+Four honest limits. **Logic bugs remain**: Rust removes memory corruption, not logic flaws, so
+bombs still need the `Limits` and pathological inputs still need a timeout. **Format coverage
+is narrower**: PSD, EPS, AI, HEIC and the 3D/CAD formats in the next section have thin or
+partial Rust support, so reject them at the edge or quarantine them to an isolated worker that
+holds no credentials. **Re-encoding changes files**: PNG output loses JPEG compression and
+drops colour profiles and EXIF, so re-encode JPEG to JPEG where size matters and carry
+provenance in your own ledger rather than in the file. **An isolate caps memory**: a Worker's
+128 MB will not decode a very large image, so route oversize files to a container sandbox under
+the same rules — no credentials, no network route worth having, a hard timeout.
 
 ## Nobody supports 3D files securely
 

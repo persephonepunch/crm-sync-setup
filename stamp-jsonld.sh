@@ -81,7 +81,7 @@ for shell in sorted(glob.glob("*.html")):
         "headline": fm["title"],
         "description": fm.get("description", ""),
         "datePublished": fm.get("date", ""),
-        "dateModified": fm.get("date", ""),
+        "dateModified": fm.get("modified") or fm.get("date", ""),
         "author": {"@type": "Organization", "name": "CRM Sync", "url": "https://crm-sync.dev"},
         "publisher": {"@type": "Organization", "name": "CRM Sync", "url": "https://crm-sync.dev"},
         "mainEntityOfPage": base,
