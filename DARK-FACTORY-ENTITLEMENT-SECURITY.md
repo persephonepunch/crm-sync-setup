@@ -63,6 +63,14 @@ citation:
 
 **Tags:** [#CRA](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) · [#Art-14 — 11 September 2026](https://eur-lex.europa.eu/eli/reg/2024/2847/oj) · #firmware · [#CRA-checklist](https://www.crm-sync.dev/pages/pim-sync#cra-checklist)
 
+> **Update, 21 October 2026 — php2shell.** Two critical flaws in the PHP runtime itself,
+> CVE-2026-109618 and CVE-2026-109619, allow unauthenticated remote code execution on every PHP
+> web server from 5.4 on, and attack traffic was seen before disclosure.
+> **[Cloudflare deploys protections against the php2shell vulnerability →](https://blog.cloudflare.com/php-vulnerabilities-waf-protection/)**
+> Its WAF rules are on by default for every plan, Free included; paid plans should confirm they
+> are in Block. Then patch to PHP 8.5.12, 8.4.27, 8.3.36 or 8.2.35 — a plugin update does not fix
+> it. [What to do, in order](#update-21-october-2026-php2shell-is-the-runtime-not-the-plugin).
+
 ![One subject, every channel. A strip across the top: OneTrust's CDN, Shopify storefronts and Webflow hosting all answer through Cloudflare, so the brand's namespace sits where the traffic already is. Left, today: uk.brand.com, ca.brand.com and fr.brand.com each keep consent in a browser cookie under different rules, with four red gaps — cookie scope across markets, a dangling subdomain that can forge consent, plugin wildcards readable in the theme, and a session ID instead of a subject — and four clouds feeding the Google Merchant and Shopify audiences through a JVM bus polled every 15 minutes. Right, the fix: web, mobile, POS, chatbot, IoT and firmware reach a Cloudflare Worker, the Buy app, which checks market, purpose and freshness with Rust types; Xano is the system of record, a KV namespace holds the projection, and an event socket feeds Azure, CRM SaaS, AWS and GCP only when the posture allows, with a Rust gRPC writer stamping posture onto BigQuery and Merchant rows so both audiences are socketed to the same answer.](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.svg)
 
 *[Open the SVG full size](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.svg) (1600 × 920) · [Download the PDF](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.pdf) · [JPG](https://persephonepunch.github.io/crm-sync-setup/assets/one-subject-every-channel.jpg). Gaps are marked in red; the walkthrough is [One subject, every channel](#one-subject-every-channel-when-consent-is-a-browser-cookie) below.*
