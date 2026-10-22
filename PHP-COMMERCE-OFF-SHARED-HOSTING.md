@@ -866,6 +866,30 @@ Every link in that chain is covered in this article:
 - Owner tokens should not sit on everyday machines.
 - Release rights widened "temporarily" need an end date, like any other key.
 
+### The order: fix trust first, then rotate keys
+
+New keys do not fix eMudhra. The two problems sit at different layers:
+
+| | What it protects | What fixes it |
+|---|---|---|
+| **eMudhra** | Whether a computer can tell the real pypi.org — or any site — from a fake one | Updating what the software trusts: pip 26.2.2, certifi, uv, Node, `ca-certificates`, rebuilt images |
+| **Your keys** (Wrangler secrets) | Your own secrets: admin keys, webhook secrets, provider API keys | The key ceremony |
+
+A forged pypi.org is accepted before any of your keys is involved, so rotating them cannot
+stop it. The order:
+
+1. **Fix trust first.** Update Node, pip (from the hash-pinned wheel), certifi and uv on every
+   machine and in every venv, and rebuild images. This is the eMudhra fix.
+2. **Then ask whether anything leaked while you were exposed.** If a `pip install`, a
+   `wrangler secret put` or a deploy ran over an untrusted network while the old trust was in
+   place, a secret could have crossed an intercepted connection. Rotate those secrets with the
+   ceremony, **from the patched machine**.
+3. **If nothing points to exposure, rotate on the normal schedule.** eMudhra alone does not
+   require new keys.
+
+The ceremony is the clean-up and the habit, not the cure. Run on an unpatched machine, it would
+send fresh keys over the same untrusted connection it is meant to protect.
+
 ### AI binding: the agent proves its permission on every call
 
 An AI agent in this architecture acts under a signed mandate: who may act, on what, up to what
