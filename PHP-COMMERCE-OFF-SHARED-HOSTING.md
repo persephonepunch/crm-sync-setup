@@ -63,6 +63,16 @@ citation:
     url: https://persephonepunch.github.io/crm-sync-setup/universal.html
   - name: "Entitlement Security (companion)"
     url: https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html
+  - name: "The Hacker News — eight eMudhra CA keys compromised"
+    url: https://thehackernews.com/2026/10/eight-emudhra-ca-keys-compromised.html
+  - name: "Help Net Security — eMudhra CA signing keys exposed"
+    url: https://www.helpnetsecurity.com/2026/10/21/emudhra-certificates-private-keys-compromised/
+  - name: "PHP security advisory — php2shell (CVE-2026-109618, CVE-2026-109619)"
+    url: https://www.php.net/archive/2026.php#2026-10-21-5
+  - name: "Node.js — October 2026 security releases"
+    url: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
+  - name: "CRM Sync — verify a mandate offline"
+    url: https://crm-sync.dev/verify
 ---
 
 # PHP Commerce: Moving Off Shared Hosting
@@ -544,6 +554,138 @@ CRM Sync's desktop build imports the published crate audits of Mozilla, Google, 
 Alliance, ISRG, Embark and Zcash — 102 crates fully audited, 357 recorded as a starting baseline
 — and fails CI on any crate version no audit covers. Wildcard trust is avoided on purpose: a
 hijacked publisher would pass it.
+
+## Signed records: SBOMs, firmware and signing keys
+
+Every incident in this article ends with the same question from the board, the insurer and
+the regulator: *were we affected, and can you prove it?* A business that has to answer by
+meeting finds out in weeks. One that keeps signed records answers by query in minutes. Three
+records do the work:
+
+- **A software bill of materials (SBOM)** is the ingredient list for each release: every
+  package, runtime and certificate bundle, with its version. When a flaw is announced, the
+  SBOM says which releases contain it.
+- **A signed firmware or build image** is the sealed box. Its hash is certified when it is
+  uploaded, so a distributor, a device or an auditor can check that what they received is
+  exactly what was built.
+- **A signing key** is the seal itself. Its private half stays on the server. Its public half
+  is published, so anyone can check a receipt, a mandate or a certificate without asking the
+  issuer.
+
+CRM Sync publishes all three. Anyone can check a mandate offline in a browser on the
+**[verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state)**,
+against the public keys at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json).
+The app's own SBOM is [public](https://compliance.crm-sync.dev/sbom/crm-sync-pwa), and firmware
+images go to the [firmware vault](https://www.crm-sync.dev/pages/firmware). The vault gives each
+image its own encryption, an upload certificate, grant-gated downloads, and a hash-chained
+ledger of every grant, denial and download.
+
+### The breaches, on one timeline
+
+| Date | What broke | Layer | What a signed record answers |
+|---|---|---|---|
+| 30 April 2025 | A key ceremony at the Indian certificate authority **eMudhra** generated eight intermediate CA keys with too little randomness. Nobody noticed for about 18 months | Signing keys | Which of our certificates chain through those intermediates |
+| 24 March 2026 | **LiteLLM** 1.82.7 and 1.82.8 on PyPI carried a credential stealer, taking SSH keys, cloud credentials, `.env` files and TLS private keys | Python / AI gateway | Which builds installed those versions, and which keys that environment could read, so you know what to rotate |
+| 10–20 October 2026 | The checkout hijack through trusted Shopify apps, with vendor-side configuration changed ([above](#october-2026-delistings-and-the-checkout-hijack)) | App identity | Which grants each app held, and when each one was used |
+| 17–20 October 2026 | A researcher recovered all eight **eMudhra** private keys from the public certificates in under a second: six TLS intermediates and two code-signing intermediates. Chrome, Mozilla, Apple and Microsoft blocked them between 17 and 20 October. Chrome removes the emSign ECC Root CA - G3 from devices from 27 October | TLS / code signing | Which runtimes and trust bundles in our releases still accept the chain |
+| 20 October 2026 | Go, NSS, Ubuntu, Debian and **Composer** — the PHP dependency manager that Drupal, Magento and Joomla projects are installed with — shipped fixes to their trust stores | PHP dependency chain | Which PHP estates have taken the updated certificate bundle |
+| 21 October 2026 | **php2shell** (CVE-2026-109618 and CVE-2026-109619): unauthenticated remote code execution in the PHP runtime. This covers every WordPress, Drupal, Magento, Joomla and Laravel host, including its plugins, whatever the application code | PHP runtime | Which origins run an affected PHP build, by version, without logging into each server |
+| 21 October 2026 | **Node.js** CVE-2026-111497, a Brotli out-of-bounds write that allows remote code execution. The same releases — 22.23.4, 24.22.1 and 26.12.1 — also reject the eMudhra chains | Node runtime | Which containers, CI runners and self-hosted apps pin an older Node |
+| 21 October 2026 | **LiteLLM** 1.107.0 on PyPI and Docker, the project's second compromise this year, again stealing signing keys and AI provider keys | Python / AI gateway | Which images resolved the floating tags, and which mandates were signed by a key that environment held |
+
+Details and sources are in [Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#update-21-october-2026-php2shell-is-the-runtime-not-the-plugin)
+and in reporting on eMudhra by [The Hacker News](https://thehackernews.com/2026/10/eight-emudhra-ca-keys-compromised.html)
+and [Help Net Security](https://www.helpnetsecurity.com/2026/10/21/emudhra-certificates-private-keys-compromised/).
+
+### What eMudhra teaches about signing keys
+
+**The keys were not stolen. They were computable.** The ceremony used certified hardware
+security modules and still produced weak keys. A key is only as strong as the randomness it
+was made from, and an audited process is not a substitute for checking the output. Four
+properties keep a signing key's failure small:
+
+| Property | What CRM Sync does | What it limits |
+|---|---|---|
+| Generated by the platform's cryptographic random source, never by hand or by a copied script | Mandate and entitlement keys are Ed25519, generated with WebCrypto inside the Worker | Weak or reused randomness |
+| Public half published with a key id | Every token names its `kid`, and the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state) rejects any `kid` that is not in the published JWKS | Trusting a key nobody can look up |
+| Rotation with an end date | Keys rotate through a recorded key ceremony. A retired key keeps verifying what it already signed until its `not_after`, then stops | The useful life of a leaked key, without voiding honest receipts |
+| Revocation you control | Retiring a CRM Sync key means editing our own JWKS. A browser vendor does not need to act | The days a public CA needs |
+
+**LiteLLM is the reason signing keys never sit in an application environment.** Both poisoned
+releases searched for signing keys and `.env` files. A key held as a platform secret and used
+only by the signing service is not on the disk the payload reads.
+
+### TLS automation: replacing a certificate is a renewal, not a project
+
+Browsers received the eMudhra block automatically. Much other software did not:
+
+- Go binaries, which need a rebuild with a fixed Go
+- anything using Python's `certifi` bundle
+- the curl that ships with macOS
+- older `cloudflared`
+- origin servers running their own mutual TLS
+- containers with a baked-in trust store
+
+Two habits close that gap:
+
+- **Let the platform issue and renew certificates.** On Cloudflare, edge certificates are issued
+  and renewed automatically. A certificate that chains to a distrusted root is replaced by the
+  next renewal, not by a ticket. A site that buys and installs certificates by hand has until
+  27 October to get off the emSign hierarchy.
+- **Treat the trust store as a dependency, and list it in the SBOM.** `certifi`,
+  `webpki-roots`, the Node and Go versions and the container base image all decide which roots
+  a program trusts. When they are listed, "who still trusts the bad root" is a search across
+  releases.
+
+### AI binding: the agent proves its permission on every call
+
+An AI agent in this architecture acts under a signed mandate: who may act, on what, up to what
+amount, and until when. The mandate is checked against the published key on every call, so:
+
+- an agent holding a mandate signed by a retired key is refused
+- a mandate altered after signing fails verification
+- a stolen environment yields keys that have already rotated
+
+Bound tasks and TLS hops are covered in [Identity, data and AI tasks](#identity-data-and-ai-tasks).
+Signing is what lets a third party — an auditor, a partner platform, Google — check that work
+without trusting us.
+
+### Records on a timeline that scales out
+
+Every grant, check, firmware download and consent change is appended to a hash-chained ledger.
+Each entry locks in the one before it, so history can be visibly broken but never quietly
+edited. The ledger is not one long chain. **Each tenant and each stream is its own thread**:
+firmware for one product, mandates for one agent, consent for one store.
+
+- **Threads do not wait on each other.** A new store or product line adds a thread, not
+  contention on a shared one, so the record scales horizontally.
+- **Order within a thread is set by a sequence number**, not a clock. Two simultaneous writes
+  cannot be mistaken for tampering.
+
+On a breach day, the incident dates in the table above are laid over those threads.
+"Everything signed by key X between 30 April 2025 and 17 October 2026" or "every image served
+with an SBOM listing `certifi` older than the fix" becomes a filter, not an investigation. To
+see one session's thread across consent, identity, purchases and engagement, open
+**See a session's story** on the
+[verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state).
+
+### The benefit, control by control
+
+| Control | Breaches it answers | Business benefit |
+|---|---|---|
+| SBOM for every release (CycloneDX or SPDX) | php2shell, Node, LiteLLM, eMudhra trust bundles | "Are we affected?" answered in minutes, and the record EU Cyber Resilience Act reporting asks for |
+| Signed firmware and build images in a vault | A swapped or poisoned image in distribution | Distributors and devices check the hash against the certificate; a leak is stopped by one rotation, with no recall |
+| Signing keys with key ids, rotation and end dates | eMudhra, the LiteLLM key theft | A leaked key's useful life ends at rotation; receipts it already signed keep verifying |
+| Automated TLS issuance, with the trust store in the SBOM | eMudhra | A distrusted chain is replaced at renewal, and lagging runtimes are found by search |
+| AI binding to signed mandates | Agent overreach, stolen agent credentials | Every agent action can be checked by a third party without trusting the operator |
+| Threaded, hash-chained ledger | All of them | A timeline that grows with the business and answers incident questions by filter |
+
+**What signed records do not do.** An SBOM does not patch anything. A signature proves who
+sealed a file, not that the file is safe. A ledger shows that history was broken; it does not
+prevent the break. Developer machines and CI runners — where Node, Wrangler and Python run —
+still need the runtime updates in the timeline. More background:
+[What Is an SBOM? Who Uses This? Everyone.](https://persephonepunch.github.io/crm-sync-setup/sbom-everyone.html)
+and [Firmware, SBOM & the Cyber Resilience Act](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html).
 
 ## No silver bullet: rotate, randomise, look forward
 
