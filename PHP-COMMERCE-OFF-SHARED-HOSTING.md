@@ -53,6 +53,12 @@ citation:
     url: https://mozilla.github.io/cargo-vet/
   - name: "PostgreSQL — row security policies"
     url: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+  - name: "Shopify — Storefront Web Components"
+    url: https://shopify.dev/docs/api/storefront-web-components
+  - name: "Shopify — Sell on WordPress (Shopify plugin)"
+    url: https://www.shopify.com/sell-on-wordpress
+  - name: "File System Agnostic Publishing (companion)"
+    url: https://persephonepunch.github.io/crm-sync-setup/universal.html
   - name: "Entitlement Security (companion)"
     url: https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html
 ---
@@ -230,6 +236,7 @@ private-window test checkout on every release.
 | EmDash on Cloudflare Workers | Edge TLS; no origin | Isolate per plugin, permissions manifest | Passkeys; SSO | Plugins have no direct database access | Pay per use |
 | 11ty + Decap CMS on Cloudflare | Edge TLS; no origin | No code runs per request | Access on `/admin` + GitHub OAuth | Static files; live data through APIs | Static requests free and unlimited |
 | Jekyll on GitHub Pages | GitHub-managed TLS | No code runs per request | GitHub accounts | Static files | Free within 1 GB and a 100 GB/month soft limit; **not permitted for e-commerce** |
+| Shopify Storefront Web Components on Webflow, WordPress, Astro/EmDash, 11ty or AEM | The site's own TLS edge; checkout on Shopify | No commerce code on the site — Shopify's script renders products and cart | The site's own; customer accounts on Shopify | The site stores no customers, orders or cards | Scales with the site; commerce scales on Shopify |
 | Shopify Functions in Rust | Runs inside Shopify | WebAssembly sandbox, declared input only | Shopify app permissions | Scoped to the shop | Shopify scales it |
 | Kubernetes + Postgres RLS | Edge TLS; NetworkPolicy; TLS to the database | Pod and namespace | Access + SSO | Row-level security per tenant and actor | Horizontal; highest cost |
 
@@ -245,6 +252,41 @@ store moves to Shopify. Pilot it on a blog subdomain first.
 **The static path** has run in production for years — Jekyll and GitHub Pages since 2008, 11ty
 since 2017, Decap since 2016 as Netlify CMS. GitHub Pages' terms forbid running an online
 business or e-commerce site on it, so a store built with Jekyll or 11ty is hosted on Cloudflare.
+
+## The safer customer option: let Shopify hold the customer and the card
+
+For a store that wants to keep its WordPress or Webflow site, the most effective PII and PCI
+reduction is to stop holding the data at all. Shopify's
+[Storefront Web Components](https://shopify.dev/docs/api/storefront-web-components) put
+products, prices and a cart on any page with a few lines of HTML, and the **Buy now** button
+sends the shopper to checkout on Shopify. Shopify's own
+[WordPress plugin](https://www.shopify.com/sell-on-wordpress) — built by Shopify, not by
+WordPress — does the same from the WordPress Editor: products are managed in Shopify and placed
+on WordPress pages and posts.
+
+The components are plain HTML elements plus one script, so they are not tied to a CMS. The same
+block works in a Webflow embed, a WordPress theme or block, an Astro or EmDash component, an 11ty
+template, and an AEM component or Edge Delivery block — anything that renders HTML and can load a
+script. Try them in Shopify's
+[playground](https://webcomponents.shopify.dev/playground?view=editor&preset=product-cards-discover).
+
+| Option | What the site holds | What Shopify holds | Why it is safer |
+|---|---|---|---|
+| **Storefront Web Components** on Webflow, WordPress, Astro/EmDash, 11ty or AEM | Markup, the store domain, and optionally a public, read-only Storefront token (needed only for inventory counts and custom data) | Catalog, prices, cart, checkout, customer accounts, payments | No customer table, no order table, no card flow and no secret key on the site; a breach of the site has no customer database to take |
+| **Shopify's WordPress plugin** | WordPress pages and posts that embed Shopify products | Products and checkout; Shopify states PCI, SOC and GDPR compliance are built in | WooCommerce's customer and order tables never exist in the WordPress database |
+| WooCommerce or Magento on the site's own server (for contrast) | Customers, orders, addresses, often payment-flow scripts | Nothing | Every row of PII sits in the same PHP application as every plugin |
+
+**What it does not remove.** The page that holds the Buy now button is still a page you serve,
+and the October 2026 hijack worked by changing what happened *before* checkout. The rules above
+still apply to it: no client-side redirects to other domains, a Content Security Policy that
+lists every script, an inventory of the scripts on any page that links to checkout, and a
+private-window test checkout on every release. WordPress still runs PHP for the content site,
+so the runtime patches still matter. Only the public Storefront token belongs in the page —
+never an Admin API token. Shopify's plugin page does not say where customer and order records
+live; confirm that before describing the plugin to customers as keeping them off WordPress.
+
+Setup, including the Webflow-to-WordPress and EmDash/Astro paths, is in
+[File System Agnostic Publishing → the Web Components block](https://persephonepunch.github.io/crm-sync-setup/universal.html#the-web-components-block-production-pattern).
 
 ## Shopify plugins become Rust Shopify Functions
 
