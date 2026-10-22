@@ -280,8 +280,11 @@ customer record; the Shopify store holds both.
 
 **The same theme renders the same everywhere.** The design is the Webflow export plus one embed
 block, with no framework code in it, so the same theme renders the same on WordPress, AEM, 11ty,
-Shopify, Next, Astro, Nuxt, Svelte and Drupal — and on every one of them the cart and checkout are still
-Shopify's, so none of them ever holds a customer record or a card. The WordPress and Astro/EmDash
+Shopify, Next, Astro, Nuxt, Svelte and Drupal — with the forms and the data-binding security intact.
+The security does not live in the theme, so it does not change when the host does: forms still post
+to the Worker and hold a typed email until the inbox confirms, `/auth/me` still decides who the caller
+is, permissions are still granted rows checked on every request, and the cart and checkout are still
+Shopify's. None of those hosts ever holds a customer record, a consent record or a card. The WordPress and Astro/EmDash
 paths are in [File System Agnostic Publishing](https://persephonepunch.github.io/crm-sync-setup/universal.html),
 and the AEM path in [Shopify / Google Integration on an AEM Scaffold](https://persephonepunch.github.io/crm-sync-setup/aem-scaffold-webflow-export.html).
 
