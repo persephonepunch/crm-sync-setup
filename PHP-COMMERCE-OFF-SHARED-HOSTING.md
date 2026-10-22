@@ -133,6 +133,21 @@ authentication services — is the permissions model this article argues for: id
 verified at the server, never inferred from what the caller typed, and access granted per task
 rather than held by default.
 
+The same mistake is not unique to apps. Identity providers and the software built on them have
+shipped it too:
+
+| Case | What was trusted | What it allowed | Reference |
+|---|---|---|---|
+| **Microsoft Entra ID — nOAuth** (first disclosed June 2023; still present in about 1 in 10 of 100+ tested SaaS apps in June 2025) | An unverified email claim used as the user's identifier | With only an attacker-controlled Entra tenant and the victim's email address, full takeover of the victim's SaaS account. MFA, conditional access and Zero Trust policies did not stop it | [Semperis](https://www.semperis.com/press-release/research-risk-noauth-vulnerability-microsoft-entra-id-enterprise-saas-applications/) |
+| **Okta AD/LDAP delegated authentication** (advisory Nov 1, 2024; introduced July 2024) | A cached earlier login for usernames longer than 52 characters — often email addresses | Sign-in with the username alone, without the right password, where MFA was off | [Okta advisory](https://trust.okta.com/security-advisories/okta-ad-ldap-delegated-authentication-username) |
+| **Rebuy Engine** (Oct 14, 2026, founder-reported) | An email address on the company's own domain, never verified | Staff-level reads on internal stores and settings reads on 11 merchant stores | Founder statement |
+
+The rule all three break is the same: **an email address is a contact detail, not an identity.**
+Identify a user by the identity provider's immutable subject — the OpenID Connect `sub` with its
+issuer, in Entra the object ID with the tenant ID — require a verified email before linking any
+account, restrict which tenants may sign in, and grant elevated access only to a named group.
+MFA is necessary and, as nOAuth shows, not sufficient.
+
 **Merchant checks:** find these apps among those installed, delisted ones included; review app
 embeds and custom JavaScript fields for scripts nobody added; run a test checkout in a private
 window and confirm it lands on Shopify's checkout domain; read Shopify's notice for your store's
