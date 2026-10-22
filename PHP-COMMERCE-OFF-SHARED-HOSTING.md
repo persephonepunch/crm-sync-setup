@@ -280,7 +280,7 @@ customer record; the Shopify store holds both.
 
 **The same theme renders the same everywhere.** The design is the Webflow export plus one embed
 block, with no framework code in it, so the same theme renders the same on WordPress, AEM, 11ty,
-Shopify, Next, Astro, Nuxt and Drupal — and on every one of them the cart and checkout are still
+Shopify, Next, Astro, Nuxt, Svelte and Drupal — and on every one of them the cart and checkout are still
 Shopify's, so none of them ever holds a customer record or a card. The WordPress and Astro/EmDash
 paths are in [File System Agnostic Publishing](https://persephonepunch.github.io/crm-sync-setup/universal.html),
 and the AEM path in [Shopify / Google Integration on an AEM Scaffold](https://persephonepunch.github.io/crm-sync-setup/aem-scaffold-webflow-export.html).
