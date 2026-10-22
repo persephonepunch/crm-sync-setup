@@ -6,6 +6,8 @@ category: "Security"
 date: 2026-10-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/PHP-COMMERCE-OFF-SHARED-HOSTING.md
 licence: CC-BY-4.0
+ogImage: https://persephonepunch.github.io/crm-sync-setup/og/php-commerce-off-shared-hosting.png
+ogImageAlt: "Form to Cloudflare: nothing stored until the inbox says yes. Three panels: a Webflow newsletter form carrying data-crm-form = newsletter and data-crm-submit = worker; the POST to /forms/newsletter on the Cloudflare Worker, intercepted before Webflow's own submit, where a typed email is held and a single-use link is mailed; and the reply, status confirmation_sent with a form_id and no user_id, the same for every address."
 tags:
   - security
   - migration
