@@ -300,6 +300,87 @@ live; confirm that before describing the plugin to customers as keeping them off
 Setup, including the Webflow-to-WordPress and EmDash/Astro paths, is in
 [File System Agnostic Publishing → the Web Components block](https://persephonepunch.github.io/crm-sync-setup/universal.html#the-web-components-block-production-pattern).
 
+## Secure forms on any front end
+
+A form is the other place PII enters, and the platform's own form storage — Webflow submissions,
+a WordPress form plugin's table, a Liquid contact form — puts that PII next to everything else
+the platform runs. CRM Sync forms send the data to the Worker instead, and the form itself is
+only HTML:
+
+```html
+<form data-crm-form="newsletter" data-crm-submit="worker">
+  <input type="email" name="email" required>
+  <label><input type="checkbox" required> I accept the Terms of Use and Privacy Policy</label>
+  <button type="submit">Submit</button>
+</form>
+<script src="https://crm-sync.dev/embed/forms.js" defer></script>
+```
+
+![A Webflow newsletter form in the Designer with the custom attributes data-crm-form = newsletter and data-crm-submit = worker, an email field and a terms checkbox.](https://crm-sync.dev/kb/media/docs/php-commerce-webflow-form-worker.png)
+
+*The crm-base newsletter form in Webflow. The design stays in the Designer; the two custom
+attributes hand the submission to the Worker.*
+
+Because the contract is two attributes and one script, the same form works wherever HTML renders:
+
+| Front end | Where the form lives |
+|---|---|
+| Webflow | A form element with the two custom attributes, as above |
+| Astro / EmDash | A component that renders the `<form>`; the script in the layout |
+| Next.js | A component that renders the `<form>`; the script through `next/script` |
+| 11ty | An include or shortcode; the script in the base layout |
+| Shopify | A theme section or snippet in Liquid; the script in `theme.liquid` |
+| WooCommerce / WordPress | A block or template part; the script enqueued by the theme |
+| AEM | A component or Edge Delivery block that emits the `<form>` |
+
+**What makes it secure.**
+
+- **The platform never stores it.** The script intercepts the submit before the platform's own
+  handler runs and posts to the Worker, so the address is not written to Webflow, WordPress or
+  Shopify form storage.
+- **A typed email proves nothing.** Without a session, the Worker records nothing and mails a
+  single-use, 48-hour confirmation link; the permission is written — with its date, time and the
+  exact wording shown — only when the inbox answers. A signed-in shopper's session proves the
+  address, so theirs is recorded immediately.
+- **The reply never reveals an account.** Every unconfirmed submission gets the same answer,
+  whether or not the address already has an account.
+- **Abuse is capped.** 60 submissions an hour per IP, three confirmation mails a day per address.
+
+**The demo, on our own data.** This is the live run from 22 October 2026, submitted from no
+session with the author's own address (masked here):
+
+```http
+POST https://crm-sync.dev/forms/newsletter
+{"email":"y•••••••••••@gmail.com","page":"/verify-email-is-not-identity","locale":"en"}
+```
+
+```json
+{"ok":true,"form":"newsletter","form_id":"newsletter_en_2026-10-22T12:02:22.862Z_f767c744",
+ "locale":"en","status":"confirmation_sent",
+ "why":"check your inbox — the request is recorded once the address confirms it"}
+```
+
+No user ID, no "created" flag, and no consent row until the link in the inbox is clicked. The
+`form_id` is the join key: the same value is written to the reconcile log, the GA4 signal event
+and the consent record, so one submission can be traced across all three.
+
+**What it does not cover.** If the script is blocked — an ad blocker, a strict CSP that omits
+it — the platform's own handler takes the submit, and the address lands in the platform's form
+storage after all. Remove the platform's own destination where the platform allows it, list
+`crm-sync.dev` in the CSP, and test the form with the script blocked.
+
+**Packaging the form.** The HTML contract above is what ships today. Because the form is a
+contract — a slug, its fields, its consent wording — it can travel in other shapes:
+
+| Shape | What it carries | Status |
+|---|---|---|
+| HTML + `forms.js` | The form and the submit interception | Built |
+| Worker route `/forms/<type>` | Validation, the hold, the confirmation mail, the consent record | Built |
+| `form_id` join key | One identifier across the reconcile log, GA4 event and consent record | Built |
+| A Rust crate | The form's field schema and validation as a type, compiled to WebAssembly and checked inside the Worker — the same shape check used for AI task binding | Pattern, not built |
+| Joinable data for 11ty, Liquid or Markdown | The form definition as data — `_data/forms.json` in 11ty, a Markdown front-matter block, or a Liquid snippet that reads it — so every front end renders the same fields and wording from one record | Pattern, not built |
+| A Shopify metaobject | The same definition as a metaobject entry, so the theme renders the form from data the store already governs | Pattern, not built |
+
 ## Shopify plugins become Rust Shopify Functions
 
 | Old plugin pattern | Replace with | Why |
