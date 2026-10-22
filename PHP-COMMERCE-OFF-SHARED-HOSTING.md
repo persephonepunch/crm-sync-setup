@@ -779,6 +779,83 @@ The configurator ([Configuration System](https://www.crm-sync.dev/#configure)) s
 environment you are in and which keys you hold. Environment rules, the key-handoff matrix and
 the RACI are in the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html).
 
+### Key layers: what each key protects
+
+Not every key is equal. Each layer protects something different, is held by someone different,
+and costs something different to replace. Knowing which layer a key belongs to tells you who may
+hold it and what to do the day it leaks.
+
+| Layer | Example in CRM Sync | What it protects | Who holds it | If it leaks |
+|---|---|---|---|---|
+| **1 · Platform root** | `ADMIN_KEY`, and the Cloudflare API token that deploys and sets secrets | Everything: configuration, every tenant, the ability to change the other keys | The key holder only. Never an agency, never CI | Rotate at once through the ceremony, then rotate every key below it |
+| **2 · Rotatable admin** | A rotatable admin key issued alongside the root | Day-to-day admin work, without exposing the root | The operations team | Rotate it. The root and other teams are untouched |
+| **3 · Tenant** | `crm_t_` tenant tokens | One store's data and settings — nothing else | That store's team, or its agency | Revoke that one token; other tenants never notice |
+| **4 · Sessions** | `JWT_SECRET` | Signed-in sessions: who is logged in right now | The platform, as a secret, never a person | Rotate; every session ends and people sign in again |
+| **5 · Signing** | Ed25519 entitlement and mandate keys | Receipts, mandates and certificates anyone can check offline | Generated inside the Worker; only the public half is published | Rotate. Past receipts keep verifying until the old key's end date; new ones use the new key |
+| **6 · Provider** | Shopify Admin token, Xano API key, Google client secret, payment keys | Access to systems someone else runs | The platform as secrets, set from the provider's dashboard by the key holder | Rotate at the provider first, then store the new value with the ceremony |
+
+**Instructions — run the layers in this order:**
+
+1. **List every key you have and give it a layer.** If you cannot say which layer a key
+   protects, it is probably layer 1 by accident. An "all-access" token used for convenience is
+   the common case.
+2. **Split anything that spans layers.** One key doing root work and tenant work means a tenant
+   leak becomes a platform leak.
+3. **Give each layer its own holder.** Agencies and contractors get layer 2 or 3, never layer 1.
+   Reviewers and AI assistants get none.
+4. **Give each layer its own environment copy.** Dev, Stage and Prod never share a value at any
+   layer.
+5. **Set a rotation date per layer** — the root on staff change and at least yearly, the others
+   every 90 days and on any incident — and record each rotation by fingerprint.
+
+### Without Cloudflare
+
+The ceremony does not need Cloudflare. Wrangler is only Cloudflare's way into its secrets
+store, and the rule is the same everywhere: **create the secret with OpenSSL and send it
+straight into the store, through a pipe or a file only you can read.**
+
+| Platform | Secrets store | Generate and store, nothing shown |
+|---|---|---|
+| Google Cloud | Secret Manager | `openssl rand -hex 32 \| gcloud secrets versions add NAME --data-file=-` |
+| AWS | Secrets Manager | `( umask 077; openssl rand -hex 32 > ~/.k )`, then `aws secretsmanager put-secret-value --secret-id NAME --secret-string file://$HOME/.k`, then delete `~/.k` |
+| Azure | Key Vault | Same file approach: `az keyvault secret set --vault-name V --name NAME --file ~/.k` |
+| HashiCorp Vault | KV store | `openssl rand -hex 32 \| vault kv put secret/app api_key=-` |
+| GitHub Actions | Repository or environment secrets | `openssl rand -hex 32 \| gh secret set NAME --env production` |
+| Kubernetes | Secrets, ideally through an external secrets operator | `openssl rand -hex 32 \| kubectl create secret generic app --from-file=api_key=/dev/stdin` |
+| Vercel | Environment variables | `openssl rand -hex 32 \| vercel env add NAME production` |
+| A server you control | A file only the app's user can read, outside the web root | Over SSH: `( umask 077; openssl rand -hex 32 > /etc/app/api_key )` |
+
+Check each command against the provider's current documentation before relying on it.
+
+**Shared hosting is the exception.** cPanel-style PHP hosting usually has no secrets store at
+all. Keys end up in `wp-config.php` or a `.env` inside the web root, readable by anything that
+runs there — including a php2shell exploit. You cannot run a proper ceremony on it. Move
+secrets outside the web root with `chmod 600` today, and plan the move off it.
+
+The other Cloudflare pieces in this article have equivalents:
+
+| This article uses | Without Cloudflare |
+|---|---|
+| Edge certificates issued and renewed automatically | Let's Encrypt via certbot, Caddy's built-in HTTPS, AWS Certificate Manager, Google-managed certificates |
+| Cloudflare Access on admin paths | Tailscale or a VPN, Google IAP, AWS Verified Access, an IP allowlist |
+| Client-IP filter on the API token | AWS IAM `aws:SourceIp` conditions, Google VPC Service Controls, Azure Conditional Access |
+| WAF rules for php2shell | AWS WAF, Google Cloud Armor, Azure WAF — patching PHP is still the only complete fix |
+
+**To use the Cloudflare route instead**, the free plan is enough to start:
+
+1. **Sign up at [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up).** Workers
+   are on the free plan and run on a `workers.dev` address, so you do not need a domain.
+2. **Install Wrangler in your project:** `npm install --save-dev wrangler`. Use Node 24.22.1 or
+   later, which rejects the eMudhra chains.
+3. **Sign in from your own terminal:** `npx wrangler login`. This opens the browser and stores a
+   login token on the machine. On a shared machine, run `npx wrangler logout` after the
+   ceremony. For production, prefer an API token scoped to the one account, locked to your
+   network's addresses.
+4. **Run the ceremony** above, one environment at a time.
+
+To manage the keys you hold in CRM Sync — create, rotate, revoke — open the
+[Configuration System](https://www.crm-sync.dev/#configure).
+
 ### TLS automation: replacing a certificate is a renewal, not a project
 
 Browsers received the eMudhra block automatically. Much other software did not:
