@@ -278,6 +278,13 @@ Shopify's `<shopify-store>` and `<shopify-cart>`, and checkout lands on the Shop
 [www.crm-sync.dev](https://www.crm-sync.dev/). The Webflow site never sees a card number or keeps a
 customer record; the Shopify store holds both.
 
+**The same theme renders the same everywhere.** The design is the Webflow export plus one embed
+block, with no framework code in it, so the same theme renders the same on WordPress, AEM, 11ty,
+Shopify, Next, Astro, Nuxt and Drupal — and on every one of them the cart and checkout are still
+Shopify's, so none of them ever holds a customer record or a card. The WordPress and Astro/EmDash
+paths are in [File System Agnostic Publishing](https://persephonepunch.github.io/crm-sync-setup/universal.html),
+and the AEM path in [Shopify / Google Integration on an AEM Scaffold](https://persephonepunch.github.io/crm-sync-setup/aem-scaffold-webflow-export.html).
+
 ![The crm-base home page in the Webflow Designer at desktop, tablet and mobile breakpoints. The page structure is a navigation component, a main section and a footer component; the navigation carries a CART link and the page holds no commerce code.](https://crm-sync.dev/kb/media/docs/php-commerce-webflow-design-layout.png)
 
 *The crm-base design in Webflow at three breakpoints. The structure is a navigation component, the
