@@ -362,7 +362,17 @@ POST https://crm-sync.dev/forms/newsletter
 
 No user ID, no "created" flag, and no consent row until the link in the inbox is clicked. The
 `form_id` is the join key: the same value is written to the reconcile log, the GA4 signal event
-and the consent record, so one submission can be traced across all three.
+and the response, and it survives confirmation, so the held entry and the recorded one join on it.
+
+**Email-only plugin forms and fee-based middleware.** Most CRM and plugin forms capture an email
+address and nothing else — no consent wording, no time, no session — and store it in the vendor's
+own database, often a PHP application outside the merchant's control. Fee-based middleware then
+copies it onward, charging per task or per record. Moving that audience to Google is not a file
+transfer: Google's EEA consent rules require `ad_user_data` and `ad_personalization` consent for
+the people in it, and an address with no consent event behind it has nothing to show. Migrate
+with the consent, not just the address — export what consent evidence exists, send the same
+single-use confirmation to everyone whose record has none, and connect the confirmed audience to
+Google's APIs directly from the Worker, which also ends the per-record middleware fee.
 
 **What it does not cover.** If the script is blocked — an ad blocker, a strict CSP that omits
 it — the platform's own handler takes the submit, and the address lands in the platform's form
@@ -412,6 +422,17 @@ do not store. Points, history and consent stay in the ledger, behind `/auth/me`.
    too. The full model — Cloudflare binds, Xano grants, Rust checks — is in
    [Entitlement Security → AI task binding](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#ai-task-binding-cloudflare-binds-xano-grants-rust-checks).
 
+**AI data binding with provisional permissions.** A task binding says which tools an agent may
+call. The data it may touch is bound the same way — by permissions that expire, and by gates on
+where the subject is, who they share with and what device they used:
+
+| Gate | What it checks | Status |
+|---|---|---|
+| **Provisional access** | Every grant carries a start and end date, and each permission can carry its own expiry; both are checked on every permission decision, so a time-limited grant ends without anyone revoking it | Built |
+| **Sovereign nation** | A per-country policy, keyed by ISO code, read before an order exists: sovereign markets require a named permission (Korea's domestic settlement, for example), sanctioned or blocked markets are refused, and an unreachable policy fails closed | Built |
+| **Peer** | Whether one subject may share with another | Partial — the check is written and tested but no route calls it yet; sharing is governed by single-use, expiring invitations today |
+| **Device** | The platform, device type and browser behind each consent event | Recorded as provenance on every consent row; refusing access by device is not built |
+
 | Hop | Permissions | TLS transport |
 |---|---|---|
 | Browser or agent → edge | Access policy, or the Xano JWE | TLS 1.2 minimum; HSTS |
@@ -437,6 +458,21 @@ can be delisted.
 | Price comparison | Reports sub-API — price competitiveness, price insights, competitive visibility | Standalone or individual sub-account | [Reports](https://developers.google.com/merchant/api/guides/reports/overview) |
 | Comparison Shopping Services | CSS API; `Csses` folds into Accounts | A CSS partner | [CSS](https://developers.google.com/merchant/api/guides/comparison-shopping-services/overview) |
 | Conversions | Conversions sub-API, `conversionSources` | Field renames: `property`, `destination`, `report` | [Migrate](https://developers.google.com/merchant/api/guides/compatibility/conversion-sources) |
+
+**Conversions at no ad spend.** Merchant Center conversion sources report conversions from free
+listings — the organic surfaces where reviews, loyalty member prices and price comparisons
+appear — as well as from ads. They only match exactly when each event carries three things,
+captured at the moment it happens:
+
+| Captured | Why it makes the match exact |
+|---|---|
+| The GA4 session ID | Ties the conversion to the visit that produced it, not to a guess about the visitor |
+| Device provenance | Platform, device type and browser, recorded with the consent event, so the same person on two devices stays two provable sessions |
+| An idempotency key | Derived from the subject or session, the event, its time and its source (`form_id`), so a retry or a double-fired tag is one conversion, never two |
+
+That is what turns an AI answer into an attributable sale: the assistant finds the candidate, and
+the session, device and key decide the transaction. CRM Sync writes all three today on form and
+consent events; conversions sent without them are estimates.
 
 A verified-purchase review or a member price shown to Google is a claim about a real order and a
 real member. CRM Sync records that claim as a signed mandate anyone can check offline in a
