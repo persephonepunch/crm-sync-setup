@@ -121,7 +121,7 @@ store access.
 | Hulk Product Options | Hijack confirmed (Oct 10) | Developer statement — [cside](https://cside.com/blog/hulkapps-shopify-checkout-hijack) |
 | Selleasy | Hijack confirmed (Oct 13) | Developer statement — [LetsMetrix](https://letsmetrix.com/blogs/shopify-checkout-hijacking-october-2026) |
 | Swym Wishlist Plus | Hijack confirmed (about Oct 14) | Unauthorised configuration change — [LetsMetrix](https://letsmetrix.com/blogs/shopify-checkout-hijacking-october-2026) |
-| Rebuy Engine — PHP app (PHP 8, CodeIgniter 4, per its [job postings](https://www.builtincolorado.com/job/staff-software-engineer/11235953)) | Delisted; **not** checkout hijacking, self-reported by the founder | Founder statement: on Oct 14, attackers found an unprotected sign-up path that skipped inbox verification, registered accounts on the company's own email domain, and inherited staff privileges on internal development stores. They read product settings and data-source rules for 11 merchant stores; no edits, no API keys or tokens exposed; merchants notified within 24 hours; contained within hours. Not independently verified |
+| Rebuy Engine — PHP app | Delisted; **not** checkout hijacking, self-reported | Statement by James Van Erck, co-founder and COO, on LinkedIn, 22 October 2026: on Oct 14, attackers found an unprotected sign-up path that skipped inbox verification, registered accounts on the company's own email domain, and inherited staff privileges on internal development stores. They read product settings and data-source rules for 11 merchant stores; no edits, no API keys or tokens exposed; merchants notified within 24 hours; contained within hours. Not independently verified |
 | Privy; Boost AI Search & Filter | Delisted Oct 18; link to the hijack unconfirmed | Tracker listings, no vendor confirmation |
 | 17TRACK; Consentmo GDPR Compliance | Delisted; link unconfirmed | Tracker listings; Consentmo's rests on a single confidential source |
 
@@ -140,13 +140,45 @@ shipped it too:
 |---|---|---|---|
 | **Microsoft Entra ID — nOAuth** (first disclosed June 2023; still present in about 1 in 10 of 100+ tested SaaS apps in June 2025) | An unverified email claim used as the user's identifier | With only an attacker-controlled Entra tenant and the victim's email address, full takeover of the victim's SaaS account. MFA, conditional access and Zero Trust policies did not stop it | [Semperis](https://www.semperis.com/press-release/research-risk-noauth-vulnerability-microsoft-entra-id-enterprise-saas-applications/) |
 | **Okta AD/LDAP delegated authentication** (advisory Nov 1, 2024; introduced July 2024) | A cached earlier login for usernames longer than 52 characters — often email addresses | Sign-in with the username alone, without the right password, where MFA was off | [Okta advisory](https://trust.okta.com/security-advisories/okta-ad-ldap-delegated-authentication-username) |
-| **Rebuy Engine** (Oct 14, 2026, founder-reported) | An email address on the company's own domain, never verified | Staff-level reads on internal stores and settings reads on 11 merchant stores | Founder statement |
+| **Rebuy Engine** (Oct 14, 2026, self-reported) | An email address on the company's own domain, never verified | Staff-level reads on internal stores and settings reads on 11 merchant stores | Co-founder and COO, LinkedIn, 22 Oct 2026 |
 
 The rule all three break is the same: **an email address is a contact detail, not an identity.**
 Identify a user by the identity provider's immutable subject — the OpenID Connect `sub` with its
 issuer, in Entra the object ID with the tenant ID — require a verified email before linking any
 account, restrict which tenants may sign in, and grant elevated access only to a named group.
 MFA is necessary and, as nOAuth shows, not sufficient.
+
+### Why `/auth/me` claims and extras refuse the impostor
+
+In the CRM Sync model, nothing an app does is decided from the email address. Every request
+is resolved through `/auth/me`, which reads five things in a fixed order, and each one is a row
+someone had to be granted rather than a fact inferred from what the caller typed:
+
+| Step | What `/auth/me` reads | What it proves | What it does not accept |
+|---|---|---|---|
+| 1 · Token | A server-signed session token, checked against a logout denylist on every read | Which subject this is — the token's subject ID, nothing more | An ID, email or role sent in the request body |
+| 2 · Account status | The subject's row, before any write runs | The account is live, not deleted or tombstoned | A valid token for a deleted account |
+| 3 · **Claims** (`user_claims`) | Identity links keyed by the provider's immutable subject — Google's `sub`, the Shopify customer ID — and `email_verified` as the provider asserted it, one row per subject | Which external identities belong to this subject | An email match as proof that two logins are the same person |
+| 4 · **Extras** (`user_extras`) | Profile and preference fields, cleared when marketing consent is withdrawn | What personal data exists, and that it is consented | Profile data held by the app that renders the page |
+| 5 · Entitlement | Permissions granted to the subject, scoped to a shop | What this subject may do, and where | Privilege inferred from an email domain, a staff flag or an account's age |
+
+Platform administration sits outside this path entirely: a separate root credential and
+revocable tenant-scoped tokens, never a user account with an elevated flag.
+
+| Incident | What the attacker had | Where `/auth/me` stops it |
+|---|---|---|
+| **Rebuy** | A new, unverified account on the company's own email domain | Step 5. A new subject has no entitlement rows, and no rule anywhere grants permissions by email domain — so the account authenticates and can reach nothing. Step 3 records it as unverified, and no claim links it to any staff subject |
+| **Entra nOAuth** | An attacker's tenant asserting the victim's email address | Step 3. Subjects are matched on the provider's immutable subject, not the email claim, so a different tenant's identity is a different subject with no claims, extras or entitlement of the victim's |
+| **Okta delegated authentication** | A username and a cached earlier sign-in | Step 1. Identity is only ever a server-signed token for a subject ID, checked against revocation on every read; there is no username-plus-cache path to a session |
+
+**What this does not yet cover.** The match on the provider's subject runs first, but an email
+fallback still sits beneath it for sign-ups that arrive without one — newsletter and request
+forms, and team invitations. An invitation proves inbox ownership because the link is delivered
+to it; a form submission does not. Closing that fallback so an unverified email can never
+attach to an existing subject is open work, and password sign-up still issues a session before
+the inbox is confirmed — a session that, per step 5, holds no permissions until one is granted.
+The full claims-and-extras model is in
+[Entitlement Security → claims and extras](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#a-layered-setup-allow-list-rust-boundary-claims-and-extras).
 
 **Merchant checks:** find these apps among those installed, delisted ones included; review app
 embeds and custom JavaScript fields for scripts nobody added; run a test checkout in a private
