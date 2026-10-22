@@ -270,6 +270,12 @@ template, and an AEM component or Edge Delivery block — anything that renders 
 script. Try them in Shopify's
 [playground](https://webcomponents.shopify.dev/playground?view=editor&preset=product-cards-discover).
 
+**A working example.** [crm-base.webflow.io](https://crm-base.webflow.io/) is a Webflow site with
+no commerce code of its own. When a shopper adds a product to the cart, a CRM Sync embed mounts
+Shopify's `<shopify-store>` and `<shopify-cart>`, and checkout lands on the Shopify store at
+[www.crm-sync.dev](https://www.crm-sync.dev/). The Webflow site never sees a card number or keeps a
+customer record; the Shopify store holds both.
+
 | Option | What the site holds | What Shopify holds | Why it is safer |
 |---|---|---|---|
 | **Storefront Web Components** on Webflow, WordPress, Astro/EmDash, 11ty or AEM | Markup, the store domain, and optionally a public, read-only Storefront token (needed only for inventory counts and custom data) | Catalog, prices, cart, checkout, customer accounts, payments | No customer table, no order table, no card flow and no secret key on the site; a breach of the site has no customer database to take |
