@@ -69,6 +69,12 @@ citation:
     url: https://www.helpnetsecurity.com/2026/10/21/emudhra-certificates-private-keys-compromised/
   - name: "PHP security advisory — php2shell (CVE-2026-109618, CVE-2026-109619)"
     url: https://www.php.net/archive/2026.php#2026-10-21-5
+  - name: "Python packaging — eMudhra / emSign incident guidance"
+    url: https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576
+  - name: "docker-library/python #1142 — images ship vulnerable pip"
+    url: https://github.com/docker-library/python/issues/1142
+  - name: "The Hacker News — LiteLLM suspects GitHub token leak in AI gateway logs"
+    url: https://thehackernews.com/2026/10/litellm-suspects-github-token-leak-in.html
   - name: "Node.js — October 2026 security releases"
     url: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
   - name: "CRM Sync — verify a mandate offline"
@@ -635,6 +641,12 @@ into a command line.
 
 **Directions — OpenSSL and Wrangler, interactive.** Run these from the Worker's folder.
 
+**Before you start: patch the machine the ceremony runs on.** `wrangler secret put` sends the
+new key to Cloudflare over HTTPS, and Wrangler runs on Node. If that machine's Node still
+trusts the eMudhra chains, a fresh key could travel over an intercepted connection. Use Node
+22.23.4, 24.22.1 or 26.12.1 or later. If Python is on the machine, follow
+[Python and Docker after eMudhra](#python-and-docker-after-emudhra-what-to-do-this-week) first.
+
 1. **Open your own terminal window, not the AI's.** If you work in an AI coding tool, do not
    run ceremony commands through it. That includes shortcuts that run a command inside the
    session, because their output becomes part of the conversation.
@@ -788,6 +800,71 @@ Two habits close that gap:
   `webpki-roots`, the Node and Go versions and the container base image all decide which roots
   a program trusts. When they are listed, "who still trusts the bad root" is a search across
   releases.
+
+### Python and Docker after eMudhra: what to do this week
+
+Python is the slowest runtime to recover from eMudhra, for a structural reason: **pip carries
+its own copy of `certifi` and always trusts it, on top of the operating system's list.** There
+is no setting to turn it off, and `--cert`, `PIP_CERT` and `REQUESTS_CA_BUNDLE` only *add*
+certificates. A fully patched operating system still leaves an old pip trusting the bad chain.
+The risk is an intercepted connection serving a fake PyPI, and the only fix is a new pip.
+
+| Tool | Fixed version | Notes |
+|---|---|---|
+| pip | **26.2.2** or later | The one that matters most: it brings its own certificates |
+| certifi | **2026.10.19** | Removes the emSign roots (advisory GHSA-6q48-6c7w-9gw2) |
+| uv | **0.13.4** or later | Advisory GHSA-hq85-5cpj-mr62; run with system certificates |
+| sigstore, conda, pixi | 4.5.1 · 26.9.4 · 0.82.1 | — |
+| Node | 22.23.4 · 24.22.1 · 26.12.1 | Same releases as the Brotli fix |
+
+Versions are from the [Python packaging announcement on discuss.python.org](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576).
+
+**Upgrade pip from the pinned wheel, not with a bare `pip install -U pip`.** An unpatched pip
+fetching its own replacement is exactly the connection an attacker would intercept. The
+announcement gives a `pip install` command naming the 26.2.2 wheel by its SHA-256 hash, so a
+substituted file is refused. Then upgrade `certifi` and `uv`. This is the hash-pinned install
+from the supply-chain table, doing the job it exists for.
+
+**Every virtual environment, not just the system Python.** Each venv has its own pip. A **new**
+venv still gets the old bundled pip from `ensurepip` until CPython ships its fix (GH-159910).
+So upgrade pip right after creating any venv, and in CI after every `python -m venv`.
+
+**Docker: a patched host does not patch an image.** The certificates are baked in at build time.
+
+- **Official `python` images:** the maintainers rebuilt them on 21 October
+  ([docker-library/python #1142](https://github.com/docker-library/python/issues/1142)), with
+  the expedited 3.13.17, 3.14.9 and 3.15.1 releases. The **3.11 and 3.12 images keep an older
+  pip**, because upstream does not change pip in those security releases. Add the pinned-wheel
+  pip upgrade to your Dockerfile, or move to 3.13 or later.
+- **Rebuild without the cache**, so the new base and certificates are actually used:
+  `docker build --pull --no-cache`. A cached layer quietly keeps the old trust store.
+- **Node and Go images on Debian** also need `ca-certificates` updated inside the image, so
+  curl, wget and git stop trusting the chain.
+- **List the trust store in the SBOM** (pip, certifi, `ca-certificates`, base-image digest), so
+  "which images still trust emSign" is a search, not an audit.
+
+**And the LiteLLM root cause shows why the key ceremony keeps the AI out.** On 22 October
+LiteLLM [disclosed how 1.107.0 was published](https://thehackernews.com/2026/10/litellm-suspects-github-token-leak-in.html):
+
+- **The tokens were in logs.** An internet-exposed internal LiteLLM deployment held GitHub CLI
+  OAuth tokens. LiteLLM says an AI coding tool's response bodies can carry the user's GitHub
+  CLI token, and those bodies were logged.
+- **The attacker used them to publish.** With three developers' tokens, including one with
+  workflow rights and an organisation owner's token used to switch off branch protection, the
+  attacker pushed the release through a lookalike repository. It was signed and published like
+  a real release.
+- **The stolen cloud keys were used within hours.** Stolen AWS credentials were being tested
+  about four and a half hours later.
+- **Release rights had just been widened.** LiteLLM had temporarily expanded them for two
+  engineers two days earlier.
+
+Every link in that chain is covered in this article:
+
+- AI traffic carries secrets, so gateway logs must not store request and response bodies.
+- Developer tokens should be scoped to one repository and to read access unless a release
+  needs more.
+- Owner tokens should not sit on everyday machines.
+- Release rights widened "temporarily" need an end date, like any other key.
 
 ### AI binding: the agent proves its permission on every call
 
