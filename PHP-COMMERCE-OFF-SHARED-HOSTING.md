@@ -967,6 +967,63 @@ stop it. The order:
 The ceremony is the clean-up and the habit, not the cure. Run on an unpatched machine, it would
 send fresh keys over the same untrusted connection it is meant to protect.
 
+### Clean up after exposure: rebuild, don't purge
+
+A package downloaded through an intercepted connection has the right name and the right version,
+and nothing on disk records that its download was faked. So you cannot find the bad ones by
+looking, and uninstalling packages one at a time does not work. **Rebuild instead, from hashes
+recorded before the exposure.**
+
+1. **Fix pip first**, as above: 26.2.2 from the hash-pinned wheel, then certifi and uv, on a
+   network you trust. A new Python alone does not fix existing environments, because every venv
+   keeps its own pip.
+2. **Delete each virtual environment and recreate it from a lockfile with hashes:**
+   `pip install --require-hashes -r requirements.txt`, or `uv sync` from a `uv.lock`. Every
+   package is checked against its recorded hash, and a substituted file is refused. No lockfile
+   yet? Generate one with the patched pip, then rebuild from it.
+3. **Clear every cache a tampered file could hide in**, or the rebuild reuses it:
+   - pip: `pip cache purge`
+   - uv: `uv cache clean`
+   - Docker: `docker build --pull --no-cache`
+   - any shared wheelhouse or internal package mirror
+4. **Rotate secrets only where there is a reason.** A malicious package runs code while it
+   installs, so removing it afterwards does not undo what it read. If installs ran over an
+   untrusted network while the old pip was in place, rotate what those environments could
+   reach, using the ceremony and the patched machine. If every install ran on networks you
+   trust, rebuilding is enough. No attack has been reported.
+5. **Scan what you rebuilt** against published advisories: `pip-audit`, or `osv-scanner` across
+   lockfiles and images. A scanner finds known-bad versions, not swapped files. Steps 2 and 3
+   handle swapped files.
+
+**The exception is LiteLLM 1.107.0.** That release was malicious, not merely exposed. Anywhere
+it was installed:
+
+- treat the environment as compromised
+- do not start Python there to clean up, because starting Python re-runs the payload
+- rebuild from 1.106.2 pinned by digest
+- rotate everything that environment could reach
+
+**Does `cargo vet` help?** For Rust, yes, but at a different layer from eMudhra:
+
+- **Against an intercepted download:** Cargo already checks every crate against the checksum in
+  the committed `Cargo.lock`. A Rust build from a lockfile was protected the way a hash-pinned
+  pip install is. Keep the lockfile committed and build with `--locked`.
+- **Against a poisoned release** — the LiteLLM kind, published by a stolen account: this is what
+  `cargo vet` is for. CI fails on any crate version that no trusted, published audit covers, so
+  a hijacked new release is stopped before anyone has reported it. Neither checksums nor
+  scanners can do that, because the bad release is "genuine" when it ships.
+- **For eMudhra itself:** Rust programs that use `webpki-roots` need its fixed release and a
+  rebuild. `cargo update -p webpki-roots`, then `cargo vet` asks for that new version to be
+  audited or certified before it ships. That is the review step working as intended.
+
+Python has no direct equivalent of `cargo vet` yet. The nearest substitutes:
+
+- hash-pinned lockfiles
+- a delay before adopting new versions
+- review of each dependency change in the pull request
+
+That is the Python row of the supply-chain table above.
+
 ### AI binding: the agent proves its permission on every call
 
 An AI agent in this architecture acts under a signed mandate: who may act, on what, up to what
