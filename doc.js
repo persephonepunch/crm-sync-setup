@@ -117,6 +117,20 @@
     marked.setOptions({ gfm: true, breaks: false });
     var art = document.getElementById('doc');
     art.innerHTML = marked.parse(head.body);
+    // Heading anchors. Marked 12 no longer emits heading ids, so every #section link — across
+    // docs and within one — opened the page at the top. Ids follow GitHub's slug rule (the one
+    // the links in these docs were written against): lowercase, drop punctuation, each space a
+    // hyphen, repeats suffixed -1, -2.
+    var usedIds = {};
+    art.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(function (h) {
+      if (h.id) return;
+      var base = h.textContent.trim().toLowerCase()
+        .replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s/g, '-');
+      if (!base) return;
+      var n = usedIds[base] || 0;
+      usedIds[base] = n + 1;
+      h.id = n ? base + '-' + n : base;
+    });
     // Audience line ("**For:** ...") renders uppercase — global doc convention (2026-08-05).
     art.querySelectorAll('p').forEach(function (p) {
       var s = p.firstElementChild;
@@ -163,6 +177,12 @@
     // YAML front matter is machine metadata (AI/Jekyll readers) — human render skips it.
     .then(function (t) { return t.replace(/^---[ \t]*\n[\s\S]*?\n---[ \t]*\n/, ''); })
     .then(render)
+    // The browser's own jump to #hash fired before the article existed; jump once it does.
+    .then(function () {
+      if (!location.hash) return;
+      var t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (t) t.scrollIntoView();
+    })
     .catch(function (e) {
       document.getElementById('hero').innerHTML =
         '<div class="kicker">' + cfg.kicker + '</div><h1>Could not load</h1>';
