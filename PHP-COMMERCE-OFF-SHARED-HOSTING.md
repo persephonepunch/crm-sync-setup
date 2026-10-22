@@ -121,8 +121,17 @@ store access.
 | Hulk Product Options | Hijack confirmed (Oct 10) | Developer statement — [cside](https://cside.com/blog/hulkapps-shopify-checkout-hijack) |
 | Selleasy | Hijack confirmed (Oct 13) | Developer statement — [LetsMetrix](https://letsmetrix.com/blogs/shopify-checkout-hijacking-october-2026) |
 | Swym Wishlist Plus | Hijack confirmed (about Oct 14) | Unauthorised configuration change — [LetsMetrix](https://letsmetrix.com/blogs/shopify-checkout-hijacking-october-2026) |
+| Rebuy Engine — PHP app (PHP 8, CodeIgniter 4, per its [job postings](https://www.builtincolorado.com/job/staff-software-engineer/11235953)) | Delisted; **not** checkout hijacking, self-reported by the founder | Founder statement: on Oct 14, attackers found an unprotected sign-up path that skipped inbox verification, registered accounts on the company's own email domain, and inherited staff privileges on internal development stores. They read product settings and data-source rules for 11 merchant stores; no edits, no API keys or tokens exposed; merchants notified within 24 hours; contained within hours. Not independently verified |
 | Privy; Boost AI Search & Filter | Delisted Oct 18; link to the hijack unconfirmed | Tracker listings, no vendor confirmation |
 | 17TRACK; Consentmo GDPR Compliance | Delisted; link unconfirmed | Tracker listings; Consentmo's rests on a single confidential source |
+
+Rebuy's account is the identity half of the same lesson. Nothing in the runtime failed: an
+email address on the company's domain was treated as proof of being staff, and staff accounts
+carried standing access to stores. Its remediation — privileges only for a named group,
+multi-factor authentication for every merchant, a third-party penetration test of the
+authentication services — is the permissions model this article argues for: identity
+verified at the server, never inferred from what the caller typed, and access granted per task
+rather than held by default.
 
 **Merchant checks:** find these apps among those installed, delisted ones included; review app
 embeds and custom JavaScript fields for scripts nobody added; run a test checkout in a private
