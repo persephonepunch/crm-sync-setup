@@ -286,8 +286,8 @@ do not store. Points, history and consent stay in the ledger, behind `/auth/me`.
 
 ## Google Merchant API: rebuild loyalty, reviews and comparison in one pass
 
-The Google feed integration is being rebuilt regardless. Merchant API became generally available
-as v1 in July 2025, its v1beta versions were discontinued on February 28, 2026, new features ship
+The Google feed integration is being rebuilt regardless. The Content API for Shopping shut
+down on 18 August 2026; Merchant API became generally available as v1 in July 2025, its v1beta versions were discontinued on February 28, 2026, new features ship
 only there, and conversion sources move from `content/v2.1` to `conversions/v1`. Connect loyalty,
 reviews and price comparison directly in the same conversion, rather than through a plugin that
 can be delisted.
@@ -327,6 +327,33 @@ CRM Sync's desktop build imports the published crate audits of Mozilla, Google, 
 Alliance, ISRG, Embark and Zcash — 102 crates fully audited, 357 recorded as a starting baseline
 — and fails CI on any crate version no audit covers. Wildcard trust is avoided on purpose: a
 hijacked publisher would pass it.
+
+## No silver bullet: rotate, randomise, look forward
+
+No single control in this article would have stopped every incident in it. TLS did not stop
+the checkout hijack. MFA did not stop nOAuth. A WAF does not stop a poisoned package, and a
+package audit does not stop an unverified sign-up. What holds is layers that change faster than
+an attacker can map them — so the defence has to move on a schedule, and be tested in ways the
+attacker cannot predict.
+
+| Practice | What it takes away from the attacker | Cadence |
+|---|---|---|
+| Rotate every credential — on a schedule, and immediately on any incident, through a recorded key ceremony | The useful life of a stolen key | Every 90 days, and on event |
+| Short-lived sessions, revocation checked on every read | Replaying a captured session | Every request |
+| Keys generated per deployment, never copied between environments | One leak opening every environment | Every deployment |
+| Unguessable identifiers — random, not sequential — in anything a public response returns | Enumerating accounts, orders and records by counting | Always |
+| A fresh Content Security Policy nonce per response | Reusing an injected script | Every response |
+| Testing the attacker cannot predict: rotating penetration-test scope, AI-assisted scanning for chained attacks, canary credentials that alert the moment anyone uses them | Mapping a defence that never changes | Continuous |
+| A delay and an audit gate on every dependency | The first hours of a malicious release | Every update |
+
+**Build to the standard that is coming, not the one being enforced today.** Every requirement
+in the table at the top of this article was announced years before it was enforced, and the
+merchants hurt worst in October 2026 were the ones still meeting the old version. The ones
+already on the calendar: the Content API for Shopping shut down on 18 August 2026; EU AI Act
+transparency obligations apply from 2 August 2026; the EU Cyber Resilience Act's reporting
+obligations began on 11 September 2026, with full obligations from 11 December 2027; GS1
+Sunrise 2027 moves retail point of sale to 2D barcodes. Each date, with its source, is in
+[The Compliance Calendar](https://persephonepunch.github.io/crm-sync-setup/compliance-calendar.html).
 
 ## What it costs
 
