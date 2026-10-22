@@ -471,8 +471,11 @@ captured at the moment it happens:
 | An idempotency key | Derived from the subject or session, the event, its time and its source (`form_id`), so a retry or a double-fired tag is one conversion, never two |
 
 That is what turns an AI answer into an attributable sale: the assistant finds the candidate, and
-the session, device and key decide the transaction. CRM Sync writes all three today on form and
-consent events; conversions sent without them are estimates.
+the session, device and key decide the transaction. CRM Sync writes all three today for a
+signed-in submission. A submission confirmed by email deliberately drops the typing browser's GA
+identifiers — carrying them would bind a stranger's browser to the person who clicked the link —
+so it keeps the device and the key but not the session. Conversions sent without all three are
+estimates.
 
 A verified-purchase review or a member price shown to Google is a claim about a real order and a
 real member. CRM Sync records that claim as a signed mandate anyone can check offline in a
