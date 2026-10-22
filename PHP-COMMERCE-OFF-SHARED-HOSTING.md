@@ -708,6 +708,65 @@ audit ledger. The full ceremony, with roles and the record format, is in
 [Rotate a Key in Three Steps](https://persephonepunch.github.io/crm-sync-setup/key-rotation-123.html)
 and the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html).
 
+### Dev, Stage and Prod: a separate ceremony for each, least privilege everywhere
+
+A key that works in two environments is one leak away from both. Each environment gets **its
+own keys, made in its own ceremony**, and no value is ever copied from one to another. The
+fingerprints prove it: if Stage and Prod show the same eight characters, something was copied.
+
+| Environment | Where it runs | Keys | Who can set them | Command |
+|---|---|---|---|---|
+| **Dev** | The developer's machine (`wrangler dev`) | Throwaway values in an uncommitted `.dev.vars`; no real customer or provider keys | The developer | `openssl rand -hex 16` into `.dev.vars` |
+| **Stage** | A separate Worker, `[env.staging]`, with its own storage | Generated for Stage only; test-mode provider keys | The release engineer | `openssl rand -hex 32 \| npx wrangler secret put NAME --config wrangler.toml --env=staging` |
+| **Prod** | The production Worker | Generated for Prod only; live provider keys | The key holder, from an approved machine on the company network | `openssl rand -hex 32 \| npx wrangler secret put NAME --config wrangler.toml --env=""` |
+
+Passing `--env` explicitly matters. With more than one environment defined, a bare Wrangler
+command falls back to the top level, which is right only by accident.
+
+**Least privilege: each person, machine and test gets the smallest key that does its job.**
+
+- **Production secrets are set on-premises only.** The Cloudflare API token that can write Prod
+  secrets belongs to the key holder. It is scoped to the one account and the Worker permissions
+  it needs, and it can be locked to the company network's addresses with Cloudflare's client-IP
+  filter on API tokens. Admin paths sit behind Cloudflare Access with a device check. A token
+  copied off the network does not work.
+- **Supply-chain tests never see a secret.** Dependency scans, crate audits and the static test
+  harness run on every pull request, so they treat every change as untrusted. CRM Sync's
+  pipeline shows the pattern:
+  - the job token can only read the repository
+  - actions are pinned to commit hashes, not movable tags
+  - installs run with `--ignore-scripts`
+  - the contract tests touch only public and fail-closed paths, so they are safe on pull
+    requests from outside forks
+
+  The one credential the test job holds is a single-repository, read-only token for a private
+  test dependency.
+- **Deploy is a separate job with separate rules.** It runs only on a merge to `main`, never on
+  a pull request, and it goes through the same deploy guard and test gate as a deploy from a
+  laptop. Worker secrets are not stored in CI at all. They are set by the ceremony, so a
+  poisoned dependency in CI has nothing to steal.
+- **Reviewers approve; they do not hold keys.** Design, content and compliance roles sign off on
+  what ships. Only the release engineer, whose role carries the release permission, promotes
+  it. The agency or consulting team gets a rotatable key, never the root key and never the
+  command line.
+
+**Trust setup: decide once, per environment, what each system will believe.** Most of the
+breaches on the timeline were failures of trust, not of encryption. Write the trust list down
+and keep it under version control:
+
+| What is trusted | Set where | Changes only by |
+|---|---|---|
+| Signing keys that verify mandates and receipts | The published JWKS, with key ids and end dates | Rotation through the ceremony |
+| Certificate roots a program accepts | The trust store in each runtime and container, listed in the SBOM | An updated runtime or bundle, recorded in the SBOM — how the eMudhra roots get removed |
+| Packages and crates | Lockfiles, hash-pinned installs, and `cargo vet` against named published audits | A reviewed audit, never a wildcard |
+| Build tools and CI actions | Commit-hash pins and a read-only job token | A reviewed pull request |
+| People and agents | Roles granted by invitation; agent mandates with caps and expiry | An entitlement change on the ledger |
+| Networks | Client-IP filters on API tokens; Cloudflare Access on admin paths | The key holder |
+
+The configurator ([Configuration System](https://www.crm-sync.dev/#configure)) shows which
+environment you are in and which keys you hold. Environment rules, the key-handoff matrix and
+the RACI are in the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html).
+
 ### TLS automation: replacing a certificate is a renewal, not a project
 
 Browsers received the eMudhra block automatically. Much other software did not:
