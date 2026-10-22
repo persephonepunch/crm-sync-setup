@@ -75,7 +75,9 @@ plugin, one compromised vendor or one runtime flaw cannot reach every customer o
 The PHP runtime itself is covered in the companion article: patch for **php2shell**
 (CVE-2026-109618 and CVE-2026-109619) and keep the Cloudflare WAF rules in Block —
 [Entitlement Security → php2shell](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#update-21-october-2026-php2shell-is-the-runtime-not-the-plugin).
-This article is about the architecture around it.
+This article is about the architecture around it. For the owner and legal view of the same
+deadlines — what goes dark, and who carries the liability — see the
+[Risk & Liability Brief: The 2026 Client-Side Cliff](https://persephonepunch.github.io/crm-sync-setup/SHOPIFY-2026-RISK-BRIEF.pdf).
 
 ## Vocabulary
 
