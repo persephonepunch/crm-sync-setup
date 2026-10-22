@@ -687,22 +687,32 @@ still need the runtime updates in the timeline. More background:
 [What Is an SBOM? Who Uses This? Everyone.](https://persephonepunch.github.io/crm-sync-setup/sbom-everyone.html)
 and [Firmware, SBOM & the Cyber Resilience Act](https://persephonepunch.github.io/crm-sync-setup/firmware-sbom-cra.html).
 
-### Its role in your security posture: AI-first resilience
+### Its role in AI-first resilience: for QA and growth marketing teams
 
-AI agents now quote, order, refund and reorder on a business's behalf. Resilience is no longer
-only about keeping systems up. It also means proving, after any incident, which actions were
-authorised and by whom. The verify plane is where that proof is checked, by anyone, without
-trusting the operator.
+AI agents and answer engines now act on a store's behalf and decide what customers see. A
+journey that quietly breaks — a consent banner, a checkout step, a tracking tag, a product feed —
+costs sales before anyone notices. The verify plane gives the two teams who catch those breaks
+the same signed record to work from.
+
+**QA and testing teams**
 
 | Challenge | Solution | Business outcome |
 |---|---|---|
-| A trusted supplier fails — a certificate authority, a package registry, an app vendor — and the business inherits the exposure | Every mandate and receipt is signed with keys the business generates, publishes and rotates itself | Exposure to a third party's failure ends at the next rotation, not on that party's timetable |
-| AI agents act at machine speed, and a stolen credential acts just as fast | Each agent action carries a signed mandate with a scope, a spending limit and an end date, checked on every call | An agent cannot exceed what it was granted, and a stolen credential expires on schedule |
-| After an incident, the board, insurer and regulator ask "were we affected?" and the answer takes weeks | Signed records on a hash-chained timeline turn that question into a filter by key, date and release | Incident answers in minutes, with evidence a third party can check |
-| Partners, marketplaces and auditors have to take the operator's word for it | Public keys and the verify plane let them check any mandate or receipt themselves, offline | Trust is shown rather than claimed, which shortens partner and audit reviews |
-| Regulation such as the EU Cyber Resilience Act and AI Act asks for records, not intentions | SBOMs, signed builds and the ledger are produced as the business runs | Compliance evidence is a by-product of operations, not a project before each audit |
+| Release sign-off waits on manual checks across regions, browsers and app versions | Every test session leaves a signed record of each consent, identity, cart and order step, open on the verify plane as **See a session's story** | Faster sign-off, with evidence attached instead of screenshots |
+| "It passed on my machine": a failure can't be reproduced or proven | The session's thread shows exactly which step changed, in order, and cannot be edited after the fact | Defects are reproduced from the record, not argued over |
+| AI agents place orders and refunds faster than anyone can watch | Each agent action carries a signed mandate with a scope, a limit and an end date; tests confirm an agent is refused outside it | Agent behaviour is tested like any other feature before it reaches customers |
+| A dependency or certificate change — like eMudhra — breaks a journey after release | Trust stores and packages are listed in the SBOM, so a test run names the release that changed | Regressions are traced to a release in minutes |
 
-<a class="doc-button" href="https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Check a mandate on the verify plane →</a>
+**AEO and tracking growth marketing teams**
+
+| Challenge | Solution | Business outcome |
+|---|---|---|
+| Tracking drifts after site changes, and the report is wrong before anyone notices | Each event carries its consent state and is checked against the signed record | Numbers the team can defend in a budget meeting |
+| Consent rules remove data, and nobody can tell lost data from broken tags | The record shows which events were withheld by consent and which never fired | Consent loss is measured, not mistaken for a tracking bug |
+| AI answer engines cite competitors, or show stale prices and stock | Product, price and review data go out as structured data and through the Merchant API from one source of truth | Accurate answers in AI search, and more citations |
+| Attribution stops at the first redirect or app hand-off | One session thread runs from first touch through consent, sign-in and order | Spend follows what actually converts |
+
+<a class="doc-button" href="https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">See a session's story on the verify plane →</a>
 
 ## No silver bullet: rotate, randomise, look forward
 
