@@ -171,12 +171,14 @@ revocable tenant-scoped tokens, never a user account with an elevated flag.
 | **Entra nOAuth** | An attacker's tenant asserting the victim's email address | Step 3. Subjects are matched on the provider's immutable subject, not the email claim, so a different tenant's identity is a different subject with no claims, extras or entitlement of the victim's |
 | **Okta delegated authentication** | A username and a cached earlier sign-in | Step 1. Identity is only ever a server-signed token for a subject ID, checked against revocation on every read; there is no username-plus-cache path to a session |
 
-**What this does not yet cover.** The match on the provider's subject runs first, but an email
-fallback still sits beneath it for sign-ups that arrive without one — newsletter and request
-forms, and team invitations. An invitation proves inbox ownership because the link is delivered
-to it; a form submission does not. Closing that fallback so an unverified email can never
-attach to an existing subject is open work, and password sign-up still issues a session before
-the inbox is confirmed — a session that, per step 5, holds no permissions until one is granted.
+**Closed on 22 October 2026.** Writing this section surfaced the same mistake in CRM Sync's own
+code, and it is fixed in production. An email-only match now attaches a login to an existing
+subject only when the inbox is proven — the provider verified the address, a Shopify one-time-code
+login, or an invitation link — and an unverified login is refused rather than attached. A typed
+email on a public form writes nothing until a single-use link mailed to that address is clicked,
+and every unconfirmed submission gets the same reply, so the form cannot reveal whether an address
+has an account. Rewards enrolment takes identity only from a session. Four static checks in the
+release gate fail if any of this regresses.
 The full claims-and-extras model is in
 [Entitlement Security → claims and extras](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#a-layered-setup-allow-list-rust-boundary-claims-and-extras).
 
