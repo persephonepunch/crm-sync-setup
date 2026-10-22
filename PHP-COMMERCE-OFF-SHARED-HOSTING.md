@@ -301,7 +301,14 @@ stakeholders adjust the **context** — the taxonomy, channels and weights that 
 ranked. **Mandate permissions** are adjusted the same way: an agent's mandate can be tested and
 revoked from the console, and the roles are separate by design — the role that tests a mandate
 before a release depends on it cannot revoke it. Each change is a recorded row, so every
-adjustment can be checked after the fact. The WordPress and Astro/EmDash
+adjustment can be checked after the fact.
+
+![The CRM Sync "Choose your view" screen: access granted by invitation, showing only the roles a person holds. Roles include CISO / DPO, Designer, Revenue BA, QA / Compliance, Release Manager, Data & Audit, Content & Strategy, Moderator, Privacy Requests, Agent Permissions, Content & QA and Shape Author.](https://crm-sync.dev/kb/media/docs/php-commerce-choose-your-view.png)
+
+*Each reviewer signs in to their own view. Access is granted by invitation, and a person sees only
+the roles they hold — Revenue BA for campaigns and bidding, QA / Compliance for review and
+sign-off, Content & Strategy for events and audiences, Agent Permissions for mandates, Shape
+Author for the data shapes themselves, authored in a Webflow collection with no git and no CLI.* The WordPress and Astro/EmDash
 paths are in [File System Agnostic Publishing](https://persephonepunch.github.io/crm-sync-setup/universal.html),
 and the AEM path in [Shopify / Google Integration on an AEM Scaffold](https://persephonepunch.github.io/crm-sync-setup/aem-scaffold-webflow-export.html).
 
