@@ -293,6 +293,8 @@ consented members, an aggregate and never a per-person score — and the JSON-LD
 rank by it. Move the theme to another host and what an answer engine reads, and how it is ranked,
 stays the same.
 
+### Stakeholder teams review the model
+
 The modeling is intentional, and it is reviewable. Because the collections, joins, weights and
 permissions are records rather than theme code, the people accountable for them can read and
 adjust them without a developer redeploying a site: subject-matter experts and QA review the
