@@ -276,6 +276,12 @@ Shopify's `<shopify-store>` and `<shopify-cart>`, and checkout lands on the Shop
 [www.crm-sync.dev](https://www.crm-sync.dev/). The Webflow site never sees a card number or keeps a
 customer record; the Shopify store holds both.
 
+![The crm-base home page in the Webflow Designer at desktop, tablet and mobile breakpoints. The page structure is a navigation component, a main section and a footer component; the navigation carries a CART link and the page holds no commerce code.](https://crm-sync.dev/kb/media/docs/php-commerce-webflow-design-layout.png)
+
+*The crm-base design in Webflow at three breakpoints. The structure is a navigation component, the
+page content and a footer component — design only. The CART link in the navigation opens Shopify's
+cart; the products, cart and checkout come from Shopify, not from Webflow.*
+
 | Option | What the site holds | What Shopify holds | Why it is safer |
 |---|---|---|---|
 | **Storefront Web Components** on Webflow, WordPress, Astro/EmDash, 11ty or AEM | Markup, the store domain, and optionally a public, read-only Storefront token (needed only for inventory counts and custom data) | Catalog, prices, cart, checkout, customer accounts, payments | No customer table, no order table, no card flow and no secret key on the site; a breach of the site has no customer database to take |
