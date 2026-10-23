@@ -111,11 +111,13 @@ deadlines — what goes dark, and who carries the liability — see the
 |---|---|---|
 | **Shared VM** | One server where many sites share an operating-system user, a database user and a filesystem | A private server with isolated apps |
 | **Private VM with Docker** | One server the internet cannot connect to, with each application in its own sealed container, reached only through a Cloudflare Tunnel | Anything with an open inbound port |
+| **TLS** | Transport Layer Security: the protocol that encrypts a connection and proves, with a certificate from a trusted certificate authority, that the server is who it claims to be. The successor to SSL; use version 1.2 or 1.3 | A guarantee the server is safe — only that you reached the right one, privately |
 | **TLS transport** | The sealed, tamper-evident envelope data travels in on every hop — shopper to edge, edge to server, server to Xano, server to database | Only the padlock in the browser |
 | **Sidecar** | A small helper that runs beside each app and does one job — here, asking Xano `/auth/me` who the caller is and attaching a verified answer | The code-injection attack; it closes the hole where an attacker types someone else's customer ID |
 | **Real-time data binding** | Prices, stock and points read live from the system that owns them | A copy refreshed by a nightly sync |
 | **AI task binding** | An automated job limited to one tenant, one task and the tools that task needs | An agent holding a platform key |
 | **Client-side redirect** | A script in the shopper's browser sending them to another domain | A 301 issued by the server |
+| **RuBAC** | Rule-based access control: every request is checked against written rules — who is asking, for which tenant, on which record, which fields, at what time — before the database is touched | Role-based access alone (RBAC), where a role such as "admin" opens everything that role can see |
 
 ## The requirements are not new
 
@@ -312,6 +314,52 @@ anything PHP-shaped touches it.
    disabled there, and every DAM or PIM secret rotated when the site leaves the shared VM.
 6. **Escape exports.** Prefix any cell that begins with `=`, `+`, `-` or `@` before a CSV leaves
    the system.
+
+### Three ways to load a product file: Matrixify, a bare database, and Xano with rules
+
+The same `product.csv` can reach a catalog three ways. What differs is who checks it, and what a
+bad row can reach.
+
+- **Matrixify** is a hosted Shopify app. It reads the spreadsheet on its own servers and writes
+  through the Shopify Admin API under the scopes the store granted it.
+- **A bare database load** is the file loaded straight into MySQL or Postgres — `LOAD DATA
+  INFILE`, `COPY`, a phpMyAdmin import, or a PHP script reading `product.csv` from an upload or
+  FTP folder.
+- **Xano with rule-based permissions** puts Postgres behind API endpoints. Nothing connects to
+  the database directly; every write goes through an endpoint that authenticates the caller,
+  checks typed inputs, and applies RuBAC rules before a row changes.
+
+| | Matrixify CSV | Bare database / `product.csv` | Xano-hardened Postgres (RuBAC) |
+|---|---|---|---|
+| **Who is checked** | The store, once, when the app was installed | Whoever holds the database password or the folder | Every request: a signed session or scoped key, resolved by `/auth/me` |
+| **What a file can write** | Everything the app's scopes allow — usually all products, customers and orders | Every table the database user can reach; often all of them | Only the fields the endpoint accepts, for the caller's tenant |
+| **Per-row rules** | None of yours — any row the sheet names is updated | None; MySQL has no row-level security | Rules on tenant, owner, record state and field: a catalog file cannot touch consent, prices outside a range, or another tenant |
+| **Bad or old file** | Re-importing last month's sheet silently resets consent, prices and stock | Same, plus a malformed file can corrupt or truncate tables | Refused rows are rejected and recorded (requirement R8); fields the source does not own are ignored |
+| **Parsing exposure** | Matrixify's parser, on Matrixify's servers | Your PHP parser, on your server — the XXE and upload risks above | Parsing at the edge (a Worker) into typed JSON; Postgres never sees the raw file |
+| **Transport** | TLS from Matrixify to Shopify | Often none inside the VM; a database port sometimes open to the internet | TLS on every hop — browser to edge, edge to Xano, Xano to Postgres |
+| **Record of change** | The app's job log | Usually none | A ledger row per write: who, which file digest, which rule allowed or refused it |
+| **Blast radius of a leaked credential** | The whole store, until the app is removed | The whole database | One tenant's allowed fields, until the key is rotated |
+
+**How the Xano side is hardened:**
+
+1. **No direct database access** in production — no public Postgres port, and any direct
+   database connector off or read-only.
+2. **Authentication on every endpoint**, with identity resolved server-side by `/auth/me`, never
+   taken from a field in the file.
+3. **Typed inputs.** Each endpoint declares the fields and types it accepts; anything else is
+   dropped before the query.
+4. **Rules before writes.** A precondition checks tenant, role and field ownership for every
+   row, and filters every query by the caller's tenant — the API-level equivalent of
+   row-level security.
+5. **Separate keys per job and environment.** An import key can write products for one tenant;
+   it cannot read customers or touch another workspace.
+6. **Sensitive fields encrypted** with a key made for that deployment, so even a full export
+   reveals ciphertext.
+
+**Choosing.** Matrixify is a sound tool for a one-off migration on Shopify — remove it, or cut its
+scopes, when the job ends, and strip columns you do not mean to change. A bare database load
+should not exist in production. For a recurring feed from a PIM, ERP or supplier, the rules
+belong in front of the database, where every row is checked and every refusal is evidence.
 
 ## The options, and what each one isolates
 
