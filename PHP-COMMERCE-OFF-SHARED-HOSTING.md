@@ -607,6 +607,27 @@ and [Help Net Security](https://www.helpnetsecurity.com/2026/10/21/emudhra-certi
 
 ### What eMudhra teaches about signing keys
 
+**Who eMudhra is.** eMudhra is an Indian digital-trust company. Its main lines of business:
+
+- **India's largest licensed certifying authority.** Under India's IT Act it issues Digital
+  Signature Certificates, which people and companies use to sign official filings: income tax,
+  GST returns, company filings and government e-tenders. This is the core of the business.
+- **eSign.** An online signing service built on Aadhaar, India's national digital identity.
+- **emSign, its publicly trusted CA brand.** Its roots sit in the Chrome, Mozilla, Apple and
+  Microsoft trust stores, so it can issue TLS and code-signing certificates that browsers
+  accept worldwide. This is the part the incident hit, and one of the few Indian-owned roots in
+  those programs.
+- **Trust software for others.** Certificate-authority and authentication products for
+  governments, banks and enterprises, in India and abroad.
+- **A listed company,** public in India since 2022 and expanding into the Middle East, Africa,
+  Southeast Asia and the US.
+
+eMudhra says TLS is about 1% of its revenue, and its shares fell about 20% after the disclosure.
+Both numbers make the same point. A small, rarely run ceremony got little scrutiny, yet the
+failure hit the company's whole product, because what it sells is trust. India's Digital
+Signature Certificates run under India's own CA licensing rather than the browser root
+programs, so as far as has been reported they are not directly affected.
+
 **The keys were not stolen. They were computable.** The ceremony used certified hardware
 security modules and still produced weak keys. A key is only as strong as the randomness it
 was made from, and an audited process is not a substitute for checking the output. Four
