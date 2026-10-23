@@ -623,6 +623,18 @@ only by the signing service is not on the disk the payload reads.
 
 ### The number 4, and what row-level controls still protect
 
+**What an elliptic-curve key is.** An elliptic curve is a fixed, published mathematical
+curve, with a fixed starting point on it, *G*. "Multiplying" a point by a number means stepping
+along the curve that many times by a special rule. The rule is easy to run forwards: given a
+number, finding the point is fast. It is effectively impossible to run backwards: given only
+the point, there is no shortcut to the number. That one-way step is the whole key pair:
+
+- the **private key** is the number
+- the **public key** is the point it lands on
+
+Elliptic-curve keys are much shorter than RSA keys of the same strength, which is why
+certificates, phones and Ed25519 signatures use them.
+
 eMudhra's keys were elliptic-curve keys, not RSA. An elliptic-curve private key is a single
 number, *d*. The public key is that number multiplied by a fixed, published starting point *G*:
 public key = *d* × *G*. Picked at random from roughly 2^256 possibilities, *d* cannot be worked
@@ -662,6 +674,39 @@ connection can give away:
   intercepted connection has no row limit. That is a layer 1 or layer 6 key in the
   [key layers](#key-layers-what-each-key-protects): rotate it through the ceremony, from a
   patched machine.
+
+**EdDSA vs. token gating — proof is not permission.** Two ideas get blurred together:
+
+| | EdDSA signature (Ed25519) | Token gating |
+|---|---|---|
+| **Question it answers** | *Who issued this, and has it been changed?* | *Should the holder be let in?* |
+| **How** | The issuer signs with a private key; anyone checks it with the published public key, offline | The server lets in whoever presents a valid token — possession is the test |
+| **What it proves** | Authenticity and integrity. A changed character fails the check | Only that someone holds the token |
+| **What it does not prove** | That the person presenting it is the person it was issued to | That the token was not copied, replayed or stolen |
+| **In CRM Sync** | Mandates, receipts and certificates, checked on the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state) against the JWKS | Sessions and entitlements: the server decrypts the token, checks the denylist and expiry, then applies the caller's roles row by row |
+
+A signed token used as a gate is still a **bearer** credential: whoever holds it, gets in. So
+signing is never the whole answer. The gate adds:
+
+- a short expiry
+- revocation checked on every read
+- an audience, so a token minted for one service is refused by another
+- spending caps and scopes on agent mandates
+- server-side role checks on each row
+
+Signing makes a token **trustworthy**. Gating decides what that trust is **worth**. The same
+split runs through web3 "token gating", where holding an NFT opens a door: the chain proves the
+token is genuine, not that the wallet holding it is the person it was meant for.
+
+**Why EdDSA, after eMudhra.** eMudhra's chain used ECDSA, the older elliptic-curve signature
+scheme. ECDSA needs a fresh random number for *every signature*. Reuse one, or let it be
+guessable, and the private key can be computed from two signatures — a well-known failure.
+EdDSA derives that number from the key and the message, so a weak random source at signing
+time cannot leak the key.
+
+**EdDSA would not have saved eMudhra.** Their failure was in *making* the key, and every scheme
+needs real randomness at key generation. That is why CRM Sync's Ed25519 keys come from the
+platform's cryptographic random source inside the Worker, never from a hand-run script.
 
 ### One architecture under any front end, whatever the platform plan
 
