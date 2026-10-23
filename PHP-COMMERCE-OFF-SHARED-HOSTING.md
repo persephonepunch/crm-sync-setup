@@ -1043,7 +1043,8 @@ Each side holds keys the other never sees:
 2. **Narrow which CAs may issue for your domains.** A DNS CAA record names the CAs allowed to
    issue for a domain, and Certificate Transparency monitoring alerts you to any certificate
    issued anyway. Neither stops a browser from trusting a bad CA, but together they shrink and
-   expose the window.
+   expose the window. Instructions are in
+   [CAA records](#caa-records-name-the-cas-that-may-issue-for-your-domain).
 3. **Leave your own keys alone unless they were exposed.** Xano encryption keys and Worker
    Ed25519 keys were never issued under emSign, so eMudhra gives no reason to rotate them. Rotate
    on their own schedule, or after an exposure like LiteLLM, through the
@@ -1054,6 +1055,175 @@ Each side holds keys the other never sees:
 
 Sources: [Xano security functions](https://docs.xano.com/xanoscript/function-reference/security);
 [W3Techs SSL certificate authority usage](https://w3techs.com/technologies/overview/ssl_certificate).
+
+### CAA records: name the CAs that may issue for your domain
+
+**What a CAA record is.** A CAA (Certification Authority Authorization) record is a DNS record
+that lists the certificate authorities allowed to issue certificates for your domain. Every
+publicly trusted CA must check it before issuing. With no CAA record, any CA in any trust store
+may issue for you. That includes emSign, the eMudhra brand whose eight intermediate keys were
+exposed. A CAA record that doesn't list emSign (`emsign.com`) tells every CA that follows the
+rules not to issue for you under it.
+
+**What it does and doesn't do:**
+
+- **It does** stop a careful CA from issuing for your domain when the CA isn't on your list.
+- **It doesn't** stop a browser trusting a certificate that was issued anyway. A CA whose keys
+  are computable, as eMudhra's were, can skip the check. Certificate Transparency monitoring
+  covers that gap: every trusted certificate is logged publicly, so an unexpected one shows up.
+- **It doesn't** touch email. CAA governs certificates only, so MX, SPF, DKIM and DMARC are
+  unaffected.
+
+**One record at the apex covers every subdomain** unless a subdomain has CAA records of its
+own. That includes subdomains pointed at other platforms, such as Shopify, so list every CA
+that any of your hosts uses before you add the first record. Otherwise the next renewal fails
+and the site goes down.
+
+#### Step 1. Find out which CAs issue for you today
+
+You don't need anyone's access for this, because certificates are public:
+
+```bash
+# Every certificate issued for the domain and its subdomains, from the public CT logs
+open "https://crt.sh/?q=%25.example.com"
+
+# The certificate each host is serving right now
+for h in example.com www.example.com account.example.com; do
+  printf '%-24s ' "$h"
+  echo | openssl s_client -connect "$h:443" -servername "$h" 2>/dev/null \
+    | openssl x509 -noout -issuer
+done
+
+# Any CAA records already published
+dig +short CAA example.com
+```
+
+On `crm-sync.dev` this showed three hosts and two CAs:
+
+| Host | Served by | Certificate from |
+|---|---|---|
+| `crm-sync.dev` | Cloudflare | Google Trust Services |
+| `www.crm-sync.dev` | Shopify, through Cloudflare | Google Trust Services |
+| `account.crm-sync.dev` | Shopify customer accounts (DNS only) | Let's Encrypt, requested by Shopify |
+
+Hosts you don't run yourself, such as Shopify customer accounts or a SaaS custom domain, are
+the ones people forget. Leaving out their CA breaks the next renewal.
+
+#### Step 2. Choose the records
+
+Use the CA's CAA identifier, not its brand name:
+
+| CA | Value |
+|---|---|
+| Google Trust Services | `pki.goog` |
+| Let's Encrypt | `letsencrypt.org` |
+| SSL.com | `ssl.com` |
+| Sectigo | `sectigo.com` (older records use `comodoca.com`) |
+| DigiCert | `digicert.com` |
+
+Add each CA twice: `issue` for ordinary names, and `issuewild` for wildcards such as
+`*.example.com`. Once any `issuewild` record exists, a CA that isn't listed there can't issue
+wildcards even if it's listed under `issue`. For `crm-sync.dev` the records were:
+
+| Name | Flags | Tag | Value |
+|---|---|---|---|
+| `@` | 0 | `issue` | `pki.goog` |
+| `@` | 0 | `issue` | `letsencrypt.org` |
+| `@` | 0 | `issue` | `ssl.com` |
+| `@` | 0 | `issuewild` | `pki.goog` |
+| `@` | 0 | `issuewild` | `letsencrypt.org` |
+
+SSL.com is included because Cloudflare may fall back to it when renewing a proxied host.
+
+**On Cloudflare,** once the zone has any CAA record, Cloudflare automatically publishes CAA
+records for every CA its Universal SSL uses. They don't appear in the dashboard list, but they
+do appear in DNS. After the records above, `crm-sync.dev` also published `comodoca.com`
+(Sectigo) and `digicert.com`. That's expected, and it's what keeps Cloudflare's own renewals
+working.
+
+**Optional:** an `iodef` record (`0 iodef "mailto:security@example.com"`) asks CAs to report
+refused requests to that address. Not every CA does.
+
+#### Step 3a. Add them in the Cloudflare dashboard
+
+1. Open **DNS → Records** for the domain.
+2. Click **+ Add record**.
+3. Set **Type** to **CAA** and **Name** to `@`.
+4. Set **Flags** to `0`.
+5. Set **Tag**:
+   - **Only allow specific hostnames** for `issue`
+   - **Only allow wildcards** for `issuewild`
+6. Enter the CA domain name, for example `letsencrypt.org`.
+7. Click **Save**. Repeat for each row.
+
+Add the CAs your hosts are using right now first. A gap of a few minutes doesn't matter, but if
+the first record names only one CA, every other CA is refused until the rest are in.
+
+#### Step 3b. Or add them with a scoped token
+
+The key-ceremony rule applies: the person makes the credential, and it never enters an AI
+session or a file.
+
+1. **Create the token:** My Profile → API Tokens → **Create Token** → Custom token.
+   - **Permissions:** Zone → DNS → Edit.
+   - **Zone Resources:** Include → Specific zone → your domain.
+   - **Expiration:** 7 days.
+2. **Check the summary before creating it.** It must read `<your domain>, DNS: Edit` with an
+   end date. If it says **All zones across all accounts** or **No expiration**, go back and
+   fix it. A token like that can rewrite the DNS of every domain you own, for good.
+3. **Run this in your own terminal.** The token is read without being shown and is cleared at
+   the end:
+
+   ```bash
+   read -s "CF_TOKEN?Paste token: "; echo        # zsh; in bash: read -rsp "Paste token: " CF_TOKEN
+   ZONE_ID=<zone id from the domain's Overview page>
+   DOMAIN=example.com
+   for v in 'issue pki.goog' 'issue letsencrypt.org' 'issue ssl.com' \
+            'issuewild pki.goog' 'issuewild letsencrypt.org'; do
+     set -- ${=v}                                    # bash: set -- $v
+     printf '%-10s %-16s ' "$1" "$2"
+     curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+       -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+       --data "{\"type\":\"CAA\",\"name\":\"$DOMAIN\",\"data\":{\"flags\":0,\"tag\":\"$1\",\"value\":\"$2\"}}" \
+       | grep -o '"success":[a-z]*'
+   done
+   unset CF_TOKEN
+   ```
+
+   Every line should end in `"success":true`. A record that already exists returns `false`,
+   and you can ignore it.
+4. **Delete the token** straight away: API Tokens → **⋯** → Delete.
+
+#### Step 4. Verify
+
+```bash
+# The records, from the authoritative nameserver and from a public resolver
+dig +short CAA example.com @$(dig +short NS example.com | head -1)
+dig +short CAA example.com @1.1.1.1
+
+# Every host still serves a valid certificate
+for h in example.com www.example.com account.example.com; do
+  curl -s -o /dev/null -w "$h %{http_code}\n" -A "Mozilla/5.0" -H "Accept: text/html" "https://$h/"
+done
+```
+
+A 2xx or 3xx on every host means nothing broke. The real test is the next renewal: note each
+certificate's expiry date and check again after it. Some Shopify hosts return 406 to a bare
+`curl` with no `Accept` header, which is not an outage.
+
+#### Step 5. Keep it current
+
+- **Before adding a custom domain for a new service,** find out which CA it uses and add that
+  CA first.
+- **Watch the CT logs** for your domain. Cloudflare's Certificate Transparency Monitoring (SSL/TLS
+  → Edge Certificates) emails you when a certificate is issued for it. crt.sh is the manual
+  check.
+- **Record the change** in the key and certificate ledger with the date and who made it, like
+  any other trust decision.
+
+Sources: [RFC 8659 — DNS CAA Resource Record](https://www.rfc-editor.org/rfc/rfc8659);
+[Cloudflare — CAA records](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/);
+[crt.sh Certificate Transparency search](https://crt.sh/).
 
 ### The number 4, and what row-level controls still protect
 
