@@ -17,7 +17,8 @@ tags:
 
 **For:** teams with a working REST integration layer who now have to make it defensible.
 **Premise:** you are not going to rewrite it. Everything below is additive.
-**Companions:** [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) for the non-technical case; [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) for the migration mechanics.
+**Revised:** 23 October 2026 — calendar updated for the AI Omnibus, the TLS lifetime schedule and the eMudhra distrust; rotation recommendations added.
+**Companions:** [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) for the non-technical case; [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) for the migration mechanics; [Key Custody](https://www.crm-sync.dev/pages/knowledge-base#agent-key-custody-models) for how an agent holds a key; the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) for Dev, Stage and Prod.
 
 ## The gap, in one sentence
 
@@ -31,14 +32,30 @@ That is the whole problem. Everything below follows from it.
 
 Not one deadline — a wave, which is worse, because there is no single date to plan around:
 
-| Instrument | In force | Hard obligations | Exposure |
-|---|---|---|---|
-| GDPR | 2018 | live | 4% global turnover |
-| NIS2 | transposition 17 Oct 2024 | live in member states | personal management liability |
-| EU AI Act | 1 Aug 2024 | prohibitions Feb 2025 · GPAI Aug 2025 · **high-risk Aug 2026** | €35M or 7% global turnover |
-| Data Act | Jan 2024 | applies Sept 2025 | member-state penalties |
-| Cyber Resilience Act | 10 Dec 2024 | reporting Sept 2026 · full Dec 2027 | €15M or 2.5% |
-| DSA | Feb 2024 | live | 6% global turnover |
+| Instrument | In force | Hard obligations | Status at 23 Oct 2026 | Exposure |
+|---|---|---|---|---|
+| GDPR | 2018 | live | live | 4% global turnover |
+| NIS2 | transposition 17 Oct 2024 | live in member states | live | personal management liability |
+| EU AI Act | 1 Aug 2024 | prohibitions Feb 2025 · GPAI Aug 2025 · high-risk Annex III **2 Dec 2027** · Annex I **2 Aug 2028** | high-risk dates moved by the AI Omnibus, Regulation (EU) 2026/1744, in force 27 Jul 2026; prohibitions and GPAI duties unchanged | €35M or 7% global turnover |
+| Data Act | Jan 2024 | applies 12 Sept 2025 | live | member-state penalties |
+| Cyber Resilience Act | 10 Dec 2024 | reporting 11 Sept 2026 · full 11 Dec 2027 | **reporting live**: 24-hour warning, 72-hour notification, 14-day final report | €15M or 2.5% |
+| DSA | Feb 2024 | live | live | 6% global turnover |
+
+**The certificate calendar runs beside it.** These are not regulations, but they set how often
+keys and certificates must change, and they arrive on fixed dates:
+
+| Date | What changes | What it asks of you |
+|---|---|---|
+| 15 Mar 2026 | Publicly trusted TLS certificates capped at 200 days (CA/Browser Forum ballot SC-081) | Automated issuance; a manual renewal now comes round twice a year |
+| 17–27 Oct 2026 | eMudhra/emSign intermediates distrusted after weak keys were found; Chrome removes the root 27 Oct | Patched runtimes and trust stores (Node, Go, Python's certifi and pip); reissue anything chained to emSign |
+| 15 Mar 2027 | TLS cap falls to 100 days | Renewal must need no person |
+| 2 Dec 2027 | AI Act high-risk (Annex III) obligations apply | Mandates, provenance and human accountability (R3, R9, R10) in place |
+| 11 Dec 2027 | Cyber Resilience Act fully applies | Signed releases, SBOMs and a secure update path you can attest |
+| 2 Aug 2028 | AI Act high-risk (Annex I, embedded in regulated products) | As above, for AI inside products |
+| 15 Mar 2029 | TLS cap falls to 47 days; domain validation reuse to 10 days | ACME end to end |
+
+The AI Omnibus moved dates; it did not remove obligations. The work is the same, with more time
+to do it properly — and the Cyber Resilience Act reporting clock is already running.
 
 The AI Act matters most here for a reason that is easy to miss: its obligations attach to **deployers**, not only to model builders. Using a general-purpose model inside a high-risk workflow makes the obligations yours. Personal liability under NIS2 is the detail that changes who in your organisation cares.
 
@@ -179,6 +196,47 @@ Design this on day one. Retrofitting it means rebuilding the chain.
 
 ---
 
+## Rotation recommendations
+
+Requirement R6 depends on keys, and keys age. Rotation limits how long a leaked key is useful;
+it must never break the record. Two rules hold for every key below:
+
+- **Retire, never delete, a signing key.** A retired key's public half stays in the JWKS,
+  marked retired, so every record it signed keeps verifying. Rotation never re-signs history.
+- **The rotation is itself a ledger row:** who rotated, which key id, which environment, the
+  fingerprint, and why. That is R4 and R10 applied to your own keys.
+
+| Key | Routine cadence | Rotate now when | Notes |
+|---|---|---|---|
+| Record and mandate signing key (Ed25519, change 7) | 90 days, with a published overlap | a signing host or CI runner is exposed; staff or agency with access leaves | Old `kid` stays published as retired |
+| Session signing secret | 90 days | the same, plus any log or transcript exposure | Never also the encryption key — one secret, one job |
+| Data-encryption master key (wraps per-record keys) | yearly | any suspected exposure | Re-wrap the record keys; the data is not re-encrypted |
+| Agent mandates | not rotated — they **expire** | the agent misbehaves or its operator changes | Hours to days, not months; revoke one without touching others (R3) |
+| Tenant and API tokens | 90 days | handoff, offboarding, a token seen anywhere outside its store | Scoped per tenant, never an admin key |
+| Third-party platform tokens (commerce, database, payment) | as the vendor allows | the token appears in a log, CI output or AI tool response | The LiteLLM incident in Oct 2026 began with OAuth tokens in gateway logs |
+| Webhook signing secrets | yearly | the receiving endpoint is exposed | Accept old and new during the overlap |
+| TLS certificates | automated, within the CA/Browser Forum cap (200 → 100 → 47 days) | the issuing CA is distrusted | The trust store belongs in the SBOM |
+
+**How a rotation is run.**
+
+1. **One ceremony per environment.** Dev, Stage and Prod each get their own keys; no value is
+   copied between them. Matching fingerprints across environments mean something was copied.
+2. **A person creates the key; automation never sees it.** The generator pipes straight into
+   the secret store, and only an eight-character fingerprint is recorded.
+3. **Fix trust before rotating.** After a CA or package-manager incident, patch the machine
+   first — a key made on an unpatched machine may need rotating again.
+4. **Generate from the platform's cryptographic random source**, never by hand or from a
+   copied script. The eMudhra keys were made in an audited ceremony and were still computable.
+5. **Plan for post-quantum.** NIST's draft transition (IR 8547) deprecates today's RSA and
+   elliptic-curve signatures after 2030 and disallows them after 2035. Keep key ids and
+   algorithm names in every record now, so an algorithm change is a new `kid`, not a migration.
+
+The step-by-step ceremony is in the
+[Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html)
+and [PHP Commerce: the key ceremony](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#the-key-ceremony-a-person-makes-the-key-the-ai-never-sees-it).
+
+---
+
 ## Conformance checklist
 
 Run this against your own stack. Each is answerable in an afternoon; the pattern of failures tells you where to start.
@@ -193,6 +251,7 @@ Run this against your own stack. Each is answerable in an afternoon; the pattern
 8. Do you have a record of what was *refused*? → R8
 9. For your last automated change: which agent, which mandate, which policy version? → R9
 10. Is there a named human accountable for each automated capability? → R10
+11. Could you rotate every signing key this week without a record failing to verify? → R6
 
 Fewer than six is normal. It is also the honest starting position for a remediation plan, and a far better thing to bring to an auditor than a confident answer you cannot substantiate.
 

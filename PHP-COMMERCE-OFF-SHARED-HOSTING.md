@@ -894,6 +894,10 @@ permission at once.**
 Details are from the Nostr specifications (NIP-01, NIP-05, NIP-19, NIP-46) — see
 [the NIPs repository](https://github.com/nostr-protocol/nips).
 
+**Which custody model fits an agent?** Participant-held keys (Nostr) and edge-held keys
+(CRM Sync) are compared side by side — identity versus authority, rotation after a compromise,
+and enterprise controls — in [Key Custody: Two Ways to Give an Agent a Key](https://www.crm-sync.dev/pages/knowledge-base#agent-key-custody-models).
+
 ### Non-random keys were never safe — AI only shortens the window
 
 Would eMudhra's keys have been fine before AI? No. A private key of 4 is found by trying 1, 2,
@@ -1115,6 +1119,8 @@ and the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-se
 A key that works in two environments is one leak away from both. Each environment gets **its
 own keys, made in its own ceremony**, and no value is ever copied from one to another. The
 fingerprints prove it: if Stage and Prod show the same eight characters, something was copied.
+The full Dev → Stage → Prod workflow, with roles for consulting teams and stakeholders, is in
+the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html).
 
 | Environment | Where it runs | Keys | Who can set them | Command |
 |---|---|---|---|---|
@@ -1457,6 +1463,9 @@ without trusting us.
 ### Records on a timeline that scales out
 
 Every grant, check, firmware download and consent change is appended to a hash-chained ledger.
+The ten requirements that ledger meets, the rotation calendar, and how erasure requests are
+handled without breaking the chain are in the
+[AI Trust Framework Requirements](https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-requirements.html).
 Each entry locks in the one before it, so history can be visibly broken but never quietly
 edited. The ledger is not one long chain. **Each tenant and each stream is its own thread**:
 firmware for one product, mandates for one agent, consent for one store.
