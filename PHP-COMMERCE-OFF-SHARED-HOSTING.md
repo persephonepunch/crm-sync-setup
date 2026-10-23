@@ -621,6 +621,102 @@ properties keep a signing key's failure small:
 releases searched for signing keys and `.env` files. A key held as a platform secret and used
 only by the signing service is not on the disk the payload reads.
 
+### The number 4, and what row-level controls still protect
+
+eMudhra's keys were elliptic-curve keys, not RSA. An elliptic-curve private key is a single
+number, *d*. The public key is that number multiplied by a fixed, published starting point *G*:
+public key = *d* × *G*. Picked at random from roughly 2^256 possibilities, *d* cannot be worked
+back from the public key.
+
+**For one of eMudhra's keys, *d* was 4.** Anyone could compute 1×*G*, 2×*G*, 3×*G* and 4×*G*
+and match the published key on the fourth try. A researcher recovered all eight keys from the
+public certificates in under a second, so all of them were tiny. `openssl rand -hex 32` draws
+*d* from the full 2^256 range. Size was never eMudhra's problem; the randomness was missing.
+
+**Which layer broke.** A certificate authority's key does not encrypt anything of yours. It
+*vouches* for other people's certificates. Whoever held eMudhra's keys could issue a "valid"
+certificate for any domain — a Xano instance, a store, pypi.org — and every client that still
+trusted emSign would accept it.
+
+| | The CA registry (eMudhra) | The data plane (Xano behind Cloudflare) |
+|---|---|---|
+| What the key does | Vouches for other people's certificates, for any domain | Encrypts one connection. Xano's certificate secures only Xano |
+| Who vouches for CRM Sync's hosts | Not eMudhra | The Xano instance: Let's Encrypt, chaining to ISRG Root X1, with a 90-day certificate renewed automatically. `crm-sync.dev`: Google Trust Services |
+| Why that is not enough | An attacker does not need your CA. They present a forged certificate to any client that still trusts emSign | The exposure is the *client's* trust store: a laptop, a container, a server — not the host's choice of CA |
+| Scope of a failure | Every site, worldwide, for every client not yet updated | One connection |
+
+**What still holds if a connection is intercepted.** Nothing at the row level fixes a broken
+CA — updating trust stores does. But row-level design decides how much an intercepted
+connection can give away:
+
+- **Sealed identity.** The session token is encrypted (JWE), and only the data plane decrypts
+  it. Someone reading the traffic cannot read or alter the claims inside. They can replay the
+  whole token, which is why logout writes it to a denylist checked on every read, and why
+  sessions are short.
+- **Row-level authorization.** Every read and write takes the caller's identity from the
+  decrypted token on the server — the `/auth/me` claims and extras — never from a user id the
+  browser sends. A captured session exposes **one person's rows, not the table.**
+- **Field-level encryption.** A field encrypted with a key the application holds stays
+  ciphertext even when its row is read.
+- **The exception is a master key.** An admin key or a data-plane API key that crosses an
+  intercepted connection has no row limit. That is a layer 1 or layer 6 key in the
+  [key layers](#key-layers-what-each-key-protects): rotate it through the ceremony, from a
+  patched machine.
+
+### One architecture under any front end, whatever the platform plan
+
+The controls in this article do not belong to WordPress, Shopify, AEM or a static site
+generator. They sit in two layers the front end calls:
+
+- **Cloudflare at the edge:** certificates, the WAF, Access, and Workers for forms, sign-in,
+  signing and consent.
+- **Xano as the data plane:** identity, rows, entitlements and encryption.
+
+The front end renders pages and calls the edge. It never holds a key and never stores a
+customer row.
+
+```
+Browser ──TLS──▶ Front end (WordPress · Shopify theme · AEM · static 11ty/Astro/Jekyll)
+                   │  renders pages; holds no secrets, stores no customer rows
+                   ▼
+               Cloudflare edge ── certificates (auto-renewed) · WAF · Access · rate limits
+                   │  Worker: forms held until confirmed · /auth/me · signing · consent
+                   ▼  (secrets live here, set by the key ceremony)
+               Xano data plane ── sealed identity · row-level authorization · field encryption
+                                  · entitlements · hash-chained records
+```
+
+| Front end | Stays on the platform | Moves to Cloudflare + Xano | How it connects |
+|---|---|---|---|
+| **WordPress** | Pages, posts, the theme | Forms, sign-in, customer records, keys. Card checkout goes to Shopify through the Shopify plugin | One script tag and two form attributes; the PHP origin sits behind Cloudflare |
+| **Shopify** | Catalog, cart, checkout, payments — the PCI scope stays with Shopify | Consent, loyalty and review records, agent mandates, signed receipts | Theme app embed or Storefront Web Components |
+| **AEM** | Content, components, the DAM | The same as WordPress | A client library or embed in the page component |
+| **Static (11ty, Astro, Jekyll, Webflow export)** | Built HTML on any host | Everything dynamic | The same script and attributes; nothing to patch on the host |
+
+**Why the plan or fee does not matter.** Shopify Basic or Plus, WordPress.com or self-hosted,
+an AEM licence or a free GitHub Pages site — the protection is the same, because none of it
+runs on the front end's plan:
+
+- the key ceremony and key layers apply to secrets the front end never sees
+- forms are held until the inbox confirms, at the edge
+- identity is sealed and rows are authorized in the data plane
+- certificates renew at the edge
+
+A platform upgrade buys features, not these controls. Changing platform does not lose them
+either. The front end can be replaced, and the same edge and data plane carry over unchanged,
+along with their records.
+
+What still depends on the front end:
+
+- **Its own runtime must be patched.** php2shell on a WordPress origin is still the host's to
+  fix, and the edge only buys time.
+- **Its theme must not leak.** No client-side redirects to other domains, and no keys in theme
+  code.
+
+The working example — one theme, one form, one sign-in across platforms — is in
+[the safer customer option](#the-safer-customer-option-let-shopify-hold-the-customer-and-the-card)
+and [secure forms on any front end](#secure-forms-on-any-front-end).
+
 ### The key ceremony: a person makes the key, the AI never sees it
 
 eMudhra shows what goes wrong when keys are made badly. LiteLLM shows where good keys leak:
