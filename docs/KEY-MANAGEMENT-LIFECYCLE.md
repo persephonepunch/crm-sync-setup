@@ -1,6 +1,6 @@
 ---
 title: "CRM Sync — Key Management Lifecycle"
-description: "Version: 1.5 Date: 2026-07-03 (v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26) Scope: Dev → Stage → Prod key management, consulting team workflow, stakeh…"
+description: "Version: 1.6 Date: 2026-10-23 (v1.5: 2026-07-03; v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26) Scope: Dev → Stage → Prod key management, consulting team workflow, stakeh…"
 canonical: https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html
 category: "Security"
 date: 2026-07-03
@@ -22,9 +22,9 @@ about:
 ---
 # CRM Sync — Key Management Lifecycle
 
-**Version:** 1.5
-**Date:** 2026-07-03 (v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26)
-**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens, **Interactive Key Ceremony (agent-safe credential operations)**, **`.env`/CLI-as-AI-exposure-surface threat model**, **organizational RACI + tech→business ownership**, **regulated-industry glossary**, **GraphQL/server-side migration significance**, **self-service tenant key management (app owners, §13)**, **server-side session revocation**
+**Version:** 1.6
+**Date:** 2026-10-23 (v1.5: 2026-07-03; v1.4: 2026-06-22; v1.2: 2026-06-15; v1.1: 2026-06-11; v1.0: 2026-05-26)
+**Scope:** Dev → Stage → Prod key management, consulting team workflow, stakeholder publish, per-market site tokens, **Interactive Key Ceremony (agent-safe credential operations)**, **`.env`/CLI-as-AI-exposure-surface threat model**, **organizational RACI + tech→business ownership**, **regulated-industry glossary**, **GraphQL/server-side migration significance**, **self-service tenant key management (app owners, §13)**, **server-side session revocation**, **email authentication — SPF, DKIM, DMARC on Cloudflare DNS (§8.4)**
 **Companion:** `KEY-CEREMONY-LOOP-REVIEW.md` — recurring, non-custodial automation checklist that continuously attests this lifecycle (the QA/Compliance *verify* lane as a `/loop`).
 
 ---
@@ -177,7 +177,6 @@ openssl rand -hex 24 | wrangler secret put ADMIN_KEY --config wrangler.toml
 openssl rand -hex 24 | wrangler secret put JWT_SECRET --config wrangler.toml
 wrangler secret put GOOGLE_CLIENT_SECRET --config wrangler.toml   # from Google Console
 wrangler secret put XANO_API_KEY --config wrangler.toml           # from Xano stage workspace
-wrangler secret put RESEND_API_KEY --config wrangler.toml         # from Resend (test mode)
 ```
 
 ### 4.2 Stage Key Inventory
@@ -454,6 +453,7 @@ curl -X POST https://crm.{prod-domain}/admin/rotate-key \
 | JWT_SECRET | Annually (invalidates all sessions) | A (engineering) | `wrangler secret put` |
 | Google Client Secret | On suspected compromise | A (engineering) | Google Console + `wrangler secret put` |
 | Shopify Admin Token | Auto-rotated (expiring tokens) | Worker (cron) | Automatic |
+| DKIM signing keys | Yearly, or on any exposure at the sending provider | A (engineering) | New selector in Cloudflare DNS, switch, remove the old one (§8.4) |
 
 ### 8.2 Incident Response — Key Compromise
 
@@ -472,6 +472,64 @@ curl -X POST https://crm.{prod-domain}/admin/rotate-key \
 - **Never** commit secrets to git (use `.dev.vars` locally, `wrangler secret put` remotely)
 - Stage and prod use **separate** KV namespaces — no cross-contamination
 - Consulting team gets **rotatable key only** — never root, never CLI access
+
+### 8.4 Email Authentication — SPF, DKIM and DMARC on Cloudflare DNS
+
+**Why this belongs in a key document.** DKIM is a signing key. The sending provider holds the
+private half; the public half is published in DNS, the same pattern as the worker's JWKS. SPF
+says which servers may send for the domain, and DMARC tells receiving mail servers what to do
+when a message fails both checks. Without them, anyone can send a login link, a password reset
+or an invoice that appears to come from the domain — the cheapest phishing there is.
+
+**Where it lives.** The `crm-sync.dev` zone is on Cloudflare DNS. Inbound mail goes to Google
+Workspace; transactional mail (login and demo emails) goes out through Resend on the
+`send.` subdomain, so the two never share a return path. Cloudflare Email Routing is disabled
+for this zone. Mail records are DNS only — MX and TXT records are never proxied.
+
+| Record | Name | Value (public DNS) | Purpose |
+|---|---|---|---|
+| MX | `crm-sync.dev` | `smtp.google.com` (priority 1) | Inbound mail to Google Workspace |
+| SPF (TXT) | `crm-sync.dev` | `v=spf1 include:_spf.google.com ~all` | Only Google may send as the apex |
+| SPF (TXT) | `send.crm-sync.dev` | `v=spf1 include:amazonses.com ~all` | Resend's sending servers, for the `send.` return path |
+| MX | `send.crm-sync.dev` | `feedback-smtp.us-east-1.amazonses.com` (10) | Bounces and complaints back to Resend |
+| DKIM (TXT) | `google._domainkey` | RSA 2048-bit public key | Signs mail sent from Google Workspace |
+| DKIM (TXT) | `resend._domainkey` | RSA 1024-bit public key | Signs mail sent through Resend |
+| DMARC (TXT) | `_dmarc.crm-sync.dev` | `v=DMARC1; p=none; sp=none; adkim=r; aspf=r` | Monitoring only — failures are reported, not blocked |
+
+Check them from any machine — public records, no credentials:
+
+```bash
+dig +short TXT crm-sync.dev
+dig +short TXT _dmarc.crm-sync.dev
+dig +short TXT send.crm-sync.dev
+dig +short TXT google._domainkey.crm-sync.dev
+dig +short TXT resend._domainkey.crm-sync.dev
+```
+
+**Who may change them.** Mail DNS is a credential surface: whoever can edit the zone can
+authorise a new sender. Edits go through the Cloudflare dashboard by A (engineering), or through
+an API token scoped to **Zone → DNS → Edit on this zone only** — never a global API key, and
+never a token handed to an agent. Each change is recorded like any other key operation (§9.4):
+who, which record, old and new value, why.
+
+**Recommendations, in order:**
+
+1. **Collect DMARC reports.** Add a `rua=` address to the DMARC record — Cloudflare's DMARC
+   Management can receive and summarise them — so failures are visible before policy tightens.
+2. **Tighten DMARC once reports are clean:** `p=none` → `p=quarantine` → `p=reject`, with
+   `sp=` following for subdomains. `p=none` is a starting point, not a control.
+3. **Move the Resend DKIM key to 2048-bit** if Resend offers it for the domain. A 1024-bit RSA
+   key gives about 80 bits of security, below the 112-bit minimum NIST has required for new signatures since the end of 2013 (SP 800-131A).
+4. **Harden SPF to `-all`** once every legitimate sender is listed, and keep each record under
+   SPF's limit of ten DNS lookups.
+5. **Rotate DKIM by selector, never in place.** Publish the new selector, switch the provider
+   to it, wait at least a week for mail in transit, then delete the old record. Rotate yearly
+   and whenever the provider reports a key exposure.
+6. **One provider key per environment that sends mail.** Dev uses a test key in `.dev.vars`;
+   any environment that sends real mail holds its own key, made in its own ceremony. A key that
+   can send from Prod's domain never sits in Stage.
+7. **Send only from verified subdomains.** A new sender gets its own subdomain, its own SPF and
+   DKIM, and a DMARC review — never a new `include:` on the apex added in a hurry.
 
 ---
 
