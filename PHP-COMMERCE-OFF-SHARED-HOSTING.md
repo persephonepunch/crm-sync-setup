@@ -647,6 +647,46 @@ and match the published key on the fourth try. A researcher recovered all eight 
 public certificates in under a second, so all of them were tiny. `openssl rand -hex 32` draws
 *d* from the full 2^256 range. Size was never eMudhra's problem; the randomness was missing.
 
+**Why elliptic curves? The business reason.** Elliptic-curve keys give the same security as RSA
+for far less size and work:
+
+| | Elliptic curve (256-bit) | RSA of the same strength (about 3,072-bit) |
+|---|---|---|
+| Public key | 32–64 bytes | About 384 bytes |
+| Signature | 64 bytes | About 384 bytes |
+| Making a key | Milliseconds, even on a phone | Much slower — two large primes must be found |
+| Signing | Fast | Several times slower |
+| Fits in a QR code or a handle | Yes | No |
+
+Smaller and faster means less bandwidth, quicker page loads, longer battery life and lighter
+servers, on every handshake and every signature.
+
+- **A certificate authority**, eMudhra included, builds an elliptic-curve hierarchy for the
+  usual reasons. eMudhra has not, as far as we have seen, stated its own.
+  - Customers want lighter, faster HTTPS.
+  - Browsers and TLS 1.3 already favour elliptic curves.
+  - A new elliptic-curve root keeps the CA in browser root programs for the next decade as RSA
+    roots age.
+  - Everything it issues and revokes gets cheaper.
+- **Nostr** chose Bitcoin's own curve (secp256k1) and signatures (BIP-340).
+  - Tested libraries, hardware signers and wallets already existed, and the same key sits
+    beside Lightning payments.
+  - A 32-byte public key is short enough to be the handle and to fit in a QR code.
+  - Relays verify every post, so small, fast signatures keep a network nobody owns cheap to run.
+  - A phone makes a key instantly, with no sign-up server.
+
+**The curve was not the mistake.** Weak randomness breaks RSA just as surely:
+
+- **Debian, 2008:** an OpenSSL bug left only about 32,000 possible keys on Debian systems.
+- **"Mining your Ps and Qs", 2012:** researchers found thousands of internet devices whose RSA
+  keys shared primes, which made them computable.
+
+Elliptic curves are slightly less forgiving of carelessness, though. ECDSA leaks the key if a
+single signature's random number is weak, which is why newer systems prefer EdDSA. The next
+cost is shared by both: a large quantum computer would break elliptic curves and RSA alike. The
+post-quantum replacements (ML-DSA for signatures, ML-KEM for key exchange) have much larger keys
+and signatures, so the size advantage that drove these choices will shrink in the migration.
+
 **Which layer broke.** A certificate authority's key does not encrypt anything of yours. It
 *vouches* for other people's certificates. Whoever held eMudhra's keys could issue a "valid"
 certificate for any domain — a Xano instance, a store, pypi.org — and every client that still
