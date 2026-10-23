@@ -1000,6 +1000,61 @@ vendor's own code signing.
 releases searched for signing keys and `.env` files. A key held as a platform secret and used
 only by the signing service is not on the disk the payload reads.
 
+### Signing keys you control: Xano encryption, AI binding and Cloudflare EdDSA
+
+**Every trusted CA can vouch for every domain.** Certificate issuance is concentrated. In July
+2024 W3Techs counted Let's Encrypt at about 64% of certificates on the top websites, GlobalSign
+about 24%, Sectigo 6%, GoDaddy 4% and DigiCert 2%
+([W3Techs, via Wikipedia](https://en.wikipedia.org/wiki/Certificate_authority#Providers)).
+eMudhra is not in that top five, yet browsers trusted its intermediates exactly as much as the
+largest CA. A trust store is flat: the smallest root in it can issue a certificate for your
+domain. You can't choose which CAs other people's software trusts, so the keys that matter most
+should not depend on a public CA at all.
+
+The stack splits the work so that a public CA secures only the connection, and everything
+that proves identity, authority or origin uses keys you hold:
+
+| Layer | Key | Who controls it | What it protects | Exposure to a CA failure |
+|---|---|---|---|---|
+| **TLS certificate** | Issued by a public CA (Let's Encrypt for Xano, Google Trust Services for `crm-sync.dev`) | The CA | The connection, browser to edge and edge to Xano | Direct: a weak CA anywhere could impersonate the host |
+| **Xano encryption** | `security.encrypt` / `security.decrypt` (AES-256) for fields at rest; `security.jwe_encode` / `jwe_decode` (A256KW key wrap, A256GCM content) for the sealed session | You, as Xano environment variables | Customer fields in Postgres, and the session token's contents | None: symmetric keys, no certificate and no CA in the chain |
+| **Cloudflare EdDSA** | Ed25519, generated with WebCrypto inside the Worker and held as a Worker secret | You, through the key ceremony | Entitlements, mandates, firmware certificates, receipts | None: the public half is published in your own JWKS with a `kid` |
+| **AI binding** | The same Ed25519 mandate key | You. The agent never holds it | What an agent may do, on which tenant, up to what amount, until when | None: the agent presents a signed mandate, and every call checks it against your JWKS |
+
+**Why the work is split this way.** Xano's security library generates RSA keys and elliptic
+curve keys on the NIST curves (P-256, P-384, P-521), and its JWS example signs with HS256, a
+shared secret. Ed25519 signing therefore stays in the Cloudflare Worker, and Xano does what it
+does best:
+
+- encrypting rows and fields
+- sealing the session as a JWE
+- applying row-level rules before data leaves the database
+
+Each side holds keys the other never sees:
+
+- A leaked Xano encryption key does not let anyone sign a mandate.
+- A leaked Worker key does not decrypt a customer row.
+
+**What this means after eMudhra:**
+
+1. **Fix trust first:** update pip, certifi, uv, Node and base images, as in
+   [Python and Docker after eMudhra](#python-and-docker-after-emudhra-what-to-do-this-week).
+   This repairs the one layer that depends on a CA.
+2. **Narrow which CAs may issue for your domains.** A DNS CAA record names the CAs allowed to
+   issue for a domain, and Certificate Transparency monitoring alerts you to any certificate
+   issued anyway. Neither stops a browser from trusting a bad CA, but together they shrink and
+   expose the window.
+3. **Leave your own keys alone unless they were exposed.** Xano encryption keys and Worker
+   Ed25519 keys were never issued under emSign, so eMudhra gives no reason to rotate them. Rotate
+   on their own schedule, or after an exposure like LiteLLM, through the
+   [key ceremony](#the-key-ceremony-a-person-makes-the-key-the-ai-never-sees-it).
+4. **Keep agents on mandates, not keys.** An agent that holds only a signed mandate has nothing
+   a CA failure or a stolen environment can turn into new authority. See
+   [AI binding](#ai-binding-the-agent-proves-its-permission-on-every-call).
+
+Sources: [Xano security functions](https://docs.xano.com/xanoscript/function-reference/security);
+[W3Techs SSL certificate authority usage](https://w3techs.com/technologies/overview/ssl_certificate).
+
 ### The number 4, and what row-level controls still protect
 
 **What an elliptic-curve key is.** An elliptic curve is a fixed, published mathematical
