@@ -387,6 +387,67 @@ store moves to Shopify. Pilot it on a blog subdomain first.
 since 2017, Decap since 2016 as Netlify CMS. GitHub Pages' terms forbid running an online
 business or e-commerce site on it, so a store built with Jekyll or 11ty is hosted on Cloudflare.
 
+### One machine, isolated: a private VM with Cloudflare and Xano, versus shared hosting
+
+WordPress does not need a cluster to be isolated. One private VM — WordPress in its own
+container, reachable only through a Cloudflare Tunnel, behind the Cloudflare WAF, with identity
+and data on Xano — closes the gaps that shared and entry-level managed hosting leave open. The
+difference is not the WAF itself; it is **whether the WAF can be the only way in.**
+
+| | Private VM: Docker + Tunnel + WAF + Xano | Shared hosting (e.g. GoDaddy, Hostinger entry plans) | Managed WordPress (e.g. WP Engine shared plans) |
+|---|---|---|---|
+| **Neighbours** | None — your containers only | Many customer accounts on one server and kernel | Other customers on shared plans; dedicated plans cost more |
+| **Isolation** | A container per app, read-only filesystem, no shared volumes | Account-level: Hostinger states each account runs in a CloudLinux LVE container, which limits resources and separates accounts | Managed by the host; not documented in detail for shared plans |
+| **Can the origin refuse everything but Cloudflare?** | Yes — no inbound ports; `cloudflared` makes outbound connections only | Generally no: running `cloudflared` or a firewall needs root, which shared plans do not give | Handled by the host's own edge |
+| **WAF** | Your Cloudflare WAF: managed rules, OWASP set, custom rules and rate limits you control | You can proxy DNS through Cloudflare, but the origin IP stays reachable, so attackers can go around the WAF | WP Engine's Global Edge Security add-on is powered by Cloudflare (WAF, DDoS, CDN, SSL); its rules are set automatically and WP Engine says it cannot customise them per site |
+| **Admin login** | Cloudflare Access in front of `/wp-admin`; nothing to brute-force | Passwords on the open web | The host's login protections |
+| **Identity and data** | Xano `/auth/me` resolves the caller; Postgres behind rule-checked endpoints | WordPress users table in a MySQL shared with the account's other sites | WordPress users table in the site's MySQL |
+| **Secrets** | Injected at runtime; signing keys never on the VM | In `wp-config.php` and `wp_options`, readable by any PHP on the account | In `wp-config.php` and `wp_options` |
+| **Patching PHP** | You pin and rebuild the image | The host's schedule | The host's schedule |
+
+**What this means.** Cloudflare's WAF can be engaged securely only when it is the sole path to
+the origin. On a private VM that is a property of the network — no inbound port exists. On shared
+hosting it is a hope: the WAF filters the traffic that comes through Cloudflare, and nothing
+stops traffic that goes to the server's address directly. Managed hosts like WP Engine close
+much of that gap with their own Cloudflare-powered edge, but the rules, keys and data model stay
+theirs, and the site's identity still lives in a WordPress users table.
+
+### RuBAC by design: claims, extras, configuration and EdDSA keys
+
+Rule-based access control is only as strong as the facts the rules read. In this architecture
+each fact comes from a place the WordPress container cannot write, so a compromised plugin can
+render a page but cannot change who the caller is, what they consented to, or what the rules say.
+
+| Rule input | Comes from | Decides | Why a plugin cannot forge it |
+|---|---|---|---|
+| **Who** — claims | Xano `user_claims`: identities keyed by each provider's immutable subject, returned by `/auth/me` | Which subject is acting, and through which login | Resolved on the server from a sealed token; never taken from a form field or an email match |
+| **What may be used** — extras | Xano `user_extras`: profile and preference fields, cleared when consent is withdrawn | Which personal fields can be shown, sent or used | Consent state is a record with a time and policy version, not a checkbox the page sets |
+| **What is allowed** — configuration | The tenant's configuration, managed in the [Configuration System](https://www.crm-sync.dev/#configure): which source owns which fields, each key's scope, each environment | Which actions, fields and rows a caller or import may touch | Changed only by its owners in the console; every change lands in the audit ledger |
+| **Proof** — EdDSA signatures | Ed25519 keys held by the Worker on Cloudflare; public halves in the JWKS | That a mandate, entitlement or receipt was issued by the platform and not altered | The private key is never on the VM; anyone can check a signature on the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state) |
+
+**One request, in order:**
+
+1. **Cloudflare WAF and Access** filter the request at the edge.
+2. **The Worker verifies the token's Ed25519 signature** against the published key id. A
+   retired, unknown or altered token stops here.
+3. **`/auth/me` returns claims and extras** for that subject — the server's answer, attached by
+   the sidecar, never the browser's.
+4. **The configuration's rules decide**: this subject, this tenant, these fields, this action.
+   The default is deny; anything not written as allowed is refused, and the refusal is recorded.
+5. **Xano's endpoint precondition** applies the same rule at the data layer and filters by tenant
+   before Postgres runs the query.
+6. **WordPress renders the result.** It never held a key, a password table or a rule.
+
+"By design" means the rules exist before the first request, not after the first incident: the
+default is deny, every input comes from a system the theme cannot write, and every decision is
+signed and logged. Moving from a shared VM to one isolated VM is the infrastructure step; RuBAC is
+what makes the move hold when a plugin is compromised anyway.
+
+Sources: [Hostinger technology](https://www.hostinger.com/ma-fr/la-technologie) (CloudLinux LVE);
+[WP Engine Global Edge Security](https://wpengine.co.uk/support/ges);
+[Cloudflare Tunnel](https://www.cloudflare.com/products/argo-tunnel). Plan features change; check
+your host's current documentation.
+
 ## The safer customer option: let Shopify hold the customer and the card
 
 For a store that wants to keep its WordPress or Webflow site, the most effective PII and PCI
