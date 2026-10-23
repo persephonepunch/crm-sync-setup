@@ -607,6 +607,56 @@ had access while the flaw was open. Under the EU Cyber Resilience Act, those ans
 and an incident report assembled by hand. **What it does not replace:** patching. The records
 prove what happened; the fixes in the timeline below still have to be applied.
 
+### Firmware identity: the part-number gap
+
+Signed records assume you can say what a record is *about*. For firmware, that is harder than
+it looks. A buyer orders by manufacturer part number (MPN). Firmware is tied to the device by
+technical identifiers instead, and **there is no standard link between the two.** The mapping
+usually lives in the manufacturer's internal systems.
+
+Where each identifier lives today:
+
+| Where | What identifies the device | Does the MPN appear? |
+|---|---|---|
+| **The firmware update itself** | UEFI capsules carry a firmware class GUID, one per model or component. IETF SUIT manifests (IoT) carry a vendor ID and a class ID, ideally a UUID derived from vendor plus model. Windows Update and LVFS/fwupd match hardware IDs computed from SMBIOS fields (manufacturer, product name, family, SKU). Components match on bus IDs: PCI vendor/device/subsystem, USB VID/PID | No. The update says "I'm for class GUID X"; the device says "I'm class GUID X" |
+| **The device** | SMBIOS tables, populated by the firmware: manufacturer, product name, SKU number | Nearly. SKU is the closest on-device equivalent, but it is free text and filled inconsistently |
+| **The platform certificate** | The TCG Platform Certificate records the platform's manufacturer, model, version and serial, and each component's manufacturer, model, serial and revision | Model, not orderable MPN. It is the closest signed record of model identity to hardware configuration; firmware version appears only indirectly, as a component revision |
+| **Attestation reference values** | In the IETF RATS model, a CoRIM/CoMID manifest — a signed list of known-good measurements — names a device class by vendor, model and boot layer and lists its expected firmware measurements. TCG Reference Integrity Manifests do the same for PCs. A verifier compares DICE or TPM measurements against them | No. This is where firmware hashes formally meet model identity, but "model" is the manufacturer's own string |
+| **SBOMs** | CycloneDX and SPDX describe firmware by supplier, name, version, CPE or PURL; CycloneDX has device and firmware component types | Optional, and often skipped |
+| **Manufacturing and ERP** | In the product's bill of materials, firmware is its own line item with its own part number and revision. A pre-programmed chip often gets a different part number from the blank one ("MCU MPN + firmware v2.3"); distributors that program chips do the same | **Yes — accurately, but privately** |
+
+**The gap.** The authoritative *MPN ↔ firmware version ↔ firmware hash* mapping sits inside the
+manufacturer's ERP and PLM systems. The public, cryptographic artifacts — capsules, SUIT
+manifests, CoRIM, platform certificates — speak in GUIDs and model strings that do not map
+cleanly to orderable part numbers. A distributor, an integrator or a buyer validating devices
+has no signed way to answer: *this MPN, at this revision, should be running exactly these
+firmware hashes.*
+
+That is a catalog and identity-resolution problem as much as a security one, and signed records
+close it:
+
+- **A signed registry row** that binds MPN, revision, firmware version, full SHA-256 and the
+  linked SBOM, verifiable offline against a published key. The
+  [firmware vault](https://www.crm-sync.dev/pages/firmware) already signs product, version,
+  digest and SBOM in each upload certificate; carrying the MPN and revision on that row is what
+  closes the gap for a buyer.
+- **An as-of read:** "which firmware should this MPN have been running on 1 March?" is a
+  question about history, answered from the ledger.
+- **Actor identity:** who certified the mapping — the manufacturer, a programming distributor,
+  an integrator — is provenance.
+
+A trusted third-party issuer, eMudhra-style, could plausibly publish such mappings. The eMudhra
+incident is also the caution: the issuer's own keys must come from a sound random source, and
+the mapping must stay verifiable when the issuer is distrusted — which is why records should be
+signed with keys you can retire and republish, not only chained to a public CA.
+
+**See it working:** the
+[Protected Firmware Asset Management and Download Service](https://www.crm-sync.dev/pages/firmware)
+vaults each image under its own key, certifies every upload, grants every download, and records
+each event in a hash-chained ledger — with SBOMs linked per image and certificates that verify
+against a public JWKS. The requirements behind it are in the
+[AI Trust Framework Requirements](https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-requirements.html#firmware-identity-the-part-number-gap).
+
 ### The breaches, on one timeline
 
 | Date | What broke | Layer | What a signed record answers |
