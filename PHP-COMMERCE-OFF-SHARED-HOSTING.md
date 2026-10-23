@@ -1058,6 +1058,82 @@ Each side holds keys the other never sees:
 Sources: [Xano security functions](https://docs.xano.com/xanoscript/function-reference/security);
 [W3Techs SSL certificate authority usage](https://w3techs.com/technologies/overview/ssl_certificate).
 
+### Layered encryption with Rust and WebAssembly: security additions shaped for AI callers
+
+**Why AI callers change the shape of the problem.** An agent's requests are well formed, fast
+and plentiful. A prompt injection doesn't arrive as obviously malformed input. It arrives as a
+valid-looking tool call with an attacker's arguments: a different order id, a larger refund, a
+field the form never had. No single control catches all of that, so each layer below answers one
+question and refuses on its own. None of them tries to judge intent.
+
+Encryption answers who can read a value, a signature answers who wrote it and whether it
+changed, and the Rust shape check answers whether this request is one the system ever declared.
+Encoding (Base64) answers none of these: it only gets bytes through a text channel.
+
+| # | Layer | What it does for an AI caller | Where it runs | Status |
+|---|---|---|---|---|
+| 1 | **TLS on every hop** | Nobody between the agent and the data can read or alter the request | Browser or agent → Cloudflare → Worker → Xano → Postgres | Built |
+| 2 | **Sealed session (JWE)** | The agent carries an identity it can't read or edit: A256KW key wrap, A256GCM content | Issued by Xano, opened only by the data plane | Built |
+| 3 | **Signed mandate (Ed25519)** | Who may act, on what, up to what amount and until when, checked against the published JWKS on every call | Cloudflare Worker | Built |
+| 4 | **Rust shape check, compiled to WebAssembly** | The request must parse into a declared type before anything reads it: a size cap, no unknown fields, bytes kept apart from text, bad Base64 refused. A call the system never declared can't be constructed | Inside the Worker, in the Wasm sandbox | Pattern, not built |
+| 5 | **Field encryption** | Sensitive fields are stored as ciphertext, so an agent or a leaked export that reads the row without a decrypt grant sees only scrambled bytes | WebCrypto AES-GCM in the Worker, or Xano `security.encrypt` | Available in both, applied per field |
+| 6 | **Row rules (RuBAC)** | Even a valid, decrypted request returns only the caller's own tenant and records | Xano, before Postgres is touched | Built for tenant and entitlement checks |
+| 7 | **Signed receipt** | Every action leaves a record a third party can verify without trusting the operator | Worker signs, ledger stores | Built for mandates and firmware vault certificates |
+
+**What the Rust layer looks like.** The allowed calls are a closed list. Serde refuses any tool
+or field that isn't on it, and the mandate's limits are checked against typed values rather than
+strings:
+
+```rust
+#[derive(serde::Deserialize)]
+#[serde(tag = "tool", deny_unknown_fields)]
+enum AgentCall {
+    ReadOrder   { order_id: u64 },
+    RefundOrder { order_id: u64, amount_cents: u32 },
+}
+
+fn admit(body: &[u8], mandate: &Mandate) -> Result<AgentCall, Refusal> {
+    if body.len() > 16 * 1024 { return Err(Refusal::TooLarge); }
+    let call: AgentCall = serde_json::from_slice(body).map_err(|_| Refusal::Shape)?;
+    match &call {
+        AgentCall::RefundOrder { amount_cents, .. } if *amount_cents > mandate.max_refund_cents =>
+            Err(Refusal::OverMandate),
+        _ => Ok(call),
+    }
+}
+```
+
+The call is refused rather than repaired. A prompt-injected "refund 500 dollars" against a
+50-dollar mandate fails at the type and limit check, before any database or model sees it.
+
+**Why Rust and WebAssembly for this layer:**
+
+- **The enum is the allow-list.** A tool that isn't declared can't be represented, so there is no
+  "unknown action" branch to forget.
+- **Bytes and text stay apart.** Ciphertext and keys are `Vec<u8>`, and text is a `String` that
+  must be valid UTF-8. Ciphertext can't slip into a text field, and a key can't land in a log as
+  if it were a message.
+- **The Wasm sandbox has no filesystem and no network.** The check sees only the bytes it is
+  handed, so even a bug in it can't reach a secret.
+- **One check, many surfaces.** The same crate compiles for the Worker, Shopify Functions, the
+  desktop build and the browser. Every front end applies the same rule, not a copy of it.
+- **Dependencies are reviewed.** `cargo vet` stops an unaudited crate version, which is the
+  LiteLLM-style poisoned release, before it ships.
+
+**What it doesn't do.** Rust prevents memory errors and undeclared shapes, not wrong business
+rules. A badly chosen mandate limit is still enforced exactly as written. Wasm also adds bundle
+size and start-up time to the Worker, so keep the checking crate small.
+
+**One encryption detail to get right.** The example in Xano's documentation uses AES-256-CBC.
+CBC hides a value but doesn't detect tampering. Where a stored value must not be altered, use an
+authenticated mode such as AES-GCM, which WebCrypto in the Worker provides, or sign the value as
+well. Either way, never reuse a nonce or IV with the same key, and keep keys in Xano environment
+variables or Worker secrets, never beside the data.
+
+These layers sit on the hops in [Identity, data and AI tasks](#identity-data-and-ai-tasks), and
+the binding model behind layers 3 and 4 is in
+[Entitlement Security → AI task binding](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#ai-task-binding-cloudflare-binds-xano-grants-rust-checks).
+
 ### CAA records: name the CAs that may issue for your domain
 
 **What a CAA record is.** A CAA (Certification Authority Authorization) record is a DNS record
