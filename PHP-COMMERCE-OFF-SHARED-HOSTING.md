@@ -588,6 +588,25 @@ images go to the [firmware vault](https://www.crm-sync.dev/pages/firmware). The 
 image its own encryption, an upload certificate, grant-gated downloads, and a hash-chained
 ledger of every grant, denial and download.
 
+### Business summary: the verify plane and the firmware vault
+
+**The need.** After a breach, three groups ask for proof, not reassurance. Customers and
+partners want to know a receipt or permission is genuine. Distributors and device owners want
+to know a firmware image is the one that was built. Regulators and insurers want to know who
+had access while the flaw was open. Under the EU Cyber Resilience Act, those answers are due in
+24 hours (early warning), 72 hours (notification) and 14 days (final report) from 11 September
+2026. A business that answers from email threads and storage links misses those deadlines.
+
+| Service | The business need | Security benefit |
+|---|---|---|
+| **[Verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state)** | Partners, auditors and agents must trust a mandate, receipt or entitlement without a call to us | The check runs in the reader's own browser against the public key at `/.well-known/jwks.json`. No account, no API call and no trust in CRM Sync is needed. One changed character reads INVALID, and a token from a retired key is refused |
+| **[Firmware vault](https://www.crm-sync.dev/pages/firmware)** | Firmware and build images are shared as storage links that, once sent, are shared forever, with no record of who fetched them | Each image gets its own AES-256-GCM key, wrapped under a versioned key and stored apart. Uploads get an Ed25519 certificate; downloads need a grant and a 120-second single-use token; every grant, denial and download is sealed into a hash-chained ledger |
+| **Both, together** | One answer to "were we affected, and who had it?" | The SBOM names the affected releases, the vault's ledger names who downloaded them, and the verify plane lets anyone check the certificates. A suspected leak is fixed by one key rotation, with no re-upload and no recall |
+
+**What it replaces:** a signed installer behind a link, a support inbox for "is this genuine?",
+and an incident report assembled by hand. **What it does not replace:** patching. The records
+prove what happened; the fixes in the timeline below still have to be applied.
+
 ### The breaches, on one timeline
 
 | Date | What broke | Layer | What a signed record answers |
@@ -639,6 +658,15 @@ properties keep a signing key's failure small:
 | Public half published with a key id | Every token names its `kid`, and the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state) rejects any `kid` that is not in the published JWKS | Trusting a key nobody can look up |
 | Rotation with an end date | Keys rotate through a recorded key ceremony. A retired key keeps verifying what it already signed until its `not_after`, then stops | The useful life of a leaked key, without voiding honest receipts |
 | Revocation you control | Retiring a CRM Sync key means editing our own JWKS. A browser vendor does not need to act | The days a public CA needs |
+
+**Two of the eight distrusted intermediates issued code-signing certificates.** Software and
+firmware signed under them lost their proof of origin with the chain. A vendor has to re-sign,
+and every customer has to trust the new signature. Images held in the
+[firmware vault](https://www.crm-sync.dev/pages/firmware) also carry their own upload certificate: the image's full SHA-256, its
+version and its SBOM, signed with an Ed25519 key that CRM Sync publishes. That certificate does
+not depend on any public CA, so a CA incident does not void it. Anyone can still check an image
+on the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state). It is a second, independent record, not a replacement for the
+vendor's own code signing.
 
 **LiteLLM is the reason signing keys never sit in an application environment.** Both poisoned
 releases searched for signing keys and `.env` files. A key held as a platform secret and used
@@ -1378,6 +1406,11 @@ recorded before the exposure.**
 5. **Scan what you rebuilt** against published advisories: `pip-audit`, or `osv-scanner` across
    lockfiles and images. A scanner finds known-bad versions, not swapped files. Steps 2 and 3
    handle swapped files.
+6. **Re-certify what you ship.** Upload each rebuilt image to the
+   [firmware vault](https://www.crm-sync.dev/pages/firmware): it gets a new digest, a new certificate and a new SBOM link. The
+   vault's ledger then lists who downloaded the earlier image and when, which is the list a
+   customer notice or a Cyber Resilience Act report needs. Partners confirm the new image on
+   the [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state).
 
 **The exception is LiteLLM 1.107.0.** That release was malicious, not merely exposed. Anywhere
 it was installed:
@@ -1547,7 +1580,10 @@ Ordered by exposure — card data first.
 8. **Google.** Merchant API migration with loyalty, reviews, comparison and conversions in the
    same pass. *Owner: marketing operations with the developer.*
 9. **Content.** Static publish first, EmDash pilot second. *Owner: content lead.*
-10. **Decommission** the shared VM after the tunnel has carried production traffic for a full
+10. **Records.** Keep an SBOM for every release, move firmware and build images from storage
+    links into the [firmware vault](https://www.crm-sync.dev/pages/firmware), and give partners and auditors the
+    [verify plane](https://crm-sync.dev/verify?utm_source=home&utm_medium=verify_plane&utm_campaign=future_state) instead of a support inbox. *Owner: developer with compliance.*
+11. **Decommission** the shared VM after the tunnel has carried production traffic for a full
     billing cycle. *Owner: DevOps.*
 
 ---
