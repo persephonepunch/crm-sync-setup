@@ -239,6 +239,11 @@ incident is also the caution: the issuer's own keys must come from a sound rando
 the mapping must stay verifiable when the issuer is distrusted — which is why records should be
 signed with keys you can retire and republish, not only chained to a public CA.
 
+**See it working:** the [Protected Firmware Asset Management and Download Service](https://www.crm-sync.dev/pages/firmware)
+vaults each image under its own key, certifies every upload, grants every download, and records
+each event in a hash-chained ledger — with SBOMs linked per image and certificates that verify
+against a public JWKS.
+
 ---
 
 ## Rotation recommendations
