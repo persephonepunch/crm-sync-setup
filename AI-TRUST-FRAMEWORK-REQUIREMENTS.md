@@ -18,7 +18,7 @@ tags:
 **For:** teams with a working REST integration layer who now have to make it defensible.
 **Premise:** you are not going to rewrite it. Everything below is additive.
 **Revised:** 23 October 2026 — calendar updated for the AI Omnibus, the TLS lifetime schedule and the eMudhra distrust; rotation recommendations added.
-**Companions:** [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) for the non-technical case; [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) for the migration mechanics; [Key Custody](https://www.crm-sync.dev/pages/knowledge-base#agent-key-custody-models) for how an agent holds a key; the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) for Dev, Stage and Prod.
+**Companions:** [The Trust Framework](https://persephonepunch.github.io/crm-sync-setup/trust-framework.html) for the non-technical case; [REST Is Not GraphQL](https://persephonepunch.github.io/crm-sync-setup/rest-is-not-graphql.html) for the migration mechanics; [Key Custody](https://www.crm-sync.dev/pages/knowledge-base#agent-key-custody-models) for how an agent holds a key; the [Key Management Lifecycle](https://persephonepunch.github.io/crm-sync-setup/key-management-lifecycle.html) for Dev, Stage and Prod; [PHP Commerce: Moving Off Shared Hosting](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html) for the October 2026 breaches, signed records and the key ceremony.
 
 ## The gap, in one sentence
 
