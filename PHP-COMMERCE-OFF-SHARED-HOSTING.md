@@ -1135,6 +1135,54 @@ These layers sit on the hops in [Identity, data and AI tasks](#identity-data-and
 the binding model behind layers 3 and 4 is in
 [Entitlement Security → AI task binding](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#ai-task-binding-cloudflare-binds-xano-grants-rust-checks).
 
+### Use-after-free in business terms: where Rust, garbage collection, Cloudflare, Xano and TLS each fit
+
+**The analogy.** A hotel checks a guest out but doesn't cancel their key card. The room is
+cleaned and given to a new guest. The old card still opens the door, and the old guest walks in
+on the new guest's belongings, or leaves something behind for them.
+
+In software, the room is a piece of memory and the key card is a pointer to it. The program
+releases the room, keeps the card, and a later step uses the card anyway. An attacker who knows
+this can arrange for their own data to be in the room when the old card is used, and the program
+ends up doing what the attacker wants.
+
+**Why it matters to a business.** It is one of the most common ways browsers and older server
+software get taken over. Many emergency browser updates and a long line of PHP security patches
+come from it. It is not a configuration mistake a team made. It is built into code written in
+older languages (C, C++ and the PHP engine itself), and the only fixes are to patch it or move
+away from it.
+
+**Who handles it at each layer.** Each part of the stack does a different job, and none stands in
+for another.
+
+| Layer | What it does | In hotel terms | Does it stop use-after-free? |
+|---|---|---|---|
+| **Rust** (the gate in front of PHP, on Cloudflare) | Won't build a program that uses a released room | No key card can be made for a room that has been checked out | **Yes**, by design, before the code ever runs |
+| **Garbage collection** (JavaScript on a Webflow page) | Releases a room only when nobody holds a card for it | The front desk never re-rents a room while any card still opens it | **Yes, for page scripts.** A site's own JavaScript can't create one |
+| **Webflow loading** (which scripts the page runs, and when) | Limits how many outside scripts get in, and keeps page sections tidy when they are swapped | Controls who gets into the lobby | **No.** It reduces how many visitors could try an old card on the browser's own rooms. It also prevents a harmless lookalike: buttons that stop working after a section reloads |
+| **The browser** (Chrome, Safari) | Its engine is C++; its makers add protections and ship updates | The hotel chain's own maintenance crew | **Partly.** That is what emergency updates are for. Your part is keeping browsers updated |
+| **Cloudflare** (where the Rust gate and the page load run) | Runs the Rust gate between the internet and the PHP store, and serves the page | The security desk at the entrance, built to the Rust standard | It brings Rust's protection to a PHP store without rewriting the store |
+| **TLS** | Encrypts the connection | An armoured car between buildings | **No.** It protects data on the way, not the program receiving it |
+| **Xano permissions** (claims, roles, row checks) | Decides who may see or change which records | Whose name is on the booking, and which rooms they may enter | **No.** It is about who is allowed, not how memory is handled. It limits the damage if something upstream is broken into |
+
+**The decision it leads to.**
+
+- **If you keep WordPress, WooCommerce or Magento:** the PHP engine underneath is C, so
+  use-after-free bugs will keep appearing in it. A Rust gate in front, on Cloudflare, turns most
+  hostile requests away before they reach PHP, using code that can't have this bug. Xano
+  permissions then limit what any request that gets through can see. The next section sets this
+  up.
+- **On the storefront (Webflow, or theme parcels):** page scripts are already safe from it,
+  because JavaScript manages its own memory. What you control is how much outside code runs:
+  fewer embeds, pinned scripts with Subresource Integrity, and a strict Content Security Policy.
+  Keep browsers updated.
+- **What to tell a board:** this is a defect in old code, not something to configure away. Shrink
+  how much of that code faces the internet: Rust at the entrance, garbage-collected code on the
+  page, and permission checks on every record. Most of these patches then become routine
+  maintenance instead of an emergency.
+
+The short definition is in the [Vocabulary](#vocabulary) under **Use-after-free (UAF)**.
+
 ### If you have to keep Magento, WooCommerce or WordPress: reinforce in place with Rust and parcels
 
 Not every team can migrate this year. Contracts, extensions, staff skills and budget can keep a
