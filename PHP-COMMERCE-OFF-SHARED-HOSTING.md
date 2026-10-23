@@ -687,6 +687,40 @@ cost is shared by both: a large quantum computer would break elliptic curves and
 post-quantum replacements (ML-DSA for signatures, ML-KEM for key exchange) have much larger keys
 and signatures, so the size advantage that drove these choices will shrink in the migration.
 
+**RSA, elliptic curve and EdDSA — what each one is.** RSA and elliptic curve are two kinds of
+key. EdDSA is not a third kind: it is a way of *signing* with an elliptic-curve key.
+
+| | RSA | Elliptic curve |
+|---|---|---|
+| The private key is | Two large secret prime numbers | One secret number |
+| The public key is | Their product — a very large number | A point on a published curve, reached by "multiplying" the starting point by that number |
+| Why it is hard to break | Splitting a huge number back into its primes is effectively impossible | Working back from the point to the number is effectively impossible |
+| Size for the same strength | About 3,072 bits | 256 bits |
+| What it can do | Sign and encrypt | Sign (ECDSA, EdDSA) and agree a shared key (ECDH) |
+| Where you see it | Older certificates, older SSH keys, many enterprise systems | Most modern HTTPS certificates, phones, Bitcoin, Nostr, eMudhra's hierarchy |
+
+| Signing with an elliptic-curve key | ECDSA | EdDSA (Ed25519 is the common form) |
+|---|---|---|
+| Age | Standardised around 2000 | Published 2011, standardised 2017 |
+| The one-time number in each signature | Must be freshly random. Weak or reused once, and the key can be computed from two signatures | Derived from the key and the message, so a bad random source at signing cannot leak the key |
+| Settings to get wrong | Several curves and options | Essentially one choice per curve |
+| Speed and side channels | Good, with careful implementation | Fast, and designed to resist timing attacks |
+| Where you see it | Most TLS certificates, eMudhra's chain included; Bitcoin before Taproot | `ssh-ed25519` keys, Tor, and CRM Sync's mandates and receipts — the `EdDSA` in the token header the verify plane checks |
+
+Nostr uses a third elliptic-curve signature, Schnorr (BIP-340). It is a close relative of EdDSA
+that also mixes fresh randomness into the one-time number.
+
+In one line each:
+
+- **RSA:** big keys built on prime numbers. Well understood and widely supported, but heavy.
+- **Elliptic curve:** small keys built on a curve. The same strength, much lighter.
+- **EdDSA:** a modern way to sign with an elliptic-curve key that removes the most common way to
+  lose it.
+
+None of them survives a key made without real randomness — eMudhra's failure, and Debian's RSA
+failure in 2008 — and a large quantum computer would break all three. The post-quantum
+replacement for signatures is ML-DSA.
+
 **Which layer broke.** A certificate authority's key does not encrypt anything of yours. It
 *vouches* for other people's certificates. Whoever held eMudhra's keys could issue a "valid"
 certificate for any domain — a Xano instance, a store, pypi.org — and every client that still
