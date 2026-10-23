@@ -77,6 +77,8 @@ citation:
     url: https://thehackernews.com/2026/10/litellm-suspects-github-token-leak-in.html
   - name: "Node.js — October 2026 security releases"
     url: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
+  - name: "Nostr protocol — NIPs"
+    url: https://github.com/nostr-protocol/nips
   - name: "CRM Sync — verify a mandate offline"
     url: https://crm-sync.dev/verify
 ---
@@ -707,6 +709,52 @@ time cannot leak the key.
 **EdDSA would not have saved eMudhra.** Their failure was in *making* the key, and every scheme
 needs real randomness at key generation. That is why CRM Sync's Ed25519 keys come from the
 platform's cryptographic random source inside the Worker, never from a hand-run script.
+
+### Nostr: when the key is the identity
+
+Nostr, the messaging protocol Jack Dorsey championed and funded, uses the same kind of key as
+eMudhra — elliptic curve — but makes the opposite choice: **the key is the identity and the
+permission at once.**
+
+- **The account is a key pair** on secp256k1, Bitcoin's curve, with Schnorr signatures.
+- **The public key (`npub…`) is the handle.** The private key (`nsec…`) is the password, the
+  account and the signature, all at once.
+- **Every post is a signed event.** Relays — the servers — check the signature and pass the
+  event on. No server issues the identity or can take it away.
+- **The optional NIP-05 name** (`name@domain`) is only a file on a website that points a name
+  at the key.
+
+| | Nostr | eMudhra (a certificate authority) | CRM Sync |
+|---|---|---|---|
+| Who vouches for a key | Nobody — trust comes from who follows it | The CA, for any domain | The issuer's own published JWKS |
+| Who makes the key | The user's app, on the user's device | The CA, in a ceremony | The Worker, from the platform's cryptographic random source |
+| What a signature means | "This key wrote it" — which is also the permission to post | "This CA vouches for this site" | "We issued this and it has not changed" — proof only |
+| Who decides access | Nobody beyond the signature; relays may add their own gates (paid relays, allowlists) | The client's trust store | The server, every time: expiry, revocation, roles per row |
+| Rotation | None built in. A new key is a new identity, without its followers | Revoke and reissue — if clients check | Key ids, end dates and a JWKS edit; old receipts keep verifying |
+| If the private key leaks | Anyone can post as you, permanently; there is no recovery | Fake certificates for any site, until trust stores update | Limited to that key's layer, and rotated through the ceremony |
+| If the private key is lost | The identity is gone | — | Rotate; nothing is lost, because the server holds the records |
+
+**What Nostr shows about everything above.**
+
+- **Making the key is still the moment that matters.** A Nostr app with a weak random source
+  would repeat eMudhra at personal scale: one predictable key, computable by anyone.
+- **Pasting an `nsec` into apps is the key-ceremony problem.** Every app it is pasted into —
+  including AI tools and browser extensions — can take the identity for good. Nostr's answer is
+  a remote signer (NIP-46, a "bunker"): the key stays in one place, and apps ask it to sign.
+  That is the ceremony's rule — the thing that holds the key is not the thing that asks for its
+  use.
+- **Proof is not permission — unless you choose to merge them.** Nostr merges them on purpose,
+  and gains censorship resistance and independence from any platform. The price is a leaked key
+  that cannot be revoked and no row-level limit on what it can do. Commerce cannot pay that
+  price: a stolen customer or admin key has to be stoppable today. So CRM Sync keeps the
+  signature as proof and leaves the decision to a server that can say no.
+- **eMudhra touches Nostr only at the edges.** Post signatures do not depend on certificate
+  authorities, so a forged certificate cannot forge a post. But relays are reached over secure
+  WebSockets and NIP-05 names are fetched over HTTPS. An intercepted connection could fake a
+  name or hide posts — it could not sign as you.
+
+Details are from the Nostr specifications (NIP-01, NIP-05, NIP-19, NIP-46) — see
+[the NIPs repository](https://github.com/nostr-protocol/nips).
 
 ### One architecture under any front end, whatever the platform plan
 
