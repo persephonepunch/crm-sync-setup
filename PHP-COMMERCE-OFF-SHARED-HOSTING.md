@@ -249,6 +249,69 @@ private-window test checkout on every release.
 | Secrets in files | Keys inside the web root | Secrets injected at runtime |
 | No audit trail | FTP edits leave no record | Git commit, image digest and deploy tag per change |
 
+### Desktop publish: how MAMP and WAMP sites reach production
+
+MAMP and WAMP are desktop bundles — **M**ac or **W**indows + **A**pache + **M**ySQL (or MariaDB)
++ **P**HP — for running WordPress or Magento on a laptop. The SQL database inside is an ordinary
+MySQL server. The risk is not the laptop; it is how the site usually gets published from it:
+
+| Step in the common workflow | What actually moves | The exposure |
+|---|---|---|
+| Build on MAMP/WAMP | A local MySQL with default settings, often user `root` with password `root` or none | Fine on a laptop; dangerous once copied |
+| Export the database (`mysqldump`, phpMyAdmin) | One `.sql` file holding every table: users, password hashes, orders, customer emails, and `wp_options` with plugin API keys | A full copy of personal data in Downloads, email or a shared drive |
+| Upload by FTP or a file manager | Code plus the dump, often left in the web root | `backup.sql` or `site.zip` downloadable by anyone who guesses the name |
+| Import on the server | The same `root`-style user, passwords and plugin keys | Desktop defaults become production credentials |
+| Point `wp-config.php` at it | One database user with every right on every table | Any plugin flaw reads or changes everything |
+| Repeat for each update | Production overwritten from the desktop, or the reverse | Orders and consent changes made live are lost or reset by the next push |
+
+**What replaces it:**
+
+1. **The desktop stays a sandbox,** with seed or synthetic data — never a copy of production
+   customers. Anonymise anything realistic first.
+2. **Publish code, not databases.** Code travels through Git and a built container image;
+   nobody uploads a `.sql` file to production.
+3. **Schema changes are migrations or versions,** applied in the image (WP-CLI, Magento
+   `setup:upgrade`) or recorded by the data platform, not hand-run SQL.
+4. **The production database has its own roles, made in its own ceremony:** no `root`, a user
+   per service, no public port, TLS required.
+5. **Desktop-to-production access goes through Cloudflare Access or a tunnel** — never an open
+   MySQL port or FTP.
+6. **Dumps are encrypted, expire, and live outside the web root,** deleted after the restore
+   they were made for.
+
+### The migration path: MySQL on a VM to Postgres in Xano
+
+Moving identity and customer data off WordPress's MySQL and into Xano's Postgres is a one-time
+migration, done once and carefully — not a recurring export. Xano provides the Postgres,
+containers and schema versioning; the rules on each endpoint are yours to write.
+
+1. **Inventory and decide what moves.** List the tables (`wp_users`, `wp_usermeta`, WooCommerce
+   orders and customers, plugin tables). Identity goes to Xano's users table and `user_claims`;
+   profile and consent to `user_extras`; orders stay with Shopify if the store is moving there;
+   products go to Shopify or the PIM. Anything nobody can name an owner for does not move.
+2. **Do not carry password hashes.** WordPress hashes belong to WordPress. Customers sign in
+   again through a magic link or a provider login, which creates a claim keyed by the provider's
+   immutable subject — the step that stops email-match impostors.
+3. **Export table by table, minimised.** One CSV per table with only the columns that move
+   (`SELECT … INTO OUTFILE`, or `mysqldump --tab`), taken from a read-only copy, on an encrypted
+   disk, never to the web root.
+4. **Create typed tables in Xano first,** then load: Xano's CSV import for small tables, or a
+   rule-checked endpoint (or Xano's bulk record functions) for large ones, so every row is
+   validated and each field lands in the table that owns it. Schema versioning records who
+   changed what and can roll back.
+5. **Reconcile.** Compare row counts and a digest of each exported file against what Xano holds,
+   and record the result in the ledger: which file, which digest, which rows were refused.
+6. **Cut over behind the sidecar.** WordPress stops reading its own users table; the `/auth/me`
+   sidecar answers who the caller is from Xano. The MySQL database goes read-only, then is
+   retired after a full billing cycle.
+7. **Close the old doors.** Delete every dump and CSV, drop the old database users, and rotate
+   every key that ever sat in `wp_options` or `wp-config.php` — in a key ceremony, on a patched
+   machine, one environment at a time.
+
+After the move, the same rule from the CSV section holds: data reaches Postgres only through an
+endpoint that authenticates the caller and checks the row, never as a file loaded into the
+database.
+
 ## Not just WordPress: PIMs, DAMs and the CSVs that feed PHP
 
 The exposure in this article is not limited to the storefront. Product information (PIM) and
