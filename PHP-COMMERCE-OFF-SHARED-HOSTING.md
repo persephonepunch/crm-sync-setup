@@ -685,7 +685,9 @@ and [Help Net Security](https://www.helpnetsecurity.com/2026/10/21/emudhra-certi
 - **emSign, its publicly trusted CA brand.** Its roots sit in the Chrome, Mozilla, Apple and
   Microsoft trust stores, so it can issue TLS and code-signing certificates that browsers
   accept worldwide. This is the part the incident hit, and one of the few Indian-owned roots in
-  those programs.
+  those programs. What failed was emSign's key generation, not its software or
+  its algorithm: the 30 April 2025 ceremony for eight intermediates under emSign ECC Root CA - G3
+  produced computable keys. The emSign root key itself was not reported as weak.
 - **Trust software for others.** Certificate-authority and authentication products for
   governments, banks and enterprises, in India and abroad.
 - **A listed company,** public in India since 2022 and expanding into the Middle East, Africa,
