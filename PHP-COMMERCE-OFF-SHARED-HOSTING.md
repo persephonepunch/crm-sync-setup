@@ -247,6 +247,72 @@ private-window test checkout on every release.
 | Secrets in files | Keys inside the web root | Secrets injected at runtime |
 | No audit trail | FTP edits leave no record | Git commit, image digest and deploy tag per change |
 
+## Not just WordPress: PIMs, DAMs and the CSVs that feed PHP
+
+The exposure in this article is not limited to the storefront. Product information (PIM) and
+digital asset (DAM) systems either run on PHP themselves or hand their data to PHP through
+plugins and CSV imports. Wherever data lands in PHP, it inherits the shared-VM risks above.
+
+**What the main systems are built on.** Self-hosted open-source tools are mostly PHP on MySQL;
+enterprise SaaS mostly is not. The SaaS rows are drawn from public job postings and vendor
+documentation, not published architecture, so treat them as indicative.
+
+| Product | Type | Built on | Database | PHP in the core? |
+|---|---|---|---|---|
+| Akeneo | PIM | PHP (Symfony) | MySQL + Elasticsearch/OpenSearch | **Yes** |
+| Pimcore | PIM + DAM | PHP (Symfony) | MySQL/MariaDB, optional OpenSearch | **Yes** |
+| ResourceSpace | DAM, open source | PHP | MySQL | **Yes** |
+| Adobe AEM Assets | DAM | Java | Apache Oak content repository | No |
+| Stibo STEP, Informatica Product 360 | PIM/MDM | Java | Oracle or SQL Server | No |
+| inRiver, Aprimo, Sitecore Content Hub | PIM/DAM | .NET | SQL Server / Azure | No |
+| Salsify | PIM | Ruby, with Python and Go services | PostgreSQL, Redis | No |
+| Bynder | DAM | Python, Java and Scala microservices | — | No (PHP only on its marketing site) |
+| Cloudinary | DAM / media | Ruby on Rails, partly moving to Go; C++ and FFmpeg/ImageMagick for media | — | No |
+
+**SaaS without PHP still reaches PHP.** Cloudinary has no PHP in its platform, but its PHP SDK,
+WordPress plugin and Magento extension do — and they run on the merchant's server. To sign
+uploads, they keep the Cloudinary **API secret** where PHP can read it: `wp_options`, `env.php`
+or a `.env` file. A php2shell-style flaw on a shared VM reads that secret, and with it an
+attacker can upload, replace or delete every image in the account — swapping product images,
+or planting files on the brand's own media domain. The same is true of every PIM connector,
+feed plugin and DAM sync module installed into WooCommerce or Magento.
+
+### CSV and spreadsheet imports are a door into PHP
+
+Even when the PIM is not PHP, the data often reaches the store as a CSV or spreadsheet loaded by
+a PHP importer — a WooCommerce or Magento import, a PIM connector, a nightly cron job. Each
+import is code reading a file someone else wrote:
+
+| Risk | What happens | Example |
+|---|---|---|
+| XML in spreadsheets (XXE) | An XLSX file is zipped XML; a crafted one makes the parser read local files — including `wp-config.php` or `env.php` | PhpSpreadsheet CVE-2024-45048, CVE-2024-47873 and CVE-2024-48917; Pimcore's data importer and admin UI were affected through it (GHSA-hq76-662x-7mw4) |
+| Image URL columns (SSRF) | The importer fetches whatever URL a row names, from inside the network — cloud metadata endpoints and admin ports included | Any import that downloads `image_url` without an allow-list |
+| Uploads in the web root | A "media" file that is really PHP is saved where the web server will run it | DAM or import folders inside `/wp-content/uploads` or `pub/media` on a shared VM |
+| Formula injection | A cell beginning with `=`, `+`, `-` or `@` runs as a formula when staff open an export in Excel | Customer names or reviews exported to CSV |
+| Full-file overwrites | A full upload rewrites fields the file should not own — prices, stock, consent | A nightly catalog file that resets every row it touches |
+| Shared credentials | The import job runs as the same OS and database user as the store, often with an admin token in a crontab | One cron line exposes the whole database |
+
+**What replaces it.** The same pattern as the rest of this article: the file is checked before
+anything PHP-shaped touches it.
+
+1. **Parse at the edge, not on the VM.** A Worker receives the file, validates every row against
+   a typed schema, and writes through the platform's API (Shopify GraphQL, the Merchant API) —
+   the PHP importer is retired, not patched.
+2. **Field ownership.** Each source may write only the fields it owns. A catalog file never
+   writes consent; an ERP file never writes reviews. Rows that try are refused and recorded.
+3. **No fetching from rows.** Image URLs are fetched only from allow-listed hosts, outside the
+   network, and stored in object storage (R2 or the DAM), never the web root.
+4. **Sign the file.** The sender's digest and identity travel with the file, and each import
+   writes a ledger row — so "which file set this price on 1 March?" is a query, as the
+   [AI Trust Framework Requirements](https://persephonepunch.github.io/crm-sync-setup/ai-trust-framework-requirements.html)
+   asks.
+5. **Until the importer is retired:** PhpSpreadsheet on a fixed release (2.2.1 or later for
+   CVE-2024-45048, and the 1.9.4 / 2.1.3 / 2.3.2 / 3.4.0 lines for CVE-2024-47873), Pimcore and its
+   data importer on their fixed releases, uploads outside the web root with PHP execution
+   disabled there, and every DAM or PIM secret rotated when the site leaves the shared VM.
+6. **Escape exports.** Prefix any cell that begins with `=`, `+`, `-` or `@` before a CSV leaves
+   the system.
+
 ## The options, and what each one isolates
 
 | Option | TLS and origin | Code isolation | Admin login | Data isolation | Scaling |
