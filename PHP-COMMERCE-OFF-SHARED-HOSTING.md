@@ -264,14 +264,30 @@ MySQL server. The risk is not the laptop; it is how the site usually gets publis
 | Point `wp-config.php` at it | One database user with every right on every table | Any plugin flaw reads or changes everything |
 | Repeat for each update | Production overwritten from the desktop, or the reverse | Orders and consent changes made live are lost or reset by the next push |
 
+**WooCommerce and Magento make the dump worse.** A store's database is not just content:
+
+- **WooCommerce** keeps orders and customers in its own tables (the HPOS `wc_orders` tables on
+  current versions, or `wp_posts` and `wp_postmeta` on older ones), payment gateway settings —
+  including gateway secret keys — in `wp_options`, and REST API keys in
+  `woocommerce_api_keys`, where the consumer secret is stored as written. A dump carries all of
+  it.
+- **Magento** stores database credentials and its encryption key (`crypt/key`) in
+  `app/etc/env.php`, and encrypts sensitive configuration in `core_config_data` with that key.
+  Copy the dump and `env.php` together — which a desktop publish usually does — and the
+  encrypted values can be decrypted. It also holds customer password hashes, orders, carts and
+  integration tokens, and needs OpenSearch beside MySQL, which brings a second service and its
+  own credentials onto the VM.
+
 **What replaces it:**
 
 1. **The desktop stays a sandbox,** with seed or synthetic data — never a copy of production
    customers. Anonymise anything realistic first.
 2. **Publish code, not databases.** Code travels through Git and a built container image;
    nobody uploads a `.sql` file to production.
-3. **Schema changes are migrations or versions,** applied in the image (WP-CLI, Magento
-   `setup:upgrade`) or recorded by the data platform, not hand-run SQL.
+3. **Schema changes are migrations or versions,** applied in the image — WP-CLI and
+   WooCommerce's own updater, Magento's declarative schema (`db_schema.xml`) with
+   `bin/magento setup:upgrade` in production mode — or recorded by the data platform, not
+   hand-run SQL.
 4. **The production database has its own roles, made in its own ceremony:** no `root`, a user
    per service, no public port, TLS required.
 5. **Desktop-to-production access goes through Cloudflare Access or a tunnel** — never an open
@@ -307,6 +323,28 @@ containers and schema versioning; the rules on each endpoint are yours to write.
 7. **Close the old doors.** Delete every dump and CSV, drop the old database users, and rotate
    every key that ever sat in `wp_options` or `wp-config.php` — in a key ceremony, on a patched
    machine, one environment at a time.
+
+**WooCommerce and Magento: what lives where, and where it goes.**
+
+| Data | WooCommerce | Magento | Destination |
+|---|---|---|---|
+| Customer identity | `wp_users`, `wp_usermeta`, `wc_customer_lookup` | `customer_entity`, `customer_address_entity` | Xano users + `user_claims`; Shopify customer if the store moves |
+| Password hashes | `wp_users.user_pass` | `customer_entity.password_hash` | **Not migrated** — sign in again by magic link or provider |
+| Consent and preferences | Usually plugin tables or `wp_usermeta` | Newsletter tables, custom attributes | `user_extras`, as consent records with time and policy version |
+| Orders and carts | HPOS `wc_orders` tables (or `wp_posts`), sessions | `sales_order`, `quote` | Shopify, or a read-only archive; never re-imported live |
+| Products and stock | `wp_posts` + `wp_postmeta`, product lookup tables | EAV `catalog_product_*` tables | Shopify or the PIM, through the API |
+| Payment and API secrets | Gateway keys in `wp_options`; `woocommerce_api_keys`; webhook secrets | `core_config_data`, encrypted with `crypt/key`; `oauth_token` integrations | **Not migrated** — revoke and reissue at each provider |
+
+**Platform-specific steps:**
+
+- **WooCommerce:** revoke every REST API key and webhook, then rotate the gateway keys at Stripe,
+  PayPal or the other provider — the copies in `wp_options` and every dump are now old.
+- **Magento:** rotate the encryption key with `bin/magento encryption:key:change` (2.4.7 and
+  later re-encrypt stored values) before the final cutover, then rotate payment and integration
+  credentials at each provider. Keep the old `env.php` off every disk once the database is
+  retired.
+- **Both:** the PIM, DAM and import plugins attached to the store hold their own keys —
+  Cloudinary, Akeneo, feed services. Rotate those too, as the CSV section describes.
 
 After the move, the same rule from the CSV section holds: data reaches Postgres only through an
 endpoint that authenticates the caller and checks the row, never as a file loaded into the
