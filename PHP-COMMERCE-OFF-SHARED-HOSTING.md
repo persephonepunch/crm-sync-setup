@@ -1134,6 +1134,146 @@ These layers sit on the hops in [Identity, data and AI tasks](#identity-data-and
 the binding model behind layers 3 and 4 is in
 [Entitlement Security → AI task binding](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html#ai-task-binding-cloudflare-binds-xano-grants-rust-checks).
 
+### If you have to keep Magento, WooCommerce or WordPress: reinforce in place with Rust and parcels
+
+Not every team can migrate this year. Contracts, extensions, staff skills and budget can keep a
+PHP store where it is. The store can still reach AI-grade security without a rewrite. You don't
+make PHP safe for agents; you stop agents and untrusted input from reaching PHP directly, and you
+move the parts that matter out of it one module at a time.
+
+**The shape:** PHP stays the origin for what it already does well, such as the catalogue pages,
+the theme and existing extensions. Everything around it is reinforced:
+
+```
+Shopper or agent
+  → Cloudflare: WAF, Access, Turnstile
+  → Worker: Rust shape gate (Wasm), mandate check, rate limits
+      ├─ unchanged routes → PHP origin over a Cloudflare Tunnel (no open inbound port)
+      └─ parcel routes    → Xano: identity, rows, entitlements, encryption
+  ← the PHP theme renders the page; parcels inside it fetch live data from the Worker
+```
+
+#### Layer 1. Put a Rust gate in front of the PHP routes agents and attackers use
+
+The gate is a Worker route with a Rust crate compiled to WebAssembly. It parses each request
+into the shapes the store declares, under a size cap, and refuses everything else before PHP
+parses a byte. It doesn't change the PHP code.
+
+| Platform | Routes to gate | What the gate enforces |
+|---|---|---|
+| **WordPress** | `/wp-json/*`, `admin-ajax.php`, `xmlrpc.php`, uploads | Declared routes and bodies only; `xmlrpc.php` refused; `/wp-admin` and `wp-login.php` behind Cloudflare Access; uploads re-encoded by the Rust stage before WordPress sees the file |
+| **WooCommerce** | `/wp-json/wc/*`, `?wc-ajax=`, checkout, webhooks | Typed cart and order bodies; quantity and price fields as numbers within limits; webhook signatures checked at the edge; consumer keys never reach a browser or an agent |
+| **Magento** | `/rest/V1/*`, `/graphql`, `/admin` | Declared REST paths and bodies; GraphQL depth and size limits; admin path behind Access; integration tokens held by the Worker, not by the agent |
+
+An agent never calls PHP with a store credential. It calls the Worker with a signed mandate, the
+gate admits a declared call, and the Worker makes the PHP or Xano call on its behalf. That is the
+[layered model above](#layered-encryption-with-rust-and-webassembly-security-additions-shaped-for-ai-callers)
+applied to an estate you keep.
+
+#### Layer 2. Replace plugins with parcels in the theme
+
+A **parcel** is one self-contained module dropped into existing theme code. It has four parts,
+one per layer of the stack, and none of them lives inside PHP:
+
+| Part | What it is | Owned by |
+|---|---|---|
+| **Markup** | A small HTML fragment with a mount point, placed in the theme | The theme: a WordPress template part or block, a WooCommerce hook, a Magento `.phtml` block, or a Liquid snippet |
+| **Behavior** | petite-vue for client-side reactivity, or HTMX for server-swapped HTML fragments | One script, hosted on the Worker with Subresource Integrity, loaded only on pages that use it |
+| **Look** | The classes and variables designed in Webflow | Webflow, exported as design tokens and CSS, so the parcel matches the site without theme CSS edits |
+| **Data and permission** | Live values and writes through the Worker to Xano | Xano holds the rows and the rules; the Worker enforces permissions. The UI only hides what a caller can't use |
+
+PHP renders a placeholder and nothing else. It never holds the API key, never stores the data
+and never decides who may see it. A vulnerable plugin can't leak what PHP never had.
+
+**petite-vue or HTMX:**
+
+- **petite-vue** (about 6 KB) for values that react in the browser: a points balance, a live
+  price or stock count, a configurator, consent preferences.
+- **HTMX** (about 14 KB) for lists and forms the server renders: order history, reviews, a
+  support form. The Worker returns an HTML fragment and HTMX swaps it in.
+
+**One parcel, three PHP themes.** The same loyalty balance in WordPress, Magento and on a
+Webflow page:
+
+```php
+<?php // WordPress or WooCommerce theme: template part, or a hook such as woocommerce_after_add_to_cart_form ?>
+<div class="crm-parcel points" data-parcel="points" v-scope="Points()" @vue:mounted="load()">
+  <span class="points__value">{{ balance }}</span> points
+</div>
+```
+
+```php
+<?php // Magento: app/design/frontend/<Vendor>/<theme>/Magento_Catalog/templates/product/points.phtml ?>
+<div class="crm-parcel points" data-parcel="points" v-scope="Points()" @vue:mounted="load()">
+  <span class="points__value">{{ balance }}</span> points
+</div>
+```
+
+```html
+<!-- The same markup in a Webflow embed, plus one shared behavior script -->
+<script type="module">
+  // a self-hosted, pinned copy of petite-vue on your Worker, loaded with Subresource Integrity
+  import { createApp } from "https://your-worker.example/vendor/petite-vue.es.js";
+  createApp({
+    Points: () => ({
+      balance: "–",
+      async load() {
+        const r = await fetch("https://your-worker.example/parcels/points", { credentials: "include" });
+        this.balance = r.ok ? (await r.json()).balance : "–";
+      },
+    }),
+  }).mount();
+</script>
+```
+
+An HTMX parcel needs no script of its own beyond HTMX. The Worker returns the rendered list, and
+only for the signed-in customer:
+
+```html
+<section class="crm-parcel orders" hx-get="https://your-worker.example/parcels/orders"
+         hx-trigger="load" hx-swap="innerHTML">Loading your orders…</section>
+```
+
+**Parcels that replace common plugins:**
+
+| Parcel | Behavior | Replaces | Data |
+|---|---|---|---|
+| Points balance and member price | petite-vue | A loyalty plugin storing points in `wp_usermeta` or a Magento extension table | Xano ledger via the Worker |
+| Live price and stock | petite-vue | Cached prices that go stale, and an overselling risk | The system that owns the value, read live |
+| Reviews list and review form | HTMX | A reviews plugin with its own tables and admin | Xano, with verified-purchase checks |
+| Secure form | HTMX, or the existing `forms.js` | Contact and lead-form plugins that store submissions in MySQL | Worker route `/forms/<type>` with the consent record (built) |
+| Consent preferences | petite-vue | A cookie plugin that keeps consent only in the browser | Xano consent rows, one subject across every site |
+| Order history | HTMX | Theme templates that query orders in PHP | Read through the Worker, scoped to the caller |
+
+#### Two security details for parcels
+
+- **Content Security Policy.** petite-vue evaluates its template expressions with `new Function`,
+  so it needs `'unsafe-eval'` in the page's CSP. Keep its expressions to bound data, never to text
+  a user wrote. Where a page must run under a strict CSP, use HTMX with
+  `htmx.config.allowEval = false` and no `hx-on` handlers, or put the parcel in a Web Component
+  with its own policy.
+- **Credentials and origin.** A parcel calls the Worker with the customer's session cookie,
+  set `HttpOnly`, `Secure` and `SameSite`. The Worker allows only the store's own origins in CORS.
+  Keys stay in Worker secrets and Xano environment variables, never in the theme, and never in
+  `wp_options` or `core_config_data`.
+
+#### Rollout order
+
+1. **Gate first.** Put the Worker and Rust gate in front of the API routes, and move admin paths
+   behind Access. Nothing in PHP changes.
+2. **Close the origin.** Serve PHP through a Cloudflare Tunnel so nothing can bypass the WAF and
+   the gate.
+3. **Parcel the plugin with the most data.** That's usually loyalty, reviews or forms. Ship it as
+   a parcel, turn off the plugin, and export, check and delete its tables.
+4. **Repeat, one plugin at a time.** Each parcel removes a PHP attack surface and a store of
+   customer data.
+5. **Decide later.** Once the data lives in Xano and the behavior lives in parcels, PHP renders
+   pages and little else. Replacing it then is a theme change, not a data migration.
+
+**Status:** the `forms.js` parcel, the `/forms/<type>` Worker route and the `<crm-*>` Web
+Components are built. The Rust gate crate, a shared parcel loader and the parcels other than forms
+are a pattern, not built.
+
 ### CAA records: name the CAs that may issue for your domain
 
 **What a CAA record is.** A CAA (Certification Authority Authorization) record is a DNS record
