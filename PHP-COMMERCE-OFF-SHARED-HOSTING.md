@@ -1131,9 +1131,31 @@ hold it and what to do the day it leaks.
 | **1 · Platform root** | `ADMIN_KEY`, and the Cloudflare API token that deploys and sets secrets | Everything: configuration, every tenant, the ability to change the other keys | The key holder only. Never an agency, never CI | Rotate at once through the ceremony, then rotate every key below it |
 | **2 · Rotatable admin** | A rotatable admin key issued alongside the root | Day-to-day admin work, without exposing the root | The operations team | Rotate it. The root and other teams are untouched |
 | **3 · Tenant** | `crm_t_` tenant tokens | One store's data and settings — nothing else | That store's team, or its agency | Revoke that one token; other tenants never notice |
-| **4 · Sessions** | `JWT_SECRET` | Signed-in sessions: who is logged in right now | The platform, as a secret, never a person | Rotate; every session ends and people sign in again |
-| **5 · Signing** | Ed25519 entitlement and mandate keys | Receipts, mandates and certificates anyone can check offline | Generated inside the Worker; only the public half is published | Rotate. Past receipts keep verifying until the old key's end date; new ones use the new key |
+| **4 · Sessions** | `JWT_SECRET` (HMAC-signed session tokens) | Signed-in sessions: who is logged in right now | The platform, as a secret, never a person | Rotate; every session ends and people sign in again. **Today it also does a second job** — see below |
+| **5 · Signing** | Ed25519 (EdDSA) keys for entitlements, mandates and receipts; ECDSA P-256 keys for agent-commerce (UCP) request signing, which the UCP standard requires | Receipts, mandates and certificates anyone can check offline; agent requests other platforms can verify | Generated inside the Worker; only the public halves are published (`/.well-known/jwks.json`, `/.well-known/ucp`) | Rotate. Past receipts keep verifying until the old key's end date; new ones use the new key |
 | **6 · Provider** | Shopify Admin token, Xano API key, Google client secret, payment keys | Access to systems someone else runs | The platform as secrets, set from the provider's dashboard by the key holder | Rotate at the provider first, then store the new value with the ceremony |
+
+**A correction we found in our own setup.** The vault and the encrypted configuration fields
+are meant to have their own master secret, `ENVELOPE_MASTER_KEY`. When it is not set, the code
+falls back to `JWT_SECRET` — and in CRM Sync's production it is not set. So one secret is doing
+two layers' jobs:
+
+- it signs sessions (layer 4)
+- it is the root of the encryption keys for vaulted firmware and tenant configuration
+
+Rotating `JWT_SECRET` today would not only sign everyone out; it would also leave every vaulted
+image and encrypted configuration field unreadable until they are re-wrapped. That is exactly
+the "one key spanning layers" problem instruction 2 below warns about.
+
+The fix is a planned migration, not a one-line change:
+
+1. Create `ENVELOPE_MASTER_KEY` through the ceremony.
+2. Re-wrap every existing envelope under it.
+3. Only then leave `JWT_SECRET` to sessions alone.
+
+Setting the new secret without step 2 would lock the existing data at once, because the code
+would immediately start deriving keys from it. Until the migration is done, treat `JWT_SECRET`
+as a layer 1 key.
 
 **Instructions — run the layers in this order:**
 
