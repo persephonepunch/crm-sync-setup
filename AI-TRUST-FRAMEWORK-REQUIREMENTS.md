@@ -186,7 +186,7 @@ The mandate record carries a named person. When an agent acts, the ledger row ca
 
 ---
 
-## The erasure problem, since you will hit it in week two
+## The erasure problem: append-only records and GDPR erasure
 
 Append-only records and a GDPR erasure request appear to be in direct conflict. They are not, and the resolution is standard:
 
