@@ -776,8 +776,23 @@ permission at once.**
 
 **What Nostr shows about everything above.**
 
-- **Making the key is still the moment that matters.** A Nostr app with a weak random source
-  would repeat eMudhra at personal scale: one predictable key, computable by anyone.
+- **Same kind of key, opposite outcome: Nostr is randomized where eMudhra was not.** Both use
+  elliptic-curve keys — a private key that is a single number — though not the same curve.
+  - **Key creation.** Each Nostr app makes its key on the user's device, normally from the
+    operating system's cryptographic random source, so the number is one of roughly 2^256 —
+    not 4.
+  - **Signing.** Nostr's Schnorr signatures (BIP-340) build each signature's one-time number
+    from the key, the message and fresh random bytes. A weak random source at signing time
+    therefore cannot leak the key — the ECDSA failure that eMudhra's chain is exposed to.
+  - **The limits.** The protocol cannot check how a key was made. There is no ceremony and no
+    authority, so a badly written app could still produce a weak key, and nothing in the network
+    would notice.
+  - **Scale, not kind.** A weak Nostr key exposes one person. A weak CA key exposes every site
+    that CA can vouch for. eMudhra's central ceremony was supposed to be the careful one, and it
+    failed once, for everyone.
+
+  The lesson is the same for both: the type of key was never the problem. What matters is
+  whether the private key came from real randomness, and whether anyone checked.
 - **Pasting an `nsec` into apps is the key-ceremony problem.** Every app it is pasted into —
   including AI tools and browser extensions — can take the identity for good. Nostr's answer is
   a remote signer (NIP-46, a "bunker"): the key stays in one place, and apps ask it to sign.
