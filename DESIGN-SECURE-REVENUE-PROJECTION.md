@@ -13,6 +13,7 @@ tags:
   - identity
   - ledger
   - architecture
+  - agentic-commerce
 about:
   - Revenue projection
   - Conversion value security
@@ -27,6 +28,8 @@ citation:
     url: https://support.google.com/google-ads/answer/6379332
   - name: "Google Ads — enhanced conversions"
     url: https://support.google.com/google-ads/answer/9888656
+  - name: "Google — Merchant API products_v1"
+    url: https://developers.google.com/merchant/api/reference/rest/products_v1/accounts.products
   - name: "RFC 8659 — DNS CAA Resource Record"
     url: https://www.rfc-editor.org/rfc/rfc8659
   - name: "PHP Commerce: Moving Off Shared Hosting (companion)"
@@ -151,6 +154,104 @@ Each of these looks exactly like a working system until someone checks the recor
 - **A reporting address no one receives.** The CAA reporting record exists, but its value starts
   with a space, so a strict certificate authority ignores it.
 
+## The two shapes the component checks
+
+A security component can only check what it can read. Two shapes carry nearly every revenue
+signal: the **product shape** Google Merchant reads, and the **customer event shape** on the user
+tags bus. Both are fixed shapes, not free-form payloads, which is what lets the component, and an
+AI caller, rely on them.
+
+### The Google Merchant data layer shape
+
+A product's price, availability and identifiers are revenue signals too: they decide what an ad
+or an AI shopping agent offers, and at what price. CRM Sync composes them in the
+[Merchant API](https://developers.google.com/merchant/api/reference/rest/products_v1/accounts.products)
+`products_v1` shape, from one composer that feeds three surfaces: the public catalog at
+`/merchant/products`, three read-only Merchant tools on the MCP endpoint
+(`merchant_get_product_by_name`, `merchant_list_products`,
+`merchant_list_aggregate_product_statuses`), and a JSON block inside each product page. One
+composer means the three can't disagree.
+
+One product, as served today:
+
+```json
+{
+  "name": "accounts/example.myshopify.com/products/en~US~<offerId>",
+  "offerId": "<offerId>",
+  "contentLanguage": "en",
+  "feedLabel": "US",
+  "productAttributes": {
+    "title": "…", "description": "…", "link": "https://…", "imageLink": "https://…",
+    "price": { "amountMicros": "129000000", "currencyCode": "USD" },
+    "availability": "IN_STOCK", "condition": "NEW", "brand": "…",
+    "identifierExists": false,
+    "productTypes": ["…"],
+    "shipping": [{ "country": "US" }],
+    "shoppingAdsExcludedCountries": ["KP", "IR", "SY"]
+  },
+  "productStatus": { "itemLevelIssues": [] }
+}
+```
+
+| Field | Security rule | What goes wrong without it |
+|---|---|---|
+| `name`, `offerId` | The offer ID is part of the resource name and never changes or gets reused | A reused ID moves one product's history, reviews and bids onto another |
+| `price.amountMicros` + `currencyCode` | Read from the live store, in the market's own currency, never converted | An exchange-rate move changes what an ad promises |
+| `availability`, `condition` | Enum values (`IN_STOCK`, `NEW`), not free text | A typo is ignored by Google, and the offer silently stops serving |
+| `gtins` or `identifierExists: false` | A real identifier, or a plain statement that there isn't one. Never an invented one | A made-up GTIN is a false claim to Google and to every agent that trusts it |
+| `shipping`, `shoppingAdsExcludedCountries` | Shipping countries come from the store's country rules; sanctioned countries are excluded | An ad reaches a market the store may not sell to |
+| `productStatus.itemLevelIssues` | Missing image, price, identifier or description reported, not hidden | A broken offer looks healthy until it is disapproved |
+| The JSON block in the page | `<` is escaped, and the block is stripped and rewritten as a unit | A product description becomes a script on the page |
+
+The walk from a flat product CSV to this shape, including why a missing `Handle` makes the same
+file read as 4 products or 169, is in
+[From product.csv to Consented Conversions](https://persephonepunch.github.io/crm-sync-setup/consented-data-layer.html).
+
+### The user tags event bus
+
+The customer side moves as events, not as copies of the customer record. Three tables carry it:
+
+| Table | Holds | Security property |
+|---|---|---|
+| **Tag catalog** | Each tag's key, kind, label, scope, whether it emits events, its event topic, and whether it is consent-linked | The catalog has no personal data. It is mirrored to Shopify as `user_tag` metaobjects, so a theme can read tag definitions and never membership |
+| **Tag membership** | Which user holds which tag, with status, a version number, timestamps, and what fired the change | Withdrawing consent ends consent-linked memberships, bumps the version and records `fired_by: consent_withdrawn` |
+| **Event bus** (`ucp_funnel_history`) | One row per event: an event ID, an idempotency key, the user, the domain, the event type, status and version, a payload, the consent basis, the region, what fired it, its source, and the channels it may reach | A redelivered event with the same idempotency key is a no-op |
+
+Seven domains write to the bus today: `tag`, `consent`, `order`, `return`, `agentic`,
+`omnibus_discount` and `audience`. An order event carries a **conversion record** in its payload,
+built for revenue projection rather than as a log line:
+
+| Conversion record field | Why it is in the record |
+|---|---|
+| `value_minor` + `currency` + `market` | Value in minor units in the market's currency, never converted, so a past conversion's worth can't drift |
+| Identity per scope | The person's account ID is recorded separately from a browser's cookie ID, so one customer on two devices isn't trained as two |
+| `consent` + `consent_version`, as at capture | Consent is a fact about a moment. Exporting under today's consent would claim a basis that didn't exist when the data was collected |
+| `pltv_score`, `pltv_model_version`, `pltv_scored_at` | The prediction as it stood, with the model that made it, so it can be checked against what actually happened |
+| `realized_value`, `realized_at` | What the customer actually spent, recorded later, so the prediction can be marked right or wrong |
+
+**What the bus doesn't do yet.** It is an event log, not yet an evidence chain:
+
+- **Writes are best-effort.** A failed write is logged and the caller carries on, so an event can
+  be missed without anyone being told. An outbox with retries would close it.
+- **Rows aren't chained or signed.** Consent and erasure events are also written to the
+  hash-chained, Ed25519-signed ledger; the bus rows themselves are not.
+- **The idempotency check reads, then writes.** A unique index on the key is what actually stops a
+  duplicate when two deliveries race.
+
+### Setting up an AI caller against both shapes
+
+An AI agent, a chat assistant or an automated job reads these shapes to decide what to offer and
+what a customer has agreed to. The security component treats it like any other caller:
+
+| Rule | State |
+|---|---|
+| The agent reads products through the Merchant shape only: the public catalog or the three read-only Merchant tools, never the store admin API | Built |
+| The agent's actions are written to the bus under the `agentic` domain, each with an idempotency key | Built |
+| Orders an agent places pass through the same release gate before any conversion or audience is sent | Built for the destinations listed above |
+| The agent spends only inside a signed mandate, and revoking the mandate stops it | Built (mandate enforcement has its own test suite) |
+| The agent reads a customer's tags only through a tool scoped by its mandate, and can't set a consent-linked tag | Pattern, not built |
+| Bus events an agent relies on are chained and signed, so it can prove what it acted on | Not built |
+
 ## What is built, and how it is tested
 
 The component is partly built. Each part is pinned by a test in the CRM Sync test harness: green
@@ -171,6 +272,10 @@ tests guard what is built, and red tests fail on purpose until a gap is built.
 | A Rust/WebAssembly shape gate on inbound vendor payloads | Not built | Red test |
 | One table linking every vendor's customer ID to the identity spine | Not built | Red test |
 | The per-destination consent mapper called on every send | Written and tested, not yet called; the release gate decides today | — |
+| One Merchant composer for the catalog, the Merchant tools and the page block, in the `products_v1` shape | Built | Live: `/merchant/products` returns `productAttributes`, enum values and the `en~US~<offerId>` name |
+| Bus events idempotent per key, consent-linked memberships ended on withdrawal | Built | Code; no harness test yet |
+| Bus writes retried through an outbox | Not built | No test yet |
+| Bus rows chained and signed | Not built | No test yet |
 
 The vendor-by-vendor detail behind the red rows is in
 [The plugin in the middle](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#the-plugin-in-the-middle-data-ownership-from-shopify-to-crm-service-fraud-consent-and-google-pltv),
