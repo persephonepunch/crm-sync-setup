@@ -328,3 +328,34 @@ disagree with what was sent.
    records.
 6. **Turn one red row green at a time,** and add each new channel with its adapter, its erasure
    call and its test together.
+
+## Resources and downloads
+
+**This document:**
+
+| Format | Link |
+|---|---|
+| Web article | [design-secure-revenue-projection.html](https://persephonepunch.github.io/crm-sync-setup/design-secure-revenue-projection.html) |
+| PDF download | [design-secure-revenue-projection.pdf](https://persephonepunch.github.io/crm-sync-setup/design-secure-revenue-projection.pdf) |
+| In the CRM Sync knowledge base | [Knowledge base → Design for Secure Revenue Projection](https://www.crm-sync.dev/pages/knowledge-base#design-secure-revenue-projection) |
+| Book chapter | [Security → Design for Secure Revenue Projection](https://persephonepunch.github.io/crm-sync-setup/book/design-secure-revenue-projection/) |
+| The two data shapes | [The two shapes the component checks](https://persephonepunch.github.io/crm-sync-setup/design-secure-revenue-projection.html#the-two-shapes-the-component-checks) |
+
+**Companion brief:** *AI Security: Challenges, Benefits, and Tools* (24 October 2026, 5 pages).
+It pairs five AI security risks (memory-unsafe native stacks, prompt injection, model supply chain,
+data leakage, over-privileged agents) with the defence each one gets from AI, shows a reference
+architecture for a secure AI data layer, and lists open-source and commercial tools and the
+frameworks auditors use (OWASP Top 10 for LLM Applications, MITRE ATLAS, NIST AI RMF, Google SAIF).
+
+- [Download the brief (PDF, 223 KB)](https://persephonepunch.github.io/crm-sync-setup/assets/ai-security-challenges-benefits-tools.pdf)
+
+The brief's architecture is the target design. Its Rust Worker trust boundary corresponds to the
+Rust shape gate, which is a red row in [What is built, and how it is tested](#what-is-built-and-how-it-is-tested):
+read the brief for where the design is going, and this document for what holds today.
+
+**Related sections:**
+
+- [The plugin in the middle](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#the-plugin-in-the-middle-data-ownership-from-shopify-to-crm-service-fraud-consent-and-google-pltv): where data ownership breaks between Shopify, CRM, service, fraud, consent and Google
+- [Google audiences and conversions with Vertex AI, and where LoRA fits](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#google-audiences-and-conversions-with-vertex-ai-and-where-lora-fits-scoping-private-channel-data): which channel data may feed conversions, audiences, pLTV or model training
+- [CAA records](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#caa-records-name-the-cas-that-may-issue-for-your-domain): naming the CAs that may issue for a domain, and a red-then-green test script
+- [From product.csv to Consented Conversions](https://persephonepunch.github.io/crm-sync-setup/book/consented-data-layer/): the walk from a flat catalog file to the Merchant shape
