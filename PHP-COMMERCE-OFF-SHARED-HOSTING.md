@@ -781,6 +781,110 @@ where the subject is, who they share with and what device they used:
 | Shopify → store logic | Function input query; webhook HMAC, constant-time compare | Shopify-hosted; HTTPS webhooks |
 | Service → database | Role per service; actor and tenant set per request | `sslmode=verify-full` |
 
+### The plugin in the middle: data ownership from Shopify to CRM, service, fraud, consent and Google pLTV
+
+A typical store sends one customer's data through several systems, each connected by a plugin:
+
+- **Marketing and CRM:** Klaviyo, Salesforce
+- **Customer service:** Gorgias, Sprinklr
+- **Consent management (CMP):** OneTrust
+- **Fraud:** Signifyd, Stripe Radar
+- **Advertising and predicted lifetime value (pLTV):** Google Customer Match, enhanced conversions and BigQuery
+
+The gap is the plugin in the middle. It holds the access tokens for both sides, and nothing it
+does leaves a record the merchant controls. The merchant is the controller under GDPR and CCPA,
+but the evidence of what was sent, with what consent, and whether it was erased sits with the
+processors.
+
+**Where ownership breaks:**
+
+| Hop | What moves | Where ownership breaks |
+|---|---|---|
+| **Shopify → plugin** | Customers, orders, marketing consent | The plugin's own credentials read the data. From here the merchant has no record of what was taken, only the vendor's logs |
+| **Inside the plugin** | Field mapping, identity matching | The plugin's mapping table becomes the real identity record (Shopify ID ↔ Klaviyo profile ↔ Salesforce contact). The vendor owns it, and it disappears with the plugin. Unmapped fields are dropped silently, consent fields often among them |
+| **Plugin → Klaviyo or Salesforce** | Profiles, events | Each system keeps its own consent fields. A two-way sync where the last write wins, or a nightly CSV or ERP import treated as the master record, can replace a customer's latest choice with an older value |
+| **Shopify → Gorgias or Sprinklr** | Order history, addresses, message threads | The ticket becomes a second customer record, outside the store's permissions. Customers paste card numbers and ID documents into messages, bringing PCI and sensitive data into a system that wasn't scoped for it. Agents can often refund or edit orders from the helpdesk with the app's token, not their own |
+| **CMP (OneTrust) ↔ Shopify** | Consent choices | The consent receipt lives in the CMP, the storefront signal lives in Shopify's Customer Privacy API, and each downstream system keeps its own copy. Nothing proves the three agree at the moment data was sent |
+| **Order → Signifyd or Stripe Radar** | Order, device, IP, payment signals | The fraud decision is made and stored by the vendor. It rests on fraud prevention as its legal basis, not marketing consent, so it must never be reused for advertising. A plugin that copies risk scores into the CRM or an audience list crosses that line |
+| **Klaviyo or Salesforce → Google** | Hashed emails, order values | Google requires `ad_user_data` and `ad_personalization` consent, but those signals were rarely carried from Shopify; they are usually inferred from a marketing opt-in. The pLTV model is then trained on data whose origin and consent nobody can prove |
+| **Erasure, back through the chain** | Deletion requests | Shopify's `customers/redact` webhook reaches the app it was sent to, not the copies in the CRM, helpdesk, fraud vendor, BigQuery or Google audiences |
+
+**Every hop is also a place code can be injected.** Each connector runs third-party code where
+PII and card data change hands: a checkout script, a webhook receiver, an import job, a helpdesk
+widget. A distrusted certificate authority (the emSign case) makes it easier to impersonate any
+of those endpoints, but the injection itself happens in whatever code runs at the handoff. That
+is why each hop needs a verified sender and a declared shape, not just TLS.
+
+#### The fix: one service bus with timestamp-verified records, linked to the user ID
+
+The plugins can keep doing the transport. They stop being the only place the evidence lives.
+Every transfer, in either direction, also writes one record to a **service bus** the merchant
+owns, keyed to the merchant's own user ID.
+
+```
+Shopify ─┐                                  ┌─ Klaviyo / Salesforce
+Gorgias ─┤                                  ├─ Gorgias / Sprinklr
+OneTrust ┼─→ Worker gate ─→ service bus ─→──┼─ Signifyd / Stripe Radar
+Signifyd ┤   (verify, shape, consent)  │    └─ Google (Customer Match, BigQuery pLTV)
+Stripe ──┘                             └─→ Xano: user ID spine, permissions, erasure fan-out
+```
+
+1. **One user ID spine the merchant owns.** Xano, behind Cloudflare, holds a pseudonymous ID for
+   each customer. Every vendor's ID (Shopify customer, Klaviyo profile, Salesforce contact,
+   Gorgias customer, OneTrust identifier, Stripe customer) is linked to it. The bus carries the
+   spine ID, never the email address.
+2. **Verify the sender at the gate.** Webhooks are checked by their HMAC or signature
+   (Shopify, Stripe, Signifyd and Gorgias all sign theirs) before anything is read, then parsed
+   into a declared shape by the Rust gate. Unknown fields and oversized bodies are refused.
+3. **Consent travels with the record.** The gate reads the consent state at the moment of the
+   transfer (CMP receipt plus Shopify signal) and writes it into the record. Google receives
+   only what was actually granted, never a value inferred from something else.
+4. **Purpose is part of the record.** Fraud and service records are tagged with their purpose
+   (`fraud_prevention`, `support`) and can't be routed to marketing or advertising destinations.
+   Card numbers and ID documents are redacted from service messages before the record is stored.
+5. **Every record is timestamped, chained and signed.** Clocks differ between clouds, so a
+   timestamp alone doesn't prove order. Each record carries:
+
+   ```json
+   {
+     "seq": 18422,
+     "prev": "sha256:9f2c…",
+     "subject": "usr_7f3c…",
+     "event": "fraud.decision",
+     "source": "signifyd",
+     "destination": "shopify.order",
+     "purpose": "fraud_prevention",
+     "consent": { "analytics_storage": "granted", "ad_user_data": "denied", "ad_personalization": "denied" },
+     "observed_at": "2026-10-24T14:02:09Z",
+     "received_at": "2026-10-24T14:02:11Z",
+     "kid": "bus-2026-10",
+     "sig": "ed25519:…"
+   }
+   ```
+
+   - `observed_at` is when the source says it happened; `received_at` is the gate's own clock.
+     A large gap between them is flagged.
+   - `seq` and `prev` (the hash of the previous record) fix the order and make a deleted or
+     edited record visible, whichever cloud's clock was right.
+   - `sig` is an Ed25519 signature from a key the merchant holds, so the record can be checked
+     anywhere: in BigQuery, by an auditor, or after leaving a vendor.
+   - Where a record may be needed as legal evidence, also anchor batches with a trusted
+     timestamp (RFC 3161) from a time-stamping authority.
+6. **Erasure fans out from the spine.** One request finds every linked vendor ID and sends each
+   vendor its deletion call. Each confirmation is written back to the bus as its own signed
+   record.
+7. **Analytics only read.** BigQuery and the pLTV model read the bus to score customers. They
+   never decide access; permission stays in Xano.
+
+**What the merchant can then answer**, for any user ID, from records it owns: what was sent to
+which vendor and when; under which consent and purpose; which vendor decisions (fraud, refunds,
+service actions) changed the order; and whether every copy was erased.
+
+**Status.** The pieces this builds on are live: consent records with device provenance, the
+Rust-shaped gate, Ed25519 signing for mandates and receipts, and Xano permissions. The
+cross-vendor bus, the vendor ID links and the erasure fan-out described here are a pattern, not
+a shipped feature.
+
 ## Google Merchant API: rebuild loyalty, reviews and comparison in one pass
 
 The Google feed integration is being rebuilt regardless. The Content API for Shopping shut
