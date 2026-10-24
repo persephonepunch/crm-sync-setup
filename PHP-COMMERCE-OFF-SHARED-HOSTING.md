@@ -1519,8 +1519,10 @@ do appear in DNS. After the records above, `crm-sync.dev` also published `comodo
 (Sectigo) and `digicert.com`. That's expected, and it's what keeps Cloudflare's own renewals
 working.
 
-**Optional:** an `iodef` record (`0 iodef "mailto:security@example.com"`) asks CAs to report
-refused requests to that address. Not every CA does.
+**Recommended:** an `iodef` record (`0 iodef "mailto:security@example.com"`) asks CAs to report
+refused requests to that address. Not every CA does. Use a mailbox that receives mail, and type
+the value with nothing before `mailto:`. `crm-sync.dev` added `0 iodef "mailto:team@crm-sync.dev"`
+on 24 October 2026.
 
 #### Step 3a. Add them in the Cloudflare dashboard
 
@@ -1531,6 +1533,8 @@ refused requests to that address. Not every CA does.
 5. Set **Tag**:
    - **Only allow specific hostnames** for `issue`
    - **Only allow wildcards** for `issuewild`
+   - **Send violation reports to URL** for `iodef`. The form's summary still says the value
+     "can issue certificates"; for this tag it only sets where reports go
 6. Enter the CA domain name, for example `letsencrypt.org`.
 7. Click **Save**. Repeat for each row.
 
@@ -1598,6 +1602,93 @@ certificate's expiry date and check again after it. Some Shopify hosts return 40
   check.
 - **Record the change** in the key and certificate ledger with the date and who made it, like
   any other trust decision.
+
+#### Step 6. Test it red, then green
+
+Verifying by eye once is not the same as knowing it stays right. Write the expected CAA down as a
+test **before** you add the records, run it and watch it fail (red), then add the records until
+it passes (green). Keep the test and run it on a schedule or in CI. It then fails the day a
+record is deleted, a new host starts using a CA you didn't list, or a value is mistyped.
+
+The script below needs Node 18 or later and nothing else. Set `DOMAIN`, `HOSTS` and `EXPECTED`
+to your own values. It reads CAA over DNS-over-HTTPS and the certificate each host actually
+serves, and checks one against the other:
+
+```js
+// caa-check.mjs: node caa-check.mjs   (exit 0 = all green)
+import tls from "node:tls";
+
+const DOMAIN = "example.com";
+const HOSTS = ["example.com", "www.example.com"];
+const EXPECTED = ["pki.goog", "letsencrypt.org", "ssl.com", "comodoca.com", "digicert.com"];
+const ISSUERS = [[/google trust/i, "pki.goog"], [/let's encrypt|isrg/i, "letsencrypt.org"],
+  [/ssl corp/i, "ssl.com"], [/sectigo|comodo/i, "comodoca.com"], [/digicert/i, "digicert.com"],
+  [/emudhra|emsign/i, "emsign.com"]];
+
+const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${DOMAIN}&type=CAA`,
+  { headers: { accept: "application/dns-json" } }).then((r) => r.json());
+const caa = (res.Answer || []).filter((a) => a.type === 257).map((a) => {
+  const [, flags, tag, value] = a.data.match(/^(\d+)\s+(\w+)\s+"(.*)"$/) || [];
+  return { flags: +flags, tag, value, ca: (value || "").split(";")[0].trim() };
+});
+const of = (tag) => caa.filter((r) => r.tag === tag);
+const issuerOf = (host) => new Promise((ok, fail) => {
+  const s = tls.connect({ host, port: 443, servername: host }, () => {
+    ok(s.getPeerCertificate(true)); s.end();
+  }).on("error", fail);
+});
+
+const results = [];
+const check = (name, pass, detail) => results.push({ name, pass, detail });
+
+check("CAA exists", caa.length > 0, `${caa.length} records`);
+check("issue lists exactly the expected CAs",
+  EXPECTED.every((c) => of("issue").some((r) => r.ca === c)) && of("issue").every((r) => EXPECTED.includes(r.ca)),
+  of("issue").map((r) => r.ca).join(", ") || "none");
+check("issuewild restricts wildcards", of("issuewild").length > 0, of("issuewild").map((r) => r.ca).join(", ") || "none");
+check("iodef is a valid URL", of("iodef").some((r) => /^(mailto:\S+@\S+|https?:\/\/\S+)$/.test(r.value)),
+  of("iodef").map((r) => JSON.stringify(r.value)).join(", ") || "none");
+for (const host of HOSTS) {
+  const cert = await issuerOf(host);
+  const ca = (ISSUERS.find(([re]) => re.test(cert.issuer.O)) || [])[1] || "unknown";
+  check(`${host} certificate is from a permitted CA`, of("issue").some((r) => r.ca === ca), `${cert.issuer.O} (${ca})`);
+  let c = cert, chain = [];
+  while (c && !chain.includes(c.fingerprint256)) { chain.push(c.fingerprint256); if (/emudhra|emsign/i.test(c.issuer.O)) chain.emsign = true; c = c.issuerCertificate; }
+  check(`${host} chain has no emSign`, !chain.emsign, `${chain.length} certificates`);
+}
+
+for (const r of results) console.log(`${r.pass ? "GREEN" : "RED  "}  ${r.name} — ${r.detail}`);
+process.exit(results.every((r) => r.pass) ? 0 : 1);
+```
+
+On a domain with no CAA yet, every line is red. After Steps 2 and 3, every line should be green.
+The `iodef` line is the one that catches the easiest mistake: the dashboard field accepts a
+leading space, and `" mailto:…"` is not a URL, so a CA that follows RFC 8659 ignores the record
+and reports nothing.
+
+**What the CRM Sync harness checks for `crm-sync.dev`.** The same checks run in the CRM Sync
+test harness alongside the custody checks they support. Green means the control is built and
+holding; red means a known gap, kept failing on purpose until it is built:
+
+| Test | What it proves | State |
+|---|---|---|
+| CAA evaluator | The RFC 8659 rules, run against fixed record sets: only listed CAs, emSign refused, `issuewild` narrows wildcards, `issue ";"` permits nothing, an unknown critical tag stops all issuance | Green |
+| Published CAA | `issue` and `issuewild` list exactly the five expected CAs | Green |
+| Served certificates | The apex and `www` (Google Trust Services) and `account` (Let's Encrypt) are each from a permitted CA | Green |
+| No emSign | No served chain includes eMudhra or emSign | Green |
+| `iodef` | A valid reporting address is published. It was red until 24 October 2026, and the first save failed it with a leading space | Green |
+| Webhook signatures | Shopify webhook HMACs are compared in constant time | Green |
+| Signed, chained consent | Consent rows are chained and Ed25519-signed, and a failure keeps the row | Green |
+| Chain order | One successor per hash, and a dense sequence number inside the hashed row | Green |
+| Erasure fan-out | Erasure reaches Shopify, Klaviyo, Salesforce, Adobe, Google Customer Match, the pLTV score and agent mandates | Green |
+| No committed private key | Worker source carries no private key; the public JWKS has public Ed25519 keys only | Green |
+| Erasure to service, fraud and CMP vendors | Gorgias, Sprinklr, Signifyd, OneTrust | Red |
+| Purpose tags | Fraud and support data kept out of ad destinations | Red |
+| Clock skew | `received_at` recorded and skew flagged on inbound vendor events | Red |
+| Rust shape gate | Inbound vendor payloads parsed by a Rust/Wasm gate | Red |
+| Vendor ID links | Every vendor's customer ID linked to the user spine in one place | Red |
+
+The red rows match the gaps in [The plugin in the middle](#the-plugin-in-the-middle-data-ownership-from-shopify-to-crm-service-fraud-consent-and-google-pltv).
 
 Sources: [RFC 8659 — DNS CAA Resource Record](https://www.rfc-editor.org/rfc/rfc8659);
 [Cloudflare — CAA records](https://developers.cloudflare.com/ssl/edge-certificates/caa-records/);
