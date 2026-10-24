@@ -1536,6 +1536,40 @@ customer base, at every place the copy lives.
 With those in place, a use-after-free at any one hop yields only what that hop was allowed to
 see.
 
+#### How RuBAC with Xano entitlements sits on top of memory safety
+
+Rule-based access control (RuBAC) and memory safety answer different questions. Memory safety
+asks: **does the program do only what its code says?** RuBAC asks: **should this request be
+allowed at all?** Each layer in the table assumes the one beneath it holds.
+
+| # | Layer | The question it answers | In this stack | What it can't stop |
+|---|---|---|---|---|
+| 1 | **Hardware and operating system memory** | Can one process read another's memory? | Separate address spaces per process, address randomisation (ASLR), non-executable memory | A bug *inside* one process |
+| 2 | **Language memory model** | Can this program use memory it has released? | **C, C++ and the PHP engine:** manual, so a use-after-free is possible. **Rust:** ownership forbids it when the code is built. **JavaScript and Java:** garbage collection | A program that is memory-safe but has the wrong logic |
+| 3 | **Sandbox or isolate** | If the code breaks, how far can it reach? | Cloudflare Worker V8 isolates, Wasm linear memory, a container per service | Anything the sandbox was *given*: its secrets, bindings and tokens |
+| 4 | **Transport (TLS)** | Can someone read or change the request on the wire? | Cloudflare edge certificate, Full (strict), an origin certificate or tunnel, TLS to Xano | A request that is properly encrypted but malicious |
+| 5 | **Identity** | Who is calling? | `/auth/me`, the provider's subject in `user_claims`, a signed session or JWT | A real user asking for something they shouldn't have |
+| 6 | **Entitlement** (Xano) | What has this subject been granted? | `entitlements`: `features` are roles, `caps` are scoped capabilities such as `crm:customer:read`, granted by purchase or by an admin and signed with EdDSA keys | Whether *this row, right now*, is allowed |
+| 7 | **RuBAC rules** (a Xano function stack or a Worker gate) | Given who is calling, what they hold and the request's context, is this allowed? | Rules that combine the capability with conditions: same tenant, owner of the row, consent on record for this purpose, market and residency (Korean personal data stays in Korea), a time window, an agent's mandate. They fail closed | A rule that was written wrong |
+| 8 | **Data** | Does the database enforce it too? | Row checks on every Xano query, a role per service, Postgres row-level security where it is used | A caller that holds a legitimate broad role |
+| 9 | **Audit** | Can we prove what happened? | The ledger: chained, signed rows (`seq`, `prev`, a signature) with the consent version at capture | Nothing; it records, it doesn't block |
+
+**Layers 5 to 8 run on top of layers 1 to 3.** A rule is code. If a use-after-free breaks the
+process that *evaluates* the rule, the attacker runs as that process and can skip the rule. So
+where a rule runs matters more than how it is written:
+
+| Where RuBAC is enforced | What a use-after-free in PHP gets the attacker |
+|---|---|
+| **Inside the PHP app** (a WordPress or Magento plugin checks roles) | Everything. The check and the database login share one memory space, so the attacker skips the check and uses the login |
+| **In Xano or a Cloudflare Worker, separate from PHP** | Only what PHP's own token is entitled to. The rules run in another memory space, on another machine, where the PHP bug can't reach, and each request is still judged on its claims, capabilities and conditions |
+| **In Xano, with PHP holding no database login at all** | Only what the signed-in user could already see. PHP asks Xano, and Xano decides row by row |
+
+**The design rule:** keep the code that might break (C, C++, PHP and third-party plugins) in a
+different memory space from the code that decides access (Xano rules, a Rust gate, a Worker),
+and give the breakable side the narrowest entitlement it needs. A memory bug at the bottom of the
+stack then can't rewrite the rules at the top. It can only ask them questions, and they still
+answer per request.
+
 The short definition is in the [Vocabulary](#vocabulary) under **Use-after-free (UAF)**.
 
 ### If you have to keep Magento, WooCommerce or WordPress: reinforce in place with Rust and parcels
