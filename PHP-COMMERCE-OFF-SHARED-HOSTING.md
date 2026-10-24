@@ -881,10 +881,14 @@ Stripe ──┘                             └─→ Xano: user ID spine, perm
 which vendor and when; under which consent and purpose; which vendor decisions (fraud, refunds,
 service actions) changed the order; and whether every copy was erased.
 
-**Status.** The pieces this builds on are live: consent records with device provenance, Shopify
-webhook HMAC checks, Ed25519 signing for mandates and receipts, and Xano permissions. The Rust
-shape gate, the cross-vendor bus, the vendor ID links and the erasure fan-out described here
-are a pattern, not a shipped feature.
+**Status.** Built today: consent records with device provenance, Shopify webhook HMAC checks in
+constant time, consent and erasure events in a hash chain ordered by `seq` and `prev_hash` and
+signed with Ed25519, and erasure fan-out to Shopify, Klaviyo, Salesforce, Adobe, Google Customer
+Match, the pLTV score and any agent mandates, with the Google instruction written to the chain.
+Not built yet, and pinned as failing tests in the CRM Sync test harness: erasure to helpdesk,
+fraud and CMP vendors (Gorgias, Sprinklr, Signifyd, OneTrust), purpose tags that keep fraud and
+support data out of ad destinations, `received_at` with clock-skew flags, the Rust shape gate,
+and one table linking every vendor ID to the user spine.
 
 ## Google Merchant API: rebuild loyalty, reviews and comparison in one pass
 
