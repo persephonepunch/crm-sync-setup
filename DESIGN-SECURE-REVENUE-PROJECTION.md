@@ -189,7 +189,9 @@ One product, as served today:
     "shipping": [{ "country": "US" }],
     "shoppingAdsExcludedCountries": ["KP", "IR", "SY"]
   },
-  "productStatus": { "itemLevelIssues": [] }
+  "productStatus": { "itemLevelIssues": [
+    { "code": "missing_identifier", "severity": "warning", "attribute": "gtins",
+      "description": "Neither GTIN nor MPN present" } ] }
 }
 ```
 
@@ -205,7 +207,7 @@ One product, as served today:
 
 The walk from a flat product CSV to this shape, including why a missing `Handle` makes the same
 file read as 4 products or 169, is in
-[From product.csv to Consented Conversions](https://persephonepunch.github.io/crm-sync-setup/consented-data-layer.html).
+[From product.csv to Consented Conversions](https://persephonepunch.github.io/crm-sync-setup/book/consented-data-layer/).
 
 ### The user tags event bus
 
