@@ -891,6 +891,85 @@ fraud and CMP vendors (Gorgias, Sprinklr, Signifyd, OneTrust), purpose tags that
 support data out of ad destinations, `received_at` with clock-skew flags, the Rust shape gate,
 and one table linking every vendor ID to the user spine.
 
+#### Google audiences and conversions with Vertex AI, and where LoRA fits: scoping private channel data
+
+The service bus decides what each channel's data may be used for before any of it reaches
+Google or a model. Three Google uses are in play, and one AI technique that is often confused
+with them:
+
+- **Conversions:** order values sent to Google Ads (enhanced conversions, or Data Manager) so
+  bidding learns which clicks led to sales.
+- **Audiences:** hashed contacts sent to Customer Match, so ads reach or exclude known customers.
+- **Predicted lifetime value (pLTV):** a model scores each customer's likely future spend, and
+  the score is sent as the conversion value instead of the first order's total. BigQuery ML
+  trains it in place; **Vertex AI** is Google's platform for training and serving larger models
+  when a client's Google team wants more than BigQuery ML.
+- **LoRA (Low-Rank Adaptation):** a small add-on trained beside a language model that changes
+  how it writes (tone, format, classification), not what it knows. It is not a targeting or
+  scoring tool.
+
+**Scope by channel.** Each record on the bus carries its purpose, and the purpose decides the
+destinations:
+
+| Channel data | Google Ads conversions | Customer Match audiences | pLTV features (BigQuery ML or Vertex AI) | LoRA training |
+|---|---|---|---|---|
+| **Shopify orders** (value, items, hashed email) | Yes, with `ad_user_data` granted | Yes, with `ad_user_data` and `ad_personalization` granted | Yes, under a pseudonymous ID, never the email | No |
+| **Klaviyo or Salesforce engagement** | No | Only customers who granted both signals | Yes, as counts and recency per pseudonymous ID | No |
+| **Helpdesk tickets** (Gorgias, Sprinklr) | No | No | No: the purpose is support | Only redacted, de-identified question-and-answer pairs, with a training basis, to teach support tone and format |
+| **Fraud decisions** (Signifyd, Stripe Radar) | No | No | No: the purpose is fraud prevention | No |
+| **Consent** (OneTrust, Shopify Customer Privacy) | Sent only as Consent Mode signals | Decides who is eligible | Filters who is scored for ad use | Decides whose pairs may be used |
+| **Korean buyers** | Aggregate count and value only, unless itemised release consent (PIPA Art. 28-8) is recorded | Only with that release consent | Scored on Korean-hosted systems, not sent abroad | Korean data trains only on Korean-hosted models |
+
+Two rules sit under the table. Personal data never goes into model weights, because an erasure
+request can't reach inside a trained model. And Google receives conversions, audiences and
+pLTV scores, never the vectors or the documents behind Ask-the-Docs; those stay in Cloudflare.
+
+**The flow:**
+
+```
+service bus (purpose + consent on every record)
+  ├─ conversions ─→ consent gate (ad_user_data) ─→ Google Ads / Data Manager
+  ├─ audiences ───→ consent gate (both signals) ─→ hashed contacts ─→ Customer Match
+  ├─ pLTV ────────→ pseudonymous features ─→ BigQuery ML  (or Vertex AI, client's Google team)
+  │                  score ─→ Xano / Worker ─→ sent as the conversion value
+  └─ LoRA ────────→ redacted, de-identified pairs ─→ one adapter per client and channel
+                     facts stay in Cloudflare Vectorize (RAG), so erasure still works
+```
+
+**Where Vertex AI fits.** It is an add-on, not a dependency. Training or serving a model in
+Vertex needs the client's own Google Cloud project, which their Google or analytics team owns
+and an agency usually can't reach. So the core runs without it: BigQuery ML trains pLTV where
+the data already sits. Vertex is handed over to the client's Google team with three things
+named: the permission it needs, the team that grants it, and what it unlocks (larger models,
+scheduled retraining, online scoring). Either way, the features arrive under a pseudonymous ID,
+and the score comes back to Xano, which decides whether it may be used.
+
+**How LoRA scales without widening access.** Scaling here means more small adapters, not one
+bigger shared model:
+
+- **One adapter per client and channel**, owned by that client as their asset. A support-tone
+  adapter for one brand is never loaded for another.
+- **Behaviour only.** Tone, format, routing and classification. Prices, stock, policy and legal
+  text stay in RAG, where they can be updated and erased.
+- **Trained on de-identified pairs only.** Names, emails, phone numbers, order numbers and card
+  data are removed first, and the pairs need their own legal basis, because training is a
+  separate purpose from answering.
+- **Recorded on the bus like any other transfer:** which dataset (by hash), which purpose, who
+  approved it, which base model, and when. An adapter with no record isn't loaded.
+- **Hosted where the data may go.** Workers AI accepts your own LoRA adapters on supported base
+  models (check current limits on rank, size and count), and Vertex AI tunes adapters inside the
+  client's Google project. Korean data uses a Korean-hosted model.
+- **Climbed to only on evidence.** Retrieval first; an adapter is trained when an evaluation set
+  shows retrieval finding the right passage but the answer still coming out wrong.
+
+**Status.** Built today: the consent-gated export of pseudonymous IDs to BigQuery, carrying the
+four Consent Mode signals; a BigQuery ML pLTV model (boosted tree, first-week features predicting
+90-day revenue) whose scores come back to the Worker; pLTV used as the audience value when a
+score exists; and all retrieval vectors in Cloudflare. Not built: Vertex AI training or serving,
+any LoRA adapter, the purpose tags that route records by scope (a failing test in the harness),
+the Korean release-consent check before an identifier upload, and requiring the purchase
+session's consent record before any upload.
+
 ## Google Merchant API: rebuild loyalty, reviews and comparison in one pass
 
 The Google feed integration is being rebuilt regardless. The Content API for Shopping shut
