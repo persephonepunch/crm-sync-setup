@@ -300,6 +300,117 @@ MySQL server. The risk is not the laptop; it is how the site usually gets publis
 6. **Dumps are encrypted, expire, and live outside the web root,** deleted after the restore
    they were made for.
 
+### Where Magento's database actually runs: MAMP, a VM, Docker or Azure
+
+Magento does not come with a database. It is a PHP application that connects to a MySQL or
+MariaDB server, and where that server runs depends on how the store is set up. MAMP and WAMP
+are only one of those places, and the weakest one for Magento.
+
+| Setup | Where the database runs | What to know |
+|---|---|---|
+| **MAMP or WAMP on a laptop** | A MySQL server inside the desktop bundle | Magento 2 also needs OpenSearch, and in practice Redis or Valkey; MAMP and WAMP bring only Apache, PHP and MySQL. A full Magento 2 does not run on them alone, and what does run is not what production runs |
+| **Docker on a laptop** | A MariaDB or MySQL container next to PHP, search and cache containers | The usual developer setup (DDEV, Warden, docker-magento). The same images can be used in production, which is the point |
+| **A small self-hosted store** | The **same VM** as PHP, search and the web server | The shared-box pattern: one compromised plugin reaches the database on the same machine |
+| **A larger self-hosted store** | Its **own VM**, or a managed database (Amazon RDS or Aurora, Azure Database for MySQL, Google Cloud SQL) | Better isolated, but the database still trusts any query that gets past PHP |
+| **Adobe Commerce Cloud** | Inside Adobe's managed cluster, on AWS or Azure. On the Pro plan, production runs on three dedicated VMs with MariaDB replicated across them (Galera) | Adobe runs the VMs. Your code, extensions and admin users are still your risk |
+| **Shared hosting (cPanel)** | A MySQL server shared with other customers' sites | The setup this article tells you to leave |
+
+**Moving the database to its own VM is a step, not the finish.** It stops a neighbour's site
+from reaching your tables. It does not stop your own PHP from reading every table, because
+Magento connects as one database user with rights to all of them. The rules about who may read
+which customer's rows still have to live somewhere: in a row-level gate in front of the data, or
+in Xano, as the migration path below describes.
+
+#### Docker with the database: the setup that matches production
+
+The same images run on a laptop, in staging and in production. The database is a container (or
+a managed service in production) that nothing outside the private network can reach.
+
+```yaml
+# compose.yaml: Magento 2.4.8 locally, shaped like production. Check Adobe's system
+# requirements for your exact version; these follow 2.4.8.
+services:
+  web:                      # nginx: the only service with a published port
+    image: nginx:1.28
+    ports: ["127.0.0.1:8080:80"]       # localhost only; production sits behind Cloudflare
+    depends_on: [php]
+  php:                      # your own image: PHP-FPM 8.3 or 8.4, Magento code baked in
+    build: .                  # its app/etc/env.php reads these; Magento does not read them by itself
+    environment:
+      DB_HOST: db
+      DB_NAME: magento
+      DB_USER: magento_app            # not root
+    secrets: [db_app_password]         # read from a file at runtime, never in the image
+    depends_on: [db, search, cache]
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: magento
+      MARIADB_USER: magento_app
+      MARIADB_PASSWORD_FILE: /run/secrets/db_app_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets: [db_app_password, db_root_password]
+    volumes: [dbdata:/var/lib/mysql]
+    # no "ports:" — only containers on this network can reach the database
+  search:
+    image: opensearchproject/opensearch:2.19.1
+    environment: { discovery.type: single-node, DISABLE_SECURITY_PLUGIN: "true" }   # local only
+  cache:
+    image: valkey/valkey:8
+secrets:
+  db_app_password:  { file: ./secrets/db_app_password }    # git-ignored
+  db_root_password: { file: ./secrets/db_root_password }
+volumes: { dbdata: {} }
+```
+
+What the file shows, in plain terms:
+
+- **Only the web server has a door.** The database, search and cache have no published port, so
+  nothing outside the containers' private network can reach them. On a laptop the web port binds
+  to `127.0.0.1`, not to the café's Wi-Fi.
+- **Magento connects as its own user, not `root`.** The root password exists only for the
+  database container's own setup, and the application never sees it.
+- **Passwords are files, mounted at runtime.** They are not in the image, the Git history or
+  `env.php` in the repository.
+- **The data lives in a named volume, not in the image.** Rebuilding the image does not touch
+  the data, and the data never travels inside the image.
+- **Search security is off only because this is local.** In production, OpenSearch runs with its
+  security plugin on, or as a managed service.
+
+**In production,** the same `php` image runs in a container platform, and the `db` container is
+usually replaced by a managed database. Nothing else in the file changes shape: the
+application still reaches the database by name, with its own user, over a private network.
+
+#### On Azure: the database, Blob Storage and the containers
+
+| Part | Azure service | Settings that matter |
+|---|---|---|
+| **PHP and nginx** | Azure Container Apps, or AKS for a larger store | The image built from the file above, pulled by digest. Only the ingress is public, and it sits behind Cloudflare |
+| **Database** | Azure Database for MySQL, Flexible Server | Private access (VNet integration) with **no public endpoint**; TLS required; a Magento user that is not the admin login; automatic backups with point-in-time restore |
+| **Search** | OpenSearch in a container on the private network, or a managed OpenSearch service | Never reachable from the internet |
+| **Cache and sessions** | Azure Managed Redis, or Valkey in a container | Private network only |
+| **Secrets** | Azure Key Vault | The database password and `crypt/key` come from Key Vault at runtime, through a managed identity, so no password sits in a file on a VM |
+| **Product images and media** (`pub/media`) | Azure Blob Storage | A **private** container, served through a CDN. See the note below |
+| **Database dumps and backups** | Azure Blob Storage, in a separate storage account | Encrypted, private, short-lived SAS links only, an immutability policy so a dump cannot be quietly replaced, and a lifecycle rule that deletes it |
+
+**A note on Blob Storage and Magento.** Magento's built-in remote storage supports Amazon S3, not
+Azure Blob. On Azure you either add a remote-storage adapter extension for Blob, or mount Blob into
+the container with BlobFuse2 or Blob NFS. Either way:
+
+- **Blob holds files, never the database.** Images, invoices and exports go there. The MySQL data
+  stays in the database service.
+- **The container is private.** Public access is turned off on the storage account. Shoppers get
+  images through the CDN, not from a public container URL.
+- **Dumps go in a different storage account from media.** A media account has to be readable by
+  the CDN; a backup account should be readable by almost no one.
+- **Invoices and exports with customer data get the same treatment as dumps:** private,
+  short-lived links, and a deletion rule.
+
+**The order to do it in:** Docker locally first, so every developer runs the same stack; then
+the managed database with private access; then Key Vault for the secrets; then Blob for media
+and backups. Each step removes one shared-box risk without waiting for the next. The
+permission rules, who may read which customer's rows, are the step none of these replace.
+
 ### The migration path: MySQL on a VM to Postgres in Xano
 
 Moving identity and customer data off WordPress's MySQL and into Xano's Postgres is a one-time
