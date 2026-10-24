@@ -54,6 +54,7 @@ chapters:
       - AI-CROSS-BORDER-REQUIREMENTS-CHECKLIST.md   # 2026-09-25 · AI cross-border requirements: a scannable checklist
       - SECURE-FRONTEND-AI-SAFE-BACKEND.md   # 2026-10-04 · Secure frontend, AI-safe backend: Webflow collections, fallback publish
       - SVG-RUST-ELM-SECURITY-GAPS.md   # 2026-10-13 · SVG, Rust and Elm: the security gaps illustration
+      - DESIGN-SECURE-REVENUE-PROJECTION.md   # 2026-10-24 · Design for Secure Revenue Projection
   - category: Specs
     docs:
       - ARCHITECTURE.md   # 2026-05-26 · CRM Sync — Why This Architecture Is Safer
