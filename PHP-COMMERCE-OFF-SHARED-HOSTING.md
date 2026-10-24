@@ -1482,6 +1482,60 @@ for another.
   page, and permission checks on every record. Most of these patches then become routine
   maintenance instead of an emergency.
 
+#### When the break meets an integration platform: Celigo, MuleSoft and Boomi
+
+A use-after-free is **how** an attacker gets in. It gives them no new permissions: it hands them
+the permissions the broken program already had. So how much they take depends on what that
+program, and everything connected to it, can reach. Integration platforms are where that reach
+usually grows.
+
+Celigo, MuleSoft and Boomi reach an on-premises or self-hosted database through an agent or
+connector that holds a database login: Boomi's Atom, MuleSoft's Database Connector, Celigo's
+on-premise agent. That login can usually run any query its database user is allowed to. A
+"daily sync" can therefore just as easily be a **daily full copy** of the database into another
+company's cloud.
+
+| What the integration does | Why it matters |
+|---|---|
+| One login reads every table | The job needs order rows; the login can also read customers, password hashes and secrets in configuration tables |
+| The copy passes through the platform | Rows sit in its staging, queues, retries and run logs, under its retention rules, not yours |
+| A full re-sync overwrites the destination | A consent withdrawal made in the destination is reset by the next nightly load from the source |
+| Nothing proves what moved | There is a run log, but no signed record of which rows, under which consent, went where |
+| The login has to reach the database port | It comes in through a firewall exception or a VPN into the database itself |
+
+**Where the break happens, and what the attacker inherits:**
+
+| Where the break happens | What the attacker inherits |
+|---|---|
+| **PHP: the Magento or WooCommerce process** | `env.php` or `wp-config.php`, holding the database login (one user, every table) and Magento's `crypt/key`: the whole database, decryptable |
+| **MySQL itself** (written in C++) | It has to be reachable first. An integration agent that connects to the database port puts that port on a network path; without it, the port could stay closed to everything except PHP |
+| **The integration platform or its agent** | Mostly Java or Node, which manage their own memory, so a use-after-free in their own code is unlikely. But they hold a login that reads everything, plus copies of the rows in staging and logs. A break there, by any method, exposes the mirror |
+| **The destination** (CRM or warehouse) | A full copy, refreshed daily, so what is taken is never more than a day old |
+
+**The point is the combination.** A use-after-free is a defect in C and C++ code that no setting
+removes. A broad login and a daily full copy turn one memory bug at one hop into the whole
+customer base, at every place the copy lives.
+
+**The fixes split the same way.**
+
+- **Make a break less likely:** a Rust gate in front of PHP, PHP and MySQL kept patched, and no
+  open database port.
+- **Make a break smaller, without dropping the integration platform:**
+  - **A scoped login.** Read-only, on views that expose only the columns the job needs, never the
+    base tables.
+  - **Changes, not copies.** Change data capture or an outbox table, so only changed rows move,
+    each with its timestamp and consent state.
+  - **Push from the source.** The source writes to a signed event bus and the platform subscribes,
+    the service-bus pattern in
+    [The plugin in the middle](#the-plugin-in-the-middle-data-ownership-from-shopify-to-crm-service-fraud-consent-and-google-pltv).
+  - **A gate between the agent and the data.** A tunnel to an endpoint that checks consent and
+    scope, not an open database port.
+  - **Retention on the platform side.** Short log retention, and payload logging turned off for
+    personal data.
+
+With those in place, a use-after-free at any one hop yields only what that hop was allowed to
+see.
+
 The short definition is in the [Vocabulary](#vocabulary) under **Use-after-free (UAF)**.
 
 ### If you have to keep Magento, WooCommerce or WordPress: reinforce in place with Rust and parcels
