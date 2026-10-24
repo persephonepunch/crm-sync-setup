@@ -834,8 +834,9 @@ Stripe ──┘                             └─→ Xano: user ID spine, perm
    Gorgias customer, OneTrust identifier, Stripe customer) is linked to it. The bus carries the
    spine ID, never the email address.
 2. **Verify the sender at the gate.** Webhooks are checked by their HMAC or signature
-   (Shopify, Stripe, Signifyd and Gorgias all sign theirs) before anything is read, then parsed
-   into a declared shape by the Rust gate. Unknown fields and oversized bodies are refused.
+   (Shopify, Stripe and Signifyd sign theirs; for any vendor that doesn't, use a per-vendor secret
+   URL behind Cloudflare Access) before anything is read, then parsed into a declared shape by
+   the Rust gate. Unknown fields and oversized bodies are refused.
 3. **Consent travels with the record.** The gate reads the consent state at the moment of the
    transfer (CMP receipt plus Shopify signal) and writes it into the record. Google receives
    only what was actually granted, never a value inferred from something else.
@@ -880,10 +881,10 @@ Stripe ──┘                             └─→ Xano: user ID spine, perm
 which vendor and when; under which consent and purpose; which vendor decisions (fraud, refunds,
 service actions) changed the order; and whether every copy was erased.
 
-**Status.** The pieces this builds on are live: consent records with device provenance, the
-Rust-shaped gate, Ed25519 signing for mandates and receipts, and Xano permissions. The
-cross-vendor bus, the vendor ID links and the erasure fan-out described here are a pattern, not
-a shipped feature.
+**Status.** The pieces this builds on are live: consent records with device provenance, Shopify
+webhook HMAC checks, Ed25519 signing for mandates and receipts, and Xano permissions. The Rust
+shape gate, the cross-vendor bus, the vendor ID links and the erasure fan-out described here
+are a pattern, not a shipped feature.
 
 ## Google Merchant API: rebuild loyalty, reviews and comparison in one pass
 
