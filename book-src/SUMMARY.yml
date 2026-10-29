@@ -119,6 +119,7 @@ chapters:
       - SEGMENTS-GA4-BIDDING.md   # 2026-07-22 · Marketing was built on the page view. The funnel now pays for the cons
       - REST-IS-NOT-GRAPHQL.md   # 2026-07-27 · REST Is Not GraphQL
       - SHOPIFY-AND-GOOGLE-SUNSETS.md   # 2026-09-16 · Shopify and Google sunsets: what is due before 11 November 2026
+      - docs/HYDROGEN-OR-BESPOKE-STACK.md   # 2026-10-29 · Hydrogen or a Bespoke Xano + Cloudflare Stack
   - category: Webflow
     docs:
       - WEBFLOW-APP-CHECKLIST.md   # 2026-05-29 · Webflow App Requirements Checklist (2026)
