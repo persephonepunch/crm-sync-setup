@@ -25,7 +25,7 @@ The Org Trust Layer gives an organization its own certificate authority and sign
 | Today | With the Org Trust Layer |
 |---|---|
 | Shared API keys and passwords for scanners, partners and services | A client certificate per device, service and agent, revocable one at a time |
-| Public CA certificates on internal systems, installed by hand (including SAP `STRUST`) | Certificates from the organization's own CA, issued from a request and renewed automatically |
+| Public CA certificates on internal systems, installed by hand (including in SAP's `STRUST` trust store) | Certificates from the organization's own CA, issued from a request and renewed automatically; SAP still holds them in `STRUST`, but the root is imported once and renewals come from the same CA |
 | Trust that breaks when a public CA is distrusted (eMudhra's emSign in 2026, Entrust in 2024) | Internal trust that depends only on the organization's own root |
 | A consent cookie any script on the page can read or change | A consent choice signed under the organization's key and checked at the edge |
 | No record of where a record came from or on what basis it was shared | Signed provenance on every outgoing record |
