@@ -446,6 +446,47 @@ let allowed = caller.market == "KR"
 if !allowed { return Err(StatusCode::FORBIDDEN); }
 ```
 
+### Certificates, PKI tokens and the data release
+
+*The security layer under edge-served data and privacy cookies, after the eMudhra CA compromise*
+
+Certificates prove who is on each end of a connection. The release gate decides whether data may leave, to whom and when. TLS proves the connection, not the bytes, so a valid certificate never unlocks data by itself.
+
+| Step | Certificate's role | What decides |
+|---|---|---|
+| 0. Inbound connection | The TLS server certificate proves the visitor reached the real domain. CAA DNS records limit which CAs may issue it. | Nothing is released |
+| 1. Who is calling | People present tokens. Machines such as a POS or SAP can present a client certificate (mutual TLS), which proves which machine; the Worker maps it to caps. | Identity only |
+| 2. Agent mandates | AP2 mandates are signed credentials checked against the issuer's published keys. | The caps and limits inside the mandate |
+| 3. Release decision | None. The Worker gate and the Xano release gate check consent at the system of record, market, caps and residency, fail closed and write the release ledger. | This is the release |
+| 4. Outbound call | Certificates prove the destination: public TLS to Google and Shopify, a client certificate to SAP, Samsung Pay's encrypted token, Apple Pay's merchant certificate at Stripe. | Delivery of data already approved |
+| 5. Audit | The ledger records which key or certificate fingerprint signed or carried each release. | Evidence, not a decision |
+
+#### What is a PKI token
+
+A PKI token is a credential whose authority comes from a private key, checked against the matching public key or certificate. It has two common forms. A **hardware PKI token** is a USB key or smart card that holds a private key and its certificate; the key never leaves the device, which is how India's digital signature certificates are issued. A **software PKI token** is a signed token (JWS, or an encrypted JWE) that anyone can verify against a published key set without calling the issuer.
+
+**Permissions it carries.** Audience, scope or caps, market, and the subject it acts for, all inside the signature, so a holder can't widen them. The release gate still checks them against the system of record.
+
+**History restrictions.** Limits in time and use: not-before and expiry; a unique ID so each token or mandate is used once or a set number of times, recorded in the ledger; revocation (a denylist for tokens, CRL or OCSP for certificates); and a read window, so a token reaches only records created after the subject's consent and inside the retention period, never back-filled history.
+
+**Key rotation.** Signing keys move from next to active to retired. Tokens and certificates signed by a retired key still verify until they expire, and a compromised key is revoked instead of retired.
+
+#### The eMudhra gap
+
+In October 2026 a researcher showed that the private keys of eight eMudhra intermediate CAs could be recovered from their public certificates. Browsers blocked them within days, and Chrome removed the emSign ECC Root CA - G3 from its root store on 27 October 2026. Every site and client that trusted that chain had to replace certificates or patch trust stores, including Node, Python's certifi and Go. The lesson for edge-served data: TLS trust is rented from public CAs, and a CA failure breaks the layer that Secure cookies and edge delivery depend on.
+
+| Cookie flag | What it stops | Depends on the CA chain |
+|---|---|---|
+| `Secure` | Sending the cookie over plain HTTP | Yes: a forged certificate lets an interceptor read it |
+| `HttpOnly` | Script on the page reading the cookie | No |
+| `SameSite` | Sending the cookie on cross-site requests | No |
+| `__Host-` prefix | Subdomains setting or overriding the cookie; requires `Secure`, no `Domain` and `Path=/` | Yes |
+| `Partitioned` | A third-party cookie following the visitor across sites | No |
+
+**What closes the gap.** CAA records with an incident contact, so only chosen CAs can issue; Certificate Transparency monitoring for unexpected certificates; patched trust stores in every server-side client, not only browsers; and consent kept as a signed server-side record, so a stolen or forged cookie can't rewrite what a visitor agreed to.
+
+**Bring your own CA.** Device and code-signing certificates from a CA the business operates or chooses, with only the signing request leaving its network.
+
 ## A visitor's first page load
 
 The difference shows up before the visitor has said yes or no. Steps marked in pink are where data can leave without a decision; steps marked in blue are where the stack checks one.
@@ -523,6 +564,8 @@ The two can be combined. A Hydrogen storefront can read Xano for enriched produc
 - [Shopify API versioning](https://shopify.dev/docs/api/usage/versioning)
 - [Shopify: offline token dates (October 2026)](https://shopify.dev/changelog/blog/app-security-updates-october-2026), [access tokens](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens) and [Dev Dashboard apps](https://shopify.dev/docs/apps/build/dev-dashboard/create-apps-using-dev-dashboard)
 - [Google product data specification](https://support.google.com/merchants/answer/7052112)
+- [Eight eMudhra CA keys compromised (The Hacker News)](https://thehackernews.com/2026/10/eight-emudhra-ca-keys-compromised.html) and [trust stores to patch (Endor Labs)](https://www.endorlabs.com/learn/emudhra-intermediate-ca-compromise-the-trust-stores-you-patched-and-the-ones-you-didnt-know-you-had)
+- [RFC 8659: CAA](https://datatracker.ietf.org/doc/html/rfc8659) and [Set-Cookie attributes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie)
 - [workers-rs](https://github.com/cloudflare/workers-rs) and [how Workers run (V8 isolates)](https://developers.cloudflare.com/workers/reference/how-workers-works/)
 - [Axum](https://docs.rs/axum/latest/axum/) and [Tokio](https://tokio.rs/)
 - [Cloudflare Containers](https://developers.cloudflare.com/containers/)
