@@ -418,6 +418,34 @@ PATCH sap:A_Product/*  # outbound to SAP, server-only
 
 Example entries; route names are illustrative.
 
+### Where the payment gate runs: Worker or Axum
+
+*Who may pay with Kakao Pay is application code, not the runtime*
+
+Neither runtime decides who may pay with what. Tokio schedules tasks across a pool of threads, and Rust's ownership rules are checked when the code compiles. A Cloudflare Worker runs each request in its own V8 isolate. Both keep one request's memory away from another's, but a rule such as "Korean market plus the `settle_sovereign_kr` entitlement unlocks Kakao Pay" is code you write. It should gate on the market the purchase settles in and an entitlement cap, never on nationality.
+
+| Step | Where | What it does |
+|---|---|---|
+| 1. Verify the caller | Worker | Checks the token on the server and loads the caller's caps |
+| 2. Look up the market | Xano settlement policy and country gateway table | Returns the market's gateway, whether it is sovereign, and the cap it requires |
+| 3. Decide | Worker settlement gate | Refuses blocked, preview and sanctioned markets; returns 403 when a sovereign market's cap is missing |
+| 4. Settle | Worker, calling Kakao Pay | Runs ready and approve only after step 3 passes |
+
+**Why the Worker.** Every request already passes through it, so the rule sits beside the consent, tenant and mandate checks it depends on, and a refusal happens before anything reaches Xano, Shopify or Kakao. The request's `cf.country` is a useful signal, but it is where the IP address appears to be, not the market of settlement.
+
+**Where Axum fits.** A second check behind the Worker for server-only routes such as SAP and Dataverse writes. If it ever takes payment routes, it verifies the token and caps itself instead of trusting the Worker's result.
+
+**Rust at the edge.** The gate doesn't need Axum to be written in Rust: `workers-rs` compiles Rust to WebAssembly and runs it as a Worker, the same pattern as the shared Rust core in the Tauri apps.
+
+**Isolation by region.** Keeping Korean personal data in Korea is a deployment choice, a Seoul-region service beside a Seoul Xano instance, not something a thread scheduler or memory manager does.
+
+```rust
+// Axum middleware: fail closed unless the market and cap match
+let allowed = caller.market == "KR"
+    && caller.caps.iter().any(|c| c == "settle_sovereign_kr");
+if !allowed { return Err(StatusCode::FORBIDDEN); }
+```
+
 ## A visitor's first page load
 
 The difference shows up before the visitor has said yes or no. Steps marked in pink are where data can leave without a decision; steps marked in blue are where the stack checks one.
@@ -495,6 +523,7 @@ The two can be combined. A Hydrogen storefront can read Xano for enriched produc
 - [Shopify API versioning](https://shopify.dev/docs/api/usage/versioning)
 - [Shopify: offline token dates (October 2026)](https://shopify.dev/changelog/blog/app-security-updates-october-2026), [access tokens](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens) and [Dev Dashboard apps](https://shopify.dev/docs/apps/build/dev-dashboard/create-apps-using-dev-dashboard)
 - [Google product data specification](https://support.google.com/merchants/answer/7052112)
+- [workers-rs](https://github.com/cloudflare/workers-rs) and [how Workers run (V8 isolates)](https://developers.cloudflare.com/workers/reference/how-workers-works/)
 - [Axum](https://docs.rs/axum/latest/axum/) and [Tokio](https://tokio.rs/)
 - [Cloudflare Containers](https://developers.cloudflare.com/containers/)
 - [Google Wallet loyalty cards](https://developers.google.com/wallet/retail/loyalty-cards)
