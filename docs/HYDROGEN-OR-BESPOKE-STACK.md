@@ -25,6 +25,14 @@ tags:
 
 They aren't substitutes. Hydrogen replaces only the storefront layer. Pick it when a client wants a standard Shopify storefront with Shopify-managed hosting. Keep the bespoke stack as the core when data comes from more than Shopify, when one backend serves several brands or regions, or when consent and data residency must be enforced in code you control.
 
+## Headless only, or CMS-agnostic
+
+**Hydrogen and Next.js can only be headless with Shopify.** They replace the Online Store theme and run beside Shopify, so a store that adopts them leaves the theme editor and its theme apps behind.
+
+**Webflow, Xano and Cloudflare are CMS-agnostic.** The same worker, data layer and web components serve WordPress, Shopify, AEM and Next.js, Astro, Svelte or Vue front ends, and Webflow's CMS can itself act as a headless content source. Each can run headless, or be brought into a Shopify native theme through a theme app extension, so the store keeps its theme editor and checkout.
+
+App blocks need an Online Store 2.0 theme with JSON templates; app embeds work in vintage themes too. Shopify suggests keeping each block's own JavaScript under 10 KB compressed, so the block loads a small loader from the worker, as the CRM Sync Brand Kit extension does.
+
 ## Request path
 
 ### Hydrogen + Oxygen
@@ -68,6 +76,7 @@ Projects that run `npm run dev --codegen` are on 2026-04 or earlier and need Sho
 |----|----|----|----|
 | Scope | One storefront: pages, cart, customer accounts | Backend, PIM, CRM, consent, webhooks, agent checkout, several front ends | Bespoke |
 | Source of truth | Shopify | Xano; Shopify is one input | Depends |
+| Rendering model | Headless only, like Next.js on Shopify; the Online Store theme is replaced | CMS-agnostic: WordPress, Shopify, AEM, Next.js, Astro, Svelte, Vue, either headless or inside a Shopify theme through app blocks and app embeds | Bespoke |
 | Front end | React, rendered on the server | Any: Webflow, 11ty, UIkit with petite-vue, no React required | Bespoke |
 | Hosting | Oxygen, run by Shopify, included with the plan | Workers, KV, R2 on your Cloudflare account | Hydrogen |
 | Data residency | Oxygen decides; little regional control | You choose regions, including a Xano instance in the visitor's country | Bespoke |
@@ -470,6 +479,7 @@ The two can be combined. A Hydrogen storefront can read Xano for enriched produc
 - [Stripe: Korean payment methods](https://docs.stripe.com/payments/countries/korea)
 - [Shopify agent checkout](https://shopify.dev/docs/agents/checkout)
 - [Shopify customer authentication](https://shopify.dev/docs/api/customer-authentication)
+- [Shopify app blocks](https://shopify.dev/docs/storefronts/themes/architecture/blocks/app-blocks) and [theme app extension limits](https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration)
 - [Shopify Checkout Kit](https://shopify.dev/docs/storefronts/mobile/checkout-kit)
 - [Tauri 2 capabilities](https://v2.tauri.app/security/capabilities/)
 - [Hydrogen ModelViewer](https://shopify.dev/docs/api/hydrogen/latest/components/media/modelviewer)
