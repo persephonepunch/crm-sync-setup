@@ -211,21 +211,30 @@ The chatbot then climbs a decision ladder on that evidence: retrieval (RAG), cor
 
 ### Chatbot plugins: what they can't include
 
-Shopify app-store chat plugins and enterprise suites such as Sprinklr run the bot as a third-party script with the vendor's own storage, keys and certificates. That makes them a signing-keys-by-proxy problem of their own: whatever the shopper types lands in the vendor's transcripts, in the vendor's region, under the vendor's CA. Three things should stay out of them.
+Most Shopify stores answer shoppers through a third-party app: helpdesk suites such as Gorgias, Zendesk and Sprinklr; SMS and conversational marketing such as Attentive and Postscript; on-site chat such as Tidio, Shopify Inbox and Intercom; and the AI agents each of them now adds. They run the bot as a third-party script or service with the vendor's own storage, keys and certificates. That makes them a signing-keys-by-proxy problem of their own: whatever the shopper types lands in the vendor's transcripts, in the vendor's region, under the vendor's CA. Three things should stay out of them.
 
-| What | Typical chat plugin or Sprinklr bot | Published-KB chatbot |
+| What | Typical chatbot app (Gorgias, Attentive, Tidio, Sprinklr and others) | Published-KB chatbot |
 |---|---|---|
 | **Card data (PCI)** | Must not be typed into chat: a transcript holding card numbers puts the vendor, and you, in PCI DSS scope, and masking depends on the vendor | Never accepted. Payment happens only in Shopify checkout |
 | **Personal data (PII)** such as address, email, phone or ID numbers | Kept in the vendor's transcripts and region, outside your consent ledger, and missed when a deletion request runs | Not collected in chat. Identity comes from the signed-in account; consent is attached and deletion propagates |
 | **Checkout links** | A generic product or cart link, without the shopper's market, consent state or grant | A URL hand-off to Shopify checkout with market and consent resolved; payment never in chat |
-| Knowledge source | The vendor's copy of your help content, or private files uploaded to it | Published, signed records; Sprinklr content is migrated into them, then retired as a live source |
+| Knowledge source | The vendor's copy of your help content, or private files uploaded to it | Published, signed records; helpdesk articles and macros (Gorgias, Sprinklr, Zendesk) are migrated into them, then retired as a live source |
 | Keys and certificates | The vendor's CA and keys, inherited by proxy | Keys you own, verifiable offline |
 
 Check each vendor's terms and data-processing addendum for where transcripts are stored and how card numbers are masked; the point is that none of those choices are yours.
 
+What each kind of app holds, and so what moves by proxy when you install it:
+
+| Kind of app | Examples | What it holds about your shoppers | What to check |
+|---|---|---|---|
+| **Helpdesk and support chat** | Gorgias, Zendesk, Sprinklr | Conversations, order lookups, macros and help articles, often with read and write access to orders and refunds | Which order and refund actions its AI agent can take without a person, and whether it writes around your gate |
+| **SMS and conversational marketing** | Attentive, Postscript | Phone numbers, marketing consent, purchase and browsing signals, two-way message history | That marketing consent stays per channel and per market, and that opt-outs and deletions reach it on the event |
+| **On-site chat widgets** | Tidio, Shopify Inbox, Intercom | Chat transcripts, visitor identifiers, and whatever the shopper types | That card data and personal data are blocked at input, and where transcripts are stored |
+| **AI agents added to any of the above** | The vendors' own AI features | Training or retrieval over your help content and past conversations | Whether your content trains a shared model, and what happens to it when the subscription ends |
+
 ### Chatbot build requirements
 
-A headless Shopify proof of concept, built on public product feeds and chatbot articles, shows the gap this section describes. It uses public data on purpose, to show the difference between being visible and being governed. Anything public can be viewed by AI, but that does not incorporate it into a knowledge base corpus with rules and permissions: no issuer, version, locale or consent scope, and no grant saying who may use it for what. Public articles an AI can read are still ungoverned until they are published as records.
+A headless Shopify proof of concept, built on public product feeds and chatbot articles, shows the gap this section describes. It uses public data on purpose, to show the difference between being visible and being governed. Anything public can be viewed by AI, but that does not incorporate it into a knowledge base corpus with rules and permissions: no issuer, version, locale or consent scope, and no grant saying who may use it for what. Public articles an AI can read are still ungoverned until they are published as records. Its chatbot still answers from legacy Sprinklr articles that were never published through the knowledge base ladder, so its answers carry no issuer, version, locale or consent scope, and nothing traces back to a canonical record. Closing that gap is the build:
 
 **Why an ungoverned ladder hallucinates.** A chatbot or AI escalation ladder that retrieves from public docs without a governed corpus pulls *anything* that matches: an old article, another market's price, a machine translation, a page written for a different audience. With no guardrails, no global ISO rules and no personalised consent state, it has nothing to check an answer against, so it fills the gaps:
 
@@ -234,14 +243,14 @@ A headless Shopify proof of concept, built on public product feeds and chatbot a
 | **Guardrails** | Answers from any matching page, including retired or off-topic ones, and blends them | Retrieval reads published records only; weak evidence goes to CRAG or a person, never a guess |
 | **Global ISO rules** | Mixes countries, languages, currencies and dates: a US price in a Korean answer, a stale date shown as current | Every record keyed by ISO 3166 country, BCP 47 language, ISO 4217 currency and ISO 8601 UTC time; retrieval filters on them |
 | **Personalised consent state** | Personalises for everyone, or for no one, and can't tell which | Each answer checks the shopper's consent at the moment it's given; the locale adapter by default, personalisation only with consent |
-| **Provenance** | Cites nothing, or cites a page that says something else | Each answer names its record, its issuer and its grant | Its chatbot still answers from legacy Sprinklr articles that were never published through the knowledge base ladder, so its answers carry no issuer, version, locale or consent scope, and nothing traces back to a canonical record. Closing that gap is the build:
+| **Provenance** | Cites nothing, or cites a page that says something else | Each answer names its record, its issuer and its grant |
 
-- [ ] **Migrate** each Sprinklr article into a canonical record (one answer per question), then stop reading Sprinklr live
+- [ ] **Migrate** each legacy helpdesk article (Sprinklr here; Gorgias, Zendesk or another helpdesk elsewhere) into a canonical record (one answer per question), then stop reading it live
 - [ ] **Publish** every record with issuer, version, market, locale and consent scope, hashed and signed with a key you own
 - [ ] **Re-index** retrieval from the published records only, filtered by locale
 - [ ] **Hand off** checkout by URL to Shopify; take no card data and no personal data in chat
 - [ ] **Trace** every answer to its record, its issuer and its grant
-- [ ] **Retire** Sprinklr as a source once the published set covers its questions
+- [ ] **Retire** the helpdesk as a knowledge source once the published set covers its questions
 
 ### LoRA audience training, linked to BigQuery and organic lookup
 
@@ -298,7 +307,7 @@ Rules are summarised, not legal advice. Check Cloudflare's and Xano's current re
 
 Build the trust layer before the first market, so every market after it is a variable and a region, not a new integration.
 
-![Globalization MVP, security first: five phases with exit gates, the security-first foundation, per-market choices and why it is an MVP](https://persephonepunch.github.io/crm-sync-setup/assets/globalization-mvp-security-first.svg)
+![Globalization MVP, security first: five phases with exit gates, the security-first foundation, the four records published in every market (firmware, Markdown, permissions, escalation ladders), per-market choices and why it is an MVP](https://persephonepunch.github.io/crm-sync-setup/assets/globalization-mvp-security-first.svg)
 
 | Phase | Build | Exit gate |
 |---|---|---|

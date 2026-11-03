@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="884" viewBox="-5 -5 1510 884">
-<rect id="background" x="-5" y="-5" width="1510" height="884" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="1068" viewBox="-5 -5 1510 1068">
+<rect id="background" x="-5" y="-5" width="1510" height="1068" fill="#fff"/>
 <g id="header">
 <text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">Globalization MVP, security first</text>
 <text x="37" y="82" font-family="Arial" font-size="14" fill="#222">Build the trust layer before the first market, so every market after it is a variable and a region, not a new integration.</text>
@@ -78,53 +78,90 @@
 <rect x="37" y="394" width="1426" height="44" rx="6" fill="#f22428"/>
 <text x="51" y="422" font-family="Arial" font-size="14" fill="#fff">Security first: phases 0 and 1 ship before any market. Every later phase inherits the keys, grants, consent gate and ledger.</text>
 </g>
-<text x="37" y="484" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">PER-MARKET CHOICES, MADE ONCE AND RECORDED</text>
+<text x="37" y="484" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">PUBLISHED IN EVERY MARKET: SIGNED RECORDS, NOT COPIED FILES</text>
+<g id="published-firmware">
+<rect x="37.0" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="525" font-family="Arial" font-size="15" fill="#000">Firmware</text>
+<rect x="301.2" y="511" width="67" height="20" rx="10" fill="#f22428"/>
+<text x="334.7" y="525" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">PHASE 1</text>
+<text x="51.0" y="550" font-family="Arial" font-size="12.5" fill="#111">Image + SBOM per device class, signed at build,</text>
+<text x="51.0" y="568" font-family="Arial" font-size="12.5" fill="#111">vaulted under its own key; each download granted to</text>
+<text x="51.0" y="586" font-family="Arial" font-size="12.5" fill="#111">a device certificate.</text>
+</g>
+<g id="published-markdown--md">
+<rect x="397.2" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="411.2" y="525" font-family="Arial" font-size="15" fill="#000">Markdown (MD)</text>
+<rect x="661.5" y="511" width="67" height="20" rx="10" fill="#f22428"/>
+<text x="695.0" y="525" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">PHASE 2</text>
+<text x="411.2" y="550" font-family="Arial" font-size="12.5" fill="#111">One source with issuer, version, market, locale and</text>
+<text x="411.2" y="568" font-family="Arial" font-size="12.5" fill="#111">consent scope; builds the page, PDF, book and KB</text>
+<text x="411.2" y="586" font-family="Arial" font-size="12.5" fill="#111">records.</text>
+</g>
+<g id="published-permissions">
+<rect x="757.5" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="771.5" y="525" font-family="Arial" font-size="15" fill="#000">Permissions</text>
+<rect x="1021.8" y="511" width="67" height="20" rx="10" fill="#f22428"/>
+<text x="1055.3" y="525" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">PHASE 1</text>
+<text x="771.5" y="550" font-family="Arial" font-size="12.5" fill="#111">Grants and mandates: who, what action, which market,</text>
+<text x="771.5" y="568" font-family="Arial" font-size="12.5" fill="#111">until when; signed on issue and revocation, checked</text>
+<text x="771.5" y="586" font-family="Arial" font-size="12.5" fill="#111">every event.</text>
+</g>
+<g id="published-escalation-ladders">
+<rect x="1117.8" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1131.8" y="525" font-family="Arial" font-size="15" fill="#000">Escalation ladders</text>
+<rect x="1382.0" y="511" width="67" height="20" rx="10" fill="#f22428"/>
+<text x="1415.5" y="525" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">PHASE 4</text>
+<text x="1131.8" y="550" font-family="Arial" font-size="12.5" fill="#111">RAG sources, the CRAG evidence bar, allowed LoRA</text>
+<text x="1131.8" y="568" font-family="Arial" font-size="12.5" fill="#111">adapters and human hand-offs; each version reviewed</text>
+<text x="1131.8" y="586" font-family="Arial" font-size="12.5" fill="#111">and signed.</text>
+</g>
+<text x="37" y="668" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">PER-MARKET CHOICES, MADE ONCE AND RECORDED</text>
 <g id="market-choice-data-residency">
-<rect x="37.0" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="51.0" y="525" font-family="Arial" font-size="15" fill="#000">Data residency</text>
-<text x="51.0" y="550" font-family="Arial" font-size="12.5" fill="#111">A Xano region where offered, or self-hosted Xano in</text>
-<text x="51.0" y="568" font-family="Arial" font-size="12.5" fill="#111">country. China: self-host on a mainland cloud.</text>
+<rect x="37.0" y="684" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="709" font-family="Arial" font-size="15" fill="#000">Data residency</text>
+<text x="51.0" y="734" font-family="Arial" font-size="12.5" fill="#111">A Xano region where offered, or self-hosted Xano in</text>
+<text x="51.0" y="752" font-family="Arial" font-size="12.5" fill="#111">country. China: self-host on a mainland cloud.</text>
 </g>
 <g id="market-choice-edge-processing">
-<rect x="397.2" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="411.2" y="525" font-family="Arial" font-size="15" fill="#000">Edge processing</text>
-<text x="411.2" y="550" font-family="Arial" font-size="12.5" fill="#111">Cloudflare Regional Services and Geo Key Manager</text>
-<text x="411.2" y="568" font-family="Arial" font-size="12.5" fill="#111">keep TLS processing and keys in region; China</text>
-<text x="411.2" y="586" font-family="Arial" font-size="12.5" fill="#111">Network needs an ICP filing.</text>
+<rect x="397.2" y="684" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="411.2" y="709" font-family="Arial" font-size="15" fill="#000">Edge processing</text>
+<text x="411.2" y="734" font-family="Arial" font-size="12.5" fill="#111">Cloudflare Regional Services and Geo Key Manager</text>
+<text x="411.2" y="752" font-family="Arial" font-size="12.5" fill="#111">keep TLS processing and keys in region; China</text>
+<text x="411.2" y="770" font-family="Arial" font-size="12.5" fill="#111">Network needs an ICP filing.</text>
 </g>
 <g id="market-choice-transfer-basis">
-<rect x="757.5" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="771.5" y="525" font-family="Arial" font-size="15" fill="#000">Transfer basis</text>
-<text x="771.5" y="550" font-family="Arial" font-size="12.5" fill="#111">Consent, contract, certification or adequacy,</text>
-<text x="771.5" y="568" font-family="Arial" font-size="12.5" fill="#111">recorded per market with its date. Korea: consent</text>
-<text x="771.5" y="586" font-family="Arial" font-size="12.5" fill="#111">before transfer.</text>
+<rect x="757.5" y="684" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="771.5" y="709" font-family="Arial" font-size="15" fill="#000">Transfer basis</text>
+<text x="771.5" y="734" font-family="Arial" font-size="12.5" fill="#111">Consent, contract, certification or adequacy,</text>
+<text x="771.5" y="752" font-family="Arial" font-size="12.5" fill="#111">recorded per market with its date. Korea: consent</text>
+<text x="771.5" y="770" font-family="Arial" font-size="12.5" fill="#111">before transfer.</text>
 </g>
 <g id="market-choice-locale-and-content">
-<rect x="1117.8" y="500" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="1131.8" y="525" font-family="Arial" font-size="15" fill="#000">Locale and content</text>
-<text x="1131.8" y="550" font-family="Arial" font-size="12.5" fill="#111">Locale chain: explicit choice, then market, then</text>
-<text x="1131.8" y="568" font-family="Arial" font-size="12.5" fill="#111">Accept-Language, never the IP alone. Reviewed</text>
-<text x="1131.8" y="586" font-family="Arial" font-size="12.5" fill="#111">translations for legal and claims text.</text>
+<rect x="1117.8" y="684" width="345.2" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1131.8" y="709" font-family="Arial" font-size="15" fill="#000">Locale and content</text>
+<text x="1131.8" y="734" font-family="Arial" font-size="12.5" fill="#111">Locale chain: explicit choice, then market, then</text>
+<text x="1131.8" y="752" font-family="Arial" font-size="12.5" fill="#111">Accept-Language, never the IP alone. Reviewed</text>
+<text x="1131.8" y="770" font-family="Arial" font-size="12.5" fill="#111">translations for legal and claims text.</text>
 </g>
-<text x="37" y="668" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">WHAT MAKES IT AN MVP AND NOT A REBUILD</text>
+<text x="37" y="852" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">WHAT MAKES IT AN MVP AND NOT A REBUILD</text>
 <g id="mvp-why-one-repo--many-markets">
-<rect x="37.0" y="684" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="51.0" y="709" font-family="Arial" font-size="15" fill="#000">One repo, many markets</text>
-<text x="51.0" y="734" font-family="Arial" font-size="12.5" fill="#111">A market is a build variable and a region, not a new site or connector.</text>
+<rect x="37.0" y="868" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="893" font-family="Arial" font-size="15" fill="#000">One repo, many markets</text>
+<text x="51.0" y="918" font-family="Arial" font-size="12.5" fill="#111">A market is a build variable and a region, not a new site or connector.</text>
 </g>
 <g id="mvp-why-keys-you-own">
-<rect x="517.3" y="684" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="531.3" y="709" font-family="Arial" font-size="15" fill="#000">Keys you own</text>
-<text x="531.3" y="734" font-family="Arial" font-size="12.5" fill="#111">No third-party chain to inherit; a distrusted public CA can't lock you</text>
-<text x="531.3" y="752" font-family="Arial" font-size="12.5" fill="#111">out.</text>
+<rect x="517.3" y="868" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="531.3" y="893" font-family="Arial" font-size="15" fill="#000">Keys you own</text>
+<text x="531.3" y="918" font-family="Arial" font-size="12.5" fill="#111">No third-party chain to inherit; a distrusted public CA can't lock you</text>
+<text x="531.3" y="936" font-family="Arial" font-size="12.5" fill="#111">out.</text>
 </g>
 <g id="mvp-why-published--not-accessed">
-<rect x="997.7" y="684" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
-<text x="1011.7" y="709" font-family="Arial" font-size="15" fill="#000">Published, not accessed</text>
-<text x="1011.7" y="734" font-family="Arial" font-size="12.5" fill="#111">AI reads signed records; private files stay private.</text>
+<rect x="997.7" y="868" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1011.7" y="893" font-family="Arial" font-size="15" fill="#000">Published, not accessed</text>
+<text x="1011.7" y="918" font-family="Arial" font-size="12.5" fill="#111">AI reads signed records; private files stay private.</text>
 </g>
 <g id="footer">
-<text x="37" y="828" font-family="Arial" font-size="12" fill="#555">Country rules summarised; check Cloudflare and Xano region lists for your plan. Not legal advice.</text>
-<text x="37" y="860" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+<text x="37" y="1012" font-family="Arial" font-size="12" fill="#555">Country rules summarised; check Cloudflare and Xano region lists for your plan. Not legal advice.</text>
+<text x="37" y="1044" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
 </g>
 </svg>
