@@ -234,7 +234,7 @@ What each kind of app holds, and so what moves by proxy when you install it:
 
 ### Chatbot build requirements
 
-A headless Shopify proof of concept, built on public product feeds and chatbot articles, shows the gap this section describes. It uses public data on purpose, to show the difference between being visible and being governed. Anything public can be viewed by AI, but that does not incorporate it into a knowledge base corpus with rules and permissions: no issuer, version, locale or consent scope, and no grant saying who may use it for what. Public articles an AI can read are still ungoverned until they are published as records. Its chatbot still answers from legacy Sprinklr articles that were never published through the knowledge base ladder, so its answers carry no issuer, version, locale or consent scope, and nothing traces back to a canonical record. Closing that gap is the build:
+A headless Shopify proof of concept, the [chatbot preview](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com) built on public product feeds and chatbot articles, shows the gap this section describes. It uses public data on purpose, to show the difference between being visible and being governed. Anything public can be viewed by AI, but that does not incorporate it into a knowledge base corpus with rules and permissions: no issuer, version, locale or consent scope, and no grant saying who may use it for what. Public articles an AI can read are still ungoverned until they are published as records. Its chatbot still answers from legacy Sprinklr articles that were never published through the knowledge base ladder, so its answers carry no issuer, version, locale or consent scope, and nothing traces back to a canonical record. Closing that gap is the build:
 
 **Why an ungoverned ladder hallucinates.** A chatbot or AI escalation ladder that retrieves from public docs without a governed corpus pulls *anything* that matches: an old article, another market's price, a machine translation, a page written for a different audience. With no guardrails, no global ISO rules and no personalised consent state, it has nothing to check an answer against, so it fills the gaps:
 
@@ -244,6 +244,12 @@ A headless Shopify proof of concept, built on public product feeds and chatbot a
 | **Global ISO rules** | Mixes countries, languages, currencies and dates: a US price in a Korean answer, a stale date shown as current | Every record keyed by ISO 3166 country, BCP 47 language, ISO 4217 currency and ISO 8601 UTC time; retrieval filters on them |
 | **Personalised consent state** | Personalises for everyone, or for no one, and can't tell which | Each answer checks the shopper's consent at the moment it's given; the locale adapter by default, personalisation only with consent |
 | **Provenance** | Cites nothing, or cites a page that says something else | Each answer names its record, its issuer and its grant |
+
+![The chatbot preview on a test store: KR market selected, headset matches priced in won with the USD charge shown, Add to cart and Agent buy on each card, a return option, and a notice that answers are AI-generated](https://persephonepunch.github.io/crm-sync-setup/assets/poc-chatbot-preview.png)
+
+The publishing side starts with a **[curated knowledge base feed](https://omenphase1-1.webflow.io/knowledge-base-search)**: support articles tagged by product family, searchable and filterable, one answer per question, with step-by-step instructions and diagrams. Curation is the first rung. The next is publishing each entry as a signed record with its issuer, version, locale and consent scope, and pointing the chatbot at those records instead of the legacy helpdesk.
+
+![A curated knowledge base feed: product-family filters on the left, and tagged support articles on the right with numbered steps and diagrams](https://persephonepunch.github.io/crm-sync-setup/assets/kb-curated-feed.png)
 
 - [ ] **Migrate** each legacy helpdesk article (Sprinklr here; Gorgias, Zendesk or another helpdesk elsewhere) into a canonical record (one answer per question), then stop reading it live
 - [ ] **Publish** every record with issuer, version, market, locale and consent scope, hashed and signed with a key you own
@@ -390,5 +396,6 @@ The cutover is done when every key has an issuer you chose, every action has a g
 - [Entitlement security](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html)
 - [Hydrogen or bespoke stack](https://persephonepunch.github.io/crm-sync-setup/hydrogen-or-bespoke-stack.html)
 - [AI cross-border requirements checklist](https://persephonepunch.github.io/crm-sync-setup/ai-cross-border-requirements-checklist.html)
+- [Chatbot preview](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com) and [curated knowledge base feed](https://omenphase1-1.webflow.io/knowledge-base-search)
 
 *Patterns, not claims about any firm. eMudhra incident details per The Hacker News and Help Net Security, October 2026. Country rules summarised; not legal advice.*
