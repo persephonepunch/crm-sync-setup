@@ -204,7 +204,7 @@ Assets that prove provenance (PDFs and firmware, images, 3D files, docs) are vau
 
 TLS proves which server is on the other end of the connection. It doesn't prove which theme is calling, or that the shopper behind it consented. That isn't left to each platform's plugin or module. Every theme loads the same way, through the **Cloudflare helmet**: a higher-order function at the edge that wraps the page before anything runs. Webflow to 11ty themes already load this way, and WordPress, AEM, Drupal, Joomla and Shopify themes load the same. It doesn't matter how or when the CMS publishes.
 
-**Why it loads the same everywhere: it's vanilla.** The helmet and what it loads are plain HTML, CSS and JavaScript. Petite-vue is the default for behaviour, and HTMX is opt-in. There's no React bundle, no build step tied to a framework and no theme API to integrate with. Any CMS that can output a page can carry it, whether that's a Liquid theme, a PHP template, an AEM component or a Twig template. The theme doesn't need to know the helmet exists.
+**Why it loads the same everywhere: it's vanilla, a core tenet of the Design Rules.** The helmet and what it loads are plain HTML, CSS and JavaScript. Petite-vue is the default for behaviour, and HTMX is opt-in. There's no React bundle, no build step tied to a framework and no theme API to integrate with. Any CMS that can output a page can carry it, whether that's a Liquid theme, a PHP template, an AEM component or a Twig template. The theme doesn't need to know the helmet exists.
 
 The helmet runs on every request, in this order:
 
@@ -397,10 +397,23 @@ Every published chunk carries a typed list of tags: market, locale, audience, co
 |---|---|---|---|
 | Data model: `enum Tag`, `Vec<Tag>` | Standard Rust | Same code, compiled to WASM | What each chunk is and what it carries |
 | Serialisation | serde | serde | Tags to JSON and vector-store metadata, and back |
-| Async runtime | Tokio | The Workers runtime (no Tokio) | Runs many I/O tasks at once: webhooks, BigQuery, vector queries |
+| Async runtime | Tokio | The Workers runtime (no Tokio) | Runs many I/O tasks at once: webhooks, BigQuery, vector queries, and GET/POST/PATCH/DELETE to Xano |
 | HTTP framework | Axum | `worker` crate (worker-rs), or TypeScript calling a Rust WASM module | Event webhooks that write tags; `/docs/ask` that runs retrieval |
 | Vector store | Qdrant or pgvector | Vectorize | Pre-filter on tag metadata |
 | Release | Cloudflare helmet, then the Xano release gate | The helmet is the Worker itself, then the Xano release gate | Every theme loads through the helmet; nothing leaves without a paired surface, a signed request and consent |
+
+**Xano stays the source of truth, whatever stack compiles the code.** Async Rust calls Xano's REST API with GET, POST, PATCH and DELETE, using the same tag model and the same idempotency key in every shell. On a server it runs on Tokio with `reqwest`. On Workers it uses `worker::Fetch`. In a CLI, a batch job or a WMS integration it's Tokio again. Each copy of a chunk, whether in Vectorize, a cache or a feed, is derived from the Xano record and reconciled against it. None of those copies becomes a second source of truth.
+
+```rust
+// Tokio + reqwest: write a tag change to Xano, the system of record
+async fn withdraw_consent(x: &Xano, doc: DocId, scope: ConsentScope, key: IdemKey) -> Result<()> {
+    let mut chunk: Chunk = x.get(&format!("/chunk/{doc}")).await?;             // GET
+    chunk.tags.retain(|t| !matches!(t, Tag::Consent(s) if *s == scope));        // plain Vec
+    x.patch(&format!("/chunk/{doc}"), &chunk, key).await?;                       // PATCH, idempotent
+    x.post("/release/ledger", &LedgerEntry::withdrawn(doc, scope), key).await?; // POST, append-only
+    Ok(())                                                                       // DELETE only on erasure
+}
+```
 
 crm-sync runs on Workers, so the `.await` calls belong to the Workers runtime. The line that removes a withdrawn consent, `chunk.tags.retain(...)`, is ordinary `Vec` code in either shell.
 
