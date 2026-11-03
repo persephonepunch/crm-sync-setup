@@ -349,6 +349,19 @@ Chatbot: pickAdapter(locale, cohort, consent) → base model + adapter; facts fr
 
 Background: [Google audiences and conversions with Vertex AI, and where LoRA fits](https://persephonepunch.github.io/crm-sync-setup/php-commerce-off-shared-hosting.html#google-audiences-and-conversions-with-vertex-ai-and-where-lora-fits-scoping-private-channel-data) and the [clean room](https://persephonepunch.github.io/crm-sync-setup/clean-room.html).
 
+### How `Vec<Tag>` organically feeds CRAG
+
+Every published chunk carries a typed list of tags: market, locale, audience, consent, provenance, sensitivity and freshness. Nobody runs a tagging project. Events write the tags: an organic search that matches a doc adds an audience, signing at publish adds provenance, a consent withdrawal removes the consent tag. Corrective retrieval then uses them at every step. It pre-filters by market, locale and sensitivity, grades each chunk on signer, freshness and consent, then answers, re-queries one level wider, or declines and escalates with the reason. Whatever fails grading is logged with its tags and becomes the next round of audiences and published records. SAP and AEM user tags are free-text strings that nothing checks or expires. A Rust enum can't hold a typo or a lapsed consent, and an exhaustive `match` breaks the build until every grader handles a new rule.
+
+![How Vec<Tag> organically feeds CRAG: events write typed tags onto each chunk; retrieval pre-filters, grades and corrects on them; failures loop back as new tags; why Vec<Tag> and Rust; and why Rust in e-commerce, consent, security and data load](https://persephonepunch.github.io/crm-sync-setup/assets/vec-tag-feeds-crag.svg)
+
+| Why Rust | What it prevents |
+|---|---|
+| **E-commerce** | Money is typed with its ISO 4217 currency, and idempotency keys are a type, so a retried checkout or mandate never acts twice |
+| **Consent** | Consent is an owned value with scope and expiry; a business default and a buyer's choice are different types |
+| **Security** | Memory safety removes the overflow and use-after-free class; keys come from a secure random source and are zeroised on drop |
+| **Data load** | Large feeds stream without garbage-collector pauses; bad rows are rejected at load, not discovered by AI at answer time |
+
 ## 6. Globalization: rules management by market
 
 Each market sets whether data must stay in country, on what basis it may leave, and which Cloudflare and Xano options keep it where it belongs.
