@@ -6,6 +6,8 @@ category: "Security"
 date: 2026-11-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/SIGNING-KEYS-BY-PROXY.md
 licence: CC-BY-4.0
+ogImage: https://persephonepunch.github.io/crm-sync-setup/og/signing-keys-by-proxy.png
+ogImageAlt: "Signing Keys by Proxy. Three cards: Issuer, whose key signs (code on GitHub, firmware and SBOMs, e-signatures, QA attestations); Grant, who allowed it (mandates for every agent, scoped and expiring, keys exchanged on the event); Households, where it counts (encrypted streaming gates, hardened signed firmware, keys held by the household). Security counts the most where humans matter the most: in our households."
 links:
   - "https://crm-sync.dev/ai-cutover-checklist|AI cutover checklist"
   - "https://crm-sync.dev/verify#certification|Verify a certificate"
