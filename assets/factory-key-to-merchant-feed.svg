@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="1186" viewBox="-5 -5 1510 1186">
+<rect id="background" x="-5" y="-5" width="1510" height="1186" fill="#fff"/>
+<g id="header">
+<text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">From factory key to Merchant feed</text>
+<text x="37" y="82" font-family="Arial" font-size="14" fill="#222">The serial number joins the device's key to the WMS and to Google Merchant: the feed stays model-level, every unit event is signed.</text>
+</g>
+<text x="37" y="128" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">THREE IDENTITIES FOR ONE PRODUCT</text>
+<g id="identities-table">
+<rect x="37" y="144" width="300" height="38" fill="#111"/>
+<text x="51" y="168" font-family="Arial" font-size="14" fill="#fff">Identity</text>
+<rect x="337" y="144" width="330" height="38" fill="#111"/>
+<text x="351" y="168" font-family="Arial" font-size="14" fill="#fff">Level</text>
+<rect x="667" y="144" width="360" height="38" fill="#111"/>
+<text x="681" y="168" font-family="Arial" font-size="14" fill="#fff">Lives in</text>
+<rect x="1027" y="144" width="436" height="38" fill="#f22428"/>
+<text x="1041" y="168" font-family="Arial" font-size="14" fill="#fff">Example</text>
+<g id="identity-gtin-and-mpn">
+<text x="51" y="208" font-family="Arial" font-size="14" fill="#000">GTIN and MPN</text>
+<text x="351" y="208" font-family="Arial" font-size="13" fill="#111">The model: every unit shares it</text>
+<text x="681" y="208" font-family="Arial" font-size="13" fill="#111">Merchant feed, PIM, Shopify</text>
+<text x="1041" y="208" font-family="Arial" font-size="13" fill="#111">gtin, mpn and brand on the offer</text>
+</g>
+<g id="identity-serial-number">
+<rect x="37" y="222" width="1426" height="40" fill="#f5f5f5"/>
+<line x1="37" y1="222" x2="1463" y2="222" stroke="#ddd" stroke-width="1"/>
+<text x="51" y="248" font-family="Arial" font-size="14" fill="#000">Serial number</text>
+<text x="351" y="248" font-family="Arial" font-size="13" fill="#111">The unit: one per device</text>
+<text x="681" y="248" font-family="Arial" font-size="13" fill="#111">Factory record, WMS, RMA</text>
+<text x="1041" y="248" font-family="Arial" font-size="13" fill="#111">Scanned at receive, pick, ship, return</text>
+</g>
+<g id="identity-device-certificate">
+<line x1="37" y1="262" x2="1463" y2="262" stroke="#ddd" stroke-width="1"/>
+<text x="51" y="288" font-family="Arial" font-size="14" fill="#f22428">Device certificate</text>
+<text x="351" y="288" font-family="Arial" font-size="13" fill="#111">The unit's cryptographic identity</text>
+<text x="681" y="288" font-family="Arial" font-size="13" fill="#111">The device's chip; the provisioning log</text>
+<text x="1041" y="288" font-family="Arial" font-size="13" fill="#111">Signed at the factory by the HSM (hardware security module)</text>
+</g>
+<line x1="337" y1="182" x2="337" y2="302" stroke="#111" stroke-width="1"/>
+<line x1="667" y1="182" x2="667" y2="302" stroke="#111" stroke-width="1"/>
+<line x1="1027" y1="182" x2="1027" y2="302" stroke="#111" stroke-width="1"/>
+<rect x="37" y="144" width="1426" height="158" fill="none" stroke="#111" stroke-width="1.5"/>
+</g>
+<text x="37" y="348" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">HOW THEY LINK, EVENT BY EVENT: EVERY STEP A SIGNED EVENT</text>
+<g id="event-flow">
+<g id="step-1">
+<rect x="37.0" y="364" width="221.0" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="49.0" y="388" font-family="Arial" font-size="14" fill="#000">1 · Factory provisioning</text>
+<text x="49.0" y="408" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">FACTORY</text>
+<text x="49.0" y="434" font-family="Arial" font-size="12.5" fill="#111">serial ⇄ certificate</text>
+<text x="49.0" y="452" font-family="Arial" font-size="12.5" fill="#111">⇄ GTIN/MPN ⇄ firmware</text>
+</g>
+<g id="flow-arrow-1">
+<line x1="258.0" y1="420" x2="269.0" y2="420.0" stroke="#111" stroke-width="1.5"/>
+<path d="M269.0,415.0 L278.0,420 L269.0,425.0 Z" fill="#111"/>
+</g>
+<g id="step-2">
+<rect x="278.0" y="364" width="221.0" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="290.0" y="388" font-family="Arial" font-size="14" fill="#000">2 · WMS receive</text>
+<text x="290.0" y="408" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">+1 STOCK</text>
+<text x="290.0" y="434" font-family="Arial" font-size="12.5" fill="#111">Scan serial: stock +1</text>
+<text x="290.0" y="452" font-family="Arial" font-size="12.5" fill="#111">for that GTIN, location</text>
+</g>
+<g id="flow-arrow-2">
+<line x1="499.0" y1="420" x2="510.0" y2="420.0" stroke="#111" stroke-width="1.5"/>
+<path d="M510.0,415.0 L519.0,420 L510.0,425.0 Z" fill="#111"/>
+</g>
+<g id="step-3">
+<rect x="519.0" y="364" width="221.0" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="531.0" y="388" font-family="Arial" font-size="14" fill="#000">3 · WMS pick and ship</text>
+<text x="531.0" y="408" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">−1 STOCK</text>
+<text x="531.0" y="434" font-family="Arial" font-size="12.5" fill="#111">Scan serial: stock −1;</text>
+<text x="531.0" y="452" font-family="Arial" font-size="12.5" fill="#111">order ⇄ serial</text>
+</g>
+<g id="flow-arrow-3">
+<line x1="740.0" y1="420" x2="751.0" y2="420.0" stroke="#111" stroke-width="1.5"/>
+<path d="M751.0,415.0 L760.0,420 L751.0,425.0 Z" fill="#111"/>
+</g>
+<g id="step-4">
+<rect x="760.0" y="364" width="221.0" height="112" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="772.0" y="388" font-family="Arial" font-size="14" fill="#000">4 · Merchant feed</text>
+<text x="772.0" y="408" font-family="Arial" font-size="10.5" fill="#f22428" letter-spacing="0.4">PER GTIN</text>
+<text x="772.0" y="434" font-family="Arial" font-size="12.5" fill="#111">Availability and price</text>
+<text x="772.0" y="452" font-family="Arial" font-size="12.5" fill="#111">from live WMS stock</text>
+</g>
+<g id="flow-arrow-4">
+<line x1="981.0" y1="420" x2="992.0" y2="420.0" stroke="#111" stroke-width="1.5"/>
+<path d="M992.0,415.0 L1001.0,420 L992.0,425.0 Z" fill="#111"/>
+</g>
+<g id="step-5">
+<rect x="1001.0" y="364" width="221.0" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1013.0" y="388" font-family="Arial" font-size="14" fill="#000">5 · RMA return</text>
+<text x="1013.0" y="408" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">VERIFY</text>
+<text x="1013.0" y="434" font-family="Arial" font-size="12.5" fill="#111">Certificate checked;</text>
+<text x="1013.0" y="452" font-family="Arial" font-size="12.5" fill="#111">firmware state checked</text>
+</g>
+<g id="flow-arrow-5">
+<line x1="1222.0" y1="420" x2="1233.0" y2="420.0" stroke="#111" stroke-width="1.5"/>
+<path d="M1233.0,415.0 L1242.0,420 L1233.0,425.0 Z" fill="#111"/>
+</g>
+<g id="step-6">
+<rect x="1242.0" y="364" width="221.0" height="112" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="1254.0" y="388" font-family="Arial" font-size="14" fill="#000">6 · Merchant feed</text>
+<text x="1254.0" y="408" font-family="Arial" font-size="10.5" fill="#f22428" letter-spacing="0.4">REFURBISHED</text>
+<text x="1254.0" y="434" font-family="Arial" font-size="12.5" fill="#111">Same GTIN,</text>
+<text x="1254.0" y="452" font-family="Arial" font-size="12.5" fill="#111">condition = refurbished</text>
+</g>
+</g>
+<text x="37" y="522" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">DATA LAYER DEPENDENCY: SAP TO MERCHANT FEED TO AI</text>
+<g id="data-layer-chain">
+<g id="hop-1">
+<rect x="37.0" y="538" width="262.8" height="118" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="49.0" y="562" font-family="Arial" font-size="15" fill="#000">SAP ECC / S/4HANA</text>
+<text x="49.0" y="582" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">SOURCE</text>
+<text x="49.0" y="606" font-family="Arial" font-size="12.5" fill="#111">Material master: MPN, and</text>
+<text x="49.0" y="624" font-family="Arial" font-size="12.5" fill="#111">GTIN stored as EAN/UPC</text>
+<text x="49.0" y="642" font-family="Arial" font-size="12.5" fill="#111">Stock and price by plant</text>
+</g>
+<g id="hop-arrow-1">
+<line x1="299.8" y1="597" x2="318.8" y2="597.0" stroke="#111" stroke-width="1.5"/>
+<path d="M318.8,592.0 L327.8,597 L318.8,602.0 Z" fill="#111"/>
+</g>
+<g id="hop-2">
+<rect x="327.8" y="538" width="262.8" height="118" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="339.8" y="562" font-family="Arial" font-size="15" fill="#000">Integration</text>
+<text x="339.8" y="582" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">SIGNED HOP</text>
+<text x="339.8" y="606" font-family="Arial" font-size="12.5" fill="#111">IDoc, OData or business</text>
+<text x="339.8" y="624" font-family="Arial" font-size="12.5" fill="#111">events, each signed and</text>
+<text x="339.8" y="642" font-family="Arial" font-size="12.5" fill="#111">timestamped on the way out</text>
+</g>
+<g id="hop-arrow-2">
+<line x1="590.6" y1="597" x2="609.6" y2="597.0" stroke="#111" stroke-width="1.5"/>
+<path d="M609.6,592.0 L618.6,597 L609.6,602.0 Z" fill="#111"/>
+</g>
+<g id="hop-3">
+<rect x="618.6" y="538" width="262.8" height="118" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="630.6" y="562" font-family="Arial" font-size="15" fill="#000">Data layer</text>
+<text x="630.6" y="582" font-family="Arial" font-size="10.5" fill="#f22428" letter-spacing="0.4">SYSTEM OF RECORD</text>
+<text x="630.6" y="606" font-family="Arial" font-size="12.5" fill="#111">Xano record, Cloudflare</text>
+<text x="630.6" y="624" font-family="Arial" font-size="12.5" fill="#111">gate: ISO keys, consent,</text>
+<text x="630.6" y="642" font-family="Arial" font-size="12.5" fill="#111">one record per GTIN</text>
+</g>
+<g id="hop-arrow-3">
+<line x1="881.4" y1="597" x2="900.4" y2="597.0" stroke="#111" stroke-width="1.5"/>
+<path d="M900.4,592.0 L909.4,597 L900.4,602.0 Z" fill="#111"/>
+</g>
+<g id="hop-4">
+<rect x="909.4" y="538" width="262.8" height="118" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="921.4" y="562" font-family="Arial" font-size="15" fill="#000">Google Merchant API</text>
+<text x="921.4" y="582" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">FEED</text>
+<text x="921.4" y="606" font-family="Arial" font-size="12.5" fill="#111">Per GTIN and MPN: price,</text>
+<text x="921.4" y="624" font-family="Arial" font-size="12.5" fill="#111">availability, condition</text>
+<text x="921.4" y="642" font-family="Arial" font-size="12.5" fill="#111">(Content API is sunset)</text>
+</g>
+<g id="hop-arrow-4">
+<line x1="1172.2" y1="597" x2="1191.2" y2="597.0" stroke="#111" stroke-width="1.5"/>
+<path d="M1191.2,592.0 L1200.2,597 L1191.2,602.0 Z" fill="#111"/>
+</g>
+<g id="hop-5">
+<rect x="1200.2" y="538" width="262.8" height="118" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1212.2" y="562" font-family="Arial" font-size="15" fill="#000">AI agents</text>
+<text x="1212.2" y="582" font-family="Arial" font-size="10.5" fill="#555" letter-spacing="0.4">READER</text>
+<text x="1212.2" y="606" font-family="Arial" font-size="12.5" fill="#111">Google AI Mode, agentic</text>
+<text x="1212.2" y="624" font-family="Arial" font-size="12.5" fill="#111">checkout, chatbots read</text>
+<text x="1212.2" y="642" font-family="Arial" font-size="12.5" fill="#111">the feed and the record</text>
+</g>
+</g>
+<g id="dependency-note">
+<rect x="37" y="670" width="1426" height="40" rx="6" fill="#f22428"/>
+<text x="51" y="696" font-family="Arial" font-size="13.5" fill="#fff">Every hop is a dependency: if SAP posts late or a hop is unsigned, the feed goes stale, Merchant disapproves the offer, and AI answers from old data.</text>
+</g>
+<text x="37" y="756" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">VERIFICATION FOR AI: FOUR CHECKS BEFORE AN AGENT RELIES ON A PRODUCT RECORD</text>
+<g id="verify-issuer">
+<rect x="37.0" y="772" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="797" font-family="Arial" font-size="15" fill="#000">Issuer</text>
+<rect x="329.2" y="783" width="39" height="20" rx="10" fill="#f22428"/>
+<text x="348.7" y="797" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">WHO</text>
+<text x="51.0" y="822" font-family="Arial" font-size="12.5" fill="#111">The record is signed with your key, and the public</text>
+<text x="51.0" y="840" font-family="Arial" font-size="12.5" fill="#111">key is published (JWKS), so an agent can verify it</text>
+<text x="51.0" y="858" font-family="Arial" font-size="12.5" fill="#111">offline.</text>
+</g>
+<g id="verify-freshness">
+<rect x="397.2" y="772" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="411.2" y="797" font-family="Arial" font-size="15" fill="#000">Freshness</text>
+<rect x="682.5" y="783" width="46" height="20" rx="10" fill="#f22428"/>
+<text x="705.5" y="797" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">WHEN</text>
+<text x="411.2" y="822" font-family="Arial" font-size="12.5" fill="#111">Every hop carries an ISO 8601 UTC timestamp; price</text>
+<text x="411.2" y="840" font-family="Arial" font-size="12.5" fill="#111">and stock beyond their staleness tolerance are re-</text>
+<text x="411.2" y="858" font-family="Arial" font-size="12.5" fill="#111">fetched live.</text>
+</g>
+<g id="verify-identity">
+<rect x="757.5" y="772" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="771.5" y="797" font-family="Arial" font-size="15" fill="#000">Identity</text>
+<rect x="1042.8" y="783" width="46" height="20" rx="10" fill="#f22428"/>
+<text x="1065.8" y="797" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">WHAT</text>
+<text x="771.5" y="822" font-family="Arial" font-size="12.5" fill="#111">The GTIN is valid and registered, MPN and brand</text>
+<text x="771.5" y="840" font-family="Arial" font-size="12.5" fill="#111">match, and a unit's serial verifies through its</text>
+<text x="771.5" y="858" font-family="Arial" font-size="12.5" fill="#111">Digital Link.</text>
+</g>
+<g id="verify-grant">
+<rect x="1117.8" y="772" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1131.8" y="797" font-family="Arial" font-size="15" fill="#000">Grant</text>
+<rect x="1361.0" y="783" width="88" height="20" rx="10" fill="#f22428"/>
+<text x="1405.0" y="797" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">MAY IT ACT</text>
+<text x="1131.8" y="822" font-family="Arial" font-size="12.5" fill="#111">An agent buys or answers only under a mandate, with</text>
+<text x="1131.8" y="840" font-family="Arial" font-size="12.5" fill="#111">the shopper's consent attached at checkout.</text>
+</g>
+<text x="37" y="940" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">WHAT THE SIGNING ADDS</text>
+<g id="adds-stock-you-can-trust">
+<rect x="37.0" y="956" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="981" font-family="Arial" font-size="15" fill="#000">Stock you can trust</text>
+<text x="51.0" y="1006" font-family="Arial" font-size="12.5" fill="#111">Merchant availability per GTIN comes from signed WMS</text>
+<text x="51.0" y="1024" font-family="Arial" font-size="12.5" fill="#111">events, not a spreadsheet upload: no overselling, no</text>
+<text x="51.0" y="1042" font-family="Arial" font-size="12.5" fill="#111">availability-mismatch disapprovals.</text>
+</g>
+<g id="adds-returns-fraud-stopped">
+<rect x="397.2" y="956" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="411.2" y="981" font-family="Arial" font-size="15" fill="#000">Returns fraud stopped</text>
+<text x="411.2" y="1006" font-family="Arial" font-size="12.5" fill="#111">A returned device whose certificate doesn't match</text>
+<text x="411.2" y="1024" font-family="Arial" font-size="12.5" fill="#111">its serial is a counterfeit or a swap, caught before</text>
+<text x="411.2" y="1042" font-family="Arial" font-size="12.5" fill="#111">the refund is released.</text>
+</g>
+<g id="adds-recalls-and-patches">
+<rect x="757.5" y="956" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="771.5" y="981" font-family="Arial" font-size="15" fill="#000">Recalls and patches</text>
+<text x="771.5" y="1006" font-family="Arial" font-size="12.5" fill="#111">The factory record says which serials shipped with</text>
+<text x="771.5" y="1024" font-family="Arial" font-size="12.5" fill="#111">which firmware, so updates reach exactly the</text>
+<text x="771.5" y="1042" font-family="Arial" font-size="12.5" fill="#111">customers who need them.</text>
+</g>
+<g id="adds-one-code-on-the-box">
+<rect x="1117.8" y="956" width="345.2" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1131.8" y="981" font-family="Arial" font-size="15" fill="#000">One code on the box</text>
+<text x="1131.8" y="1006" font-family="Arial" font-size="12.5" fill="#111">A GS1 Digital Link QR carries GTIN and serial</text>
+<text x="1131.8" y="1024" font-family="Arial" font-size="12.5" fill="#111">together: the product page and that unit's</text>
+<text x="1131.8" y="1042" font-family="Arial" font-size="12.5" fill="#111">verification in one scan.</text>
+</g>
+<g id="footer">
+<text x="37" y="1108" font-family="Arial" font-size="13" fill="#000">Google Merchant never sees serials or certificates: it works at GTIN and MPN level, with brand, condition and availability.</text>
+<text x="37" y="1130" font-family="Arial" font-size="12.5" fill="#444">HSM: hardware security module, a tamper-resistant device that creates and holds signing keys; it signs inside the hardware, so the key never leaves it.</text>
+<text x="37" y="1162" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+</g>
+</svg>

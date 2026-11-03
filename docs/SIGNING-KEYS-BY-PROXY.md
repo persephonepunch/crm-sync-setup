@@ -123,6 +123,8 @@ Security counts the most where humans matter the most: in our households. The Oc
 | **Cameras, doorbells and baby monitors** | Watching over children, pets and deliveries while away |
 | **Sensors for older relatives** | Living independently for longer, with an alert to family if something changes |
 | **EV chargers and home batteries** | Charging when power is cheapest and cleanest |
+| **Printers and scanners** | Printing from any phone or laptop in the home, scanning straight to email or cloud storage, and ink or toner reordered before it runs out |
+| **Loyalty programmes** | Member prices, points and offers that match what the household actually buys |
 | **The TV and phone together** | One screen and one remote for the whole home |
 
 **The TV and the phone have become the home's micro-network.** Many households now run the home from a phone on the sofa and a smart TV on the wall: casting to the screen, using the phone as the remote, and letting the TV act as the hub for lights, cameras, speakers and appliances. Newer devices join a local mesh (Thread) and a common smart-home standard (Matter), so the phone, the TV and each device talk inside the home, without a round trip to every maker's cloud. That is good for speed, for working when the internet is down, and for privacy.
@@ -170,7 +172,7 @@ A CA proves who holds a certificate. It does not prove what they may sign or do.
 |---|---|---|
 | What it is | Licence grants, upload attestations and deletion records signed with crm-sync's Ed25519 key, published at [`/.well-known/jwks.json`](https://crm-sync.dev/.well-known/jwks.json) | Self-hosted Xano on infrastructure you operate, with a TLS certificate from a CA you choose |
 | How it is checked | [`crm-sync.dev/license/verify`](https://crm-sync.dev/license/verify): anyone verifies offline, with no account and no CA chain that can be distrusted; short links at `/v/<hash>`, print QR at `/license/qr/<hash>.svg` | Your trust store: confirm the Node and Composer bundles reject the October 2026 eMudhra chains |
-| Key custody | The platform's signing key; the public half is published | Your own HSM or key vault, in country |
+| Key custody | The platform's signing key; the public half is published | Your own hardware security module (HSM) or key vault, in country |
 
 Assets that prove provenance (PDFs and firmware, images, 3D files, docs) are vaulted the same way: each file under its own key, every upload certified, every download granted and recorded in a hash-chained ledger. See the [Protected Firmware Asset Management and Download Service](https://www.crm-sync.dev/pages/firmware) and [Firmware asset publishing](https://persephonepunch.github.io/crm-sync-setup/firmware-asset-publishing.html).
 
@@ -202,6 +204,23 @@ A point-of-sale register is a device that moves money and stock. When registers,
 | **Store goes offline** | The register queues its signed events, each with an ISO 8601 UTC timestamp | Events replay in order; duplicates are dropped by key | Lost sales and returns, and a store that never reconciles with the warehouse |
 
 The same rules from the rest of this article apply: a certificate per register and scanner, revocable one at a time; no plugin writing stock or refunds around the gate; and a ledger that shows, for any refund, which register, which person or agent, and which warehouse receipt it rested on.
+
+**From factory key to Merchant feed.** The serial number is what joins the device's key to the WMS and to Google Merchant. The **GTIN** and **MPN** identify the model, and every unit shares them. The **serial number** identifies the unit. The **device certificate**, signed at the factory by the manufacturer's HSM, proves the unit is genuine. The factory's provisioning record ties all three to the firmware version. WMS events scan the serial at receiving, picking, shipping and returns, so the stock Merchant reads per GTIN comes from signed events, and a returned device whose certificate doesn't match its serial is caught before a refund. Google Merchant never sees serials or certificates: it works at GTIN and MPN level, with brand, condition and availability.
+
+Behind the feed sits a chain of dependencies: SAP holds the material master (the MPN, and the GTIN stored as EAN/UPC) and stock by plant; an integration hop (IDoc, OData or business events) carries it out; the data layer keeps one signed record per GTIN; the Merchant API publishes it; and AI agents, from Google AI Mode to agentic checkout and chatbots, read the result. If SAP posts late or a hop is unsigned, the feed goes stale, Merchant disapproves the offer, and AI answers from old data. Before an agent relies on a product record it should check four things: the **issuer** (signed with your key, verifiable offline against your published JWKS), **freshness** (a UTC timestamp on every hop, with price and stock re-fetched live past their tolerance), **identity** (a valid GTIN, matching MPN and brand, and a serial that verifies through its Digital Link), and the **grant** (a mandate, with the shopper's consent at checkout).
+
+![From factory key to Merchant feed: three identities (GTIN and MPN for the model, the serial for the unit, the device certificate for its cryptographic identity), six signed events from factory provisioning through WMS receive, pick and ship, the Merchant feed, an RMA return and a refurbished listing; the data layer dependency from SAP through integration, the data layer and the Merchant API to AI agents; four verification checks for AI (issuer, freshness, identity, grant); and what the signing adds](https://persephonepunch.github.io/crm-sync-setup/assets/factory-key-to-merchant-feed.svg)
+
+**Loyalty feeds and time-sensitive consent.** Loyalty adds member prices and points to the same feed, and conversions back to Google. Both depend on consent that changes over time: a shopper can allow ads use today and withdraw it tomorrow. So every step carries the consent state *at the moment of the event*, and personal and card data stay behind the gate:
+
+| Step | What moves | The rule |
+|---|---|---|
+| **Member joins** | A pseudonymous loyalty ID, and consent per purpose, channel and market, each with a timestamp | Consent is recorded as an event, not a checkbox stored once |
+| **Member price published** | Member prices and points per GTIN in the Merchant feed (its loyalty programme attributes) and on site | Published as a signed record; price comes live from the system of record |
+| **Purchase** | Order value, the loyalty ID and a hashed email | Card data stays tokenised with the payment provider and never enters a feed (PCI); personal data is hashed before it leaves (PII) |
+| **Conversion sent to Google** | Value and hashed identifiers, with the consent state at the time of purchase | Sent only if ads-data consent was granted at that moment; a later withdrawal stops future sends |
+| **AI answers about member prices** | Price, points and offers | Read from published records; personalised only for a signed-in member with consent; CRAG declines rather than guesses |
+| **Withdrawal or deletion** | A consent-change or deletion event | Reaches the feed, conversions and audiences on the event, with a receipt from each |
 
 ## 5. Knowledge base: publish, don't unlock
 
