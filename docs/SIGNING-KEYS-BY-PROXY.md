@@ -1,6 +1,6 @@
 ---
 title: "Signing Keys by Proxy: AI Security, Globalization, Tools and Permissions"
-description: "When a consultancy, plugin or platform signs with a certificate authority you never chose, you inherit that CA by proxy. How the October 2026 eMudhra distrust turns into AI, trust and boundary lockouts; why a certificate is not a grant; how ECC/SAP signing fits; per-country rules for China, Japan, Korea, Vietnam, Singapore, Taiwan, EU/Germany and the UK; a security-first Globalization MVP on Cloudflare and Xano; and an AI cutover checklist."
+description: "Buy applications were built for one document format at a time: SAP spreadsheets, Adobe Experience Cloud and AEM pages, data managed in a browser. Extending them to AI and robots reaches households, warehouses, agents and peer mandates, so the rules have to run as memory-safe Rust code with securely random keys, not fail at a document-type rule. Security counts the most where humans matter the most: in our households. This article covers when you inherit a signing key by proxy, what locks out when its chain breaks, why a certificate is not a grant, per-market rules, a security-first Globalization MVP and an AI cutover checklist."
 canonical: https://persephonepunch.github.io/crm-sync-setup/signing-keys-by-proxy.html
 category: "Security"
 date: 2026-11-03
@@ -71,6 +71,7 @@ AI work signs on every event: each pull request, each consent change, each new m
 | **Time zone gap** | An incident starts while the external team is offline, and nobody on your side can rotate or revoke | Revocation is automated on the event, and your own on-call staff hold pre-approved emergency mandates |
 | **Crisis mitigation on breach** | During a breach, nobody can say who holds which key, revoke it quickly, or show regulators what happened when. GDPR allows 72 hours to notify | One switch per key and per grant; revocation reaches every system on the event; the ledger's timestamps are the evidence for the notification |
 | **Plugins without memory safety, with hard-coded upserts** | A plugin or application writes straight into the database with hard-coded upserts, outside the event path: no signature, no consent check, no ledger entry. A memory bug in it can expose keys held in the same process | Plugins hold no signing keys and no direct write access; every write passes the gate as a signed event; the gate runs memory-safe code (Rust, Wasm) |
+| **Unsigned device commands and soft firmware: households** | Home appliances accept commands from anyone who reaches their login page, as the supermarket controllers did in October 2026, and stream usage data that shows when the home is empty | An encrypted streaming gate the household controls, a certificate per appliance with household-held keys, signed commands within firmware limits, and hardened, signed firmware |
 
 **Distributed keys and rolling data gating.** The answer to these risks is to spread keys across the systems that act, each with its own scoped grant, and to have AI check every write against consent, market rules and mandates as it arrives: a gate that rolls with the data instead of a batch review after it. That model only holds if nothing writes around the gate. A plugin that hard-codes upserts into the data store, or runs in a runtime without memory safety, is a side door: its writes carry no signature, and a single memory-corruption bug can hand an attacker the keys and the write path together. October 2026 made the point twice: [php2shell](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html) gave unauthenticated code execution in the PHP runtime under every WordPress, Drupal, Magento, Joomla and Laravel host, whatever the plugin code, and an AI gateway package was compromised for the second time this year, again stealing signing keys and AI provider keys from the environment it ran in.
 
@@ -98,6 +99,52 @@ These are patterns, not claims about any firm. A contract, or the certificate ch
 A key ceremony at eMudhra on 30 April 2025 generated eight intermediate CA keys with too little randomness. Between 17 and 20 October 2026 a researcher recovered all eight private keys from the public certificates, and Chrome, Mozilla, Apple and Microsoft blocked them: six TLS intermediates and two code-signing intermediates. Chrome removes the emSign ECC Root CA - G3 from devices from 27 October. Go, NSS, Ubuntu, Debian and Composer shipped trust-store fixes on 20 October, and the Node.js releases of 21 October also reject the chains. India's Digital Signature Certificates run under India's own CA licensing rather than the browser root programs and, as reported, were not directly affected.
 
 The keys were not stolen; they were computable. An audited process with certified hardware still produced weak keys, so the lesson is about provenance: know which of your certificates chain through which CA, and sign your own records with keys you own and can retire. Background: [Hydrogen or bespoke stack](https://persephonepunch.github.io/crm-sync-setup/hydrogen-or-bespoke-stack.html), [Org Trust Layer](https://persephonepunch.github.io/crm-sync-setup/org-trust-layer.html), and reporting by [The Hacker News](https://thehackernews.com/2026/10/eight-emudhra-ca-keys-compromised.html) and [Help Net Security](https://www.helpnetsecurity.com/2026/10/21/emudhra-certificates-private-keys-compromised/).
+
+### The same month, on the shop floor: refrigeration controllers in France and the UK
+
+The eMudhra keys were weak; in October's other incident there were no keys at all. On the night of 11 October 2026, attackers reached the refrigeration controllers of hundreds of French supermarkets, including Intermarché, Netto, Coopérative U, Carrefour, Monoprix and E.Leclerc stores. The Danfoss controllers ran web servers open to the internet, and many accepted the username `admin` with the current date as the password. The attackers set cases to defrost with food inside: some reached about 50 °C within six hours, some equipment melted or caught fire, and the change went unnoticed because it raised no alarm and no staff were present. No data was stolen; the losses ran to tens of millions of euros. Danfoss had shipped a fix for its current AK-SM800A series in August 2025, but older units were end-of-life. The Prime Minister asked ANSSI to investigate, and its director said the controllers urgently needed disconnecting from the internet.
+
+On 13 October, UK Cyber Defence found more than 800 UK refrigeration and building controllers with their login pages on the open internet. By early November, UK victims were confirmed: a West London wholesaler, Langridge Organic, found six of its ten cold-room controllers, running Copeland's Dixell XWEB software, set to defrost with a 150 °F maximum and their temperature alerts switched off. Manual checks saved its stock. The NCSC said it was aware of a small number of affected UK organisations. On 2 November, similar attacks hit supermarket refrigeration in Belgium, Luxembourg, the Netherlands, Sweden, Estonia, Ireland and Portugal. No one has been publicly identified as responsible.
+
+Both incidents are the same signing-keys problem. A controller that accepts any command from anyone who reaches its login page has no **issuer** (no device or operator certificate) and no **grant** (nothing says who may change a setpoint, by how much, or when). The attacker also switched off the alarm through the same channel, so the record of what changed was lost with it. Sources: [Wikipedia](https://en.wikipedia.org/wiki/2026_French_supermarket_refrigerator_hack), [Public Sénat](https://www.publicsenat.fr/actualites/politique/cyberattaque-contre-des-frigos-connectes-de-supermarches-des-systemes-de-refrigeration-exposes-sur-internet-alertent-des-experts-en-cybersecurite), and The Grocer on [UK exposure](https://www.thegrocer.co.uk/news/more-than-800-uk-supermarket-fridges-at-heightened-risk-of-hacking/724713.article) and [UK victims](https://thegrocer.co.uk/news/latest-wave-of-fridge-cyberattacks-claims-more-uk-victims/725503.article).
+
+### Households: where humans matter the most
+
+Security counts the most where humans matter the most: in our households. The October attacks hit shops, but the same class of device sits in homes: fridges and freezers, heat pumps, boilers, thermostats and EV chargers, all on the household network and most talking to a manufacturer's cloud. A home has no security team and no morning temperature check. If a supermarket controller can be set to defrost from the internet, a home appliance with an open login page or a default password can be too, and its data stream says far more about the household: when the fridge door opens, when the heating comes on, when nobody is home.
+
+**Why households wire them up.** The benefits are real, and they are why the answer is to secure the stream, not to unplug:
+
+| Use | Benefit to the household |
+|---|---|
+| **Heating, heat pumps and thermostats** | Lower bills: heating runs on schedules and on cheaper time-of-use tariffs, and only in rooms in use |
+| **Fridges and freezers** | Less food waste: a warning when the door is left open or the temperature drifts |
+| **Cameras, doorbells and baby monitors** | Watching over children, pets and deliveries while away |
+| **Sensors for older relatives** | Living independently for longer, with an alert to family if something changes |
+| **EV chargers and home batteries** | Charging when power is cheapest and cleanest |
+| **The TV and phone together** | One screen and one remote for the whole home |
+
+**The TV and the phone have become the home's micro-network.** Many households now run the home from a phone on the sofa and a smart TV on the wall: casting to the screen, using the phone as the remote, and letting the TV act as the hub for lights, cameras, speakers and appliances. Newer devices join a local mesh (Thread) and a common smart-home standard (Matter), so the phone, the TV and each device talk inside the home, without a round trip to every maker's cloud. That is good for speed, for working when the internet is down, and for privacy.
+
+It also makes the TV and the phone the **gate**. Whatever reaches them can reach every device paired to them, and TVs often run for years without updates while streaming viewing data to their makers. Matter shows the right pattern: every certified device carries its own **device attestation certificate** from its manufacturer, and pairing gives it a fresh **operational certificate** issued by the household's own network, so the household, not the maker, holds the keys that let a device join or leave. The household's gate should work the same way for everything else: local first, encrypted, and under keys the household holds.
+
+Cameras show what is at stake. In late November 2025, Korean police arrested four people over the hacking of about **120,000 internet-connected cameras** in homes and businesses, including private homes, a Pilates studio and a gynecology clinic. Two of them accounted for most of the hacks and made sexually exploitative videos from the footage, which were sold on an overseas site; police also arrested buyers and moved to close the site. The way in was simple: the cameras had weak passwords, such as repeated characters or sequential numbers and letters. Many had been installed to watch over children and pets. A leaked video can't be recalled the way a spoiled freezer can be restocked, which is why the stream itself has to be gated. Sources: [BleepingComputer](https://bleepingcomputer.com/news/security/korea-arrests-suspects-selling-intimate-videos-from-hacked-ip-cameras), [Kaspersky](https://www.kaspersky.com/blog/south-korea-120000-ip-cameras-hacked/54961/), [The Star](https://www.thestar.com.my/tech/tech-news/2025/12/03/120000-home-cameras-were-hacked-for-sexual-videos-south-korean-police-say).
+
+Households need two things before anything else: **an encrypted data streaming gate**, and **hardened firmware**.
+
+| Requirement | What it means at home | What it stops |
+|---|---|---|
+| **No open login page, no default password** | Each appliance ships with a unique credential and no management page on the internet | The October method: find the page, type `admin` and the date |
+| **An encrypted data streaming gate** | Telemetry and camera video leave the home only encrypted, through one gate the household controls, and only for the purposes the household agreed to | Usage data revealing when the home is empty; silent streaming to parties the household never chose |
+| **Keys held by the household** | Every appliance has its own certificate, and the household holds the keys that pair it to apps and services, so access can be revoked one device or one service at a time | A manufacturer, installer or app keeping standing access after the household has moved on |
+| **Signed commands within safe limits** | Remote commands from an app or cloud are signed, checked against what the household granted, and kept within limits set in firmware | A fridge told to run a 50 °C defrost, or a heating system turned off in winter |
+| **Hardened firmware** | Updates are signed and verified before install, the device boots only signed code, memory-safe components handle network input, and an SBOM lists what is inside | A forged update, a memory-corruption bug becoming remote control, or an unpatched unit nobody knew was vulnerable |
+| **A stated support period** | The maker says how long security updates will come, and the device warns before they stop | Appliances that keep running years after their last patch, as the end-of-life French controllers did |
+| **The TV and phone as the gate** | The hub (TV, phone or home hub) gets security updates for as long as it runs the home, appliances sit on their own network segment, and pairing uses the household's own certificates (as Matter does) | An old, unpatched TV becoming the way into every device paired to it |
+| **Local alarms and local control** | Alerts sound on the device and work without the cloud; the cloud can't switch them off | An attacker silencing the warning while changing the setting |
+
+The rules are arriving. The UK's product security regime has banned universal default passwords on connectable consumer products since April 2024 and requires a stated support period. In the EU, the Radio Equipment Directive's cybersecurity requirements have applied to wireless devices since August 2025, and the Cyber Resilience Act adds vulnerability reporting from September 2026 and full security obligations, including secure updates and an SBOM, from December 2027.
+
+The same controls protect lights-out sites, where cold rooms, chillers and server cooling run with nobody on the floor; see [Entitlement Security](https://persephonepunch.github.io/crm-sync-setup/dark-factory-entitlement-security.html).
 
 ## 3. AI security: trust and boundary lockout
 
@@ -138,6 +185,21 @@ Assets that prove provenance (PDFs and firmware, images, 3D files, docs) are vau
 - **`STRUST` doesn't update itself.** Browsers and runtimes shipped the distrust in October; an ABAP trust store changes only when someone edits it. Check every PSE in `STRUST`, plus ADS and Java stack keystores.
 - **The S/4HANA move carries trust.** A system conversion (SUM with DMO) migrates the PSEs too. Clean out stale or proxy certificates first; ECC mainstream maintenance ends in 2027.
 - **Unsigned spreadsheets are the weakest link.** Hash each handoff file and record it, signed with a key you own.
+
+### Stores: POS registers in sync with warehouse and RMA systems
+
+A point-of-sale register is a device that moves money and stock. When registers, the warehouse management system (WMS) and the returns system (RMA, return merchandise authorization) sync by batch file or shared credentials, nobody can say which register recorded a return, who authorised the refund, or whether the item ever reached the warehouse. Keeping them in sync safely means every step is a **signed event** from a known device, under a grant, and each system acts only on events it can verify:
+
+| Event | Signed by | What the receiving system checks | Without it |
+|---|---|---|---|
+| **Sale at the register** | The register's device certificate, plus the cashier's session | Price matches the published record; stock is reduced once; payment is a token, never card data | Stock drifts, prices are disputed, and card data enters PCI scope |
+| **Return at the counter** | The register and cashier, citing the original sale's signed record | The return matches a real sale and is within policy; an RMA number is issued | Refunds on items never sold there: return fraud |
+| **RMA authorised** | A service agent, or an AI agent under a mandate | Refund limit, market and reason within the grant | Agents, contractors or plugins issuing refunds without authority |
+| **Item received at the warehouse** | The scanner's device certificate | The item matches the RMA and its condition is graded | A refund paid before the item arrives, or stock counted twice |
+| **Refund released** | The payment service, only after the receipt record exists | One refund per RMA, enforced by an idempotency key | Double refunds when a sync retries |
+| **Store goes offline** | The register queues its signed events, each with an ISO 8601 UTC timestamp | Events replay in order; duplicates are dropped by key | Lost sales and returns, and a store that never reconciles with the warehouse |
+
+The same rules from the rest of this article apply: a certificate per register and scanner, revocable one at a time; no plugin writing stock or refunds around the gate; and a ledger that shows, for any refund, which register, which person or agent, and which warehouse receipt it rested on.
 
 ## 5. Knowledge base: publish, don't unlock
 
@@ -247,6 +309,19 @@ Build the trust layer before the first market, so every market after it is a var
 | **4 · AI rungs** | RAG, then CRAG on weak evidence; LoRA with the locale adapter by default, and audience adapters trained from BigQuery cohorts and organic lookup only with training consent; mandates for every agent action | No rung opens a locked file; no adapter holds personal data |
 
 Phases 0 and 1 ship before any market. Every later phase inherits the keys, grants, consent gate and ledger, which is what keeps it an MVP rather than a rebuild per market.
+
+### Publishing requirements for the MVP
+
+Four things are published in every market, and each is a signed record, not a file someone copies into a system:
+
+| Published | Source and format | Signed and checked | Phase and gate |
+|---|---|---|---|
+| **Firmware** | The image plus its SBOM, per device class and version | Signed at build; vaulted under its own key; each download granted to a device certificate and recorded in the ledger; devices verify before install | Phase 1: no device runs an image it can't verify |
+| **Markdown (MD)** | Markdown with frontmatter carrying issuer, version, market, locale and consent scope: the one source for the web page, the PDF, the book and the knowledge base records | Content-hashed and signed at publish; every surface traces back to the same commit | Phase 2: every answer and page traces to one source |
+| **Permissions** | Grants and mandates as records: who or which agent, which action, which market, until when | Signed when issued, and again when revoked; checked on every event, never cached past expiry | Phase 1: nothing acts without a current grant |
+| **Escalation ladders** | Per market: which sources RAG may read, the evidence bar that sends a question to CRAG, which LoRA adapters are allowed and under what consent, and which answers go to a person (money, law, risk) | Each ladder version reviewed (a QA attestation) and signed before it goes live; the version in force is recorded with every answer | Phase 4: no rung changes without a signed review |
+
+A new market reuses all four: its firmware channel, its Markdown slice, its grants and its ladder are configuration on the same rails, not a new integration.
 
 ## 8. AI cutover checklist
 
