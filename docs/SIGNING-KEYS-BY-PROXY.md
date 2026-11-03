@@ -222,6 +222,18 @@ Behind the feed sits a chain of dependencies: SAP holds the material master (the
 | **AI answers about member prices** | Price, points and offers | Read from published records; personalised only for a signed-in member with consent; CRAG declines rather than guesses |
 | **Withdrawal or deletion** | A consent-change or deletion event | Reaches the feed, conversions and audiences on the event, with a receipt from each |
 
+**Loyalty and subscription applications need AI memory-safe binding.** Loyalty and subscription apps (points, tiers, member prices, renewals, pauses and skips, from apps such as Smile.io, LoyaltyLion and Yotpo for loyalty or Recharge and Skio for subscriptions) hold entitlements that move money: a redemption, a free item, a renewal charge. Once an AI agent can act on them for a member, each action has to be *bound*: tied to the member's identity, their consent at that moment, the payment token and a grant, in one signed record that the gate checks in memory-safe code before anything happens. Binding in the plugin's own database, or in a runtime without memory safety, is the side door this article describes: a hard-coded upsert can grant points or skip a charge with no signature, and a memory bug can expose the payment and loyalty keys together.
+
+| Action an agent takes | Bound to | Checked at the gate |
+|---|---|---|
+| **Redeem points or apply a member price** | Member ID, tier, the points balance record and a mandate | The balance is read live, not from memory or embeddings; the redemption is signed once, with an idempotency key, so a retry can't redeem twice |
+| **Pause, skip or change a subscription** | Member ID, the subscription record and the member's instruction | Only within what the member granted; every change is signed and timestamped |
+| **Renew and charge** | The payment token (never card data), the renewal date and current consent | The charge runs only if the subscription is active and consent hasn't been withdrawn |
+| **Send offers or win-back messages** | Marketing consent per channel and market, at send time | No consent at that moment means no send, whatever the segment says |
+| **Cancel or delete** | A cancellation or deletion event | Reaches the app, the feed and Google conversions on the event; balances are settled, then removed |
+
+These are patterns to check in each app's terms and API, not claims about how any one app handles them.
+
 ## 5. Knowledge base: publish, don't unlock
 
 Chatbots that answer from locked PDFs, docs, Markdown and spreadsheets, or from raw images and 3D files (JPG, PNG, SVG, WebP, OBJ, STL, FBX, GLB), read sources nobody approved, signed or versioned. A knowledge base for AI is **published once** as structured records carrying issuer, version, market, locale and consent scope, hashed and signed with a key you own. Media and 3D files become a manifest (alt text, dimensions, product link, licence) while the file stays in the vault under its own key.
