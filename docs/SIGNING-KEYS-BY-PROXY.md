@@ -21,6 +21,58 @@ tags:
 
 Every signature answers two questions: *who issued the key*, and *who granted the signer the right to use it*. When a consultancy, a plugin or a platform signs on your behalf with a certificate authority (CA) you never chose, you inherit that CA by proxy: its trust, its revocation service, its jurisdiction, and its failures. October 2026 showed what that costs when the CA is distrusted. This article sets out when you use a CA by proxy, what locks out when its chain breaks, how ECC/SAP signing fits, what each market requires, and how to build a Globalization MVP security first, with a cutover checklist to get there.
 
+## What are signing keys, and where are they used?
+
+A signing key is a business's digital seal. It comes in two halves. The **private key** stays with whoever signs, like the stamp locked in a notary's drawer. The **public key** is shared with everyone, so anyone can check that a stamp is genuine without asking the signer. A valid signature proves two things: **who** signed, and that **nothing changed** after they signed. Change one character of a signed contract, firmware file or code release and the check fails.
+
+You already rely on signing keys every day, usually without seeing them:
+
+| Where | What is signed, by whom | What it proves | If the key fails |
+|---|---|---|---|
+| **Code on GitHub** | Commits and pushes, with a developer's RSA or Ed25519 key | Who made the change, and that it wasn't altered | Anyone with the key can push as that person: revoke it and issue a new one |
+| **Firmware and SBOMs** | The firmware image and its parts list (SBOM), by the manufacturer | The device runs the real update, and the parts list matches what shipped; the EU Cyber Resilience Act expects this | Devices reject updates, or accept a fake one |
+| **E-signatures on legal documents** | Contracts, SOWs and filings, with a certificate from a certificate authority (CA) | This person agreed to this exact document, at this time | Signed documents show as invalid if the CA is distrusted |
+| **QA attestations in Agile** | Review approvals, test runs and release builds, by reviewers and the CI pipeline | The build was reviewed and tested, and no gate was skipped | No proof a release passed QA: an audit gap |
+
+**The business question is never only "is it signed?"** It is also: *whose key, issued by whom, and who granted them the right to sign for us?* A developer's key proves who pushed, but not whether they were allowed to push to that repository. A consultant's certificate proves who signed, but not whether they could sign for your company. That gap between **issuer** and **grant** is what this article is about, and it grows when the key belongs to someone else: a vendor, a plugin, or a consultancy signing **by proxy**.
+
+### Why this matters now: keys have to move on events
+
+Historically, signatures lived inside SLA-bound enterprise applications with a heavy price tag, such as SAP and AEM, and governance of those keys was assigned to a consulting team. The keys sat inside the application, and changing who could sign meant a change request, a consulting ticket and a release window. That worked when signing happened a few times a quarter.
+
+It also fitted what those systems were built for. SAP grew from accounting: accumulated ledger rows, in effect spreadsheets at enterprise scale, posted in batches by trusted staff on an internal network. Records like that never needed memory safety, because nothing untrusted reached the code at run time. **Attestation was a timestamp**, the posting date and the change log, not a signature anyone outside could verify. **Data subject request (DSR) evidence was held in pay-to-use data repositories**: vendor add-ons and archives billed by volume or by query, so proving a deletion meant paying to read your own records.
+
+| | Then: SLA application | Now: event-driven AI |
+|---|---|---|
+| **Records** | Ledger rows posted in batches by trusted staff | Events from shoppers, partners and agents, arriving all the time |
+| **Runtime exposure** | Internal network; memory safety not a requirement | Internet-facing edge, where memory-safe code (Rust, Wasm) is the baseline |
+| **Attestation** | A timestamp and a change log | A signature anyone can verify offline, against a key you publish |
+| **DSR evidence** | Held in pay-to-use repositories | An append-only ledger you own, with a receipt from every system that acted |
+| **Key changes** | Change request, consulting ticket, release window | Issued, rotated or revoked on the event |
+
+AI work signs on every event: each pull request, each consent change, each new market. Three capabilities stay blocked until the organization can **exchange keys on the event**, issuing, rotating or revoking a key or grant at the moment something happens:
+
+| AI capability | What it has to sign on each event | Blocked when keys live in an SLA application |
+|---|---|---|
+| **AI code review** | A review attestation per pull request, with a short-lived key the CI pipeline can verify | Keys are held in vendor or consultancy tooling, with no way to issue one per review |
+| **Data governance by mandate** | A scoped, expiring mandate on every agent action, revoked the moment consent changes | Grants change through tickets and release windows, not on the consent event |
+| **AI globalization weighting** | Each market's weighting or adapter, published as a signed record when that market's rules or data change | Weights and configuration ship on the application's release cycle, so a market can't be signed for when its rule changes |
+
+**The risks of leaving keys there.** When signing and its governance sit with an external team inside an SLA application, the organization carries risks it doesn't control:
+
+| Risk | What happens | With key exchange on events you own |
+|---|---|---|
+| **Single point of failure: one developer** | The one person who holds a key, or knows how to rotate it, is away or leaves. Releases and revocations stall | Keys live in the organization's key store, not with a person; rotation needs two approvers and follows a written runbook |
+| **External supply chain access** | A per-seat plugin or application, run by an outside team, holds standing credentials into your systems. Their compromise becomes yours | Each vendor gets a scoped, expiring grant and its own certificate, revocable alone, and every access is a signed record |
+| **Knowledge and training data lost at the end** | When the subscription or the external team's contract ends, the knowledge base, prompts, labelled data and adapters stay on their platform | The corpus is published as signed records you hold; adapters and training sets sit in your own registry; exit terms require export |
+| **Time zone gap** | An incident starts while the external team is offline, and nobody on your side can rotate or revoke | Revocation is automated on the event, and your own on-call staff hold pre-approved emergency mandates |
+| **Crisis mitigation on breach** | During a breach, nobody can say who holds which key, revoke it quickly, or show regulators what happened when. GDPR allows 72 hours to notify | One switch per key and per grant; revocation reaches every system on the event; the ledger's timestamps are the evidence for the notification |
+| **Plugins without memory safety, with hard-coded upserts** | A plugin or application writes straight into the database with hard-coded upserts, outside the event path: no signature, no consent check, no ledger entry. A memory bug in it can expose keys held in the same process | Plugins hold no signing keys and no direct write access; every write passes the gate as a signed event; the gate runs memory-safe code (Rust, Wasm) |
+
+**Distributed keys and rolling data gating.** The answer to these risks is to spread keys across the systems that act, each with its own scoped grant, and to have AI check every write against consent, market rules and mandates as it arrives: a gate that rolls with the data instead of a batch review after it. That model only holds if nothing writes around the gate. A plugin that hard-codes upserts into the data store, or runs in a runtime without memory safety, is a side door: its writes carry no signature, and a single memory-corruption bug can hand an attacker the keys and the write path together. October 2026 made the point twice: [php2shell](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html) gave unauthenticated code execution in the PHP runtime under every WordPress, Drupal, Magento, Joomla and Laravel host, whatever the plugin code, and an AI gateway package was compromised for the second time this year, again stealing signing keys and AI provider keys from the environment it ran in.
+
+Key exchange on events is what moves signing out of the SLA application and into infrastructure the organization owns. The rest of this article shows what that takes: whose keys, which grants, and where each market's rules apply.
+
 ![Does the client use eMudhra by proxy? Three parties, four situations, relying-party dependencies, AI/trust/boundary lockout, contract clauses, certificates you control, ECC/SAP signing and per-country rules](https://persephonepunch.github.io/crm-sync-setup/assets/ca-by-proxy-emudhra.svg)
 
 ## 1. When you use a CA by proxy
