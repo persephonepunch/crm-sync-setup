@@ -204,6 +204,8 @@ Assets that prove provenance (PDFs and firmware, images, 3D files, docs) are vau
 
 TLS proves which server is on the other end of the connection. It doesn't prove which theme is calling, or that the shopper behind it consented. That isn't left to each platform's plugin or module. Every theme loads the same way, through the **Cloudflare helmet**: a higher-order function at the edge that wraps the page before anything runs. Webflow to 11ty themes already load this way, and WordPress, AEM, Drupal, Joomla and Shopify themes load the same. It doesn't matter how or when the CMS publishes.
 
+**Why it loads the same everywhere: it's vanilla.** The helmet and what it loads are plain HTML, CSS and JavaScript. Petite-vue is the default for behaviour, and HTMX is opt-in. There's no React bundle, no build step tied to a framework and no theme API to integrate with. Any CMS that can output a page can carry it, whether that's a Liquid theme, a PHP template, an AEM component or a Twig template. The theme doesn't need to know the helmet exists.
+
 The helmet runs on every request, in this order:
 
 1. **Consent loads first.** Nothing else on the page runs until consent is read.
@@ -215,7 +217,7 @@ The Xano release gate then checks consent at the system of record, along with th
 
 | Connected theme | What the CMS publish owns | What loads through the helmet (the same for every theme) | Paired by |
 |---|---|---|---|
-| **Webflow → 11ty** | Pages, CMS items, design | Consent, stack loader, caps, mandate check, signed release request | Origin (`webflow.io` and the custom domain) |
+| **Webflow → 11ty** | Pages, CMS items, design | Consent, stack loader (vanilla JS/CSS/HTML, petite-vue or HTMX), caps, mandate check, signed release request | Origin (`webflow.io` and the custom domain) |
 | **Shopify** | Theme, sections, app embeds | The same | Store domain |
 | **WordPress** | Theme, blocks, page builder | The same | Site origin |
 | **AEM** | Components, templates, Dispatcher cache | The same | Each environment: dev, stage and prod |
