@@ -5,32 +5,32 @@
 <defs><style>
  .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
  .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
- .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#f22428;letter-spacing:.2em}
  .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
- .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#f22428}
  .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
- .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#f22428}
  .def{font:16px Helvetica,Arial,sans-serif;fill:#000}
  .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
- .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#f22428}
  .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
  .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
  .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
  .chip{font:700 12px Helvetica,Arial,sans-serif;fill:#fff}
  .c{font:11px 'Courier New',Courier,monospace;fill:#000}
- .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#f22428;text-anchor:middle}
  .box{fill:#fff;stroke:#000;stroke-width:1.5}
- .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rgap{fill:#fff;stroke:#f22428;stroke-width:1.6;stroke-dasharray:5 4}
  .rule{stroke:#000;stroke-width:.8;fill:none}
  .ln{stroke:#767676;stroke-width:1.2;fill:none}
- .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .lnr{stroke:#f22428;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
  .ah{fill:#767676}
- .ahr{fill:#c8102e}
+ .ahr{fill:#f22428}
 </style></defs>
 <rect width="1600" height="1490" fill="#fff"/>
 <text class="h" x="60" y="52">LOCALIZED AI — CRAWLER FILES vs CONSENT, LOCALE-AWARE RETRIEVAL, LoRA CHOSEN BY CONSENT</text>
 <text class="g" x="60" y="76">crawler files decide which content AI may read; consent decides which people your systems may use</text>
-<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#f22428" stroke-width="1.6" stroke-dasharray="4 3"/>
 <text class="s" x="1326" y="76">Red dashed = a security gap.</text>
 <path class="rule" d="M60,96H1540"/>
 <text class="sec" x="60" y="124">TWO CHANNELS THAT NEVER MIX</text>
@@ -44,8 +44,8 @@
 <text class="r" x="314" y="212">requests, not access control;</text>
 <text class="r" x="314" y="229">public: they list the paths</text>
 <text class="r" x="314" y="246">llms.txt is a hint only</text>
-<rect x="482.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="496.0" y="188.5">L2</text>
-<rect x="448.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="462.0" y="188.5">L1</text>
+<rect x="482.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="496.0" y="188.5">L2</text>
+<rect x="448.0" y="176" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="462.0" y="188.5">L1</text>
 <rect class="box" x="540" y="168" width="240" height="110"/>
 <text class="bt" x="554" y="192">Crawlers</text>
 <text class="b" x="554" y="212">Googlebot: Search, AI Overviews</text>
@@ -77,10 +77,10 @@
 <path class="ah" d="M1298,223L1289.0,218.5L1289.0,227.5z"/>
 <path class="lnr" d="M800,140V282"/>
 <rect class="rgap" x="60" y="296" width="460" height="36"/>
-<rect x="70.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="317.5">L4</text>
+<rect x="70.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="317.5">L4</text>
 <text class="btr" x="108" y="318">Customer names or orders in JSON-LD</text>
 <rect class="rgap" x="540" y="296" width="520" height="36"/>
-<rect x="550.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="564" y="317.5">L3</text>
+<rect x="550.0" y="305" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="564" y="317.5">L3</text>
 <text class="btr" x="588" y="318">Crawl permission read as consent: it never is</text>
 <path class="rule" d="M60,350H1540"/>
 <text class="sec" x="60" y="378">LOCALIZED RETRIEVAL — FILTER BY LOCALE FIRST, THEN FALL BACK</text>
@@ -121,13 +121,13 @@
 <text class="chip" x="714.0999999999999" y="505" text-anchor="middle">3 · Accept-Language</text>
 <text class="btr" x="813.4" y="505">Never the IP address alone.</text>
 <rect class="rgap" x="60" y="532" width="480" height="36"/>
-<rect x="70.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="553.5">L5</text>
+<rect x="70.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="553.5">L5</text>
 <text class="btr" x="108" y="554">Stale price from the vector store</text>
 <rect class="rgap" x="560" y="532" width="480" height="36"/>
-<rect x="570.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="553.5">L6</text>
+<rect x="570.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="553.5">L6</text>
 <text class="btr" x="608" y="554">Machine-translated claims in answers</text>
 <rect class="rgap" x="1060" y="532" width="480" height="36"/>
-<rect x="1070.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="553.5">L7</text>
+<rect x="1070.0" y="541" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="553.5">L7</text>
 <text class="btr" x="1108" y="554">Locale guessed from the IP address</text>
 <path class="rule" d="M60,590H1540"/>
 <text class="sec" x="60" y="618">LoRA ADAPTERS — THE LOCALE PICKS THE LANGUAGE, CONSENT UNLOCKS PERSONALIZATION</text>
@@ -201,13 +201,13 @@
 <text class="b" x="1274" y="852">weights can&#x27;t forget one person:</text>
 <text class="b" x="1274" y="869">retrain without the withdrawn</text>
 <rect class="rgap" x="60" y="902" width="480" height="36"/>
-<rect x="70.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="923.5">L8</text>
+<rect x="70.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="923.5">L8</text>
 <text class="btr" x="108" y="924">Adapter trained without training consent</text>
 <rect class="rgap" x="560" y="902" width="480" height="36"/>
-<rect x="570.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="923.5">L9</text>
+<rect x="570.0" y="911" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="923.5">L9</text>
 <text class="btr" x="608" y="924">Withdrawn consent stays in the weights</text>
 <rect class="rgap" x="1060" y="902" width="480" height="36"/>
-<rect x="1066.5" y="911" width="35" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="923.5">L10</text>
+<rect x="1066.5" y="911" width="35" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="923.5">L10</text>
 <text class="btr" x="1108" y="924">Personalization served without a consent check</text>
 <path class="rule" d="M60,960H1540"/>
 <text class="sec" x="60" y="988">RULES BY LOCALE</text>
@@ -233,34 +233,34 @@
 <text class="b" x="1199" y="1082">before training outside Japan.</text>
 <path class="rule" d="M60,1130H1540"/>
 <text class="secr" x="60" y="1158">TEN GAPS — AND THE FIX FOR EACH</text>
-<rect x="64.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1191.5">L1</text>
+<rect x="64.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1191.5">L1</text>
 <text class="btr" x="102" y="1192">robots.txt used as access control</text>
 <text class="b" x="102" y="1211">Fix: Protect sensitive paths with authentication; a Disallow line publishes the path</text>
-<rect x="64.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1245.5">L2</text>
+<rect x="64.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1245.5">L2</text>
 <text class="btr" x="102" y="1246">llms.txt lists private pages</text>
 <text class="b" x="102" y="1265">Fix: Generate it from an allowlist of public URLs, never from the whole CMS</text>
-<rect x="64.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1299.5">L3</text>
+<rect x="64.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1299.5">L3</text>
 <text class="btr" x="102" y="1300">Crawl permission read as consent</text>
 <text class="b" x="102" y="1319">Fix: Separate channels; check the consent state on every event</text>
-<rect x="64.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1353.5">L4</text>
+<rect x="64.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1353.5">L4</text>
 <text class="btr" x="102" y="1354">Structured data leaks people</text>
 <text class="b" x="102" y="1373">Fix: No customer names or order details in JSON-LD: it is published with no consent check</text>
-<rect x="64.0" y="1395" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1407.5">L5</text>
+<rect x="64.0" y="1395" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="78" y="1407.5">L5</text>
 <text class="btr" x="102" y="1408">Stale price from the vector store</text>
 <text class="b" x="102" y="1427">Fix: Never answer price or availability from embeddings; fetch live by country</text>
-<rect x="814.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1191.5">L6</text>
+<rect x="814.0" y="1179" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1191.5">L6</text>
 <text class="btr" x="852" y="1192">Machine-translated claims</text>
 <text class="b" x="852" y="1211">Fix: Only human-translated chunks for legal and claims text</text>
-<rect x="814.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1245.5">L7</text>
+<rect x="814.0" y="1233" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1245.5">L7</text>
 <text class="btr" x="852" y="1246">Locale guessed from the IP address</text>
 <text class="b" x="852" y="1265">Fix: Explicit choice, then market, then Accept-Language; apply that locale&#x27;s rules</text>
-<rect x="814.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1299.5">L8</text>
+<rect x="814.0" y="1287" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1299.5">L8</text>
 <text class="btr" x="852" y="1300">Adapter trained without training consent</text>
 <text class="b" x="852" y="1319">Fix: A separate training scope per record; dataset_hash and record_count in the ledger</text>
-<rect x="814.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1353.5">L9</text>
+<rect x="814.0" y="1341" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1353.5">L9</text>
 <text class="btr" x="852" y="1354">Withdrawn consent stays in the weights</text>
 <text class="b" x="852" y="1373">Fix: Scheduled retirement (retire_by) and a retrain without the withdrawn</text>
-<rect x="810.5" y="1395" width="35" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1407.5">L10</text>
+<rect x="810.5" y="1395" width="35" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="828" y="1407.5">L10</text>
 <text class="btr" x="852" y="1408">Personalization without a consent check</text>
 <text class="b" x="852" y="1427">Fix: Check consent and blocked markets on every request; fall back to the language adapter</text>
 <text class="bt" x="60" y="1468">Crawler files decide which content AI reads. Consent decides which people your systems use. The ledger records which adapter answered, under which consent.</text>

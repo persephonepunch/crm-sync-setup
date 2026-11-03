@@ -5,32 +5,32 @@
 <defs><style>
  .h{font:700 20px Helvetica,Arial,sans-serif;fill:#000}
  .sec{font:700 10px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.2em}
- .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;letter-spacing:.2em}
+ .secr{font:700 10px Helvetica,Arial,sans-serif;fill:#f22428;letter-spacing:.2em}
  .bt{font:700 13px Helvetica,Arial,sans-serif;fill:#000}
- .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .btr{font:700 13px Helvetica,Arial,sans-serif;fill:#f22428}
  .lt{font:700 14px Helvetica,Arial,sans-serif;fill:#000}
- .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .ltr{font:700 14px Helvetica,Arial,sans-serif;fill:#f22428}
  .def{font:16px Helvetica,Arial,sans-serif;fill:#000}
  .b{font:11px Helvetica,Arial,sans-serif;fill:#000}
- .r{font:11px Helvetica,Arial,sans-serif;fill:#c8102e}
+ .r{font:11px Helvetica,Arial,sans-serif;fill:#f22428}
  .g{font:11px Helvetica,Arial,sans-serif;fill:#767676}
  .s{font:10px Helvetica,Arial,sans-serif;fill:#767676}
  .lab{font:700 9px Helvetica,Arial,sans-serif;fill:#767676;letter-spacing:.1em}
  .chip{font:700 12px Helvetica,Arial,sans-serif;fill:#fff}
  .c{font:11px 'Courier New',Courier,monospace;fill:#000}
- .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#c8102e;text-anchor:middle}
+ .nr{font:700 10px Helvetica,Arial,sans-serif;fill:#f22428;text-anchor:middle}
  .box{fill:#fff;stroke:#000;stroke-width:1.5}
- .rgap{fill:#fff;stroke:#c8102e;stroke-width:1.6;stroke-dasharray:5 4}
+ .rgap{fill:#fff;stroke:#f22428;stroke-width:1.6;stroke-dasharray:5 4}
  .rule{stroke:#000;stroke-width:.8;fill:none}
  .ln{stroke:#767676;stroke-width:1.2;fill:none}
- .lnr{stroke:#c8102e;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+ .lnr{stroke:#f22428;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
  .ah{fill:#767676}
- .ahr{fill:#c8102e}
+ .ahr{fill:#f22428}
 </style></defs>
 <rect width="1600" height="1430" fill="#fff"/>
 <text class="h" x="60" y="52">AUDIENCE TARGETS IN A CMS — DEFINITIONS, NOT MEMBERS</text>
 <text class="g" x="60" y="76">the CMS holds the query and the rules; Xano holds the people; the sync joins them and writes back totals only</text>
-<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#c8102e" stroke-width="1.6" stroke-dasharray="4 3"/>
+<rect x="1296" y="64" width="22" height="14" fill="#fff" stroke="#f22428" stroke-width="1.6" stroke-dasharray="4 3"/>
 <text class="s" x="1326" y="76">Red dashed = a security gap.</text>
 <path class="rule" d="M60,96H1540"/>
 <text class="sec" x="60" y="124">LIFECYCLE — THE AGENT PROPOSES, A PERSON PUBLISHES</text>
@@ -63,13 +63,13 @@
 <text class="b" x="1274" y="184">Customer Match with ad_user_data</text>
 <text class="b" x="1274" y="201">and ad_personalization; Klaviyo</text>
 <rect class="rgap" x="60" y="242" width="480" height="36"/>
-<rect x="70.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="263.5">T3</text>
+<rect x="70.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="263.5">T3</text>
 <text class="btr" x="108" y="264">The agent publishes its own audience</text>
 <rect class="rgap" x="560" y="242" width="480" height="36"/>
-<rect x="570.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="263.5">T4</text>
+<rect x="570.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="263.5">T4</text>
 <text class="btr" x="608" y="264">Definition changed after approval</text>
 <rect class="rgap" x="1060" y="242" width="480" height="36"/>
-<rect x="1070.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="263.5">T2</text>
+<rect x="1070.0" y="251" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="263.5">T2</text>
 <text class="btr" x="1108" y="264">A template page publishes the collection</text>
 <path class="rule" d="M60,300H1540"/>
 <text class="sec" x="60" y="328">WHERE EACH PIECE LIVES</text>
@@ -126,13 +126,13 @@
 <path class="ah" d="M1002,494L1011.0,498.5L1011.0,489.5z"/>
 <text class="s" x="1006" y="484">state</text>
 <rect class="rgap" x="60" y="660" width="480" height="36"/>
-<rect x="70.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="681.5">T1</text>
+<rect x="70.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="681.5">T1</text>
 <text class="btr" x="108" y="682">Members stored in the CMS</text>
 <rect class="rgap" x="560" y="660" width="480" height="36"/>
-<rect x="570.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="681.5">T7</text>
+<rect x="570.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="681.5">T7</text>
 <text class="btr" x="608" y="682">Precise location or device IDs</text>
 <rect class="rgap" x="1060" y="660" width="480" height="36"/>
-<rect x="1070.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="681.5">T8</text>
+<rect x="1070.0" y="669" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="1084" y="681.5">T8</text>
 <text class="btr" x="1108" y="682">Secrets in the Destinations collection</text>
 <path class="rule" d="M60,750H1540"/>
 <text class="sec" x="60" y="778">SYNC ORDER FOR EACH MATCHED PERSON — THE FIRST FAILURE STOPS</text>
@@ -189,10 +189,10 @@
 <path class="ah" d="M1340,904L1344.5,895.0L1335.5,895.0z"/>
 <text class="g" x="1350" y="900">state: held below cohort</text>
 <rect class="rgap" x="60" y="922" width="480" height="36"/>
-<rect x="70.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="943.5">T6</text>
+<rect x="70.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="84" y="943.5">T6</text>
 <text class="btr" x="108" y="944">Open DSR still targeted</text>
 <rect class="rgap" x="560" y="922" width="480" height="36"/>
-<rect x="570.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="943.5">T5</text>
+<rect x="570.0" y="931" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="584" y="943.5">T5</text>
 <text class="btr" x="608" y="944">Small slices identify people</text>
 <path class="rule" d="M60,980H1540"/>
 <text class="sec" x="60" y="1008">AUDIENCE STATES — WHAT COMES BACK TO WEBFLOW (EXAMPLE: MIN COHORT 50)</text>
@@ -238,28 +238,28 @@
 <text class="s" x="60" y="1152">Below Min cohort every count is left empty: small counts sliced by device, market and campaign can identify a person (C2).</text>
 <path class="rule" d="M60,1170H1540"/>
 <text class="secr" x="60" y="1198">EIGHT GAPS — AND THE FIX FOR EACH</text>
-<rect x="62.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1227.5">T1</text>
+<rect x="62.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1227.5">T1</text>
 <text class="btr" x="100" y="1228">Members stored in the CMS</text>
 <text class="b" x="100" y="1244">Fix: Definitions only; Contains personal data must be off, or the sync refuses the item</text>
-<rect x="62.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1267.5">T2</text>
+<rect x="62.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1267.5">T2</text>
 <text class="btr" x="100" y="1268">A template page publishes the collection</text>
 <text class="b" x="100" y="1284">Fix: Don&#x27;t bind it to a Collection template page; every field on one is public</text>
-<rect x="62.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1307.5">T3</text>
+<rect x="62.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1307.5">T3</text>
 <text class="btr" x="100" y="1308">The agent publishes its own audience</text>
 <text class="b" x="100" y="1324">Fix: Agents create drafts only; a person reviews and publishes</text>
-<rect x="62.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1347.5">T4</text>
+<rect x="62.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="76" y="1347.5">T4</text>
 <text class="btr" x="100" y="1348">Definition changed after approval</text>
 <text class="b" x="100" y="1364">Fix: A definition hash recorded at approval; a mismatch blocks the sync</text>
-<rect x="812.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1227.5">T5</text>
+<rect x="812.0" y="1215" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1227.5">T5</text>
 <text class="btr" x="850" y="1228">Small slices identify people</text>
 <text class="b" x="850" y="1244">Fix: Counts below Min cohort left empty in every snapshot</text>
-<rect x="812.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1267.5">T6</text>
+<rect x="812.0" y="1255" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1267.5">T6</text>
 <text class="btr" x="850" y="1268">Open DSR still targeted</text>
 <text class="b" x="850" y="1284">Fix: DSR checked first, before consent, on every sync</text>
-<rect x="812.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1307.5">T7</text>
+<rect x="812.0" y="1295" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1307.5">T7</text>
 <text class="btr" x="850" y="1308">Precise location or device IDs</text>
 <text class="b" x="850" y="1324">Fix: Country or region and a device class only</text>
-<rect x="812.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#c8102e" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1347.5">T8</text>
+<rect x="812.0" y="1335" width="28" height="18" rx="9" fill="#fff" stroke="#f22428" stroke-width="1.3" stroke-dasharray="3 2"/><text class="nr" x="826" y="1347.5">T8</text>
 <text class="btr" x="850" y="1348">Secrets in the Destinations collection</text>
 <text class="b" x="850" y="1364">Fix: Store the secret&#x27;s name; the secret lives in Cloudflare or Xano</text>
 <text class="bt" x="60" y="1408">The CMS holds the query and the rules. Xano holds the people. Only totals come back.</text>
