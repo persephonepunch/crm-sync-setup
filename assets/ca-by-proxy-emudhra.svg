@@ -1,0 +1,468 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="3096" viewBox="-5 -5 1510 3096">
+<rect id="background" x="-5" y="-5" width="1510" height="3096" fill="#fff"/>
+<g id="header">
+<text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">Does the client use eMudhra by proxy?</text>
+<text x="37" y="82" font-family="Arial" font-size="14" fill="#222">When a consultancy signs with an eMudhra certificate, it depends on whose certificate signs and who runs the system.</text>
+</g>
+<text x="37" y="128" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">THREE PARTIES</text>
+<g id="parties">
+<g id="party-client">
+<rect x="37" y="144" width="400" height="96" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51" y="170" font-family="Arial" font-size="17" fill="#000">Client</text>
+<text x="423" y="169" font-family="Arial" font-size="10.5" fill="#333" text-anchor="end" letter-spacing="0.4">RELYING PARTY</text>
+<text x="51" y="196" font-family="Arial" font-size="12.5" fill="#111">Hires the consultancy</text>
+<text x="51" y="214" font-family="Arial" font-size="12.5" fill="#111">Opens signed PDFs; may have its own CA</text>
+</g>
+<g id="party-consultancy">
+<rect x="550" y="144" width="400" height="96" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="564" y="170" font-family="Arial" font-size="17" fill="#000">Consultancy</text>
+<text x="936" y="169" font-family="Arial" font-size="10.5" fill="#333" text-anchor="end" letter-spacing="0.4">E.G. BIG FOUR OR IT SERVICES</text>
+<text x="564" y="196" font-family="Arial" font-size="12.5" fill="#111">Signs its own documents</text>
+<text x="564" y="214" font-family="Arial" font-size="12.5" fill="#111">May run signing or systems for the client</text>
+</g>
+<g id="party-emudhra">
+<rect x="1063" y="144" width="400" height="96" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="1077" y="170" font-family="Arial" font-size="17" fill="#f22428">eMudhra</text>
+<text x="1449" y="169" font-family="Arial" font-size="10.5" fill="#333" text-anchor="end" letter-spacing="0.4">CERTIFICATE AUTHORITY</text>
+<text x="1077" y="196" font-family="Arial" font-size="12.5" fill="#111">Issues signing certificates</text>
+<text x="1077" y="214" font-family="Arial" font-size="12.5" fill="#111">Runs revocation checks (OCSP, CRL)</text>
+</g>
+<g id="arrow-hires">
+<line x1="437" y1="184" x2="541.0" y2="184.0" stroke="#111" stroke-width="1.5"/>
+<path d="M541.0,179.0 L550,184 L541.0,189.0 Z" fill="#111"/>
+<text x="493.5" y="176" font-family="Arial" font-size="10.5" fill="#111" text-anchor="middle">hires</text>
+</g>
+<g id="arrow-certificate">
+<line x1="950" y1="184" x2="1054.0" y2="184.0" stroke="#f22428" stroke-width="1.5"/>
+<path d="M1054.0,179.0 L1063,184 L1054.0,189.0 Z" fill="#f22428"/>
+<text x="1006.5" y="176" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">certificate from</text>
+</g>
+<g id="arrow-signed-pdf">
+<line x1="550" y1="214" x2="446.0" y2="214.0" stroke="#f22428" stroke-width="1.5"/>
+<path d="M446.0,219.0 L437,214 L446.0,209.0 Z" fill="#f22428"/>
+</g>
+<text x="493.5" y="232" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">signed PDF</text>
+</g>
+<text x="37" y="286" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">FOUR SITUATIONS, FOUR ANSWERS</text>
+<g id="scenario-signs-its-own">
+<rect x="37.0" y="302" width="345.2" height="171" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="327" font-family="Arial" font-size="15" fill="#000">Signs its own</text>
+<rect x="336.2" y="313" width="32" height="20" rx="10" fill="#111"/>
+<text x="352.2" y="327" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">NO</text>
+<text x="51.0" y="352" font-family="Arial" font-size="12" fill="#555">Consultancy signs → client validates</text>
+<text x="51.0" y="376" font-family="Arial" font-size="12.5" fill="#111">An SOW, invoice or sign-off signed with the</text>
+<text x="51.0" y="394" font-family="Arial" font-size="12.5" fill="#111">consultancy's eMudhra certificate.</text>
+<text x="51.0" y="421" font-family="Arial" font-size="12.5" fill="#111">The client only checks the chain and revocation. No</text>
+<text x="51.0" y="439" font-family="Arial" font-size="12.5" fill="#111">account, key or contract with eMudhra.</text>
+</g>
+<g id="scenario-signs-via-their-setup">
+<rect x="397.2" y="302" width="345.2" height="171" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="411.2" y="327" font-family="Arial" font-size="15" fill="#000">Signs via their setup</text>
+<rect x="605.5" y="313" width="123" height="20" rx="10" fill="#f22428"/>
+<text x="667.0" y="327" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">YES, INDIRECTLY</text>
+<text x="411.2" y="352" font-family="Arial" font-size="12" fill="#f22428">Client signer → consultancy → eMudhra</text>
+<text x="411.2" y="376" font-family="Arial" font-size="12.5" fill="#111">Client people sign through the consultancy's Acrobat</text>
+<text x="411.2" y="394" font-family="Arial" font-size="12.5" fill="#111">Sign account or eSign portal.</text>
+<text x="411.2" y="421" font-family="Arial" font-size="12.5" fill="#111">Signer identity data goes to eMudhra: effectively a</text>
+<text x="411.2" y="439" font-family="Arial" font-size="12.5" fill="#111">subprocessor the client never chose.</text>
+</g>
+<g id="scenario-runs-client-systems">
+<rect x="757.5" y="302" width="345.2" height="171" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="771.5" y="327" font-family="Arial" font-size="15" fill="#000">Runs client systems</text>
+<rect x="979.8" y="313" width="109" height="20" rx="10" fill="#f22428"/>
+<text x="1034.3" y="327" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">YES, DIRECTLY</text>
+<text x="771.5" y="352" font-family="Arial" font-size="12" fill="#f22428">eMudhra cert in the client's AEM or Sign</text>
+<text x="771.5" y="376" font-family="Arial" font-size="12.5" fill="#111">The consultancy installs eMudhra certificates or</text>
+<text x="771.5" y="394" font-family="Arial" font-size="12.5" fill="#111">enables it as the provider in client systems.</text>
+<text x="771.5" y="421" font-family="Arial" font-size="12.5" fill="#111">It is now the client's configuration; the</text>
+<text x="771.5" y="439" font-family="Arial" font-size="12.5" fill="#111">consultancy only made the choice.</text>
+</g>
+<g id="scenario-client-has-its-own-ca">
+<rect x="1117.8" y="302" width="345.2" height="171" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1131.8" y="327" font-family="Arial" font-size="15" fill="#000">Client has its own CA</text>
+<rect x="1417.0" y="313" width="32" height="20" rx="10" fill="#111"/>
+<text x="1433.0" y="327" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">NO</text>
+<text x="1131.8" y="352" font-family="Arial" font-size="12" fill="#555">Client signs with its own CA</text>
+<text x="1131.8" y="376" font-family="Arial" font-size="12.5" fill="#111">The client only receives eMudhra-signed documents.</text>
+<text x="1131.8" y="403" font-family="Arial" font-size="12.5" fill="#111">It needs to trust eMudhra's root, usually through</text>
+<text x="1131.8" y="421" font-family="Arial" font-size="12.5" fill="#111">Adobe's trust list (AATL).</text>
+</g>
+<text x="37" y="519" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">EVEN AS A RELYING PARTY ONLY, THE CLIENT DEPENDS ON EMUDHRA FOR</text>
+<g id="dependency-revocation-checks">
+<rect x="37.0" y="535" width="465.3" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="560" font-family="Arial" font-size="15" fill="#000">Revocation checks</text>
+<text x="51.0" y="585" font-family="Arial" font-size="12.5" fill="#111">Validating a signature calls eMudhra's OCSP responder or CRL. Long-term</text>
+<text x="51.0" y="603" font-family="Arial" font-size="12.5" fill="#111">validation helps only if it was embedded at signing.</text>
+</g>
+<g id="dependency-trust-in-the-root">
+<rect x="517.3" y="535" width="465.3" height="122" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="531.3" y="560" font-family="Arial" font-size="15" fill="#000">Trust in the root</text>
+<text x="531.3" y="585" font-family="Arial" font-size="12.5" fill="#111">Not hypothetical: 17–20 Oct 2026, Chrome, Mozilla, Apple and Microsoft</text>
+<text x="531.3" y="603" font-family="Arial" font-size="12.5" fill="#111">blocked eight eMudhra intermediates whose private keys were recoverable.</text>
+<text x="531.3" y="621" font-family="Arial" font-size="12.5" fill="#111">Chrome removes emSign ECC Root CA - G3 from 27 Oct.</text>
+</g>
+<g id="dependency-legal-weight">
+<rect x="997.7" y="535" width="465.3" height="122" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1011.7" y="560" font-family="Arial" font-size="15" fill="#000">Legal weight</text>
+<text x="1011.7" y="585" font-family="Arial" font-size="12.5" fill="#111">Valid under Indian law. Whether it counts as qualified in the EU, or</text>
+<text x="1011.7" y="603" font-family="Arial" font-size="12.5" fill="#111">elsewhere, depends on the certificate type and jurisdiction.</text>
+</g>
+<text x="37" y="703" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">AI / TRUST / BOUNDARY LOCKOUT: WHAT STOPS WHEN A CHAIN IS DISTRUSTED</text>
+<g id="lockout-ai-lockout">
+<rect x="37.0" y="719" width="465.3" height="189" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="744" font-family="Arial" font-size="15" fill="#000">AI lockout</text>
+<rect x="428.3" y="730" width="60" height="20" rx="10" fill="#f22428"/>
+<text x="458.3" y="744" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">AGENTS</text>
+<text x="51.0" y="769" font-family="Arial" font-size="12" fill="#f22428">Agent → TLS handshake → blocked chain → no call</text>
+<text x="51.0" y="793" font-family="Arial" font-size="12.5" fill="#111">Agents, AI gateways and MCP tools calling an API whose certificate</text>
+<text x="51.0" y="811" font-family="Arial" font-size="12.5" fill="#111">chains through a blocked intermediate fail the handshake: the tool call</text>
+<text x="51.0" y="829" font-family="Arial" font-size="12.5" fill="#111">never happens.</text>
+<text x="51.0" y="856" font-family="Arial" font-size="12.5" fill="#111">Mandates signed with keys from an exposed environment must be rejected,</text>
+<text x="51.0" y="874" font-family="Arial" font-size="12.5" fill="#111">and code-signed packages and adapters fail verification.</text>
+</g>
+<g id="lockout-trust-lockout">
+<rect x="517.3" y="719" width="465.3" height="189" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="531.3" y="744" font-family="Arial" font-size="15" fill="#000">Trust lockout</text>
+<rect x="894.6" y="730" width="74" height="20" rx="10" fill="#f22428"/>
+<text x="931.6" y="744" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">RUNTIMES</text>
+<text x="531.3" y="769" font-family="Arial" font-size="12" fill="#f22428">Browser, OS, Node, Composer, certifi reject the chain</text>
+<text x="531.3" y="793" font-family="Arial" font-size="12.5" fill="#111">A distrusted chain is not a warning: browsers and runtimes refuse the</text>
+<text x="531.3" y="811" font-family="Arial" font-size="12.5" fill="#111">connection, so the site or API is unreachable.</text>
+<text x="531.3" y="838" font-family="Arial" font-size="12.5" fill="#111">Signed documents on that chain show as invalid wherever they are opened.</text>
+</g>
+<g id="lockout-boundary-lockout">
+<rect x="997.7" y="719" width="465.3" height="189" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1011.7" y="744" font-family="Arial" font-size="15" fill="#000">Boundary lockout</text>
+<rect x="1368.0" y="730" width="81" height="20" rx="10" fill="#f22428"/>
+<text x="1408.5" y="744" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">CROSSINGS</text>
+<text x="1011.7" y="769" font-family="Arial" font-size="12" fill="#f22428">Edge ↔ origin, webhooks, feed syncs, partner APIs</text>
+<text x="1011.7" y="793" font-family="Arial" font-size="12.5" fill="#111">Every boundary crossing is a TLS handshake. A distrusted chain on either</text>
+<text x="1011.7" y="811" font-family="Arial" font-size="12.5" fill="#111">side stops the crossing: feeds stall, webhooks fail.</text>
+<text x="1011.7" y="838" font-family="Arial" font-size="12.5" fill="#111">Consent, opt-out and deletion events stop propagating: a DSR lockout.</text>
+<text x="1011.7" y="856" font-family="Arial" font-size="12.5" fill="#111">Queue them and replay once the chain is reissued.</text>
+</g>
+<text x="37" y="938" font-family="Arial" font-size="12.5" fill="#000">Recover faster: know which certificates chain through which CA, automate reissue (ACME) with a second CA ready, and sign records with keys you own and can verify offline.</text>
+<text x="37" y="980" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">WHEN IT IS BY PROXY, THESE BECOME CONCRETE</text>
+<g id="consequence-vendor-and-subprocessor-lists">
+<rect x="37.0" y="996" width="465.3" height="104" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="1021" font-family="Arial" font-size="15" fill="#000">Vendor and subprocessor lists</text>
+<text x="51.0" y="1046" font-family="Arial" font-size="12.5" fill="#111">eMudhra belongs in the client's third-party register and data processing</text>
+<text x="51.0" y="1064" font-family="Arial" font-size="12.5" fill="#111">agreement, through the consultancy's contract.</text>
+</g>
+<g id="consequence-personal-data">
+<rect x="517.3" y="996" width="465.3" height="104" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="531.3" y="1021" font-family="Arial" font-size="15" fill="#000">Personal data</text>
+<text x="531.3" y="1046" font-family="Arial" font-size="12.5" fill="#111">Signer identity checks, including Aadhaar eSign, process personal data</text>
+<text x="531.3" y="1064" font-family="Arial" font-size="12.5" fill="#111">in India: residency and transfer questions for EU and UK signers.</text>
+</g>
+<g id="consequence-exit">
+<rect x="997.7" y="996" width="465.3" height="104" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1011.7" y="1021" font-family="Arial" font-size="15" fill="#000">Exit</text>
+<text x="1011.7" y="1046" font-family="Arial" font-size="12.5" fill="#111">If the consultancy leaves, the signing setup and certificate</text>
+<text x="1011.7" y="1064" font-family="Arial" font-size="12.5" fill="#111">relationship may go with it.</text>
+</g>
+<text x="37" y="1146" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">CONTRACT CLAUSES TO ASK FOR</text>
+<g id="clause-disclose-every-provider">
+<rect x="37.0" y="1162" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="1187" font-family="Arial" font-size="15" fill="#000">Disclose every provider</text>
+<text x="51.0" y="1212" font-family="Arial" font-size="12.5" fill="#111">Every trust service provider and CA used for the client's signers or</text>
+<text x="51.0" y="1230" font-family="Arial" font-size="12.5" fill="#111">systems.</text>
+</g>
+<g id="clause-certificates-issued-to-the-client">
+<rect x="517.3" y="1162" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="531.3" y="1187" font-family="Arial" font-size="15" fill="#000">Certificates issued to the client</text>
+<text x="531.3" y="1212" font-family="Arial" font-size="12.5" fill="#111">Certificates installed in client systems name the client, not the</text>
+<text x="531.3" y="1230" font-family="Arial" font-size="12.5" fill="#111">consultancy.</text>
+</g>
+<g id="clause-embed-ltv">
+<rect x="997.7" y="1162" width="465.3" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1011.7" y="1187" font-family="Arial" font-size="15" fill="#000">Embed LTV</text>
+<text x="1011.7" y="1212" font-family="Arial" font-size="12.5" fill="#111">Revocation info and timestamps embedded so documents stay verifiable</text>
+<text x="1011.7" y="1230" font-family="Arial" font-size="12.5" fill="#111">after the relationship ends.</text>
+</g>
+<text x="37" y="1312" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">CERTIFICATES YOU CONTROL: NO THIRD-PARTY CHAIN TO INHERIT</text>
+<g id="own-cert-crm-sync-certificate-link">
+<rect x="37.0" y="1328" width="705.5" height="171" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="1353" font-family="Arial" font-size="15" fill="#000">crm-sync certificate link</text>
+<rect x="661.5" y="1339" width="67" height="20" rx="10" fill="#111"/>
+<text x="695.0" y="1353" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">OWN KEY</text>
+<text x="51.0" y="1378" font-family="Arial" font-size="12" fill="#555">crm-sync.dev/license/verify?cert=…</text>
+<text x="51.0" y="1402" font-family="Arial" font-size="12.5" fill="#111">Licence grants, upload attestations and deletion records are signed with crm-sync's Ed25519 key, published at</text>
+<text x="51.0" y="1420" font-family="Arial" font-size="12.5" fill="#111">/.well-known/jwks.json.</text>
+<text x="51.0" y="1447" font-family="Arial" font-size="12.5" fill="#111">Anyone verifies offline, with no account and no CA chain that can be distrusted. Short links at /v/&lt;hash&gt;; print</text>
+<text x="51.0" y="1465" font-family="Arial" font-size="12.5" fill="#111">QR at /license/qr/&lt;hash&gt;.svg.</text>
+</g>
+<g id="own-cert-xano-self-host-certificate">
+<rect x="757.5" y="1328" width="705.5" height="171" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="771.5" y="1353" font-family="Arial" font-size="15" fill="#000">Xano self-host certificate</text>
+<rect x="1382.0" y="1339" width="67" height="20" rx="10" fill="#111"/>
+<text x="1415.5" y="1353" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">YOUR CA</text>
+<text x="771.5" y="1378" font-family="Arial" font-size="12" fill="#555">Your domain, your TLS certificate, your trust store</text>
+<text x="771.5" y="1402" font-family="Arial" font-size="12.5" fill="#111">Self-hosted Xano runs on infrastructure you operate: you choose the CA for its TLS certificate and keep the</text>
+<text x="771.5" y="1420" font-family="Arial" font-size="12.5" fill="#111">private key in your own HSM or key vault, in country.</text>
+<text x="771.5" y="1447" font-family="Arial" font-size="12.5" fill="#111">You also own the trust store: confirm the Node and Composer bundles reject the October 2026 eMudhra chains.</text>
+</g>
+<text x="37" y="1545" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">ECC / SAP SIGNING: THE SAME SCRUTINY, PLUS TWO ECC-SPECIFIC RISKS</text>
+<g id="ecc-table">
+<rect x="37" y="1561" width="250" height="38" fill="#111"/>
+<text x="49" y="1585" font-family="Arial" font-size="13.5" fill="#fff">What gets signed</text>
+<rect x="287" y="1561" width="400" height="38" fill="#111"/>
+<text x="299" y="1585" font-family="Arial" font-size="13.5" fill="#fff">Mechanism in ECC</text>
+<rect x="687" y="1561" width="250" height="38" fill="#111"/>
+<text x="699" y="1585" font-family="Arial" font-size="13.5" fill="#fff">Who usually sets it up</text>
+<rect x="937" y="1561" width="526" height="38" fill="#f22428"/>
+<text x="949" y="1585" font-family="Arial" font-size="13.5" fill="#fff">Proxy risk</text>
+<g id="ecc-pdf-forms">
+<text x="49" y="1624" font-family="Arial" font-size="14" fill="#000">PDF forms</text>
+<text x="49" y="1642" font-family="Arial" font-size="12" fill="#555">Invoices, POs, delivery notes</text>
+<text x="299" y="1624" font-family="Arial" font-size="12.5" fill="#111">Interactive Forms by Adobe through Adobe</text>
+<text x="299" y="1642" font-family="Arial" font-size="12.5" fill="#111">Document Services (ADS), with a .pfx credential</text>
+<text x="699" y="1624" font-family="Arial" font-size="12.5" fill="#111">Consultants, during the build</text>
+<text x="949" y="1624" font-family="Arial" font-size="12.5" fill="#f22428">Directly: the CA behind that credential is</text>
+<text x="949" y="1642" font-family="Arial" font-size="12.5" fill="#f22428">now the client's</text>
+</g>
+<g id="ecc-approvals-and-records">
+<rect x="37" y="1657" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="1657" x2="1463" y2="1657" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="1682" font-family="Arial" font-size="14" fill="#000">Approvals and records</text>
+<text x="49" y="1700" font-family="Arial" font-size="12" fill="#555">QM, batch records, change</text>
+<text x="49" y="1718" font-family="Arial" font-size="12" fill="#555">master, 21 CFR Part 11</text>
+<text x="299" y="1682" font-family="Arial" font-size="12.5" fill="#111">SAP digital signature through SSF, keys in</text>
+<text x="299" y="1700" font-family="Arial" font-size="12.5" fill="#111">PSE files managed in STRUST</text>
+<text x="699" y="1682" font-family="Arial" font-size="12.5" fill="#111">Basis team or consultants</text>
+<text x="949" y="1682" font-family="Arial" font-size="12.5" fill="#f22428">Directly, if they imported keys or</text>
+<text x="949" y="1700" font-family="Arial" font-size="12.5" fill="#f22428">certificates from their CA</text>
+</g>
+<g id="ecc-outbound-https">
+<line x1="37" y1="1733" x2="1463" y2="1733" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="1758" font-family="Arial" font-size="14" fill="#000">Outbound HTTPS</text>
+<text x="49" y="1776" font-family="Arial" font-size="12" fill="#555">Shopify, Google, banks,</text>
+<text x="49" y="1794" font-family="Arial" font-size="12" fill="#555">tax portals</text>
+<text x="299" y="1758" font-family="Arial" font-size="12.5" fill="#111">ICM web server, SSL client PSEs in STRUST</text>
+<text x="699" y="1758" font-family="Arial" font-size="12.5" fill="#111">Basis team or consultants</text>
+<text x="949" y="1758" font-family="Arial" font-size="12.5" fill="#f22428">Trust store: ECC may still trust a chain</text>
+<text x="949" y="1776" font-family="Arial" font-size="12.5" fill="#f22428">everything around it now refuses</text>
+</g>
+<g id="ecc-india-statutory-filings">
+<rect x="37" y="1809" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="1809" x2="1463" y2="1809" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="1834" font-family="Arial" font-size="14" fill="#000">India statutory filings</text>
+<text x="49" y="1852" font-family="Arial" font-size="12" fill="#555">GST, e-invoice, company</text>
+<text x="49" y="1870" font-family="Arial" font-size="12" fill="#555">filings</text>
+<text x="299" y="1834" font-family="Arial" font-size="12.5" fill="#111">Digital Signature Certificates (DSCs) on</text>
+<text x="299" y="1852" font-family="Arial" font-size="12.5" fill="#111">USB tokens; eMudhra is a large issuer</text>
+<text x="699" y="1834" font-family="Arial" font-size="12.5" fill="#111">Often the consultancy or an</text>
+<text x="699" y="1852" font-family="Arial" font-size="12.5" fill="#111">outside CA firm</text>
+<text x="949" y="1834" font-family="Arial" font-size="12.5" fill="#f22428">Grant problem: the certificate names a</text>
+<text x="949" y="1852" font-family="Arial" font-size="12.5" fill="#f22428">consultant, not the client</text>
+</g>
+<g id="ecc-spreadsheets">
+<line x1="37" y1="1885" x2="1463" y2="1885" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="1910" font-family="Arial" font-size="14" fill="#000">Spreadsheets</text>
+<text x="49" y="1928" font-family="Arial" font-size="12" fill="#555">Migration templates, LSMW,</text>
+<text x="49" y="1946" font-family="Arial" font-size="12" fill="#555">Migration Cockpit, reports</text>
+<text x="299" y="1910" font-family="Arial" font-size="12.5" fill="#111">Usually unsigned; sometimes Office</text>
+<text x="299" y="1928" font-family="Arial" font-size="12.5" fill="#111">signatures with a personal certificate</text>
+<text x="699" y="1910" font-family="Arial" font-size="12.5" fill="#111">Consultants</text>
+<text x="949" y="1910" font-family="Arial" font-size="12.5" fill="#111">No signature at all, so no provenance</text>
+</g>
+<line x1="287" y1="1599" x2="287" y2="1961" stroke="#111" stroke-width="1"/>
+<line x1="687" y1="1599" x2="687" y2="1961" stroke="#111" stroke-width="1"/>
+<line x1="937" y1="1599" x2="937" y2="1961" stroke="#111" stroke-width="1"/>
+<rect x="37" y="1561" width="1426" height="400" fill="none" stroke="#111" stroke-width="1.5"/>
+</g>
+<g id="ecc-risk-strust-doesn-t-update-itself">
+<rect x="37.0" y="1985" width="345.2" height="167" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="51.0" y="2010" font-family="Arial" font-size="15" fill="#000">STRUST doesn't update itself</text>
+<text x="51.0" y="2035" font-family="Arial" font-size="12.5" fill="#111">Browsers, Node, Composer and operating systems</text>
+<text x="51.0" y="2053" font-family="Arial" font-size="12.5" fill="#111">shipped the eMudhra distrust in October. An ABAP</text>
+<text x="51.0" y="2071" font-family="Arial" font-size="12.5" fill="#111">trust store changes only when someone edits it.</text>
+<text x="51.0" y="2098" font-family="Arial" font-size="12.5" fill="#111">Check every PSE in STRUST, plus ADS and Java stack</text>
+<text x="51.0" y="2116" font-family="Arial" font-size="12.5" fill="#111">keystores.</text>
+</g>
+<g id="ecc-risk-a-certificate-is-not-authority">
+<rect x="397.2" y="1985" width="345.2" height="167" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="411.2" y="2010" font-family="Arial" font-size="15" fill="#000">A certificate is not authority</text>
+<text x="411.2" y="2035" font-family="Arial" font-size="12.5" fill="#111">A CA proves who holds the certificate, not what they</text>
+<text x="411.2" y="2053" font-family="Arial" font-size="12.5" fill="#111">may sign. A consultant's DSC on a client filing</text>
+<text x="411.2" y="2071" font-family="Arial" font-size="12.5" fill="#111">needs a written grant: who, what, how long, revoked</text>
+<text x="411.2" y="2089" font-family="Arial" font-size="12.5" fill="#111">on exit.</text>
+</g>
+<g id="ecc-risk-the-s-4hana-move-carries-trust">
+<rect x="757.5" y="1985" width="345.2" height="167" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="771.5" y="2010" font-family="Arial" font-size="15" fill="#000">The S/4HANA move carries trust</text>
+<text x="771.5" y="2035" font-family="Arial" font-size="12.5" fill="#111">A system conversion (SUM with DMO) migrates the PSEs</text>
+<text x="771.5" y="2053" font-family="Arial" font-size="12.5" fill="#111">too. Clean out stale or proxy certificates first;</text>
+<text x="771.5" y="2071" font-family="Arial" font-size="12.5" fill="#111">ECC mainstream maintenance ends in 2027.</text>
+</g>
+<g id="ecc-risk-unsigned-spreadsheets">
+<rect x="1117.8" y="1985" width="345.2" height="167" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1131.8" y="2010" font-family="Arial" font-size="15" fill="#000">Unsigned spreadsheets</text>
+<text x="1131.8" y="2035" font-family="Arial" font-size="12.5" fill="#111">Migration data handed over by consultants has no</text>
+<text x="1131.8" y="2053" font-family="Arial" font-size="12.5" fill="#111">issuer. Hash each handoff file and record it, signed</text>
+<text x="1131.8" y="2071" font-family="Arial" font-size="12.5" fill="#111">with a key you own: the same ledger as firmware.</text>
+</g>
+<g id="ecc-checklist">
+<rect x="37" y="2176" width="1426" height="96" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51" y="2201" font-family="Arial" font-size="15" fill="#000">Checklist for the consulting engagement</text>
+<text x="51" y="2226" font-family="Arial" font-size="12.5" fill="#111">·  Export every PSE and certificate in STRUST, with its issuer chain and who imported it</text>
+<text x="51" y="2244" font-family="Arial" font-size="12.5" fill="#111">·  Name the ADS signing credential: issued to whom, by which CA</text>
+<text x="51" y="2262" font-family="Arial" font-size="12.5" fill="#111">·  List every DSC used for statutory filings, who holds the token, and the grant behind it</text>
+<text x="764" y="2226" font-family="Arial" font-size="12.5" fill="#111">·  Require certificates in client systems to name the client</text>
+<text x="764" y="2244" font-family="Arial" font-size="12.5" fill="#111">·  Hash and log every spreadsheet and PDF handed over</text>
+</g>
+<text x="37" y="2318" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">RULES MANAGEMENT: IN-COUNTRY DATA AND TRANSFER, WITH CLOUDFLARE AND XANO</text>
+<g id="cjk-table">
+<rect x="37" y="2334" width="120" height="38" fill="#111"/>
+<text x="49" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Country</text>
+<rect x="157" y="2334" width="190" height="38" fill="#111"/>
+<text x="169" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Law</text>
+<rect x="347" y="2334" width="250" height="38" fill="#111"/>
+<text x="359" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Data in country</text>
+<rect x="597" y="2334" width="290" height="38" fill="#111"/>
+<text x="609" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Cross-border transfer</text>
+<rect x="887" y="2334" width="290" height="38" fill="#f22428"/>
+<text x="899" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Cloudflare</text>
+<rect x="1177" y="2334" width="286" height="38" fill="#f22428"/>
+<text x="1189" y="2358" font-family="Arial" font-size="13.5" fill="#fff">Xano</text>
+<g id="cjk-china">
+<text x="49" y="2397" font-family="Arial" font-size="14" fill="#f22428">China</text>
+<text x="169" y="2397" font-family="Arial" font-size="12.5" fill="#111">PIPL, Data Security</text>
+<text x="169" y="2415" font-family="Arial" font-size="12.5" fill="#111">Law, Cybersecurity Law</text>
+<text x="359" y="2397" font-family="Arial" font-size="12.5" fill="#111">Required for critical infrastructure</text>
+<text x="359" y="2415" font-family="Arial" font-size="12.5" fill="#111">operators and above volume</text>
+<text x="359" y="2433" font-family="Arial" font-size="12.5" fill="#111">thresholds; important data stays</text>
+<text x="609" y="2397" font-family="Arial" font-size="12.5" fill="#111">Security assessment, standard</text>
+<text x="609" y="2415" font-family="Arial" font-size="12.5" fill="#111">contract or certification, unless</text>
+<text x="609" y="2433" font-family="Arial" font-size="12.5" fill="#111">an exemption applies</text>
+<text x="899" y="2397" font-family="Arial" font-size="12.5" fill="#111">China Network via JD Cloud</text>
+<text x="899" y="2415" font-family="Arial" font-size="12.5" fill="#111">(Enterprise), needs an ICP filing;</text>
+<text x="899" y="2433" font-family="Arial" font-size="12.5" fill="#111">Geo Key Manager picks key regions</text>
+<text x="1189" y="2397" font-family="Arial" font-size="12.5" fill="#111">No mainland region: self-host on a</text>
+<text x="1189" y="2415" font-family="Arial" font-size="12.5" fill="#111">mainland cloud, with its own TLS</text>
+<text x="1189" y="2433" font-family="Arial" font-size="12.5" fill="#111">certificate from a CA you choose</text>
+</g>
+<g id="cjk-japan">
+<rect x="37" y="2448" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="2448" x2="1463" y2="2448" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2473" font-family="Arial" font-size="14" fill="#000">Japan</text>
+<text x="169" y="2473" font-family="Arial" font-size="12.5" fill="#111">APPI</text>
+<text x="359" y="2473" font-family="Arial" font-size="12.5" fill="#111">Not required by law</text>
+<text x="609" y="2473" font-family="Arial" font-size="12.5" fill="#111">Consent naming the country, or a</text>
+<text x="609" y="2491" font-family="Arial" font-size="12.5" fill="#111">recipient with equivalent</text>
+<text x="609" y="2509" font-family="Arial" font-size="12.5" fill="#111">safeguards; EU adequacy</text>
+<text x="899" y="2473" font-family="Arial" font-size="12.5" fill="#111">Regional Services and Geo Key</text>
+<text x="899" y="2491" font-family="Arial" font-size="12.5" fill="#111">Manager keep TLS processing and</text>
+<text x="899" y="2509" font-family="Arial" font-size="12.5" fill="#111">keys in Japan</text>
+<text x="1189" y="2473" font-family="Arial" font-size="12.5" fill="#111">A Japan-region instance where</text>
+<text x="1189" y="2491" font-family="Arial" font-size="12.5" fill="#111">offered, or self-host in Japan</text>
+</g>
+<g id="cjk-korea">
+<line x1="37" y1="2524" x2="1463" y2="2524" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2549" font-family="Arial" font-size="14" fill="#f22428">Korea</text>
+<text x="169" y="2549" font-family="Arial" font-size="12.5" fill="#111">PIPA (2023</text>
+<text x="169" y="2567" font-family="Arial" font-size="12.5" fill="#111">amendment)</text>
+<text x="359" y="2549" font-family="Arial" font-size="12.5" fill="#111">No general rule; sector rules for</text>
+<text x="359" y="2567" font-family="Arial" font-size="12.5" fill="#111">finance and public-sector cloud</text>
+<text x="609" y="2549" font-family="Arial" font-size="12.5" fill="#111">Consent before transfer, or a</text>
+<text x="609" y="2567" font-family="Arial" font-size="12.5" fill="#111">certified or adequate recipient;</text>
+<text x="609" y="2585" font-family="Arial" font-size="12.5" fill="#111">disclose country and recipient</text>
+<text x="899" y="2549" font-family="Arial" font-size="12.5" fill="#111">Regional Services and Geo Key</text>
+<text x="899" y="2567" font-family="Arial" font-size="12.5" fill="#111">Manager; check the Korea region</text>
+<text x="1189" y="2549" font-family="Arial" font-size="12.5" fill="#111">A Seoul-region instance, or</text>
+<text x="1189" y="2567" font-family="Arial" font-size="12.5" fill="#111">self-host in Korea</text>
+</g>
+<g id="cjk-vietnam">
+<rect x="37" y="2600" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="2600" x2="1463" y2="2600" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2625" font-family="Arial" font-size="14" fill="#f22428">Vietnam</text>
+<text x="169" y="2625" font-family="Arial" font-size="12.5" fill="#111">PDP Law (from 2026),</text>
+<text x="169" y="2643" font-family="Arial" font-size="12.5" fill="#111">Decree 53 (Cyber Law)</text>
+<text x="359" y="2625" font-family="Arial" font-size="12.5" fill="#111">Some services must store in</text>
+<text x="359" y="2643" font-family="Arial" font-size="12.5" fill="#111">Vietnam; foreign firms when</text>
+<text x="359" y="2661" font-family="Arial" font-size="12.5" fill="#111">ordered by the regulator</text>
+<text x="609" y="2625" font-family="Arial" font-size="12.5" fill="#111">Transfer impact assessment</text>
+<text x="609" y="2643" font-family="Arial" font-size="12.5" fill="#111">filed with the Ministry of</text>
+<text x="609" y="2661" font-family="Arial" font-size="12.5" fill="#111">Public Security</text>
+<text x="899" y="2625" font-family="Arial" font-size="12.5" fill="#111">No local residency product; keep</text>
+<text x="899" y="2643" font-family="Arial" font-size="12.5" fill="#111">personal data out of edge logs</text>
+<text x="899" y="2661" font-family="Arial" font-size="12.5" fill="#111">and caches</text>
+<text x="1189" y="2625" font-family="Arial" font-size="12.5" fill="#111">Self-host in Vietnam where</text>
+<text x="1189" y="2643" font-family="Arial" font-size="12.5" fill="#111">localisation applies; otherwise</text>
+<text x="1189" y="2661" font-family="Arial" font-size="12.5" fill="#111">a nearby region with the filing</text>
+</g>
+<g id="cjk-singapore">
+<line x1="37" y1="2676" x2="1463" y2="2676" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2701" font-family="Arial" font-size="14" fill="#000">Singapore</text>
+<text x="169" y="2701" font-family="Arial" font-size="12.5" fill="#111">PDPA</text>
+<text x="359" y="2701" font-family="Arial" font-size="12.5" fill="#111">Not required by law</text>
+<text x="609" y="2701" font-family="Arial" font-size="12.5" fill="#111">Comparable protection: contract,</text>
+<text x="609" y="2719" font-family="Arial" font-size="12.5" fill="#111">binding corporate rules or</text>
+<text x="609" y="2737" font-family="Arial" font-size="12.5" fill="#111">certification</text>
+<text x="899" y="2701" font-family="Arial" font-size="12.5" fill="#111">Regional Services and Geo Key</text>
+<text x="899" y="2719" font-family="Arial" font-size="12.5" fill="#111">Manager; check the region list</text>
+<text x="1189" y="2701" font-family="Arial" font-size="12.5" fill="#111">A Singapore-region instance</text>
+<text x="1189" y="2719" font-family="Arial" font-size="12.5" fill="#111">where offered</text>
+</g>
+<g id="cjk-taiwan">
+<rect x="37" y="2752" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="2752" x2="1463" y2="2752" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2777" font-family="Arial" font-size="14" fill="#000">Taiwan</text>
+<text x="169" y="2777" font-family="Arial" font-size="12.5" fill="#111">PDPA (2023</text>
+<text x="169" y="2795" font-family="Arial" font-size="12.5" fill="#111">amendment)</text>
+<text x="359" y="2777" font-family="Arial" font-size="12.5" fill="#111">Not general; sector rules</text>
+<text x="609" y="2777" font-family="Arial" font-size="12.5" fill="#111">Allowed unless the regulator</text>
+<text x="609" y="2795" font-family="Arial" font-size="12.5" fill="#111">restricts a destination, e.g.</text>
+<text x="609" y="2813" font-family="Arial" font-size="12.5" fill="#111">mainland China for some sectors</text>
+<text x="899" y="2777" font-family="Arial" font-size="12.5" fill="#111">Standard network; keep keys</text>
+<text x="899" y="2795" font-family="Arial" font-size="12.5" fill="#111">out of restricted regions</text>
+<text x="1189" y="2777" font-family="Arial" font-size="12.5" fill="#111">Nearest region or self-host;</text>
+<text x="1189" y="2795" font-family="Arial" font-size="12.5" fill="#111">never route through a</text>
+<text x="1189" y="2813" font-family="Arial" font-size="12.5" fill="#111">restricted destination</text>
+</g>
+<g id="cjk-eu---germany">
+<line x1="37" y1="2828" x2="1463" y2="2828" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2853" font-family="Arial" font-size="14" fill="#f22428">EU · Germany</text>
+<text x="169" y="2853" font-family="Arial" font-size="12.5" fill="#111">GDPR, BDSG,</text>
+<text x="169" y="2871" font-family="Arial" font-size="12.5" fill="#111">TDDDG (cookies)</text>
+<text x="359" y="2853" font-family="Arial" font-size="12.5" fill="#111">Not required by law; often a</text>
+<text x="359" y="2871" font-family="Arial" font-size="12.5" fill="#111">contract term for public sector</text>
+<text x="359" y="2889" font-family="Arial" font-size="12.5" fill="#111">and health</text>
+<text x="609" y="2853" font-family="Arial" font-size="12.5" fill="#111">Adequacy (incl. EU-US DPF,</text>
+<text x="609" y="2871" font-family="Arial" font-size="12.5" fill="#111">Japan, Korea, UK) or SCCs</text>
+<text x="609" y="2889" font-family="Arial" font-size="12.5" fill="#111">with a transfer assessment</text>
+<text x="899" y="2853" font-family="Arial" font-size="12.5" fill="#111">Data Localization Suite: Regional</text>
+<text x="899" y="2871" font-family="Arial" font-size="12.5" fill="#111">Services, Customer Metadata</text>
+<text x="899" y="2889" font-family="Arial" font-size="12.5" fill="#111">Boundary, Geo Key Manager (EU)</text>
+<text x="1189" y="2853" font-family="Arial" font-size="12.5" fill="#111">An EU-region instance, or</text>
+<text x="1189" y="2871" font-family="Arial" font-size="12.5" fill="#111">self-host in Germany</text>
+</g>
+<g id="cjk-uk">
+<rect x="37" y="2904" width="1426" height="76" fill="#f5f5f5"/>
+<line x1="37" y1="2904" x2="1463" y2="2904" stroke="#ddd" stroke-width="1"/>
+<text x="49" y="2929" font-family="Arial" font-size="14" fill="#000">UK</text>
+<text x="169" y="2929" font-family="Arial" font-size="12.5" fill="#111">UK GDPR, DPA 2018,</text>
+<text x="169" y="2947" font-family="Arial" font-size="12.5" fill="#111">Data (Use and Access)</text>
+<text x="169" y="2965" font-family="Arial" font-size="12.5" fill="#111">Act 2025</text>
+<text x="359" y="2929" font-family="Arial" font-size="12.5" fill="#111">Not required by law</text>
+<text x="609" y="2929" font-family="Arial" font-size="12.5" fill="#111">UK adequacy regulations, IDTA</text>
+<text x="609" y="2947" font-family="Arial" font-size="12.5" fill="#111">or Addendum; UK-US data</text>
+<text x="609" y="2965" font-family="Arial" font-size="12.5" fill="#111">bridge</text>
+<text x="899" y="2929" font-family="Arial" font-size="12.5" fill="#111">Regional Services; check the</text>
+<text x="899" y="2947" font-family="Arial" font-size="12.5" fill="#111">UK region</text>
+<text x="1189" y="2929" font-family="Arial" font-size="12.5" fill="#111">A UK or EU-region instance, or</text>
+<text x="1189" y="2947" font-family="Arial" font-size="12.5" fill="#111">self-host in the UK</text>
+</g>
+<line x1="157" y1="2372" x2="157" y2="2980" stroke="#111" stroke-width="1"/>
+<line x1="347" y1="2372" x2="347" y2="2980" stroke="#111" stroke-width="1"/>
+<line x1="597" y1="2372" x2="597" y2="2980" stroke="#111" stroke-width="1"/>
+<line x1="887" y1="2372" x2="887" y2="2980" stroke="#111" stroke-width="1"/>
+<line x1="1177" y1="2372" x2="1177" y2="2980" stroke="#111" stroke-width="1"/>
+<rect x="37" y="2334" width="1426" height="646" fill="none" stroke="#111" stroke-width="1.5"/>
+</g>
+<g id="footer">
+<text x="37" y="3020" font-family="Arial" font-size="13" fill="#000">A signature you only validate is a dependency. A signing setup your people use, or a certificate in your systems, is a vendor.</text>
+<text x="37" y="3040" font-family="Arial" font-size="12" fill="#555">Patterns, not a claim about any firm. eMudhra incident per The Hacker News and Help Net Security, October 2026. Country rules summarised; check Cloudflare and Xano region lists. Not legal advice.</text>
+<text x="37" y="3072" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+</g>
+</svg>

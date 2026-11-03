@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="676" viewBox="-5 -5 1510 676">
+<rect id="background" x="-5" y="-5" width="1510" height="676" fill="#fff"/>
+<g id="header">
+<text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">AI cutover checklist: signing keys, grants and boundaries</text>
+<text x="37" y="82" font-family="Arial" font-size="14" fill="#222">Move AI onto keys you own and grants you can revoke, without a lockout: inventory first, switch in a window, then retire what no one granted.</text>
+</g>
+<g id="phases">
+<g id="phase-before-cutover">
+<rect x="37.0" y="128" width="455.3" height="452" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="53.0" y="158" font-family="Arial" font-size="18" fill="#000">1 · Before cutover</text>
+<rect x="390.8" y="143" width="85.5" height="20" rx="10" fill="#111"/>
+<text x="433.6" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">INVENTORY</text>
+<g id="check-1-1">
+<rect x="53.0" y="190" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="203" font-family="Arial" font-size="14" fill="#000">Inventory every certificate</text>
+<text x="79.0" y="222" font-family="Arial" font-size="12" fill="#444">issuer chain for TLS, STRUST, ADS, Java keystores, CI runners</text>
+</g>
+<g id="check-1-2">
+<rect x="53.0" y="246" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="259" font-family="Arial" font-size="14" fill="#000">List every signing key</text>
+<text x="79.0" y="278" font-family="Arial" font-size="12" fill="#444">and who holds it: staff, consultants, DSC tokens</text>
+</g>
+<g id="check-1-3">
+<rect x="53.0" y="302" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="315" font-family="Arial" font-size="14" fill="#000">Publish your own key set</text>
+<text x="79.0" y="334" font-family="Arial" font-size="12" fill="#444">JWKS for records you sign; verify offline</text>
+</g>
+<g id="check-1-4">
+<rect x="53.0" y="358" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="371" font-family="Arial" font-size="14" fill="#000">Write the grants</text>
+<text x="79.0" y="390" font-family="Arial" font-size="12" fill="#444">who may sign or act on what, for how long</text>
+</g>
+<g id="check-1-5">
+<rect x="53.0" y="414" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="427" font-family="Arial" font-size="14" fill="#000">Publish the knowledge base</text>
+<text x="79.0" y="446" font-family="Arial" font-size="12" fill="#444">signed records with content hashes; no locked files</text>
+</g>
+<g id="check-1-6">
+<rect x="53.0" y="470" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="483" font-family="Arial" font-size="14" fill="#000">Map each market's rule</text>
+<text x="79.0" y="502" font-family="Arial" font-size="12" fill="#444">residency, transfer basis, Cloudflare and Xano region</text>
+</g>
+<g id="check-1-7">
+<rect x="53.0" y="526" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="539" font-family="Arial" font-size="14" fill="#000">Make DSR events replayable</text>
+<text x="79.0" y="558" font-family="Arial" font-size="12" fill="#444">queue consent, opt-out and deletion with timestamps</text>
+</g>
+</g>
+<g id="phase-arrow-1">
+<line x1="492.3" y1="158" x2="513.3" y2="158.0" stroke="#f22428" stroke-width="1.5"/>
+<path d="M513.3,153.0 L522.3,158 L513.3,163.0 Z" fill="#f22428"/>
+</g>
+<g id="phase-cutover-window">
+<rect x="522.3" y="128" width="455.3" height="396" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="538.3" y="158" font-family="Arial" font-size="18" fill="#000">2 · Cutover window</text>
+<rect x="898.6" y="143" width="63.0" height="20" rx="10" fill="#f22428"/>
+<text x="930.1" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">SWITCH</text>
+<g id="check-2-1">
+<rect x="538.3" y="190" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="203" font-family="Arial" font-size="14" fill="#000">Agents act only under mandates</text>
+<text x="564.3" y="222" font-family="Arial" font-size="12" fill="#444">scoped, expiring grants per tool and per market</text>
+</g>
+<g id="check-2-2">
+<rect x="538.3" y="246" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="259" font-family="Arial" font-size="14" fill="#000">mTLS per service and agent</text>
+<text x="564.3" y="278" font-family="Arial" font-size="12" fill="#444">a client certificate each, revocable one at a time</text>
+</g>
+<g id="check-2-3">
+<rect x="538.3" y="302" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="315" font-family="Arial" font-size="14" fill="#000">Retrieval reads published records</text>
+<text x="564.3" y="334" font-family="Arial" font-size="12" fill="#444">locale-filtered; never private buckets</text>
+</g>
+<g id="check-2-4">
+<rect x="538.3" y="358" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="371" font-family="Arial" font-size="14" fill="#000">Price and stock stay live</text>
+<text x="564.3" y="390" font-family="Arial" font-size="12" fill="#444">from the system of record, never embeddings</text>
+</g>
+<g id="check-2-5">
+<rect x="538.3" y="414" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="427" font-family="Arial" font-size="14" fill="#000">Keep the old path read-only</text>
+<text x="564.3" y="446" font-family="Arial" font-size="12" fill="#444">switch traffic, don't delete; roll back by route</text>
+</g>
+<g id="check-2-6">
+<rect x="538.3" y="470" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="483" font-family="Arial" font-size="14" fill="#000">Watch the lockout signals</text>
+<text x="564.3" y="502" font-family="Arial" font-size="12" fill="#444">handshake failures, denied tool calls, stalled feeds</text>
+</g>
+</g>
+<g id="phase-arrow-2">
+<line x1="977.6" y1="158" x2="998.6" y2="158.0" stroke="#111" stroke-width="1.5"/>
+<path d="M998.6,153.0 L1007.6,158 L998.6,163.0 Z" fill="#111"/>
+</g>
+<g id="phase-after-cutover">
+<rect x="1007.7" y="128" width="455.3" height="396" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1023.7" y="158" font-family="Arial" font-size="18" fill="#000">3 · After cutover</text>
+<rect x="1384.0" y="143" width="63.0" height="20" rx="10" fill="#111"/>
+<text x="1415.5" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">RETIRE</text>
+<g id="check-3-1">
+<rect x="1023.7" y="190" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="203" font-family="Arial" font-size="14" fill="#000">Revoke what no one granted</text>
+<text x="1049.7" y="222" font-family="Arial" font-size="12" fill="#444">consultant and proxy certificates, old API keys</text>
+</g>
+<g id="check-3-2">
+<rect x="1023.7" y="246" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="259" font-family="Arial" font-size="14" fill="#000">Retire old keys</text>
+<text x="1049.7" y="278" font-family="Arial" font-size="12" fill="#444">and republish the key set; old records still verify</text>
+</g>
+<g id="check-3-3">
+<rect x="1023.7" y="302" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="315" font-family="Arial" font-size="14" fill="#000">Replay the DSR queue</text>
+<text x="1049.7" y="334" font-family="Arial" font-size="12" fill="#444">log a receipt from every system that acted</text>
+</g>
+<g id="check-3-4">
+<rect x="1023.7" y="358" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="371" font-family="Arial" font-size="14" fill="#000">Prove residency</text>
+<text x="1049.7" y="390" font-family="Arial" font-size="12" fill="#444">each market's data in its region, with evidence</text>
+</g>
+<g id="check-3-5">
+<rect x="1023.7" y="414" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="427" font-family="Arial" font-size="14" fill="#000">Embed LTV in signed documents</text>
+<text x="1049.7" y="446" font-family="Arial" font-size="12" fill="#444">revocation info and timestamps travel with them</text>
+</g>
+<g id="check-3-6">
+<rect x="1023.7" y="470" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="483" font-family="Arial" font-size="14" fill="#000">Schedule trust-store reviews</text>
+<text x="1049.7" y="502" font-family="Arial" font-size="12" fill="#444">browsers patch themselves; STRUST and runtimes don't</text>
+</g>
+</g>
+</g>
+<g id="footer">
+<text x="37" y="620" font-family="Arial" font-size="13" fill="#000">The cutover is done when every key has an issuer you chose, every action has a grant you can revoke, and every market's data has a region you can prove.</text>
+<text x="37" y="652" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+</g>
+</svg>

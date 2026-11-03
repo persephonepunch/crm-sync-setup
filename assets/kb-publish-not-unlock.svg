@@ -1,0 +1,231 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="1300" viewBox="-5 -5 1510 1300">
+<rect id="background" x="-5" y="-5" width="1510" height="1300" fill="#fff"/>
+<g id="header">
+<text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">Publish the knowledge. Don't let AI unlock it.</text>
+<text x="37" y="82" font-family="Arial" font-size="14" fill="#222">A knowledge base for AI is published once as signed records, not read from private files. The chatbot climbs a decision ladder on that evidence.</text>
+<rect x="1240" y="66" width="22" height="14" fill="none" stroke="#f22428" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="1270" y="78" font-family="Arial" font-size="11.5" fill="#333">Red dashed = never read by AI</text>
+</g>
+<text x="37" y="128" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">PRIVATE ASSETS IN, PUBLISHED RECORDS OUT</text>
+<g id="private-assets">
+<rect x="37" y="144" width="430" height="300" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="51" y="170" font-family="Arial" font-size="17" fill="#000">Private assets</text>
+<text x="453" y="169" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="end" letter-spacing="0.4">LOCKED</text>
+<text x="51" y="200" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">PRIVATE DOCUMENTS</text>
+<g id="chips-docs">
+<rect x="51" y="210" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="74.0" y="227.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">PDF</text>
+<rect x="105" y="210" width="54" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="132.0" y="227.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">Docs</text>
+<rect x="167" y="210" width="86" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="210.0" y="227.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">Markdown</text>
+<rect x="261" y="210" width="118" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="320.0" y="227.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">Spreadsheets</text>
+</g>
+<text x="51" y="266" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">MEDIA AND 3D</text>
+<g id="chips-media">
+<rect x="51" y="276" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="74.0" y="293.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">JPG</text>
+<rect x="105" y="276" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="128.0" y="293.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">PNG</text>
+<rect x="159" y="276" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="182.0" y="293.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">SVG</text>
+<rect x="213" y="276" width="54" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="240.0" y="293.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">WebP</text>
+</g>
+<g id="chips-3d">
+<rect x="51" y="310" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="74.0" y="327.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">OBJ</text>
+<rect x="105" y="310" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="128.0" y="327.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">STL</text>
+<rect x="159" y="310" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="182.0" y="327.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">FBX</text>
+<rect x="213" y="310" width="46" height="26" rx="13" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="236.0" y="327.5" font-family="Arial" font-size="12.5" fill="#111" text-anchor="middle">GLB</text>
+</g>
+<text x="51" y="366" font-family="Arial" font-size="12.5" fill="#111">Price files, spec sheets, SOWs, migration templates,</text>
+<text x="51" y="384" font-family="Arial" font-size="12.5" fill="#111">manuals, product renders and models</text>
+<text x="51" y="402" font-family="Arial" font-size="12.5" fill="#f22428"></text>
+<text x="51" y="420" font-family="Arial" font-size="12.5" fill="#f22428">Nobody approved them as sources or signed them,</text>
+<text x="51" y="438" font-family="Arial" font-size="12.5" fill="#f22428">and nobody can say which version a model read.</text>
+</g>
+<g id="published-records">
+<rect x="545" y="144" width="450" height="300" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<text x="559" y="170" font-family="Arial" font-size="17" fill="#000">Published KB records</text>
+<text x="981" y="169" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="end" letter-spacing="0.4">AI READS HERE</text>
+<text x="559" y="200" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">EVERY RECORD CARRIES</text>
+<text x="559" y="220" font-family="Arial" font-size="12.5" fill="#111">issuer · version · market · locale · consent scope</text>
+<text x="559" y="238" font-family="Arial" font-size="12.5" fill="#111">a content hash, signed with a key you own</text>
+<text x="559" y="280" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">DOCUMENTS BECOME</text>
+<text x="559" y="300" font-family="Arial" font-size="12.5" fill="#111">structured articles, FAQs and manual text,</text>
+<text x="559" y="318" font-family="Arial" font-size="12.5" fill="#111">one canonical answer per question</text>
+<text x="559" y="360" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">MEDIA AND 3D BECOME A MANIFEST</text>
+<text x="559" y="380" font-family="Arial" font-size="12.5" fill="#111">alt text, dimensions, product link, licence;</text>
+<text x="559" y="398" font-family="Arial" font-size="12.5" fill="#111">the file stays in the vault under its own key</text>
+</g>
+<g id="data-layer">
+<rect x="1073" y="144" width="390" height="300" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1087" y="170" font-family="Arial" font-size="17" fill="#000">Revenue and commerce data layer</text>
+<text x="1087" y="204" font-family="Arial" font-size="14" fill="#000">Product data</text>
+<text x="1087" y="223" font-family="Arial" font-size="12.5" fill="#111">catalog, variants, categories, taxonomy</text>
+<text x="1087" y="260" font-family="Arial" font-size="14" fill="#000">Live price and availability</text>
+<text x="1087" y="279" font-family="Arial" font-size="12.5" fill="#111">fetched from the system of record, never embeddings</text>
+<text x="1087" y="316" font-family="Arial" font-size="14" fill="#000">Entitlements</text>
+<text x="1087" y="335" font-family="Arial" font-size="12.5" fill="#111">who may see, buy or change what, per market</text>
+<text x="1087" y="372" font-family="Arial" font-size="14" fill="#000">Consent</text>
+<text x="1087" y="391" font-family="Arial" font-size="12.5" fill="#111">attached to every record that moves</text>
+</g>
+<g id="arrow-publish">
+<line x1="467" y1="294" x2="536.0" y2="294.0" stroke="#f22428" stroke-width="1.5"/>
+<path d="M536.0,289.0 L545,294 L536.0,299.0 Z" fill="#f22428"/>
+<text x="506.0" y="286" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">publish once</text>
+</g>
+<g id="arrow-feed">
+<line x1="995" y1="294" x2="1064.0" y2="294.0" stroke="#111" stroke-width="1.5"/>
+<path d="M1064.0,289.0 L1073,294 L1064.0,299.0 Z" fill="#111"/>
+<text x="1034.0" y="286" font-family="Arial" font-size="10.5" fill="#111" text-anchor="middle">feeds</text>
+</g>
+<text x="37" y="490" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">THE DECISION LADDER: EACH RUNG NEEDS MORE EVIDENCE, NO RUNG OPENS A LOCKED FILE</text>
+<g id="ladder">
+<g id="rung-1">
+<rect x="37.0" y="548" width="334.0" height="104" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="574" font-family="Arial" font-size="16" fill="#000">1 · Retrieve</text>
+<rect x="316.5" y="559" width="40.5" height="20" rx="10" fill="#111"/>
+<text x="336.8" y="573" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">RAG</text>
+<text x="51.0" y="602" font-family="Arial" font-size="12.5" fill="#111">Answer from published records,</text>
+<text x="51.0" y="620" font-family="Arial" font-size="12.5" fill="#111">filtered by the shopper's locale</text>
+</g>
+<g id="ladder-arrow-1">
+<line x1="371.0" y1="598" x2="392.0" y2="598.0" stroke="#111" stroke-width="1.5"/>
+<path d="M392.0,593.0 L401.0,598 L392.0,603.0 Z" fill="#111"/>
+</g>
+<g id="rung-2">
+<rect x="401.0" y="534" width="334.0" height="118" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="415.0" y="560" font-family="Arial" font-size="16" fill="#000">2 · Correct</text>
+<rect x="673.0" y="545" width="48.0" height="20" rx="10" fill="#111"/>
+<text x="697.0" y="559" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">CRAG</text>
+<text x="415.0" y="588" font-family="Arial" font-size="12.5" fill="#111">Weak or conflicting evidence:</text>
+<text x="415.0" y="606" font-family="Arial" font-size="12.5" fill="#111">re-retrieve or narrow the source</text>
+</g>
+<g id="ladder-arrow-2">
+<line x1="735.0" y1="584" x2="756.0" y2="584.0" stroke="#111" stroke-width="1.5"/>
+<path d="M756.0,579.0 L765.0,584 L756.0,589.0 Z" fill="#111"/>
+</g>
+<g id="rung-3">
+<rect x="765.0" y="520" width="334.0" height="132" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="779.0" y="546" font-family="Arial" font-size="16" fill="#000">3 · Adapt</text>
+<rect x="1037.0" y="531" width="48.0" height="20" rx="10" fill="#111"/>
+<text x="1061.0" y="545" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">LORA</text>
+<text x="779.0" y="574" font-family="Arial" font-size="12.5" fill="#111">Locale adapter by default;</text>
+<text x="779.0" y="592" font-family="Arial" font-size="12.5" fill="#111">personalisation only with consent</text>
+</g>
+<g id="ladder-arrow-3">
+<line x1="1099.0" y1="570" x2="1120.0" y2="570.0" stroke="#111" stroke-width="1.5"/>
+<path d="M1120.0,565.0 L1129.0,570 L1120.0,575.0 Z" fill="#111"/>
+</g>
+<g id="rung-4">
+<rect x="1129.0" y="506" width="334.0" height="146" rx="6" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="1143.0" y="532" font-family="Arial" font-size="16" fill="#000">4 · Escalate</text>
+<rect x="1393.5" y="517" width="55.5" height="20" rx="10" fill="#f22428"/>
+<text x="1421.2" y="531" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">HUMAN</text>
+<text x="1143.0" y="560" font-family="Arial" font-size="12.5" fill="#111">Money, law or risk in the answer:</text>
+<text x="1143.0" y="578" font-family="Arial" font-size="12.5" fill="#111">hand off to a person</text>
+</g>
+</g>
+<g id="ladder-gates">
+<text x="37" y="686" font-family="Arial" font-size="13" fill="#000">Gates on every rung:</text>
+<text x="185" y="686" font-family="Arial" font-size="13" fill="#f22428">no agent acts without a mandate  ·  price and stock come live from the system of record  ·  every answer names its record, its issuer and its grant</text>
+</g>
+<text x="37" y="732" font-family="Arial" font-size="11" fill="#333" letter-spacing="0.4">HOW THE KNOWLEDGE BASE IS BUILT</text>
+<g id="kb-one-canonical-corpus">
+<rect x="37.0" y="748" width="345.2" height="140" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="773" font-family="Arial" font-size="15" fill="#000">One canonical corpus</text>
+<rect x="322.2" y="759" width="46" height="20" rx="10" fill="#111"/>
+<text x="345.2" y="773" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">XANO</text>
+<text x="51.0" y="798" font-family="Arial" font-size="12.5" fill="#111">Articles, image records (R2 DAM), PDF manual text</text>
+<text x="51.0" y="816" font-family="Arial" font-size="12.5" fill="#111">and FAQs authored in Webflow, all canonical in Xano.</text>
+<text x="51.0" y="834" font-family="Arial" font-size="12.5" fill="#111">Legacy help-desk content (Sprinklr) is migrated in,</text>
+<text x="51.0" y="852" font-family="Arial" font-size="12.5" fill="#111">then retired as a live source.</text>
+</g>
+<g id="kb-answer-ladder">
+<rect x="397.2" y="748" width="345.2" height="140" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="411.2" y="773" font-family="Arial" font-size="15" fill="#000">Answer ladder</text>
+<rect x="647.5" y="759" width="81" height="20" rx="10" fill="#111"/>
+<text x="688.0" y="773" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">RETRIEVAL</text>
+<text x="411.2" y="798" font-family="Arial" font-size="12.5" fill="#111">Shopify KB metaobjects first, then vectorised</text>
+<text x="411.2" y="816" font-family="Arial" font-size="12.5" fill="#111">articles, then manual text; product questions fall</text>
+<text x="411.2" y="834" font-family="Arial" font-size="12.5" fill="#111">back to product search. The multilingual index is</text>
+<text x="411.2" y="852" font-family="Arial" font-size="12.5" fill="#111">always locale-filtered.</text>
+</g>
+<g id="kb-one-category-spine">
+<rect x="757.5" y="748" width="345.2" height="140" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="771.5" y="773" font-family="Arial" font-size="15" fill="#000">One category spine</text>
+<rect x="1042.8" y="759" width="46" height="20" rx="10" fill="#111"/>
+<text x="1065.8" y="773" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">JOIN</text>
+<text x="771.5" y="798" font-family="Arial" font-size="12.5" fill="#111">A category pivot joins KB and FAQ categories,</text>
+<text x="771.5" y="816" font-family="Arial" font-size="12.5" fill="#111">Shopify collections, Google taxonomy and channel</text>
+<text x="771.5" y="834" font-family="Arial" font-size="12.5" fill="#111">tags. Every projection traces back to its canonical</text>
+<text x="771.5" y="852" font-family="Arial" font-size="12.5" fill="#111">row.</text>
+</g>
+<g id="kb-market-publish-rail">
+<rect x="1117.8" y="748" width="345.2" height="140" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1131.8" y="773" font-family="Arial" font-size="15" fill="#000">Market publish rail</text>
+<rect x="1382.0" y="759" width="67" height="20" rx="10" fill="#111"/>
+<text x="1415.5" y="773" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">PUBLISH</text>
+<text x="1131.8" y="798" font-family="Arial" font-size="12.5" fill="#111">One export, sliced per market at build time. Sources</text>
+<text x="1131.8" y="816" font-family="Arial" font-size="12.5" fill="#111">are fingerprinted every 15 minutes; a change</text>
+<text x="1131.8" y="834" font-family="Arial" font-size="12.5" fill="#111">triggers a rebuild. The Xano key never leaves</text>
+<text x="1131.8" y="852" font-family="Arial" font-size="12.5" fill="#111">Cloudflare.</text>
+</g>
+<text x="37" y="934" font-family="Arial" font-size="11" fill="#f22428" letter-spacing="0.4">SEVEN GAPS, AND THE FIX FOR EACH</text>
+<g id="gaps">
+<g id="gap-k1">
+<rect x="37" y="941" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="52" y="955" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K1</text>
+<text x="79" y="956" font-family="Arial" font-size="14" fill="#f22428">The bot reads locked files</text>
+<text x="79" y="976" font-family="Arial" font-size="12.5" fill="#111">Fix: publish once as signed records; the AI never holds file access</text>
+</g>
+<g id="gap-k2">
+<rect x="750" y="941" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="765" y="955" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K2</text>
+<text x="792" y="956" font-family="Arial" font-size="14" fill="#f22428">Nobody knows which version</text>
+<text x="792" y="976" font-family="Arial" font-size="12.5" fill="#111">Fix: a content hash per record; ingest only when the hash changes</text>
+</g>
+<g id="gap-k3">
+<rect x="37" y="997" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="52" y="1011" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K3</text>
+<text x="79" y="1012" font-family="Arial" font-size="14" fill="#f22428">Answers in the wrong language</text>
+<text x="79" y="1032" font-family="Arial" font-size="12.5" fill="#111">Fix: filter every retrieval by the shopper's locale</text>
+</g>
+<g id="gap-k4">
+<rect x="750" y="997" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="765" y="1011" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K4</text>
+<text x="792" y="1012" font-family="Arial" font-size="14" fill="#f22428">Price or stock from embeddings</text>
+<text x="792" y="1032" font-family="Arial" font-size="12.5" fill="#111">Fix: re-fetch live by product handle from the system of record</text>
+</g>
+<g id="gap-k5">
+<rect x="37" y="1053" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="52" y="1067" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K5</text>
+<text x="79" y="1068" font-family="Arial" font-size="14" fill="#f22428">Raw media or 3D files exposed</text>
+<text x="79" y="1088" font-family="Arial" font-size="12.5" fill="#111">Fix: AI reads the manifest; the file stays in the vault under its own key</text>
+</g>
+<g id="gap-k6">
+<rect x="750" y="1053" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="765" y="1067" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K6</text>
+<text x="792" y="1068" font-family="Arial" font-size="14" fill="#f22428">Personalisation without consent</text>
+<text x="792" y="1088" font-family="Arial" font-size="12.5" fill="#111">Fix: the locale adapter by default; personalisation only with consent</text>
+</g>
+<g id="gap-k7">
+<rect x="37" y="1109" width="30" height="20" rx="10" fill="#fff" stroke="#f22428" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="52" y="1123" font-family="Arial" font-size="10.5" fill="#f22428" text-anchor="middle">K7</text>
+<text x="79" y="1124" font-family="Arial" font-size="14" fill="#f22428">ISO rules missing</text>
+<text x="79" y="1144" font-family="Arial" font-size="12.5" fill="#111">Fix: key every record by ISO 3166 country, BCP 47 language, ISO 4217 currency, ISO 8601 UTC time; filter on them</text>
+</g>
+</g>
+<g id="footer">
+<text x="37" y="1204" font-family="Arial" font-size="13" fill="#000">Every answer can name the record it came from, who issued it, and who granted the access.</text>
+<text x="37" y="1226" font-family="Arial" font-size="12.5" fill="#111">Read more: The AI ladder: retrieval, adapters, humans, and who holds the keys</text>
+<text x="37" y="1244" font-family="Arial" font-size="12.5" fill="#f22428">persephonepunch.github.io/crm-sync-setup/ai-ladder-escalation-and-mandates.html</text>
+<text x="37" y="1276" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+</g>
+</svg>
