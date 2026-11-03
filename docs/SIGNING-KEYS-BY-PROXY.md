@@ -200,6 +200,25 @@ The funnel is where all three meet: if the developer can't verify a mandate, the
 
 Assets that prove provenance (PDFs and firmware, images, 3D files, docs) are vaulted the same way: each file under its own key, every upload certified, every download granted and recorded in a hash-chained ledger. See the [Protected Firmware Asset Management and Download Service](https://www.crm-sync.dev/pages/firmware) and [Firmware asset publishing](https://persephonepunch.github.io/crm-sync-setup/firmware-asset-publishing.html).
 
+### Xano release gate: TLS opens the connection, the connected theme decides nothing alone
+
+TLS proves which server is on the other end of the connection. It doesn't prove that the theme, plugin or module calling it is the one you registered, or that the shopper behind it consented. So the Xano release gate makes every release contingent on the connected surface:
+
+1. **Is the surface paired?** It must be a registered theme, plugin or module for this tenant.
+2. **Is the request signed?** It must carry the gate's shared secret or a client certificate, not just a TLS session.
+3. **Does consent hold?** Consent is checked at the system of record, together with the market, caps and residency rules.
+
+If any check fails, the gate refuses the release and still writes the refusal to the release ledger. A kill switch refuses every release at once.
+
+| Connected theme | Module architecture | How it reaches the gate | Released only when |
+|---|---|---|---|
+| **Shopify** | Theme app extension and app embed; app proxy; Customer Privacy API in the theme | Through the crm-sync Worker (app proxy or Admin API), never from theme JavaScript straight to Xano | The store domain is paired to the tenant, the proxy request is HMAC-signed by Shopify, and consent in the record covers the purpose |
+| **WordPress** | Plugin (PHP) with the theme as presentation only; WooCommerce hooks for orders | Server-side from the plugin, with the secret in `wp-config.php` or the environment, never in theme files or the database options table | The site origin is paired, the plugin version is signed and current, and no theme or page builder carries its own copy of the key |
+| **AEM** | OSGi bundle (Sling servlet or service) behind Dispatcher; components render, they don't hold keys | From the bundle on Author or Publish, through an allow-listed egress host, with the secret in the Cloud Manager secret store | The environment (dev, stage or prod) is paired separately, and the request names the content and market it serves |
+| **SAP** | ABAP class or BTP extension; Integration Suite (CPI) iFlow for outbound | From the iFlow or BTP destination, with a client certificate in the SAP keystore and the secret in the destination service | The system ID and client are paired, the integration user is the only caller, and the 15-minute batch has not left consent stale |
+
+Theme changes don't change what is released. A redesign, a new page builder or a consultant's component can show or hide data, but it can't widen what the gate sends, because the decision sits with the gate, after the theme, at the system of record.
+
 ### ECC/SAP signing: the same scrutiny, plus two ECC-specific risks
 
 | What gets signed | Mechanism in ECC | Who usually sets it up | Proxy risk |
@@ -361,6 +380,21 @@ Every published chunk carries a typed list of tags: market, locale, audience, co
 | **Consent** | Consent is an owned value with scope and expiry; a business default and a buyer's choice are different types |
 | **Security** | Memory safety removes the overflow and use-after-free class; keys come from a secure random source and are zeroised on drop |
 | **Data load** | Large feeds stream without garbage-collector pauses; bad rows are rejected at load, not discovered by AI at answer time |
+
+### Where `Vec<Tag>` runs: Tokio/Axum or Workers
+
+`Vec<Tag>` is plain Rust from the standard library, with no runtime attached. Tokio and Axum are one shell you can run it in; Cloudflare Workers is another. The tag model and the grader stay the same, and only the HTTP and async layer changes.
+
+| Layer | Self-hosted server | Cloudflare Workers | Role in the CRAG loop |
+|---|---|---|---|
+| Data model: `enum Tag`, `Vec<Tag>` | Standard Rust | Same code, compiled to WASM | What each chunk is and what it carries |
+| Serialisation | serde | serde | Tags to JSON and vector-store metadata, and back |
+| Async runtime | Tokio | The Workers runtime (no Tokio) | Runs many I/O tasks at once: webhooks, BigQuery, vector queries |
+| HTTP framework | Axum | `worker` crate (worker-rs), or TypeScript calling a Rust WASM module | Event webhooks that write tags; `/docs/ask` that runs retrieval |
+| Vector store | Qdrant or pgvector | Vectorize | Pre-filter on tag metadata |
+| Release | Xano release gate | Xano release gate | Nothing leaves without paired surface, signed request and consent |
+
+crm-sync runs on Workers, so the `.await` calls belong to the Workers runtime. The line that removes a withdrawn consent, `chunk.tags.retain(...)`, is ordinary `Vec` code in either shell.
 
 ## 6. Globalization: rules management by market
 
