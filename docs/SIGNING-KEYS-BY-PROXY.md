@@ -166,6 +166,30 @@ A distrusted chain is not a warning. Browsers and runtimes refuse the connection
 
 A CA proves who holds a certificate. It does not prove what they may sign or do. That needs a **grant** from the organization: who, what, for how long, revoked on exit. For AI agents the grant is a **mandate**: scoped to tools and markets, expiring, and checked on every action.
 
+### UCP agent mandates: the permissions and authorization funnel
+
+In agentic checkout, the mandate is a signed, checkable object. The Universal Commerce Protocol (UCP), co-developed by Shopify and Google, carries an agent from discovery to post-purchase, and plugs into the Agent Payments Protocol (AP2) for payment authorization. AP2 expresses permission as signed mandates: an **intent mandate** (what the shopper asked for, within which limits) and a **cart mandate** (the exact cart the shopper approved), with the payment passed on as a token, never card data. Each stage of the funnel needs three things: an **idempotent ID**, so a retry never acts twice; the **consent** in force at that moment; and an **authorization** the gate can verify.
+
+| Funnel stage | Mandate or record | Idempotent ID | Consent | Authorization |
+|---|---|---|---|---|
+| **1 · Intent** | Intent mandate: what the shopper wants, a price cap and an expiry, signed by the shopper | Intent ID | Purposes read; no personal data needed yet | The agent may search and compare, nothing more |
+| **2 · Cart** | Cart mandate: exact items, prices and merchant, approved by the shopper or within the intent's limits | Cart ID, plus a key on every cart update | `checkout.buyer.consent` from UCP's buyer-consent extension: only `source: "platform"` records the buyer's choice; `source: "business"` is a default, not consent | The merchant checks the cart sits inside the intent mandate |
+| **3 · Checkout** | The UCP checkout session | Checkout ID, plus a key on completion | Missing consent data (say, SMS chosen with no phone number) is a warning, and checkout must not complete | The gate verifies the mandate signatures and the agent's grant |
+| **4 · Payment** | Payment token to the payment provider | One key per charge, so a retry can't charge twice | Ads-data consent decides whether the conversion goes to Google | The payment provider authorizes; the agent never sees card data |
+| **5 · Post-purchase** | Order, return or subscription change | Order ID, RMA ID, a key per change | Marketing consent checked at send time | The agent acts only within its mandate: returns and changes as granted |
+| **6 · Revoke** | A mandate-revoked or consent-withdrawn event | The event's own ID, logged once | Withdrawal reaches every system on the event | The gate refuses any further action under that mandate |
+
+**DX, AX and UX: who the funnel has to work for.** The same mandate has three audiences, and each needs something different:
+
+| Experience | Who | What they need from the funnel |
+|---|---|---|
+| **DX** (developer experience) | The teams building the store, the gate and the integrations | One schema for mandates and consent; an idempotency key on every state change; signed responses they can verify against a published key set; test mandates in a sandbox; clear failures, such as a missing-consent warning, instead of silent drops |
+| **AX** (agent experience) | The AI agents shopping on someone's behalf | A machine-readable profile saying which capabilities the store supports; mandates that are scoped and expiring; deterministic answers; retries that are safe because of idempotency; declines that say why, so the agent can ask the shopper rather than guess |
+| **UX** (user experience) | The shopper, and the household | A plain view of what the agent may do and up to how much; approval once, within limits; revoke at any time; a receipt for each action; consent asked once and remembered, not re-prompted |
+
+The funnel is where all three meet: if the developer can't verify a mandate, the agent can't trust the answer, and the shopper can't trust the agent.
+
+
 ### Certificates you control
 
 | | crm-sync certificate link | Xano self-host certificate |
