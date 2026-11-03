@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="676" viewBox="-5 -5 1510 676">
-<rect id="background" x="-5" y="-5" width="1510" height="676" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="900" viewBox="-5 -5 1510 900">
+<rect id="background" x="-5" y="-5" width="1510" height="900" fill="#fff"/>
 <g id="header">
 <text x="37" y="54" font-family="'Times New Roman', Times, serif" font-size="30" fill="#000">AI cutover checklist: signing keys, grants and boundaries</text>
 <text x="37" y="82" font-family="Arial" font-size="14" fill="#222">Move AI onto keys you own and grants you can revoke, without a lockout: inventory first, switch in a window, then retire what no one granted.</text>
 </g>
 <g id="phases">
 <g id="phase-before-cutover">
-<rect x="37.0" y="128" width="455.3" height="452" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<rect x="37.0" y="128" width="455.3" height="676" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
 <text x="53.0" y="158" font-family="Arial" font-size="18" fill="#000">1 · Before cutover</text>
 <rect x="390.8" y="143" width="85.5" height="20" rx="10" fill="#111"/>
 <text x="433.6" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">INVENTORY</text>
@@ -45,13 +45,33 @@
 <text x="79.0" y="539" font-family="Arial" font-size="14" fill="#000">Make DSR events replayable</text>
 <text x="79.0" y="558" font-family="Arial" font-size="12" fill="#444">queue consent, opt-out and deletion with timestamps</text>
 </g>
+<g id="check-1-8">
+<rect x="53.0" y="582" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="595" font-family="Arial" font-size="14" fill="#000">Name a second key holder</text>
+<text x="79.0" y="614" font-family="Arial" font-size="12" fill="#444">no key depends on one developer; two approvers</text>
+</g>
+<g id="check-1-9">
+<rect x="53.0" y="638" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="651" font-family="Arial" font-size="14" fill="#000">List every external team and plugin</text>
+<text x="79.0" y="670" font-family="Arial" font-size="12" fill="#444">seat licence, credentials, what it can write</text>
+</g>
+<g id="check-1-10">
+<rect x="53.0" y="694" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="707" font-family="Arial" font-size="14" fill="#000">Secure the exit before contract end</text>
+<text x="79.0" y="726" font-family="Arial" font-size="12" fill="#444">export KB, prompts, training data, adapters</text>
+</g>
+<g id="check-1-11">
+<rect x="53.0" y="750" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="79.0" y="763" font-family="Arial" font-size="14" fill="#000">Find writes around the gate</text>
+<text x="79.0" y="782" font-family="Arial" font-size="12" fill="#444">hard-coded upserts; runtimes without memory safety</text>
+</g>
 </g>
 <g id="phase-arrow-1">
 <line x1="492.3" y1="158" x2="513.3" y2="158.0" stroke="#f22428" stroke-width="1.5"/>
 <path d="M513.3,153.0 L522.3,158 L513.3,163.0 Z" fill="#f22428"/>
 </g>
 <g id="phase-cutover-window">
-<rect x="522.3" y="128" width="455.3" height="396" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
+<rect x="522.3" y="128" width="455.3" height="564" rx="6" fill="#fff4f4" stroke="#f22428" stroke-width="1.5"/>
 <text x="538.3" y="158" font-family="Arial" font-size="18" fill="#000">2 · Cutover window</text>
 <rect x="898.6" y="143" width="63.0" height="20" rx="10" fill="#f22428"/>
 <text x="930.1" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">SWITCH</text>
@@ -85,13 +105,28 @@
 <text x="564.3" y="483" font-family="Arial" font-size="14" fill="#000">Watch the lockout signals</text>
 <text x="564.3" y="502" font-family="Arial" font-size="12" fill="#444">handshake failures, denied tool calls, stalled feeds</text>
 </g>
+<g id="check-2-7">
+<rect x="538.3" y="526" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="539" font-family="Arial" font-size="14" fill="#000">Move plugin writes behind the gate</text>
+<text x="564.3" y="558" font-family="Arial" font-size="12" fill="#444">signed events; no plugin keys or direct DB access</text>
+</g>
+<g id="check-2-8">
+<rect x="538.3" y="582" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="595" font-family="Arial" font-size="14" fill="#000">Replace standing vendor credentials</text>
+<text x="564.3" y="614" font-family="Arial" font-size="12" fill="#444">scoped, expiring grant per vendor, revocable alone</text>
+</g>
+<g id="check-2-9">
+<rect x="538.3" y="638" width="16" height="16" rx="3" fill="#fff" stroke="#f22428" stroke-width="1.5"/>
+<text x="564.3" y="651" font-family="Arial" font-size="14" fill="#000">Cover every time zone</text>
+<text x="564.3" y="670" font-family="Arial" font-size="12" fill="#444">own on-call staff hold emergency mandates</text>
+</g>
 </g>
 <g id="phase-arrow-2">
 <line x1="977.6" y1="158" x2="998.6" y2="158.0" stroke="#111" stroke-width="1.5"/>
 <path d="M998.6,153.0 L1007.6,158 L998.6,163.0 Z" fill="#111"/>
 </g>
 <g id="phase-after-cutover">
-<rect x="1007.7" y="128" width="455.3" height="396" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<rect x="1007.7" y="128" width="455.3" height="508" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
 <text x="1023.7" y="158" font-family="Arial" font-size="18" fill="#000">3 · After cutover</text>
 <rect x="1384.0" y="143" width="63.0" height="20" rx="10" fill="#111"/>
 <text x="1415.5" y="157" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">RETIRE</text>
@@ -125,10 +160,20 @@
 <text x="1049.7" y="483" font-family="Arial" font-size="14" fill="#000">Schedule trust-store reviews</text>
 <text x="1049.7" y="502" font-family="Arial" font-size="12" fill="#444">browsers patch themselves; STRUST and runtimes don't</text>
 </g>
+<g id="check-3-7">
+<rect x="1023.7" y="526" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="539" font-family="Arial" font-size="14" fill="#000">Rehearse a breach</text>
+<text x="1049.7" y="558" font-family="Arial" font-size="12" fill="#444">revoke, replay, produce the timeline within 72 hours</text>
+</g>
+<g id="check-3-8">
+<rect x="1023.7" y="582" width="16" height="16" rx="3" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1049.7" y="595" font-family="Arial" font-size="14" fill="#000">Close external access at contract end</text>
+<text x="1049.7" y="614" font-family="Arial" font-size="12" fill="#444">only after the export is verified</text>
+</g>
 </g>
 </g>
 <g id="footer">
-<text x="37" y="620" font-family="Arial" font-size="13" fill="#000">The cutover is done when every key has an issuer you chose, every action has a grant you can revoke, and every market's data has a region you can prove.</text>
-<text x="37" y="652" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
+<text x="37" y="844" font-family="Arial" font-size="13" fill="#000">The cutover is done when every key has an issuer you chose, every action has a grant you can revoke, and every market's data has a region you can prove.</text>
+<text x="37" y="876" font-family="Arial" font-size="12.5" fill="#f22428">Yoonsun Lee · YSL150 LLC</text>
 </g>
 </svg>

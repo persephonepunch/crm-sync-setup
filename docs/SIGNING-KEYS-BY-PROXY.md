@@ -6,6 +6,9 @@ category: "Security"
 date: 2026-11-03
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/SIGNING-KEYS-BY-PROXY.md
 licence: CC-BY-4.0
+links:
+  - "https://crm-sync.dev/ai-cutover-checklist|AI cutover checklist"
+  - "https://crm-sync.dev/verify#certification|Verify a certificate"
 tags:
   - pki
   - signing-keys
@@ -260,6 +263,10 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Publish the knowledge base** as signed records with content hashes; no locked files
 - [ ] **Map each market's rule**: residency, transfer basis, Cloudflare and Xano region
 - [ ] **Make DSR events replayable**: queue consent, opt-out and deletion with timestamps
+- [ ] **Name a second key holder**: no key or rotation depends on one developer; two approvers and a written runbook
+- [ ] **List every external team and plugin with access**: its seat licence, its credentials and what it can write
+- [ ] **Secure the exit before the contract ends**: export the knowledge base, prompts, labelled data and adapters, and confirm the export opens
+- [ ] **Find writes around the gate**: plugins with hard-coded upserts, or running without memory safety
 
 ### Cutover window: switch
 
@@ -269,6 +276,9 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Price and stock stay live** from the system of record, never embeddings
 - [ ] **Keep the old path read-only**: switch traffic, don't delete; roll back by route
 - [ ] **Watch the lockout signals**: handshake failures, denied tool calls, stalled feeds
+- [ ] **Move plugin writes behind the gate**: every write a signed event; no plugin holds signing keys or direct database access
+- [ ] **Replace standing vendor credentials**: a scoped, expiring grant and certificate per vendor, revocable alone
+- [ ] **Cover every time zone**: your own on-call staff hold pre-approved emergency mandates
 
 ### After cutover: retire
 
@@ -278,6 +288,8 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Prove residency**: each market's data in its region, with evidence
 - [ ] **Embed LTV** in signed documents, so revocation info and timestamps travel with them
 - [ ] **Schedule trust-store reviews**: browsers patch themselves; `STRUST` and runtimes don't
+- [ ] **Rehearse a breach**: revoke a key, replay the queue and produce the timeline within GDPR's 72 hours
+- [ ] **Close external access at contract end**: only after the export is verified
 
 ### Contract clauses to ask for
 

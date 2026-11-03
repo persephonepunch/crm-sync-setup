@@ -102,6 +102,9 @@ module.exports = () => {
         tags: fm.tags || fm.hashtags || [], canonical: fm.canonical || "",
         ogImage: fm.ogImage || "", ogImageAlt: fm.ogImageAlt || "",
         source: REPO + src, raw: PAGES + src, html, toc,
+        // Optional cross-links for the header panel: frontmatter `links:` as "href|label" strings
+        // (the same format the styled page reads from data-extra).
+        links: (fm.links || []).map((x) => { const [href, label] = String(x).split("|").map((y) => (y || "").trim()); return { href, label } }).filter((x) => x.href && x.label),
       }
       chapter.pages.push(page)
       pages.push(page)

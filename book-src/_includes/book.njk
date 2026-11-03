@@ -92,6 +92,7 @@
           <span><a href="{{ doc.raw }}" download>Markdown</a></span>
           <span><a href="{{ doc.source }}" rel="noopener">GitHub source</a></span>
           {%- if doc.canonical %}<span><a href="{{ doc.canonical }}">Styled page</a></span>{% endif %}
+          {%- for l in doc.links %}<span><a href="{{ l.href }}">{{ l.label }}</a></span>{% endfor %}
         </div>
         {%- if doc.tags.length %}
         <ul class="tags">{% for t in doc.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
