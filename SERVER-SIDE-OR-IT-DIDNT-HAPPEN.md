@@ -3,7 +3,7 @@ title: "Server-Side or It Didn't Happen — Developer Due Diligence for Commerce
 description: "A theme that looks right is not a system that is right. Why the jeopardy lives in cart, checkout, returns, fraud, and remittance; why functions stay server-rendered and shape-gated; why the record is part of the deliverable — and who carries what you didn't write down."
 canonical: https://persephonepunch.github.io/crm-sync-setup/server-side-or-it-didnt-happen.html
 category: "Security"
-date: 2026-08-05
+date: 2026-11-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md
 licence: CC-BY-4.0
 tags:
@@ -101,8 +101,8 @@ ways, in escalating order:
    evidence at all.
 
 That third failure is the fact pattern at the base of the wiretap
-class-action wave (CIPA §631 and its state siblings; Revlon was among the
-named defendants): when discovery asks *"prove this visitor's session was
+class-action wave (CIPA §631 and its state siblings; Nike is among the
+named defendants, in the table below): when discovery asks *"prove this visitor's session was
 not recorded after she declined,"* a client-side stack has nothing to
 produce. The absence of the record **is** the case. Statutory damages run
 $5,000 per violation — arguably per session — with no regulator required.
@@ -160,6 +160,99 @@ what it produced or where the data went. Buying the tool satisfied neither
 obligation, because in both cases **the obligation was the record, and the tool
 was never connected to one.** A consent management platform reports what it
 showed a visitor. Only a register knows what the business then did.
+
+## Seven brands, one load order: JavaScript order, shape and regional transport
+
+None of the cases below is only a legal story. Each is a data system that ran
+in the **wrong order**, carried the **wrong shape**, or moved data through the
+**wrong route or region**, and in each the record that would have caught it
+either did not exist or was not joined to the system that failed. The load
+order is the yardstick; the table says, case by case, where it broke.
+
+### The load order the table is measured against
+
+| Step | Runs where | What it does | Nothing of this runs before it |
+|---|---|---|---|
+| **1 · Region** | Edge (a Cloudflare Worker), before any HTML | Resolves country and subdivision (ISO 3166-2), reads the `Sec-GPC: 1` header, picks the regime: opt-in (EU, UK, Korea) or opt-out (California and other US states) | Any HTML, script or pixel |
+| **2 · Consent gate** | First script on the page, inline and synchronous | Shows that regime's banner with **Accept and Reject at equal weight**; sets Consent Mode v2 defaults to `denied` | Tag manager, pixels, session replay, chat |
+| **3 · Consent record** | Server, `POST /consent` | Writes the choice with an idempotency key to the register, in the visitor's region | Any non-essential tag |
+| **4 · Locale** | Edge and page | Language (BCP 47), market, currency (ISO 4217) | Prices, copy, model weighting |
+| **5 · Tags by purpose** | Tag manager or server-side tagging | Loads only the purposes granted in step 3; GPC counts as opt-out of sale and sharing | Replay, chat, AI |
+| **6 · Replay, chat, AI** | Last, loaded lazily | Session replay, chat widgets, AI weighting, with the locale passed in | — |
+
+The shape step 3 writes. One row per decision, keyed so a retry never records
+twice:
+
+```json
+{
+  "idempotency_key": "cns_7f3a2c",
+  "session_id": "s_91e0",
+  "region": "US-CA",
+  "regime": "opt_out",
+  "gpc": true,
+  "purposes": { "analytics": false, "ads": false, "sale_share": false },
+  "banner_version": "2026-11-04.1",
+  "recorded_at": "2026-11-04T14:02:11Z"
+}
+```
+
+Regional transport: where that row and the events it governs travel.
+
+| Region | Regime | Before the visitor chooses | Where the record and events live |
+|---|---|---|---|
+| California and other US states | Opt-out (CCPA/CPRA and state siblings) | Collection may run; GPC and the opt-out link must work **without** the banner | US region |
+| EU and UK | Opt-in (GDPR, ePrivacy/PECR) | Everything non-essential `denied` | EU region |
+| Korea | Opt-in (PIPA) | Everything non-essential `denied` | Seoul region |
+
+### The cases, by date
+
+| Date | Brand | Linked data system failure (public record) | Order of JS execution | API / shape | Regional data layer transport |
+|---|---|---|---|---|---|
+| 2001-02-26 | **Nike** | The i2 demand-planning system, rushed live and heavily customised, ordered too many slow sellers and too few best-sellers; Nike put lost sales near **$100 million** for the quarter and moved short-range planning into SAP | Not a browser case, same rule upstream: the planning run's output drove orders before anyone reconciled it | Forecast quantities accepted without a check against orders in the system of record | One central planning run for every market |
+| 2016-04-11 | **Kylie Cosmetics** (Shopify, before Coty) | During a lip-kit launch, a website glitch showed shoppers other customers' personal information | Step 6 rule: under launch load, nothing personal renders unless the server has tied it to this session | A response carrying personal data must be keyed to the session and never cacheable | — |
+| 2018-02 → 2022-06 | **Revlon** | SAP ERP go-live at the Oxford, North Carolina plant disrupted service levels; a **material weakness** in internal control was disclosed with the FY2018 10-K (March 2019); shareholder suits followed; Chapter 11 in June 2022 | Not a browser case: the new system took live orders before its controls were proven | Order and inventory records changed system at cutover; the filings tie the disruption to the ERP launch | One plant's cutover reached every market it supplied |
+| 2018-11-07 | **Coty** | Warehouse and planning-centre consolidation after the P&G Beauty integration disrupted supply in all three divisions; shares fell about **22%** that day. (Coty took 51% of Kylie Cosmetics in November 2019) | Not a browser case: consolidation went ahead of proven continuity | Systems upgraded after leaving P&G's transitional services; planning data moved home | Consolidating US and European centres put both regions on one failure |
+| 2020-09 | **Kylie Cosmetics** (Coty, Shopify) | Told customers their data was exposed when two Shopify support employees took customer transaction records from at least 100 merchants; Shopify said card data was not affected | Not a browser case: platform staff access | Keep in the platform only what the order needs; the consent and identity record lives in your own system of record | Data held by the platform follows the platform's access controls, not yours |
+| 2021 and 2025-12-16 | **Nike** | 2021: a California court kept the claim that Nike aided FullStory's alleged wiretapping through **session replay** on nike.com. December 2025: *Magenheim v. Nike* (S.D. Fla.) alleges no consent banner, **GPC ignored**, and collection continuing after a manual opt-out; a parallel California suit names Google, Meta and The Trade Desk tags. Allegations, undecided | Steps 1, 2 and 6: replay and ad tags ran before any choice; GPC read at step 1 never stopped step 5 | `Sec-GPC: 1` must write `sale_share: false` to the record and block the tags it governs | Florida's wiretap statute and California's CIPA reach the same site through different laws |
+| 2023-03-22 | **Diageo** (pension scheme, via Capita) | Ransomware at the outsourcer Capita exposed personal data of some Diageo UK pension-scheme members; the ICO fined Capita **£14 million** in October 2025 | Not a browser case: a processor's endpoint ran a malicious file | A processor holds only the fields its job needs; the record shows which | Personal data processed outside your systems still carries your exposure |
+| 2024-01 | **Anheuser-Busch** | Proposed class action (*Callaway v. Anheuser-Busch*) over online terms requiring users of its platforms to agree not to disparage the company, brought for California users. Status unverified | Step 2: agreement inferred from use is not a choice anyone made | Terms acceptance recorded as an event with a version, not assumed from browsing | California consumer law applies to California visitors whatever the brand's home market |
+| 2025-03-12 | **Honda** | CPPA fine of **$632,500**: Accept in one click, Reject in two; a rights form asking eight data elements; ad-tech recipients without the required contract terms | Step 2 in the wrong shape: the gate ran, asymmetrically | Opting out needs no identity data: the request shape should carry only the choice | Data went to ad-tech recipients with no record of the terms it travelled under |
+| 2025-05-06 | **Todd Snyder** (Shopify Plus) | CPPA fine of **$345,178**: for about 40 days the consent banner flashed and vanished, so opt-outs went unprocessed; photo ID demanded for privacy requests | Step 2 never reachable, and no one saw it: the gate failed to load | No step 3 record: forty days of zero opt-out rows was the alarm nobody had | US opt-out regime: GPC and the opt-out link must work without the banner |
+
+### What the table says
+
+- **Order.** Honda, Todd Snyder and the Nike tracking suits are the same
+  failure at different steps: something ran before the choice existed, or the
+  choice ran in a shape that favoured one answer. Step 2 is a gate, not a
+  decoration.
+- **Shape.** Revlon, Coty and Nike's i2 run are pre-browser versions of the
+  same lesson: a system took live orders before its output was reconciled
+  against the record. Honda's eight-field form is the same error in a privacy
+  request.
+- **Transport.** Kylie Cosmetics in 2020, Diageo's pension data and Honda's
+  ad-tech contracts all failed one hop away from the brand, at a platform, a
+  processor or a recipient. The record has to say where data went and under
+  what terms, because the hop is where the brand loses sight of it.
+
+Where no public consent or tracking action was found against a brand
+(Revlon, Coty, Diageo), the row records the brand's documented data system
+failure instead. Pending suits are allegations. *Not legal advice.*
+
+Sources:
+[CIO: Nike rebounds](https://www.cio.com/article/272460/supply-chain-management-nike-rebounds-how-and-why-nike-recovered-from-its-supply-chain-disaster.html) ·
+[TMZ: Kylie lip-kit site glitch (2016)](https://www.tmz.com/2016/04/11/kylie-jenner-lip-kit-website-personal-information/) ·
+[Revlon FY2018 10-K](https://www.sec.gov/Archives/edgar/data/887921/000088792119000004/rev201810-k.htm) ·
+[Computer Weekly: SAP disruption leads to Revlon class action](https://www.computerweekly.com/news/252464278/SAP-disruption-leads-to-Revlon-class-action-lawsuit) ·
+[Coty Q1 FY2019 results](https://investors.coty.com/news-events-and-presentations/news/news-details/2018/Coty-Inc-Reports-First-Quarter-Fiscal-2019-Results/default.aspx) ·
+[Fashion Network: Coty shares fall 22%](https://ae.fashionnetwork.com/news/Coty-shares-plunge-22-percent-as-supply-chain-problems-mount,1032615.html) ·
+[Fox Business: Kylie Cosmetics and the Shopify breach](https://foxbusiness.com/lifestyle/kylie-cosmetics-warns-customers-shopify-data-breach) ·
+[Eric Goldman: Nike and FullStory (2021)](https://blog.ericgoldman.org/archives/2021/10/privacy-lawsuit-based-on-website-tracking-by-service-provider-trimmed.htm) ·
+[Top Class Actions: Nike tracking suit](https://topclassactions.com/lawsuit-settlements/lawsuit-news/nike-class-action-claims-company-tracks-shares-customer-data-without-consent/) ·
+[Bloomberg Law: Nike trackers suit](https://news.bloomberglaw.com/privacy-and-data-security/nike-hit-with-proposed-class-action-lawsuit-over-online-trackers) ·
+[The Scotsman: Diageo pension members and Capita](https://www.scotsman.com/news/crime/diageo-pension-fund-members-caught-up-in-russia-linked-capita-cyberattack-4143864) ·
+[ICO: Capita fined £14m](https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2025/10/capita-fined-14m-for-data-breach-affecting-over-6m-people/) ·
+[ClassAction.org: Anheuser-Busch online terms suit](https://www.classaction.org/news/anheuser-busch-sued-over-alleged-silencing-provision-in-online-terms-and-conditions) ·
+CPPA announcements for Honda (12 March 2025) and Todd Snyder (6 May 2025)
 
 ## The React case, which is the one most teams are shipping now
 

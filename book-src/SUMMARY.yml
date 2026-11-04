@@ -40,7 +40,7 @@ chapters:
       - SBOM-EVERYONE.md   # 2026-07-29 · What Is an SBOM? Who Uses This? Everyone.
       - TRUST-VOCABULARY.md   # 2026-07-29 · The Trust Vocabulary — Every Term on One Page
       - VERIFY-IT-SHEET.md   # 2026-07-29 · Verify It Yourself — the IT Sheet
-      - SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md   # 2026-08-05 · Server-Side or It Didn't Happen — Developer Due Diligence for Commerce
+      - SERVER-SIDE-OR-IT-DIDNT-HAPPEN.md   # 2026-11-04 · Server-Side or It Didn't Happen — Developer Due Diligence for Commerce
       - TRUST-WITH-LOGIN.md   # 2026-08-06 · Trust With Login — The Bind Is the Product
       - CAPABILITY-NOT-PERIMETER.md   # 2026-08-09 · Permissions for AI, in plain terms — capability, not perimeter
       - SECURITY-POSTURE.md   # 2026-08-16 · CRM Sync — Security & Compliance Posture
