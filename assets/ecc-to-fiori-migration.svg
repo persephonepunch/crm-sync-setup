@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="847" viewBox="-5 -5 1510 847">
+<rect id="background" x="-5" y="-5" width="1510" height="847" fill="#fff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="header">
+<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">ECC to S/4HANA and Fiori: what moves, and how</text>
+<text x="37" y="80" font-family="Arial" font-size="14" fill="#222" text-anchor="start">Each layer of an ECC system has its own migration step. The data path changes most: files and IDocs give way to OData APIs and events.</text>
+</g>
+<g id="approaches">
+<text x="37" y="122" font-family="Arial" font-size="14" fill="#000" text-anchor="start">Three ways in:</text>
+<g id="approach-1">
+<rect x="150" y="108" width="430" height="40" fill="#f5f5f5"/>
+<text x="162" y="125" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">System conversion (brownfield)</text>
+<text x="162" y="141" font-family="Arial" font-size="12" fill="#333" text-anchor="start">convert ECC in place, keep history and custom code</text>
+</g>
+<g id="approach-2">
+<rect x="588" y="108" width="430" height="40" fill="#f5f5f5"/>
+<text x="600" y="125" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">New implementation (greenfield)</text>
+<text x="600" y="141" font-family="Arial" font-size="12" fill="#333" text-anchor="start">start clean, migrate selected data</text>
+</g>
+<g id="approach-3">
+<rect x="1026" y="108" width="430" height="40" fill="#f5f5f5"/>
+<text x="1038" y="125" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Selective data transition</text>
+<text x="1038" y="141" font-family="Arial" font-size="12" fill="#333" text-anchor="start">move chosen company codes, years or processes</text>
+</g>
+</g>
+<g id="grid-header">
+<rect x="37" y="178" width="170" height="32" fill="#111"/>
+<text x="51" y="199" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Layer</text>
+<rect x="227" y="178" width="387" height="32" fill="#111"/>
+<text x="241" y="199" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">ECC today</text>
+<rect x="651" y="178" width="387" height="32" fill="#111"/>
+<text x="665" y="199" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Migration step</text>
+<rect x="1075" y="178" width="387" height="32" fill="#111"/>
+<text x="1089" y="199" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">S/4HANA + Fiori</text>
+<rect x="1075" y="174" width="387" height="4" fill="#f22468"/>
+</g>
+<g id="row-1">
+<text x="37" y="248" font-family="Arial" font-size="15" fill="#000" text-anchor="start">User interface</text>
+<rect x="227" y="222" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="241" y="248" font-family="Arial" font-size="15" fill="#000" text-anchor="start">SAP GUI transactions</text>
+<text x="241" y="272" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">VA01, MM01, ME21N screens</text>
+<text x="241" y="291" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">One transaction, many roles</text>
+<line x1="618" y1="265.0" x2="647" y2="265.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="651" y="222" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="665" y="248" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Map transactions to apps</text>
+<text x="665" y="272" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Fiori apps recommendations</text>
+<text x="665" y="291" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">from SAP Readiness Check</text>
+<line x1="1042" y1="265.0" x2="1071" y2="265.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1075" y="222" width="387" height="86" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1089" y="248" font-family="Arial" font-size="15" fill="#d01a57" text-anchor="start">Fiori launchpad</text>
+<text x="1089" y="272" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Role-based apps, browser and mobile</text>
+<text x="1089" y="291" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Fiori elements from annotations</text>
+</g>
+<g id="row-2">
+<text x="37" y="346" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Roles</text>
+<rect x="227" y="320" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="241" y="346" font-family="Arial" font-size="15" fill="#000" text-anchor="start">PFCG roles of transaction codes</text>
+<text x="241" y="370" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Broad, accumulated over years</text>
+<text x="241" y="389" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Reviewed at audit time</text>
+<line x1="618" y1="363.0" x2="647" y2="363.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="651" y="320" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="665" y="346" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Rebuild as business roles</text>
+<text x="665" y="370" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Business catalogs, spaces and pages</text>
+<text x="665" y="389" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Remove what no app needs</text>
+<line x1="1042" y1="363.0" x2="1071" y2="363.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1075" y="320" width="387" height="86" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1089" y="346" font-family="Arial" font-size="15" fill="#d01a57" text-anchor="start">Business roles per app</text>
+<text x="1089" y="370" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Least privilege, per Fiori app</text>
+<text x="1089" y="389" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Same roles gate the OData services</text>
+</g>
+<g id="row-3">
+<text x="37" y="444" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Data model</text>
+<rect x="227" y="418" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="241" y="444" font-family="Arial" font-size="15" fill="#000" text-anchor="start">ECC tables</text>
+<text x="241" y="468" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">MARA, KNA1, LFA1, BSEG, MSEG</text>
+<text x="241" y="487" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Customer and vendor separate</text>
+<line x1="618" y1="461.0" x2="647" y2="461.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="651" y="418" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="665" y="444" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Migration Cockpit + CVI</text>
+<text x="665" y="468" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Staging tables or direct transfer</text>
+<text x="665" y="487" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Customer/vendor → Business Partner</text>
+<line x1="1042" y1="461.0" x2="1071" y2="461.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1075" y="418" width="387" height="86" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1089" y="444" font-family="Arial" font-size="15" fill="#d01a57" text-anchor="start">Simplified model</text>
+<text x="1089" y="468" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Business Partner for both</text>
+<text x="1089" y="487" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">ACDOCA universal journal, MATDOC</text>
+</g>
+<g id="row-4">
+<text x="37" y="542" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Integration</text>
+<rect x="227" y="516" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="241" y="542" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Files, IDocs and RFC</text>
+<text x="241" y="566" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">CSV drops, flat files, batch jobs</text>
+<text x="241" y="585" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Mapping in spreadsheets</text>
+<line x1="618" y1="559.0" x2="647" y2="559.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="651" y="516" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="665" y="542" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Expose APIs, retire file drops</text>
+<text x="665" y="566" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">OData services and released APIs</text>
+<text x="665" y="585" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Integration Suite for partners</text>
+<line x1="1042" y1="559.0" x2="1071" y2="559.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1075" y="516" width="387" height="86" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1089" y="542" font-family="Arial" font-size="15" fill="#d01a57" text-anchor="start">OData APIs and events</text>
+<text x="1089" y="566" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Business events to subscribers</text>
+<text x="1089" y="585" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Consented data out through the gate</text>
+</g>
+<g id="row-5">
+<text x="37" y="640" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Custom code</text>
+<rect x="227" y="614" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="241" y="640" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Z-programs and modifications</text>
+<text x="241" y="664" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">User exits in the core</text>
+<text x="241" y="683" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Unknown usage</text>
+<line x1="618" y1="657.0" x2="647" y2="657.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="651" y="614" width="387" height="86" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="665" y="640" font-family="Arial" font-size="15" fill="#000" text-anchor="start">ABAP Test Cockpit checks</text>
+<text x="665" y="664" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Usage data decides keep or retire</text>
+<text x="665" y="683" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Remediate what's kept</text>
+<line x1="1042" y1="657.0" x2="1071" y2="657.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1075" y="614" width="387" height="86" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1089" y="640" font-family="Arial" font-size="15" fill="#d01a57" text-anchor="start">Clean core</text>
+<text x="1089" y="664" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Extensions on BTP or released APIs</text>
+<text x="1089" y="683" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Upgrades without re-testing the core</text>
+</g>
+<g id="deadline">
+<rect x="37" y="718" width="1426" height="40" fill="#f5f5f5"/>
+<text x="53" y="743" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Deadline: SAP ends mainstream maintenance for ECC 6.0 on 31 December 2027; optional extended maintenance runs to 2030 at extra cost.</text>
+</g>
+<g id="crm-sync-fit">
+<text x="37" y="792" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">Where CRM Sync fits: S/4HANA stays the record for finance and logistics. Xano holds consent, grants and the ledger. Data moves between them by API and events, never a CSV drop.</text>
+</g>
+<g id="footer">
+<text x="37" y="822" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Transaction codes and tables are examples. Check SAP's Readiness Check and simplification list for your release. CRM Sync · Middleware vs AI Architecture</text>
+</g>
+</svg>

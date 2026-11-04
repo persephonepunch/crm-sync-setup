@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="910" viewBox="-5 -5 1510 910">
+<rect id="background" x="-5" y="-5" width="1510" height="910" fill="#fff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="header">
+<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">One product, four shapes: ECC, Fiori, product.csv and GraphQL</text>
+<text x="37" y="80" font-family="Arial" font-size="14" fill="#222" text-anchor="start">The Shopify base in Airtable, Feedonomics, Salsify and Rithum all still move the product.csv shape. Google Merchant API JSON is the destination in this example.</text>
+</g>
+<g id="column-headers">
+<rect x="169" y="112" width="305" height="32" fill="#111"/>
+<text x="183" y="133" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">ECC tables</text>
+<rect x="498" y="112" width="305" height="32" fill="#111"/>
+<text x="512" y="133" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Fiori / S/4HANA OData</text>
+<rect x="827" y="112" width="305" height="32" fill="#111"/>
+<text x="841" y="133" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">product.csv shape</text>
+<rect x="1156" y="112" width="305" height="32" fill="#111"/>
+<text x="1170" y="133" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">GraphQL + Merchant API JSON</text>
+<rect x="1156" y="108" width="305" height="4" fill="#f22468"/>
+</g>
+<g id="row-products">
+<text x="37" y="182" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Product</text>
+<text x="37" y="202" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Xano: products</text>
+<rect x="169" y="158" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="183" y="182" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">MARA, MAKT and pricing</text>
+<text x="183" y="204" font-family="Arial" font-size="12" fill="#333" text-anchor="start">MATNR 000000000000100245</text>
+<text x="183" y="222" font-family="Arial" font-size="12" fill="#333" text-anchor="start">MAKTX description, EAN11 GTIN</text>
+<text x="183" y="240" font-family="Arial" font-size="12" fill="#333" text-anchor="start">MEINS unit; price in conditions</text>
+<text x="183" y="258" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Exported by SE16, ALV or LSMW</text>
+<line x1="477" y1="217.0" x2="495" y2="217.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="498" y="158" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="512" y="182" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">API_PRODUCT_SRV (OData)</text>
+<text x="512" y="204" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Product, ProductDescription</text>
+<text x="512" y="222" font-family="Arial" font-size="12" fill="#333" text-anchor="start">GlobalTradeItemNumber per unit</text>
+<text x="512" y="240" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Released API, role-checked</text>
+<text x="512" y="258" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Fiori apps read the same service</text>
+<line x1="806" y1="217.0" x2="824" y2="217.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="827" y="158" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="841" y="182" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">Handle, Title, Variant SKU …</text>
+<text x="841" y="204" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Variant Price, Variant Barcode</text>
+<text x="841" y="222" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Image Src, one row per variant</text>
+<text x="841" y="240" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Airtable base, Feedonomics,</text>
+<text x="841" y="258" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Salsify, Rithum: same columns</text>
+<line x1="1135" y1="217.0" x2="1153" y2="217.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1156" y="158" width="305" height="118" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1170" y="182" font-family="Arial" font-size="14.5" fill="#d01a57" text-anchor="start">productSet → ProductInput</text>
+<text x="1170" y="204" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Shopify Admin GraphQL productSet</text>
+<text x="1170" y="222" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Merchant: offerId, feedLabel,</text>
+<text x="1170" y="240" font-family="Arial" font-size="12" fill="#333" text-anchor="start">contentLanguage, productAttributes</text>
+<text x="1170" y="258" font-family="Arial" font-size="12" fill="#333" text-anchor="start">price.amountMicros, IN_STOCK</text>
+</g>
+<g id="row-users">
+<text x="37" y="314" font-family="Arial" font-size="16" fill="#000" text-anchor="start">User</text>
+<text x="37" y="334" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Xano: users</text>
+<rect x="169" y="290" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="183" y="314" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">KNA1 customers, PFCG staff</text>
+<text x="183" y="336" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Customers and vendors apart</text>
+<text x="183" y="354" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Staff access as transaction roles</text>
+<text x="183" y="372" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Consent outside ECC, if at all</text>
+<text x="183" y="390" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Addresses in ADRC</text>
+<line x1="477" y1="349.0" x2="495" y2="349.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="498" y="290" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="512" y="314" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">Business Partner + roles</text>
+<text x="512" y="336" font-family="Arial" font-size="12" fill="#333" text-anchor="start">API_BUSINESS_PARTNER (OData)</text>
+<text x="512" y="354" font-family="Arial" font-size="12" fill="#333" text-anchor="start">One partner for customer and vendor</text>
+<text x="512" y="372" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Business roles per Fiori app</text>
+<text x="512" y="390" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Same roles gate the services</text>
+<line x1="806" y1="349.0" x2="824" y2="349.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="827" y="290" width="305" height="118" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="841" y="314" font-family="Arial" font-size="14.5" fill="#000" text-anchor="start">customers.csv</text>
+<text x="841" y="336" font-family="Arial" font-size="12" fill="#333" text-anchor="start">First Name, Last Name, Email</text>
+<text x="841" y="354" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Accepts Email Marketing: yes/no</text>
+<text x="841" y="372" font-family="Arial" font-size="12" fill="#333" text-anchor="start">No time or source of consent</text>
+<text x="841" y="390" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Staff access: seats, by hand</text>
+<line x1="1135" y1="349.0" x2="1153" y2="349.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1156" y="290" width="305" height="118" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1170" y="314" font-family="Arial" font-size="14.5" fill="#d01a57" text-anchor="start">Customer + account users</text>
+<text x="1170" y="336" font-family="Arial" font-size="12" fill="#333" text-anchor="start">GraphQL emailMarketingConsent</text>
+<text x="1170" y="354" font-family="Arial" font-size="12" fill="#333" text-anchor="start">marketingState, consentUpdatedAt</text>
+<text x="1170" y="372" font-family="Arial" font-size="12" fill="#333" text-anchor="start">Merchant accounts.users: staff only</text>
+<text x="1170" y="390" font-family="Arial" font-size="12" fill="#333" text-anchor="start">accessRights mirror Xano grants</text>
+</g>
+<g id="json-examples">
+<text x="37" y="446" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Merchant API JSON, from the Xano products and users collections</text>
+<g id="json-1">
+<rect x="37" y="458" width="850" height="128" fill="#f5f5f5"/>
+<text x="51" y="480" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">Product collection → ProductInput</text>
+<text x="51" y="502" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">POST /products/v1/accounts/{ACCOUNT}/productInputs:insert?dataSource=…</text>
+<text x="51" y="519" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">{ "offerId": "100245", "contentLanguage": "en", "feedLabel": "US",</text>
+<text x="51" y="536" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">  "productAttributes": { "title": "Oak bed frame, queen",</text>
+<text x="51" y="553" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">    "gtins": ["00012345678905"], "availability": "IN_STOCK", "condition": "NEW",</text>
+<text x="51" y="570" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">    "price": { "amountMicros": "499000000", "currencyCode": "USD" } } }</text>
+</g>
+<g id="json-2">
+<rect x="903" y="458" width="560" height="128" fill="#f5f5f5"/>
+<text x="917" y="480" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">User collection → account users</text>
+<text x="917" y="502" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">POST /accounts/v1/accounts/{ACCOUNT}/users?userId=analyst@example.com</text>
+<text x="917" y="519" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">{ "accessRights": ["READ_ONLY", "PERFORMANCE_REPORTING"] }</text>
+<text x="917" y="536" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve"></text>
+<text x="917" y="553" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">Revoke the grant in Xano → DELETE …/users/analyst@example.com</text>
+<text x="917" y="570" font-family="Arial" font-size="12" fill="#111" text-anchor="start" xml:space="preserve">Shoppers are never Merchant users: their consent stays in Xano</text>
+</g>
+</g>
+<g id="what-needs-to-change">
+<text x="37" y="626" font-family="Arial" font-size="18" fill="#000" text-anchor="start">What needs to change</text>
+<rect x="37" y="645" width="7" height="7" fill="#f22468"/>
+<text x="54" y="654" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">The record leaves the file: Xano's collections are the source; the CSV, the Airtable base and feed tools become views</text>
+<rect x="37" y="669" width="7" height="7" fill="#f22468"/>
+<text x="54" y="678" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Rows become typed resources: one ProductInput per offerId, feedLabel and language; price in micros; enums, not free text</text>
+<rect x="37" y="693" width="7" height="7" fill="#f22468"/>
+<text x="54" y="702" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Keys survive the trip: offerId from the ECC material number; GTIN check digit validated before anything is sent</text>
+<rect x="37" y="717" width="7" height="7" fill="#f22468"/>
+<text x="54" y="726" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Files become calls: productInputs:insert or productSet on each change, and a delete is a call too, not a missing row</text>
+<rect x="37" y="741" width="7" height="7" fill="#f22468"/>
+<text x="54" y="750" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Markets are fields, not files: feedLabel and contentLanguage on one record instead of a CSV per country</text>
+<rect x="37" y="765" width="7" height="7" fill="#f22468"/>
+<text x="54" y="774" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Consent is a record, not a column: state, time and source, as in emailMarketingConsent, never a yes/no cell</text>
+<rect x="37" y="789" width="7" height="7" fill="#f22468"/>
+<text x="54" y="798" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Users are grants, not seats: Merchant access rights mirror Xano grants, and revoking one deletes the user</text>
+<rect x="37" y="813" width="7" height="7" fill="#f22468"/>
+<text x="54" y="822" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Status comes back to you: product issues read from the API into your ledger, not left in a feed dashboard</text>
+<rect x="37" y="837" width="7" height="7" fill="#f22468"/>
+<text x="54" y="846" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Feed tools become channels: Feedonomics, Salsify and Rithum read from the API for marketplaces; they don't own the record</text>
+</g>
+<g id="footer">
+<text x="37" y="884" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Field names are examples; check your release and each vendor's current schema. Merchant API v1. CRM Sync · Middleware vs AI Architecture</text>
+</g>
+</svg>

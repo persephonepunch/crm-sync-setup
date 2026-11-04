@@ -255,7 +255,9 @@ translating them again.
 
 The same data can move two ways. On the batch path, SAP ECC exports a CSV, Matrixify bulk-imports it into Shopify, a copy lands in Airtable, and GA4 exports to BigQuery where SQL joins it to CRM data later. Each step makes a copy, and each copy can be the one someone trusts. On the event path, each change is one event: a Cloudflare Worker checks it at the edge, D1 holds a derived queue or read model, Xano Postgres is the record behind a documented API, and every consumer reads from that API.
 
-![Comparison map: SAP ECC, CSV, Matrixify, Airtable and GA4 to BigQuery SQL loads, against a Cloudflare Worker, D1, Xano Postgres with a Swagger/OpenAPI API, and consumers by API; with hosting on the edge, VM-Docker or Kubernetes, and a matrix comparing the two paths](https://persephonepunch.github.io/crm-sync-setup/assets/batch-vs-api-comparison-map.svg)
+The middle lane zooms into the CSV step, where most of the cost hides. Getting ECC data into an application by file takes five steps: **extract** (SE16, ALV or LSMW exports, IDocs or flat files, still in SAP field names like `MATNR` and `KUNNR`), **map** fields in a spreadsheet or script (`MATNR` to SKU, `MEINS` to unit, code lists matched by hand), **cleanse** (strip leading zeros, fix units, dedupe, with the decisions recorded nowhere), fill **one CSV template per target application**, then **import**, where partial failures land in a job log and the row loses its link to the ECC record. Change a code in ECC and every template drifts. On the API path the same mapping is code: typed in the Worker, checked against the OpenAPI schema, versioned in git, and every record keeps its ECC key.
+
+![Comparison map: SAP ECC, CSV, Matrixify, Airtable and GA4 to BigQuery SQL loads; the five steps of ECC data transformation from CSV to an application; against a Cloudflare Worker, D1, Xano Postgres with a Swagger/OpenAPI API, and consumers by API; with hosting on the edge, VM-Docker or Kubernetes, and a matrix comparing the two paths](https://persephonepunch.github.io/crm-sync-setup/assets/batch-vs-api-comparison-map.svg)
 
 | Dimension | Batch and file (ECC → CSV → Matrixify, Airtable, GA4 → BigQuery) | Event and API (Workers + D1 → Xano Postgres) |
 |---|---|---|
@@ -272,6 +274,86 @@ The same data can move two ways. On the batch path, SAP ECC exports a CSV, Matri
 | **Runs on** | Desktop exports, SaaS import jobs, scheduled SQL | Workers and D1 at the edge; Xano cloud, or self-hosted on a VM with Docker or on Kubernetes |
 
 The batch tools stay useful: Matrixify for a one-off migration, Airtable or Sheets as a view, BigQuery for analysis. The difference is which copy is the record.
+
+### ECC to S/4HANA and Fiori: the migration under the map
+
+Most ECC data paths in the map exist because ECC was built around SAP GUI transactions and batch files. Moving to S/4HANA, with Fiori as its interface, changes every layer, and the data path most of all: file drops and IDocs give way to OData APIs and business events, which is the shape the event path above expects. SAP ends mainstream maintenance for ECC 6.0 on 31 December 2027, with optional extended maintenance to 2030 at extra cost.
+
+There are three ways in: a **system conversion** (brownfield: convert ECC in place, keeping history and custom code), a **new implementation** (greenfield: start clean and migrate selected data), or a **selective data transition** (move chosen company codes, years or processes).
+
+![ECC to S/4HANA and Fiori: user interface, roles, data model, integration and custom code, each from ECC today through a migration step to S/4HANA and Fiori, with the three migration approaches, the 2027 maintenance deadline and where CRM Sync fits](https://persephonepunch.github.io/crm-sync-setup/assets/ecc-to-fiori-migration.svg)
+
+| Layer | ECC today | Migration step | S/4HANA + Fiori |
+|---|---|---|---|
+| **User interface** | SAP GUI transactions (`VA01`, `MM01`, `ME21N`); one transaction serves many roles | Map transactions to apps with the Fiori apps recommendations in SAP Readiness Check | Fiori launchpad: role-based apps in the browser and on mobile; Fiori elements generated from annotations |
+| **Roles** | PFCG roles built from transaction codes, broad and accumulated over years | Rebuild as business roles from business catalogs, spaces and pages; remove what no app needs | Least privilege per Fiori app; the same roles gate the OData services behind it |
+| **Data model** | ECC tables (`MARA`, `KNA1`, `LFA1`, `BSEG`, `MSEG`); customers and vendors kept separately | Migration Cockpit (staging tables or direct transfer); customer/vendor integration (CVI) to Business Partner | Business Partner for both; the `ACDOCA` universal journal and `MATDOC` material documents |
+| **Integration** | CSV drops, flat files, IDocs, RFC and batch jobs; mapping in spreadsheets | Expose OData services and released APIs; Integration Suite for partners; retire file drops | OData APIs and business events to subscribers; consented data leaves through the gate |
+| **Custom code** | Z-programs, user exits and modifications in the core, with unknown usage | ABAP Test Cockpit checks; usage data decides what to keep or retire; remediate what's kept | Clean core: extensions on BTP or through released APIs, so upgrades don't re-test the core |
+
+**Where CRM Sync fits.** S/4HANA stays the record for finance and logistics. Xano holds consent, grants and the ledger. Data moves between them by API and events, never a CSV drop, so the transformation lane in the map becomes code on one side of the migration rather than spreadsheets on both. Transaction codes and tables are examples: check SAP's Readiness Check and the simplification list for your release.
+
+### One product, four shapes: ECC, Fiori, product.csv and GraphQL
+
+The same product and user records take four shapes on their way out: ECC tables, the OData services that S/4HANA and Fiori read, the product.csv shape, and GraphQL or JSON at the destination. Here the destination is the Google Merchant API. The middle shape is the one to watch. Airtable's [Shopify store base](https://www.airtable.com/universe/expAyxuRwfshA5Isv/shopify-store-compact-base) (products, inventory and orders) is, like Feedonomics, Salsify and Rithum, still built around rows in Shopify's product.csv columns: `Handle`, `Title`, `Variant SKU`, `Variant Price`, `Variant Barcode`, one row per variant. The tools differ in what they do with the rows; the rows are the same.
+
+![One product, four shapes: product and user records as ECC tables, Fiori and S/4HANA OData services, the product.csv shape used by the Airtable Shopify base, Feedonomics, Salsify and Rithum, and Shopify GraphQL plus Google Merchant API JSON; with JSON examples for the product and user collections and a list of what needs to change](https://persephonepunch.github.io/crm-sync-setup/assets/product-shapes-ecc-fiori-csv-graphql.svg)
+
+| Record | ECC tables | Fiori / S/4HANA OData | product.csv shape | GraphQL + Merchant API JSON |
+|---|---|---|---|---|
+| **Product** (Xano `products`) | `MARA`, `MAKT` and pricing conditions: `MATNR` with leading zeros, `MAKTX`, `EAN11`, `MEINS` | `API_PRODUCT_SRV`: `Product`, `ProductDescription`, `GlobalTradeItemNumber` per unit; the same service Fiori apps read | `Handle`, `Title`, `Variant SKU`, `Variant Price`, `Variant Barcode`, `Image Src`, one row per variant | Shopify Admin GraphQL `productSet`; Merchant `ProductInput` with `offerId`, `feedLabel`, `contentLanguage` and typed `productAttributes` |
+| **User** (Xano `users`) | `KNA1` customers kept apart from vendors; staff access as PFCG transaction roles; consent outside ECC, if anywhere | `API_BUSINESS_PARTNER`: one Business Partner for customer and vendor; business roles per Fiori app | `customers.csv`: name, email, and `Accepts Email Marketing` as yes or no, with no time or source | Shopify `emailMarketingConsent` (`marketingState`, `consentUpdatedAt`); Merchant `accounts.users` for staff only, with access rights from Xano grants |
+
+**The product collection as Merchant API JSON.** One `ProductInput` per offer, language and feed label, inserted into an API data source each time the Xano record changes:
+
+```http
+POST https://merchantapi.googleapis.com/products/v1/accounts/{ACCOUNT_ID}/productInputs:insert?dataSource=accounts/{ACCOUNT_ID}/dataSources/{DATASOURCE_ID}
+```
+
+```json
+{
+  "offerId": "100245",
+  "contentLanguage": "en",
+  "feedLabel": "US",
+  "productAttributes": {
+    "title": "Oak bed frame, queen",
+    "link": "https://www.example.com/p/100245",
+    "imageLink": "https://www.example.com/img/100245.jpg",
+    "gtins": ["00012345678905"],
+    "availability": "IN_STOCK",
+    "condition": "NEW",
+    "price": { "amountMicros": "499000000", "currencyCode": "USD" }
+  }
+}
+```
+
+`offerId` is the ECC material number without its leading zeros, the GTIN passes its check digit before it is sent, and the price is in micros (499.00 USD is `499000000`).
+
+**The user collection as Merchant account users.** Merchant Center users are the people who may work in the account, never shoppers. Each one mirrors a grant in Xano, and revoking the grant deletes the user:
+
+```http
+POST https://merchantapi.googleapis.com/accounts/v1/accounts/{ACCOUNT_ID}/users?userId=analyst@example.com
+```
+
+```json
+{ "accessRights": ["READ_ONLY", "PERFORMANCE_REPORTING"] }
+```
+
+The access rights are `STANDARD`, `READ_ONLY`, `ADMIN`, `PERFORMANCE_REPORTING` and `API_DEVELOPER`. A new user stays `PENDING` until they accept the invitation. Shoppers' data, and their consent, stay in Xano.
+
+**What needs to change:**
+
+- **The record leaves the file.** Xano's product and user collections are the source; the CSV, the Airtable base and the feed tools become views of it.
+- **Rows become typed resources.** One `ProductInput` per `offerId`, feed label and language; price in micros; enums such as `IN_STOCK`, not free text.
+- **Keys survive the trip.** `offerId` comes from the ECC material number, and the GTIN check digit is validated before anything is sent.
+- **Files become calls.** `productInputs:insert` or `productSet` on each change, and a delete is a call too, not a row that quietly disappears from the next file.
+- **Markets are fields, not files.** `feedLabel` and `contentLanguage` on one record instead of one CSV per country.
+- **Consent is a record, not a column.** State, time and source, as in Shopify's `emailMarketingConsent`, never a yes/no cell.
+- **Users are grants, not seats.** Merchant access rights mirror Xano grants, and revoking a grant deletes the user.
+- **Status comes back to you.** Product issues are read back from the API into your ledger, not left in a feed tool's dashboard.
+- **Feed tools become channels.** Feedonomics, Salsify and Rithum still earn their place mapping to marketplaces, reading from the API; they no longer own the record.
+
+Field names are examples: check your SAP release and each vendor's current schema. Merchant API JSON per the [Merchant API v1 product guide](https://developers.google.com/merchant/api/guides/products/add-manage) and [user access guide](https://developers.google.com/merchant/api/guides/accounts/control-access).
 
 ### Airtable vs Xano: keys and rate ceilings
 
