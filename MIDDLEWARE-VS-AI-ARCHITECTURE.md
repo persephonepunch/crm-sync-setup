@@ -398,7 +398,18 @@ Going global changes the numbers as well as the words. A product's weight, dimen
 3. **The record is written** in Xano, in SI units, for all markets.
 4. **Each market is projected**: ISO 4217 currency, language (`contentLanguage`, ISO 639), units and rounding for that destination.
 5. **Channels** receive their projection: Shopify, the Merchant API, the WMS.
-6. **BigQuery and Vertex AI load last**: LLM weighting, embeddings and ranking use only consented rows, deduplicated by the same idempotency key, so a retry never counts or weights a product twice.
+6. **BigQuery and Vertex AI load after the channels**: audiences are built by location, and LLM weighting, embeddings and ranking use the language model for that locale, on consented rows only, deduplicated by the same idempotency key, so a retry never counts or weights a product twice.
+7. **The TypeScript event loader runs last**: once consent, the record and the audience's locale are known, the page's script loads and its events carry the right market, language and currency.
+
+**Not English by default.** The language model is chosen by locale, like the currency and the units, and the same rules apply to the AI strategy as to the data. A model trained mostly on English quietly degrades Korean, Japanese, Chinese, Thai or Vietnamese search and copy, and pivoting every translation through English loses meaning twice. For APAC in particular:
+
+| Job | Model | Why it fits |
+|---|---|---|
+| **Search and retrieval** across languages | BAAI `bge-m3` (on Cloudflare Workers AI as `@cf/baai/bge-m3`) | Multilingual embeddings for 100+ languages in one vector space, so a Korean query can find a Japanese product description |
+| **Translation** between market languages | Meta `m2m100` (on Workers AI as `@cf/meta/m2m100-1.2b`) | Many-to-many: translates Korean to Japanese directly, without pivoting through English |
+| **Audiences and weighting** | Vertex AI, with BigQuery | Audience by location and language; a multilingual embedding model when ranking runs there |
+
+The guardrails don't change with the model: product content goes in, personal data doesn't; the market's residency rules decide where the call runs; and a human reviews machine translation for regulated copy such as pricing, safety and legal text.
 
 **Rules that make it global:**
 
@@ -408,7 +419,8 @@ Going global changes the numbers as well as the words. A product's weight, dimen
 - **Round only at the projection**, to what each destination accepts: Merchant takes up to 4 decimals and `in` or `cm`; Shopify takes its own units.
 - **Let the market choose the display**: `feedLabel` and `contentLanguage`, with ISO 3166 country, ISO 639 language and ISO 4217 currency.
 - **Keep GTINs and parents structured**: arrays and links, not a barcode cell and a parent flag.
-- **Load analytics last**: BigQuery and Vertex AI read consented, deduplicated rows, after the record and the channels.
+- **Load analytics and scripts last**: BigQuery and Vertex AI read consented, deduplicated rows after the record and the channels; the TypeScript event loader runs after them.
+- **Not English by default**: choose the language model by locale; for APAC, `bge-m3` for multilingual embeddings and `m2m100` for direct translation.
 - **Keep pack levels apart**: each, case and pallet each carry their own weight, dimensions, volume and GTIN, so the WMS and the feed agree.
 
 Field names and unit lists are examples: check your SAP release, Shopify's metafield types and Google's [product data specification](https://support.google.com/merchants/answer/7052112).

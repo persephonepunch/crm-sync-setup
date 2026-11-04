@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="890" viewBox="-5 -5 1510 890">
-<rect id="background" x="-5" y="-5" width="1510" height="890" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="913" viewBox="-5 -5 1510 913">
+<rect id="background" x="-5" y="-5" width="1510" height="913" fill="#fff"/>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
 <g id="header">
 <text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">One measurement, every market: product.csv to GraphQL, Merchant and the WMS</text>
@@ -153,39 +153,45 @@
 <g id="load-order">
 <text x="37" y="534" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Load order</text>
 <g id="load-step-1">
-<rect x="37.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<rect x="37.0" y="548" width="191.7" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
 <text x="47.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">1 · Consent</text>
 <text x="47.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">read before anything moves</text>
-<line x1="265.0" y1="573" x2="275.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="230.7" y1="573" x2="240.7" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
 </g>
 <g id="load-step-2">
-<rect x="277.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
-<text x="287.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">2 · Idempotency key</text>
-<text x="287.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">one key per change</text>
-<line x1="505.0" y1="573" x2="515.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="242.7" y="548" width="191.7" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="252.71428571428572" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">2 · Idempotency key</text>
+<text x="252.71428571428572" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">one key per change</text>
+<line x1="436.4" y1="573" x2="446.4" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
 </g>
 <g id="load-step-3">
-<rect x="517.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
-<text x="527.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">3 · Write the record</text>
-<text x="527.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Xano, SI units, all markets</text>
-<line x1="745.0" y1="573" x2="755.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="448.4" y="548" width="191.7" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="458.42857142857144" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">3 · Write the record</text>
+<text x="458.42857142857144" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Xano, SI units, all markets</text>
+<line x1="642.1" y1="573" x2="652.1" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
 </g>
 <g id="load-step-4">
-<rect x="757.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
-<text x="767.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">4 · Project per market</text>
-<text x="767.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">ISO 4217 currency, language, units</text>
-<line x1="985.0" y1="573" x2="995.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="654.1" y="548" width="191.7" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="664.1428571428571" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">4 · Project per market</text>
+<text x="664.1428571428571" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">currency, language, units</text>
+<line x1="847.9" y1="573" x2="857.9" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
 </g>
 <g id="load-step-5">
-<rect x="997.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
-<text x="1007.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">5 · Channels</text>
-<text x="1007.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Shopify, Merchant, WMS</text>
-<line x1="1225.0" y1="573" x2="1235.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="859.9" y="548" width="191.7" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="869.8571428571429" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">5 · Channels</text>
+<text x="869.8571428571429" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Shopify, Merchant, WMS</text>
+<line x1="1053.6" y1="573" x2="1063.6" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
 </g>
 <g id="load-step-6">
-<rect x="1237.0" y="548" width="226.0" height="50" fill="#fff" stroke="#f22468" stroke-width="2"/>
-<text x="1247.0" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">6 · BigQuery, Vertex AI</text>
-<text x="1247.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">LLM weighting on consented rows</text>
+<rect x="1065.6" y="548" width="191.7" height="50" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1075.5714285714287" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">6 · BigQuery, Vertex AI</text>
+<text x="1075.5714285714287" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">audience and LM by locale</text>
+<line x1="1259.3" y1="573" x2="1269.3" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-7">
+<rect x="1271.3" y="548" width="191.7" height="50" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1281.2857142857142" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">7 · TypeScript loader</text>
+<text x="1281.2857142857142" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">events load last, in locale</text>
 </g>
 </g>
 <g id="rules">
@@ -203,11 +209,13 @@
 <rect x="37" y="774" width="7" height="7" fill="#f22468"/>
 <text x="54" y="783" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">GTINs and parents aren't CSV-shaped: gtins is an array, variants nest (productSet) or share an itemGroupId (Merchant), and packs link child to parent</text>
 <rect x="37" y="797" width="7" height="7" fill="#f22468"/>
-<text x="54" y="806" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">BigQuery and Vertex AI load last: only consented rows, deduplicated by the same idempotency key, so a retry never counts or weights twice</text>
+<text x="54" y="806" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">BigQuery and Vertex AI load after the channels: consented rows only, deduplicated by the idempotency key; the TypeScript event loader runs last</text>
 <rect x="37" y="820" width="7" height="7" fill="#f22468"/>
-<text x="54" y="829" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Keep pack levels apart: each, case and pallet each carry weight, dimensions, volume and their own GTIN, so the WMS and the feed agree</text>
+<text x="54" y="829" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Not English by default: choose the language model by locale; for APAC, bge-m3 multilingual embeddings and m2m100 direct translation</text>
+<rect x="37" y="843" width="7" height="7" fill="#f22468"/>
+<text x="54" y="852" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Keep pack levels apart: each, case and pallet each carry weight, dimensions, volume and their own GTIN, so the WMS and the feed agree</text>
 </g>
 <g id="footer">
-<text x="37" y="864" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Field names and unit lists are examples; check your SAP release, Shopify's metafield types and the Merchant product data specification. CRM Sync · Middleware vs AI Architecture</text>
+<text x="37" y="887" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Field names and unit lists are examples; check your SAP release, Shopify's metafield types and the Merchant product data specification. CRM Sync · Middleware vs AI Architecture</text>
 </g>
 </svg>
