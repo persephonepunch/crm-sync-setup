@@ -206,18 +206,18 @@ Regional transport: where that row and the events it governs travel.
 
 ### The cases, by date
 
-| Date | Brand | Linked data system failure (public record) | Order of JS execution | API / shape | Regional data layer transport |
-|---|---|---|---|---|---|
-| 2001-02-26 | **Nike** | The i2 demand-planning system, rushed live and heavily customised, ordered too many slow sellers and too few best-sellers; Nike put lost sales near **$100 million** for the quarter and moved short-range planning into SAP | Not a browser case, same rule upstream: the planning run's output drove orders before anyone reconciled it | Forecast quantities accepted without a check against orders in the system of record | One central planning run for every market |
-| 2016-04-11 | **Kylie Cosmetics** (Shopify, before Coty) | During a lip-kit launch, a website glitch showed shoppers other customers' personal information | Step 6 rule: under launch load, nothing personal renders unless the server has tied it to this session | A response carrying personal data must be keyed to the session and never cacheable | — |
-| 2018-02 → 2022-06 | **Revlon** | SAP ERP go-live at the Oxford, North Carolina plant disrupted service levels; a **material weakness** in internal control was disclosed with the FY2018 10-K (March 2019); shareholder suits followed; Chapter 11 in June 2022 | Not a browser case: the new system took live orders before its controls were proven | Order and inventory records changed system at cutover; the filings tie the disruption to the ERP launch | One plant's cutover reached every market it supplied |
-| 2018-11-07 | **Coty** | Warehouse and planning-centre consolidation after the P&G Beauty integration disrupted supply in all three divisions; shares fell about **22%** that day. (Coty took 51% of Kylie Cosmetics in November 2019) | Not a browser case: consolidation went ahead of proven continuity | Systems upgraded after leaving P&G's transitional services; planning data moved home | Consolidating US and European centres put both regions on one failure |
-| 2020-09 | **Kylie Cosmetics** (Coty, Shopify) | Told customers their data was exposed when two Shopify support employees took customer transaction records from at least 100 merchants; Shopify said card data was not affected | Not a browser case: platform staff access | Keep in the platform only what the order needs; the consent and identity record lives in your own system of record | Data held by the platform follows the platform's access controls, not yours |
-| 2021 and 2025-12-16 | **Nike** | 2021: a California court kept the claim that Nike aided FullStory's alleged wiretapping through **session replay** on nike.com. December 2025: *Magenheim v. Nike* (S.D. Fla.) alleges no consent banner, **GPC ignored**, and collection continuing after a manual opt-out; a parallel California suit names Google, Meta and The Trade Desk tags. Allegations, undecided | Steps 1, 2 and 6: replay and ad tags ran before any choice; GPC read at step 1 never stopped step 5 | `Sec-GPC: 1` must write `sale_share: false` to the record and block the tags it governs | Florida's wiretap statute and California's CIPA reach the same site through different laws |
-| 2023-03-22 | **Diageo** (pension scheme, via Capita) | Ransomware at the outsourcer Capita exposed personal data of some Diageo UK pension-scheme members; the ICO fined Capita **£14 million** in October 2025 | Not a browser case: a processor's endpoint ran a malicious file | A processor holds only the fields its job needs; the record shows which | Personal data processed outside your systems still carries your exposure |
-| 2024-01 | **Anheuser-Busch** | Proposed class action (*Callaway v. Anheuser-Busch*) over online terms requiring users of its platforms to agree not to disparage the company, brought for California users. Status unverified | Step 2: agreement inferred from use is not a choice anyone made | Terms acceptance recorded as an event with a version, not assumed from browsing | California consumer law applies to California visitors whatever the brand's home market |
-| 2025-03-12 | **Honda** | CPPA fine of **$632,500**: Accept in one click, Reject in two; a rights form asking eight data elements; ad-tech recipients without the required contract terms | Step 2 in the wrong shape: the gate ran, asymmetrically | Opting out needs no identity data: the request shape should carry only the choice | Data went to ad-tech recipients with no record of the terms it travelled under |
-| 2025-05-06 | **Todd Snyder** (Shopify Plus) | CPPA fine of **$345,178**: for about 40 days the consent banner flashed and vanished, so opt-outs went unprocessed; photo ID demanded for privacy requests | Step 2 never reachable, and no one saw it: the gate failed to load | No step 3 record: forty days of zero opt-out rows was the alarm nobody had | US opt-out regime: GPC and the opt-out link must work without the banner |
+| Date | Brand | Linked data system failure (public record) | Order of JS execution | API / shape | Regional data layer transport | Withdrawal, DSR or SAP override |
+|---|---|---|---|---|---|---|
+| 2001-02-26 | **Nike** | The i2 demand-planning system, rushed live and heavily customised, ordered too many slow sellers and too few best-sellers; Nike put lost sales near **$100 million** for the quarter and moved short-range planning into SAP | Not a browser case, same rule upstream: the planning run's output drove orders before anyone reconciled it | Forecast quantities accepted without a check against orders in the system of record | One central planning run for every market | No consent or request involved. Not SAP: the i2 planner failed, and SAP took over its planning |
+| 2016-04-11 | **Kylie Cosmetics** (Shopify, before Coty) | During a lip-kit launch, a website glitch showed shoppers other customers' personal information | Step 6 rule: under launch load, nothing personal renders unless the server has tied it to this session | A response carrying personal data must be keyed to the session and never cacheable | — | No consent or request involved; exposure, not withdrawal |
+| 2018-02 → 2022-06 | **Revlon** | SAP ERP go-live at the Oxford, North Carolina plant disrupted service levels; a **material weakness** in internal control was disclosed with the FY2018 10-K (March 2019); shareholder suits followed; Chapter 11 in June 2022 | Not a browser case: the new system took live orders before its controls were proven | Order and inventory records changed system at cutover; the filings tie the disruption to the ERP launch | One plant's cutover reached every market it supplied | No consent or request involved. SAP, but the failure was orders, inventory and financial controls, not a consent flag |
+| 2018-11-07 | **Coty** | Warehouse and planning-centre consolidation after the P&G Beauty integration disrupted supply in all three divisions; shares fell about **22%** that day. (Coty took 51% of Kylie Cosmetics in November 2019) | Not a browser case: consolidation went ahead of proven continuity | Systems upgraded after leaving P&G's transitional services; planning data moved home | Consolidating US and European centres put both regions on one failure | No consent or request involved |
+| 2020-09 | **Kylie Cosmetics** (Coty, Shopify) | Told customers their data was exposed when two Shopify support employees took customer transaction records from at least 100 merchants; Shopify said card data was not affected | Not a browser case: platform staff access | Keep in the platform only what the order needs; the consent and identity record lives in your own system of record | Data held by the platform follows the platform's access controls, not yours | No consent or request involved; insider access at the platform |
+| 2021 and 2025-12-16 | **Nike** | 2021: a California court kept the claim that Nike aided FullStory's alleged wiretapping through **session replay** on nike.com. December 2025: *Magenheim v. Nike* (S.D. Fla.) alleges no consent banner, **GPC ignored**, and collection continuing after a manual opt-out; a parallel California suit names Google, Meta and The Trade Desk tags. Allegations, undecided | Steps 1, 2 and 6: replay and ad tags ran before any choice; GPC read at step 1 never stopped step 5 | `Sec-GPC: 1` must write `sale_share: false` to the record and block the tags it governs | Florida's wiretap statute and California's CIPA reach the same site through different laws | **Wiretap: yes.** 2021: recording with no consent at all, from page load. 2025: **after withdrawal, alleged**: collection continued after a manual opt-out and despite GPC. No SAP involved |
+| 2023-03-22 | **Diageo** (pension scheme, via Capita) | Ransomware at the outsourcer Capita exposed personal data of some Diageo UK pension-scheme members; the ICO fined Capita **£14 million** in October 2025 | Not a browser case: a processor's endpoint ran a malicious file | A processor holds only the fields its job needs; the record shows which | Personal data processed outside your systems still carries your exposure | No consent or request involved; a processor breach |
+| 2024-01 | **Anheuser-Busch** | Proposed class action (*Callaway v. Anheuser-Busch*) over online terms requiring users of its platforms to agree not to disparage the company, brought for California users. Status unverified | Step 2: agreement inferred from use is not a choice anyone made | Terms acceptance recorded as an event with a version, not assumed from browsing | California consumer law applies to California visitors whatever the brand's home market | No withdrawal or request involved; agreement inferred from use |
+| 2025-03-12 | **Honda** | CPPA fine of **$632,500**: Accept in one click, Reject in two; a rights form asking eight data elements; ad-tech recipients without the required contract terms | Step 2 in the wrong shape: the gate ran, asymmetrically | Opting out needs no identity data: the request shape should carry only the choice | Data went to ad-tech recipients with no record of the terms it travelled under | Not wiretap. **Request handling (DSR):** eight data elements demanded for opt-outs that need no verification; authorised agents made hard to use. No finding that choices were ignored. No SAP involved |
+| 2025-05-06 | **Todd Snyder** (Shopify Plus) | CPPA fine of **$345,178**: for about 40 days the consent banner flashed and vanished, so opt-outs went unprocessed; photo ID demanded for privacy requests | Step 2 never reachable, and no one saw it: the gate failed to load | No step 3 record: forty days of zero opt-out rows was the alarm nobody had | US opt-out regime: GPC and the opt-out link must work without the banner | Not wiretap. **After withdrawal:** opt-outs went unprocessed for about 40 days while tracking continued. **Request handling (DSR):** photo ID demanded. No SAP involved |
 
 ### What the table says
 
@@ -234,8 +234,50 @@ Regional transport: where that row and the events it governs travel.
   processor or a recipient. The record has to say where data went and under
   what terms, because the hop is where the brand loses sight of it.
 
+
+### The risk none of these cases shows yet: a batch job overwriting a withdrawal
+
+None of the public records above shows SAP or any other back-office system
+overwriting a consent choice. It is still the failure this stack is most
+likely to produce next, because of how batch integration works. *This is a
+pattern, not a documented case.*
+
+1. **10:02** A shopper withdraws marketing consent on the storefront. The
+   register writes `marketing: false`.
+2. **10:05** A CRM or ERP batch job (Boomi, Celigo, MuleSoft, or an IDoc into
+   SAP, every 15 minutes or nightly) starts from a copy of the customer
+   record taken before 10:02, still holding `marketing: true`.
+3. **10:15** The job writes its copy back over the customer record. The
+   withdrawal is gone, the next campaign mails the shopper, and the latest
+   choice is no longer the one in force.
+
+That is processing after withdrawal: the same fact pattern as Todd Snyder's
+forty days and the opt-out allegations against Nike, reached through the back
+office instead of the browser.
+
+The rules that make it impossible:
+
+- **Consent is append-only in the system of record.** Every choice is a new
+  row with a timestamp and an idempotency key; nothing updates a consent
+  flag in place.
+- **The newest row wins.** The current state is always the latest row, so a
+  stale copy has nothing to overwrite.
+- **Batch jobs read consent and never write it.** The SAP, CRM and ESP
+  mappings carry consent fields as read-only, and the integration user
+  holds no grant to change them.
+- **Withdrawal propagates out at once.** A withdrawal is pushed to every
+  downstream system as an event, rather than waiting for the next batch to
+  notice it.
+- **Reconcile daily.** Compare each downstream copy with the register. Any
+  copy saying `true` where the register's latest row says `false` is an
+  incident, logged with the job that wrote it.
+- **Requests (DSR) follow the same path.** Opting out of sale or sharing needs
+  no identity check; access and deletion requests are verified once,
+  recorded, and fanned out to every system that holds a copy, with a receipt
+  from each.
+
 Where no public consent or tracking action was found against a brand
-(Revlon, Coty, Diageo), the row records the brand's documented data system
+(Revlon, Coty, Diageo, Kylie Cosmetics), the row records the brand's documented data system
 failure instead. Pending suits are allegations. *Not legal advice.*
 
 Sources:
