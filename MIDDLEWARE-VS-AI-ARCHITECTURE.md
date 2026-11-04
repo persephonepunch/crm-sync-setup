@@ -348,12 +348,70 @@ The access rights are `STANDARD`, `READ_ONLY`, `ADMIN`, `PERFORMANCE_REPORTING` 
 - **Keys survive the trip.** `offerId` comes from the ECC material number, and the GTIN check digit is validated before anything is sent.
 - **Files become calls.** `productInputs:insert` or `productSet` on each change, and a delete is a call too, not a row that quietly disappears from the next file.
 - **Markets are fields, not files.** `feedLabel` and `contentLanguage` on one record instead of one CSV per country.
+- **GTINs and parents aren't CSV-shaped.** `gtins` is an array; variants nest under the product (`productSet`) or share an `itemGroupId` (Merchant has no parent row); pack levels link child to parent. One `Barcode` cell and an "is parent" flag column can't hold that.
 - **Consent is a record, not a column.** State, time and source, as in Shopify's `emailMarketingConsent`, never a yes/no cell.
 - **Users are grants, not seats.** Merchant access rights mirror Xano grants, and revoking a grant deletes the user.
 - **Status comes back to you.** Product issues are read back from the API into your ledger, not left in a feed tool's dashboard.
 - **Feed tools become channels.** Feedonomics, Salsify and Rithum still earn their place mapping to marketplaces, reading from the API; they no longer own the record.
 
 Field names are examples: check your SAP release and each vendor's current schema. Merchant API JSON per the [Merchant API v1 product guide](https://developers.google.com/merchant/api/guides/products/add-manage) and [user access guide](https://developers.google.com/merchant/api/guides/accounts/control-access).
+
+### Many hops, many reshapes: Feedonomics, Salsify and Rithum
+
+A product rarely goes from ECC to a channel in one step. A common chain runs it through a PIM or product experience platform such as Salsify, a feed tool such as Feedonomics and a marketplace hub such as Rithum (formed from CommerceHub and ChannelAdvisor), then on to Amazon, Walmart, Google and Meta. Each hop imports the data, reshapes it into its own model and exports it again in the next hop's template. Five reshapes, three vendor copies, each with its own credential.
+
+![Many hops, many reshapes: SAP ECC to a CSV export, Salsify, Feedonomics, the Rithum hub and the channels, with five reshapes; against one Xano record in PIM Sync projected to each channel by API](https://persephonepunch.github.io/crm-sync-setup/assets/many-hops-pim-reshape.svg)
+
+| | Many hops | One record (PIM Sync) |
+|---|---|---|
+| **Reshapes** | One per hop: five before a channel sees the product | One per channel, from the same record |
+| **Copies** | The CSV, plus a copy in each vendor, each behind its own credential | One record in Xano; every channel view derived from it |
+| **Enrichment** | A title or category fixed at hop 4 never reaches the source | Made on the record, so every channel gets it |
+| **Deletion and consent** | Chased through every hop | One delete; each channel's receipt in the ledger |
+| **Errors** | Surface at the channel, several hops from the cause | Channel status read back by API into the ledger |
+| **Feed tools** | Own a copy of the catalogue | Still map to marketplaces, reading from the API |
+
+These are patterns, not claims about any vendor: each tool does real work, and the chain is often how a catalogue grew. What PIM Sync changes is where the record lives. It keeps product, assets, variants, translations, market prices, consent and grants in Xano and projects them to Shopify, the Merchant API, Webflow and marketplaces by API.
+
+<a class="doc-button" href="https://apps.shopify.com/pim-sync" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Install PIM Sync on Shopify: one record, a projection per channel →</a>
+
+More on how it works: [PIM Sync on crm-sync.dev](https://www.crm-sync.dev/pages/pim-sync).
+
+### One measurement, every market: units from product.csv to the WMS
+
+Going global changes the numbers as well as the words. A product's weight, dimensions, volume and the distances it travels have to mean the same thing in the ECC record, the storefront, Google Merchant Center and the warehouse, in every market. product.csv carries almost none of it: `Variant Grams` and a display `Variant Weight Unit`, and no dimensions, volume or distance at all.
+
+![One measurement, every market: weight, length, volume, distance and GTINs with parents, from ECC through product.csv, the Xano record, Shopify GraphQL and the Merchant API to the WMS; with the load order from consent to BigQuery and Vertex AI, and the rules that make it global](https://persephonepunch.github.io/crm-sync-setup/assets/global-units-csv-graphql-merchant-wms.svg)
+
+| Measure | ECC (SAP T006) | product.csv | Xano record | Shopify GraphQL | Merchant API JSON | WMS |
+|---|---|---|---|---|---|---|
+| **Weight** | `BRGEW` / `NTGEW` with `GEWEI`; KG maps to ISO `KGM` | `Variant Grams`; weight unit for display only | Kilograms at full precision, plus the unit as entered | `inventoryItem.measurement.weight` | `shippingWeight`, `productWeight`: `g`, `kg`, `oz` or `lb`, up to 4 decimals | Each, case and pallet weight; dimensional against actual weight |
+| **Length** | `MARM`: `LAENG`, `BREIT`, `HOEHE` with `MEABM`, per unit of measure | None | Metres, per pack level | A `dimension` metafield | `shippingLength`, `shippingWidth`, `shippingHeight`: `in` or `cm` | L × W × H per pack level, for slotting and carton fit |
+| **Volume** | `VOLUM` with `VOLEH`; M3 maps to `MTQ`, L to `LTR` | None | Cubic metres; contents in litres | A `volume` metafield | `unitPricingMeasure` and `unitPricingBaseMeasure` (750 ml, priced per 100 ml) | Cube per case and pallet; Ti × Hi and trailer fill |
+| **Distance** | Route master distance, with its own unit | None | Kilometres; miles as a view | Local delivery radius, per location | Shipping settings `serviceRadius`: `MILES` or `KILOMETERS` | Pick-path travel distance; carrier zones |
+| **GTINs and parent** | `EAN11` per unit of measure; configurable parent with variants | One `Barcode` cell per row; "is parent" as a flag | `gtins[]` per variant and pack level; parent and children linked | `productSet` with variants nested; a barcode per variant | `gtins[]` array; variants grouped by `itemGroupId`, no parent row | GTIN-14 per case, SSCC per pallet; pack levels linked |
+
+**Load order.** The market projection and the analytics come after the controls, never before:
+
+1. **Consent** is read before anything moves.
+2. **An idempotency key** is set for the change, so every later step can retry safely.
+3. **The record is written** in Xano, in SI units, for all markets.
+4. **Each market is projected**: ISO 4217 currency, language (`contentLanguage`, ISO 639), units and rounding for that destination.
+5. **Channels** receive their projection: Shopify, the Merchant API, the WMS.
+6. **BigQuery and Vertex AI load last**: LLM weighting, embeddings and ranking use only consented rows, deduplicated by the same idempotency key, so a retry never counts or weights a product twice.
+
+**Rules that make it global:**
+
+- **Store SI once**, at full precision, with the unit as entered beside it: a 1 lb item is 0.45359237 kg and still knows it was 1 lb.
+- **Name units with UN/ECE Recommendation 20 codes** (`KGM`, `MTR`, `LTR`, `MTQ`, `KMT`), the codes SAP's T006 ISO column and GS1 data use.
+- **Convert with exact factors**: 1 lb = 0.45359237 kg, 1 in = 2.54 cm, 1 US gal = 3.785411784 L, 1 mi = 1.609344 km.
+- **Round only at the projection**, to what each destination accepts: Merchant takes up to 4 decimals and `in` or `cm`; Shopify takes its own units.
+- **Let the market choose the display**: `feedLabel` and `contentLanguage`, with ISO 3166 country, ISO 639 language and ISO 4217 currency.
+- **Keep GTINs and parents structured**: arrays and links, not a barcode cell and a parent flag.
+- **Load analytics last**: BigQuery and Vertex AI read consented, deduplicated rows, after the record and the channels.
+- **Keep pack levels apart**: each, case and pallet each carry their own weight, dimensions, volume and GTIN, so the WMS and the feed agree.
+
+Field names and unit lists are examples: check your SAP release, Shopify's metafield types and Google's [product data specification](https://support.google.com/merchants/answer/7052112).
 
 ### Airtable vs Xano: keys and rate ceilings
 

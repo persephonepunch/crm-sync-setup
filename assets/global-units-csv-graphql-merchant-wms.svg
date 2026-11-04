@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="890" viewBox="-5 -5 1510 890">
+<rect id="background" x="-5" y="-5" width="1510" height="890" fill="#fff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="header">
+<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">One measurement, every market: product.csv to GraphQL, Merchant and the WMS</text>
+<text x="37" y="80" font-family="Arial" font-size="14" fill="#222" text-anchor="start">Weight, length, volume and distance kept once in SI with UN/ECE codes, converted exactly, and shown in each market's units only at the edge.</text>
+</g>
+<g id="column-headers">
+<rect x="153.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="163.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">ECC (SAP T006)</text>
+<rect x="374.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="384.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">product.csv</text>
+<rect x="595.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="605.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">Xano record (canonical)</text>
+<rect x="816.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="826.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">Shopify GraphQL</text>
+<rect x="1037.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="1047.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">Merchant API JSON</text>
+<rect x="1258.0" y="108" width="205.0" height="32" fill="#111"/>
+<text x="1268.0" y="129" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">WMS</text>
+<rect x="595.0" y="104" width="205.0" height="4" fill="#f22468"/>
+</g>
+<g id="row-weight">
+<text x="37" y="176" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Weight</text>
+<rect x="153.0" y="152" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="163.0" y="176" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">BRGEW / NTGEW + GEWEI</text>
+<text x="163.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">KG → ISO code KGM</text>
+<line x1="360.0" y1="183.0" x2="372.0" y2="183.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="374.0" y="152" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="384.0" y="176" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Variant Grams (integer)</text>
+<text x="384.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Weight Unit: display only</text>
+<line x1="581.0" y1="183.0" x2="593.0" y2="183.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="595.0" y="152" width="205.0" height="62" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="605.0" y="176" font-family="Arial" font-size="12.5" fill="#d01a57" text-anchor="start">Kilograms, full precision</text>
+<text x="605.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">KGM; as entered: 1 lb (LBR)</text>
+<line x1="802.0" y1="183.0" x2="814.0" y2="183.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="816.0" y="152" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="826.0" y="176" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">inventoryItem.measurement</text>
+<text x="826.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">weight unit POUNDS etc.</text>
+<line x1="1023.0" y1="183.0" x2="1035.0" y2="183.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1037.0" y="152" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1047.0" y="176" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">shippingWeight</text>
+<text x="1047.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">g, kg, oz or lb; 4 decimals</text>
+<line x1="1244.0" y1="183.0" x2="1256.0" y2="183.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1258.0" y="152" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1268.0" y="176" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Each, case, pallet weight</text>
+<text x="1268.0" y="196" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Dim weight vs actual</text>
+</g>
+<g id="row-length">
+<text x="37" y="248" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Length</text>
+<rect x="153.0" y="224" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="163.0" y="248" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">MARM: LAENG, BREIT, HOEHE</text>
+<text x="163.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">MEABM unit, per pack unit</text>
+<line x1="360.0" y1="255.0" x2="372.0" y2="255.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="374.0" y="224" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="384.0" y="248" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">No dimension columns</text>
+<text x="384.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Lost, or typed into the body</text>
+<line x1="581.0" y1="255.0" x2="593.0" y2="255.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="595.0" y="224" width="205.0" height="62" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="605.0" y="248" font-family="Arial" font-size="12.5" fill="#d01a57" text-anchor="start">Metres, per pack level</text>
+<text x="605.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">MTR; as entered: cm or in</text>
+<line x1="802.0" y1="255.0" x2="814.0" y2="255.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="816.0" y="224" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="826.0" y="248" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">dimension metafield</text>
+<text x="826.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">{value, unit: cm, in, m …}</text>
+<line x1="1023.0" y1="255.0" x2="1035.0" y2="255.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1037.0" y="224" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1047.0" y="248" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">shippingLength/Width/Height</text>
+<text x="1047.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">in or cm only</text>
+<line x1="1244.0" y1="255.0" x2="1256.0" y2="255.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1258.0" y="224" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1268.0" y="248" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">L × W × H per pack level</text>
+<text x="1268.0" y="268" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Slotting, carton fit</text>
+</g>
+<g id="row-volume">
+<text x="37" y="320" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Volume</text>
+<rect x="153.0" y="296" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="163.0" y="320" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">VOLUM + VOLEH</text>
+<text x="163.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">M3 → MTQ, L → LTR</text>
+<line x1="360.0" y1="327.0" x2="372.0" y2="327.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="374.0" y="296" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="384.0" y="320" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">No volume column</text>
+<text x="384.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Unit price base guessed</text>
+<line x1="581.0" y1="327.0" x2="593.0" y2="327.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="595.0" y="296" width="205.0" height="62" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="605.0" y="320" font-family="Arial" font-size="12.5" fill="#d01a57" text-anchor="start">Cubic metres; content in L</text>
+<text x="605.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">MTQ / LTR, per pack level</text>
+<line x1="802.0" y1="327.0" x2="814.0" y2="327.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="816.0" y="296" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="826.0" y="320" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">volume metafield</text>
+<text x="826.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">{value, unit: ml, l, m3 …}</text>
+<line x1="1023.0" y1="327.0" x2="1035.0" y2="327.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1037.0" y="296" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1047.0" y="320" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">unitPricingMeasure</text>
+<text x="1047.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">750 ml; base measure 100 ml</text>
+<line x1="1244.0" y1="327.0" x2="1256.0" y2="327.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1258.0" y="296" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1268.0" y="320" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Cube per case and pallet</text>
+<text x="1268.0" y="340" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Ti × Hi, trailer fill</text>
+</g>
+<g id="row-distance">
+<text x="37" y="392" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Distance</text>
+<rect x="153.0" y="368" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="163.0" y="392" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Route master distance</text>
+<text x="163.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">with its own unit</text>
+<line x1="360.0" y1="399.0" x2="372.0" y2="399.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="374.0" y="368" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="384.0" y="392" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">No distance at all</text>
+<text x="384.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Radius set by hand</text>
+<line x1="581.0" y1="399.0" x2="593.0" y2="399.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="595.0" y="368" width="205.0" height="62" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="605.0" y="392" font-family="Arial" font-size="12.5" fill="#d01a57" text-anchor="start">Kilometres</text>
+<text x="605.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">KMT; miles (SMI) as a view</text>
+<line x1="802.0" y1="399.0" x2="814.0" y2="399.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="816.0" y="368" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="826.0" y="392" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Local delivery radius</text>
+<text x="826.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Set per location</text>
+<line x1="1023.0" y1="399.0" x2="1035.0" y2="399.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1037.0" y="368" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1047.0" y="392" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">shippingSettings radius</text>
+<text x="1047.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">MILES or KILOMETERS</text>
+<line x1="1244.0" y1="399.0" x2="1256.0" y2="399.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1258.0" y="368" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1268.0" y="392" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">Pick-path travel distance</text>
+<text x="1268.0" y="412" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Carrier zones</text>
+</g>
+<g id="row-gtins,-parent">
+<text x="37" y="464" font-family="Arial" font-size="15" fill="#000" text-anchor="start">GTINs, parent</text>
+<rect x="153.0" y="440" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="163.0" y="464" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">EAN11 per unit of measure</text>
+<text x="163.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Configurable parent, variants</text>
+<line x1="360.0" y1="471.0" x2="372.0" y2="471.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="374.0" y="440" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="384.0" y="464" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">One Barcode cell per row</text>
+<text x="384.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">'Is parent' as a flag column</text>
+<line x1="581.0" y1="471.0" x2="593.0" y2="471.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="595.0" y="440" width="205.0" height="62" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="605.0" y="464" font-family="Arial" font-size="12.5" fill="#d01a57" text-anchor="start">gtins[] per variant and pack</text>
+<text x="605.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Parent and children linked</text>
+<line x1="802.0" y1="471.0" x2="814.0" y2="471.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="816.0" y="440" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="826.0" y="464" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">productSet: variants nested</text>
+<text x="826.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">barcode per variant</text>
+<line x1="1023.0" y1="471.0" x2="1035.0" y2="471.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1037.0" y="440" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1047.0" y="464" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">gtins[] array, itemGroupId</text>
+<text x="1047.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Variants grouped, no parent row</text>
+<line x1="1244.0" y1="471.0" x2="1256.0" y2="471.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1258.0" y="440" width="205.0" height="62" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1268.0" y="464" font-family="Arial" font-size="12.5" fill="#000" text-anchor="start">GTIN-14 per case, SSCC pallet</text>
+<text x="1268.0" y="484" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Pack levels linked, not flagged</text>
+</g>
+<g id="load-order">
+<text x="37" y="534" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Load order</text>
+<g id="load-step-1">
+<rect x="37.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="47.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">1 · Consent</text>
+<text x="47.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">read before anything moves</text>
+<line x1="265.0" y1="573" x2="275.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-2">
+<rect x="277.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="287.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">2 · Idempotency key</text>
+<text x="287.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">one key per change</text>
+<line x1="505.0" y1="573" x2="515.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-3">
+<rect x="517.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="527.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">3 · Write the record</text>
+<text x="527.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Xano, SI units, all markets</text>
+<line x1="745.0" y1="573" x2="755.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-4">
+<rect x="757.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="767.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">4 · Project per market</text>
+<text x="767.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">ISO 4217 currency, language, units</text>
+<line x1="985.0" y1="573" x2="995.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-5">
+<rect x="997.0" y="548" width="226.0" height="50" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="1007.0" y="569" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">5 · Channels</text>
+<text x="1007.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Shopify, Merchant, WMS</text>
+<line x1="1225.0" y1="573" x2="1235.0" y2="573" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="load-step-6">
+<rect x="1237.0" y="548" width="226.0" height="50" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1247.0" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">6 · BigQuery, Vertex AI</text>
+<text x="1247.0" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">LLM weighting on consented rows</text>
+</g>
+</g>
+<g id="rules">
+<text x="37" y="640" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Rules that make it global</text>
+<rect x="37" y="659" width="7" height="7" fill="#f22468"/>
+<text x="54" y="668" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Store SI once, at full precision, with the unit as entered beside it: a 1 lb item is 0.45359237 kg and still knows it was 1 lb</text>
+<rect x="37" y="682" width="7" height="7" fill="#f22468"/>
+<text x="54" y="691" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Name units with UN/ECE Recommendation 20 codes (KGM, MTR, LTR, MTQ, KMT), the codes SAP's T006 ISO column and GS1 data use</text>
+<rect x="37" y="705" width="7" height="7" fill="#f22468"/>
+<text x="54" y="714" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Convert with exact factors: 1 lb = 0.45359237 kg, 1 in = 2.54 cm, 1 US gal = 3.785411784 L, 1 mi = 1.609344 km</text>
+<rect x="37" y="728" width="7" height="7" fill="#f22468"/>
+<text x="54" y="737" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Round only at the projection, to what each destination accepts: Merchant takes 4 decimals and in or cm; Shopify takes its own enums</text>
+<rect x="37" y="751" width="7" height="7" fill="#f22468"/>
+<text x="54" y="760" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Let the market choose the display: feedLabel and contentLanguage, ISO 3166 country, ISO 639 language, ISO 4217 currency</text>
+<rect x="37" y="774" width="7" height="7" fill="#f22468"/>
+<text x="54" y="783" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">GTINs and parents aren't CSV-shaped: gtins is an array, variants nest (productSet) or share an itemGroupId (Merchant), and packs link child to parent</text>
+<rect x="37" y="797" width="7" height="7" fill="#f22468"/>
+<text x="54" y="806" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">BigQuery and Vertex AI load last: only consented rows, deduplicated by the same idempotency key, so a retry never counts or weights twice</text>
+<rect x="37" y="820" width="7" height="7" fill="#f22468"/>
+<text x="54" y="829" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Keep pack levels apart: each, case and pallet each carry weight, dimensions, volume and their own GTIN, so the WMS and the feed agree</text>
+</g>
+<g id="footer">
+<text x="37" y="864" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Field names and unit lists are examples; check your SAP release, Shopify's metafield types and the Merchant product data specification. CRM Sync · Middleware vs AI Architecture</text>
+</g>
+</svg>
