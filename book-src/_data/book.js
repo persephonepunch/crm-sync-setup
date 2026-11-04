@@ -56,9 +56,12 @@ module.exports = () => {
         .replace(/(<img\b[^>]*\bsrc=")([^"]+)"/g, (_, a, h) => `${a}${resolve(src, h, true)}"`)
         .replace(/<table\b[^>]*>/g, (t) => `<div class="table-wrap">${t}`).replace(/<\/table>/g, "</table></div>")
 
-      // The doc's own H1 becomes the page title (doc.css hides a leading one anyway).
-      const h1 = html.match(/^\s*<h1>(.*?)<\/h1>/)
+      // The doc's own H1 becomes the page title. The hero already renders the title as the page's
+      // one H1, so drop the leading one from the body rather than only hiding it with doc.css:
+      // a second H1 still reaches crawlers, reader modes and text extractors.
+      const h1 = html.match(/^\s*<h1>(.*?)<\/h1>\s*/)
       const title = fm.title || fm.name || (h1 ? text(h1[1]) : path.basename(src, ".md"))
+      if (h1) html = html.slice(h1[0].length)
 
       // Ids on h2/h3/h4 (h4 so a subsection can be linked to; it stays out of the TOC), numbered h2s
       // (2.3.1 style, like a Rust book chapter), and the page TOC.

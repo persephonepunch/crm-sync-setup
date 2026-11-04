@@ -1,9 +1,9 @@
 ---
 title: "Signing Keys by Proxy: AI Security, Globalization, Tools and Permissions"
-description: "Buy applications were built for one document format at a time: SAP spreadsheets, Adobe Experience Cloud and AEM pages, data managed in a browser. Extending them to AI and robots reaches households, warehouses, agents and peer mandates, so the rules have to run as memory-safe Rust code with securely random keys, not fail at a document-type rule. Security counts the most where humans matter the most: in our households. This article covers when you inherit a signing key by proxy, what locks out when its chain breaks, why a certificate is not a grant, per-market rules, a security-first Globalization MVP and an AI cutover checklist."
+description: "Packaged enterprise applications were built for one document format at a time: SAP spreadsheets, Adobe Experience Cloud and AEM pages, data managed in a browser. Extending them to AI and robots reaches households, warehouses, agents and peer mandates, so the rules have to run as memory-safe Rust code with securely random keys, not fail at a document-type rule. Security counts the most where humans matter the most: in our households. This article covers when you inherit a signing key by proxy, what locks out when its chain breaks, why a certificate is not a grant, per-market rules, a security-first Globalization MVP and an AI cutover checklist."
 canonical: https://persephonepunch.github.io/crm-sync-setup/signing-keys-by-proxy.html
 category: "Security"
-date: 2026-11-03
+date: 2026-11-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/docs/SIGNING-KEYS-BY-PROXY.md
 licence: CC-BY-4.0
 ogImage: https://persephonepunch.github.io/crm-sync-setup/og/signing-keys-by-proxy.png
@@ -101,6 +101,16 @@ These are patterns, not claims about any firm. A contract, or the certificate ch
 A key ceremony at eMudhra on 30 April 2025 generated eight intermediate CA keys with too little randomness. Between 17 and 20 October 2026 a researcher recovered all eight private keys from the public certificates, and Chrome, Mozilla, Apple and Microsoft blocked them: six TLS intermediates and two code-signing intermediates. Chrome removes the emSign ECC Root CA - G3 from devices from 27 October. Go, NSS, Ubuntu, Debian and Composer shipped trust-store fixes on 20 October, and the Node.js releases of 21 October also reject the chains. India's Digital Signature Certificates run under India's own CA licensing rather than the browser root programs and, as reported, were not directly affected.
 
 The keys were not stolen; they were computable. An audited process with certified hardware still produced weak keys, so the lesson is about provenance: know which of your certificates chain through which CA, and sign your own records with keys you own and can retire. Background: [Hydrogen or bespoke stack](https://persephonepunch.github.io/crm-sync-setup/hydrogen-or-bespoke-stack.html), [Org Trust Layer](https://persephonepunch.github.io/crm-sync-setup/org-trust-layer.html), and reporting by [The Hacker News](https://thehackernews.com/2026/10/eight-emudhra-ca-keys-compromised.html) and [Help Net Security](https://www.helpnetsecurity.com/2026/10/21/emudhra-certificates-private-keys-compromised/).
+
+### Watching for the next one: Cloudflare Radar Zero Wire
+
+On 3 November 2026 Cloudflare added [Zero Wire](https://radar.cloudflare.com/security/zero-wire) to Radar: plain-language briefings on critical vulnerabilities in Internet-facing software, including web applications and the runtimes and libraries under them. It isn't a catalogue of every CVE. Each briefing separates confirmed facts from open questions, and sets out what to do now, the evidence (CVE records, vendor advisories, CISA's Known Exploited Vulnerabilities catalogue), a dated chronology, and whether a Cloudflare control applies. Briefings are grouped as *Needs attention* or *Reference*, and new ones arrive by [RSS](https://radar.cloudflare.com/security/zero-wire/rss).
+
+Three details fit this article's model:
+
+- **The agent prompt is read-only.** Each briefing carries a prompt for an AI agent to assess your exposure, and copying it scans or changes nothing. Give the agent that runs it a read-only grant, not a standing credential: assessment is one mandate, remediation another.
+- **Attempts aren't compromises.** Radar charts show requests that match WAF rules. Cloudflare's own caveat is that an observed attempt doesn't show that anyone was compromised, and no attempts seen on its network doesn't show there was no exploitation elsewhere. Your ledger, not a traffic chart, is the evidence for your systems.
+- **A CA failure is a different feed.** Zero Wire's scope is software vulnerabilities. A distrusted CA, like eMudhra, arrives as a trust-store change from the browser root programs and runtime vendors, so keep the certificate inventory and trust-store reviews in [the cutover checklist](#8-ai-cutover-checklist) as their own watch.
 
 ### The same month, on the shop floor: refrigeration controllers in France and the UK
 
@@ -227,6 +237,8 @@ The Xano release gate then checks consent at the system of record, along with th
 
 **Why the CMS doesn't matter.** No theme, plugin or module holds the gate secret, so a WordPress plugin update, an AEM component from a consultant or a Joomla extension can't widen what gets released. Publishing changes what a page shows. It never changes what the gate sends, because that decision sits at the edge and the system of record, outside the CMS. A new platform needs one thing: put its origin behind the helmet and pair it.
 
+**A WAF rule is cover, not a fix, and only for traffic that passes through it.** Cloudflare says so in its Zero Wire briefings: a managed WAF rule is a compensating control for the traffic it covers, not a replacement for patching, and blocking requests can't undo what already happened at the origin. Its first briefing, on a PHP runtime flaw, makes the CMS point too: updating application code or a plugin doesn't repair the runtime underneath a WordPress or Magento site. The same holds for the helmet. If the origin also answers on its public IP, a caller can skip the edge, and the consent read, the pairing and the signed request with it. Accept only traffic from the edge, with [Authenticated Origin Pulls](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/) (a client certificate the origin checks, another certificate you control) or a [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/) with no public listener.
+
 ### ECC/SAP signing: the same scrutiny, plus two ECC-specific risks
 
 | What gets signed | Mechanism in ECC | Who usually sets it up | Proxy risk |
@@ -273,7 +285,7 @@ Behind the feed sits a chain of dependencies: SAP holds the material master (the
 | **AI answers about member prices** | Price, points and offers | Read from published records; personalised only for a signed-in member with consent; CRAG declines rather than guesses |
 | **Withdrawal or deletion** | A consent-change or deletion event | Reaches the feed, conversions and audiences on the event, with a receipt from each |
 
-**Loyalty and subscription applications need AI memory-safe binding.** Loyalty and subscription apps (points, tiers, member prices, renewals, pauses and skips, from apps such as Smile.io, LoyaltyLion and Yotpo for loyalty or Recharge and Skio for subscriptions) hold entitlements that move money: a redemption, a free item, a renewal charge. Once an AI agent can act on them for a member, each action has to be *bound*: tied to the member's identity, their consent at that moment, the payment token and a grant, in one signed record that the gate checks in memory-safe code before anything happens. Binding in the plugin's own database, or in a runtime without memory safety, is the side door this article describes: a hard-coded upsert can grant points or skip a charge with no signature, and a memory bug can expose the payment and loyalty keys together.
+**Loyalty and subscription applications need AI memory-safe binding.** Loyalty and subscription apps (points, tiers, member prices, renewals, pauses and skips, from apps such as [Smile.io](https://smile.io), LoyaltyLion and Yotpo for loyalty or Recharge and Skio for subscriptions) hold entitlements that move money: a redemption, a free item, a renewal charge. Once an AI agent can act on them for a member, each action has to be *bound*: tied to the member's identity, their consent at that moment, the payment token and a grant, in one signed record that the gate checks in memory-safe code before anything happens. Binding in the plugin's own database, or in a runtime without memory safety, is the side door this article describes: a hard-coded upsert can grant points or skip a charge with no signature, and a memory bug can expose the payment and loyalty keys together.
 
 | Action an agent takes | Bound to | Checked at the gate |
 |---|---|---|
@@ -404,8 +416,11 @@ Every published chunk carries a typed list of tags: market, locale, audience, co
 
 **Xano stays the source of truth, whatever stack compiles the code.** Async Rust calls Xano's REST API with GET, POST, PATCH and DELETE, using the same tag model and the same idempotency key in every shell. On a server it runs on Tokio with `reqwest`. On Workers it uses `worker::Fetch`. In a CLI, a batch job or a WMS integration it's Tokio again. Each copy of a chunk, whether in Vectorize, a cache or a feed, is derived from the Xano record and reconciled against it. None of those copies becomes a second source of truth.
 
+The sketch below shows the Tokio shell. `Xano` stands for a thin client over `reqwest`, and `Chunk`, `Tag`, `DocId`, `ConsentScope`, `IdemKey` and `LedgerEntry` are the tag model's own types, so it is a pattern to read, not a file to compile.
+
 ```rust
-// Tokio + reqwest: write a tag change to Xano, the system of record
+// Sketch, Tokio + reqwest: write a tag change to Xano, the system of record.
+// Assumes the tag model's types and a Xano client; error type via anyhow::Result.
 async fn withdraw_consent(x: &Xano, doc: DocId, scope: ConsentScope, key: IdemKey) -> Result<()> {
     let mut chunk: Chunk = x.get(&format!("/chunk/{doc}")).await?;             // GET
     chunk.tags.retain(|t| !matches!(t, Tag::Consent(s) if *s == scope));        // plain Vec
@@ -415,7 +430,7 @@ async fn withdraw_consent(x: &Xano, doc: DocId, scope: ConsentScope, key: IdemKe
 }
 ```
 
-crm-sync runs on Workers, so the `.await` calls belong to the Workers runtime. The line that removes a withdrawn consent, `chunk.tags.retain(...)`, is ordinary `Vec` code in either shell.
+crm-sync runs on Workers, so there the same function swaps the `reqwest` client for `worker::Fetch` and its `.await` calls run on the Workers runtime instead of Tokio. The line that removes a withdrawn consent, `chunk.tags.retain(...)`, is ordinary `Vec` code in either shell.
 
 ## 6. Globalization: rules management by market
 
@@ -494,6 +509,7 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Move plugin writes behind the gate**: every write a signed event; no plugin holds signing keys or direct database access
 - [ ] **Replace standing vendor credentials**: a scoped, expiring grant and certificate per vendor, revocable alone
 - [ ] **Cover every time zone**: your own on-call staff hold pre-approved emergency mandates
+- [ ] **Close the origin bypass**: origins accept only edge traffic (Authenticated Origin Pulls or a Tunnel), so neither the helmet nor a WAF rule can be skipped
 
 ### After cutover: retire
 
@@ -503,6 +519,7 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Prove residency**: each market's data in its region, with evidence
 - [ ] **Embed LTV** in signed documents, so revocation info and timestamps travel with them
 - [ ] **Schedule trust-store reviews**: browsers patch themselves; `STRUST` and runtimes don't
+- [ ] **Subscribe to vulnerability briefings**: the [Zero Wire RSS feed](https://radar.cloudflare.com/security/zero-wire/rss) for runtimes and libraries; patch the software, and treat a WAF rule as cover until you do
 - [ ] **Rehearse a breach**: revoke a key, replay the queue and produce the timeline within GDPR's 72 hours
 - [ ] **Close external access at contract end**: only after the export is verified
 
@@ -521,6 +538,7 @@ The cutover is done when every key has an issuer you chose, every action has a g
 - [Entitlement security](https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html)
 - [Hydrogen or bespoke stack](https://persephonepunch.github.io/crm-sync-setup/hydrogen-or-bespoke-stack.html)
 - [AI cross-border requirements checklist](https://persephonepunch.github.io/crm-sync-setup/ai-cross-border-requirements-checklist.html)
+- [Cloudflare Radar Zero Wire](https://radar.cloudflare.com/security/zero-wire) and its [launch post](https://blog.cloudflare.com/zero-wire/)
 - [Chatbot preview](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com) and [curated knowledge base feed](https://omenphase1-1.webflow.io/knowledge-base-search)
 
-*Patterns, not claims about any firm. eMudhra incident details per The Hacker News and Help Net Security, October 2026. Country rules summarised; not legal advice.*
+*Patterns, not claims about any firm. eMudhra incident details per The Hacker News and Help Net Security, October 2026. Zero Wire details per Cloudflare's launch post and changelog, 3 November 2026. Country rules summarised; not legal advice.*
