@@ -33,6 +33,18 @@ about:
 
 **Companion reading:** the reference doc [CRM Sync — Firmware, SBOM & the Cyber Resilience Act](./firmware-sbom-cra.html), the identifier plan [Product Taxonomy, GraphQL and the GID Rename — CPG Planning for Sunrise 2027](./sunrise-2027-identifier-thread.html), and the screen-by-screen deck [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
 
+> **SBOM Registry: a current parts list for every app release.** A Software Bill of Materials (SBOM) lists every component and version in a build. The [SBOM Registry](https://www.crm-sync.dev/products/sbom-registry) builds one for you:
+>
+> - **Generated on every release**: a CycloneDX SBOM straight from your lockfile, pushed from CI with its own key, so it can't drift out of date.
+> - **One address per version**: registry-served and content-addressed (the ETag is the SHA-256), so whoever you share it with can check they hold the exact document.
+> - **Scanned for known vulnerabilities**: checked in place, and ready for Grype or Dependency-Track.
+> - **Private by default**: shown to authorities or customers on request, not posted for attackers.
+>
+> The CRA assumes an evidence chain, and the SBOM is its first link: the registry keeps that link current by construction.
+
+<a class="doc-button" href="https://www.crm-sync.dev/products/sbom-registry" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Get the SBOM Registry: a CycloneDX SBOM for every release →</a>
+
+
 ---
 
 Firmware distribution today is usually a signed installer behind a storage link. A URL that, once shared, is shared forever — with no record of who fetched it, when, or under what authority.

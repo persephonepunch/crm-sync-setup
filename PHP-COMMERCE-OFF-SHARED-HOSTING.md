@@ -91,6 +91,18 @@ citation:
 > Shopify and Google have been raising these requirements since 2022. Most of the deadlines have
 > passed; what remains is enforcement — delisting, blocked installs and lost ad eligibility.
 
+> **SBOM Registry: a current parts list for every app release.** A Software Bill of Materials (SBOM) lists every component and version in a build. The [SBOM Registry](https://www.crm-sync.dev/products/sbom-registry) builds one for you:
+>
+> - **Generated on every release**: a CycloneDX SBOM straight from your lockfile, pushed from CI with its own key, so it can't drift out of date.
+> - **One address per version**: registry-served and content-addressed (the ETag is the SHA-256), so whoever you share it with can check they hold the exact document.
+> - **Scanned for known vulnerabilities**: checked in place, and ready for Grype or Dependency-Track.
+> - **Private by default**: shown to authorities or customers on request, not posted for attackers.
+>
+> For a PHP store it lists every package your lockfile pins, so a plugin or library advisory becomes a lookup, not an audit.
+
+<a class="doc-button" href="https://www.crm-sync.dev/products/sbom-registry" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Get the SBOM Registry: a CycloneDX SBOM for every release →</a>
+
+
 **Who this is for:** merchants, agencies and app developers running WordPress and WooCommerce,
 Magento or Adobe Commerce, or PHP-backed Shopify apps — loyalty, upsell, product options,
 wishlists — on shared or single-VM hosting.

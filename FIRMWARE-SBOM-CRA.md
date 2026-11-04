@@ -35,6 +35,18 @@ about:
 **Companion surfaces:** the live [Protected Firmware service](https://www.crm-sync.dev/pages/firmware) and the [Compliance QA checklist + SBOM registry](https://compliance.crm-sync.dev).
 **Companion reading:** the article [Your Firmware Is a URL — the CRA Assumes an Evidence Chain](./cra-evidence-chain.html) and the screen-by-screen deck [Entitlement for Composable AI (PDF)](./entitlement-for-composable-ai.pdf).
 
+> **SBOM Registry: a current parts list for every app release.** A Software Bill of Materials (SBOM) lists every component and version in a build. The [SBOM Registry](https://www.crm-sync.dev/products/sbom-registry) builds one for you:
+>
+> - **Generated on every release**: a CycloneDX SBOM straight from your lockfile, pushed from CI with its own key, so it can't drift out of date.
+> - **One address per version**: registry-served and content-addressed (the ETag is the SHA-256), so whoever you share it with can check they hold the exact document.
+> - **Scanned for known vulnerabilities**: checked in place, and ready for Grype or Dependency-Track.
+> - **Private by default**: shown to authorities or customers on request, not posted for attackers.
+>
+> The Cyber Resilience Act expects an SBOM that stays current for every product; this is the app half of the evidence chain this document describes.
+
+<a class="doc-button" href="https://www.crm-sync.dev/products/sbom-registry" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Get the SBOM Registry: a CycloneDX SBOM for every release →</a>
+
+
 This document answers three questions in plain terms — *what is an SBOM*, *what is firmware vaulting*, and *what does the Cyber Resilience Act actually require* — then defines every term the product uses.
 
 ---

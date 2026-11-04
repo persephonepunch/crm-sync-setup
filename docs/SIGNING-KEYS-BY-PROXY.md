@@ -26,6 +26,18 @@ tags:
 
 Every signature answers two questions: *who issued the key*, and *who granted the signer the right to use it*. When a consultancy, a plugin or a platform signs on your behalf with a certificate authority (CA) you never chose, you inherit that CA by proxy: its trust, its revocation service, its jurisdiction, and its failures. October 2026 showed what that costs when the CA is distrusted. This article sets out when you use a CA by proxy, what locks out when its chain breaks, how ECC/SAP signing fits, what each market requires, and how to build a Globalization MVP security first, with a cutover checklist to get there.
 
+> **SBOM Registry: a current parts list for every app release.** A Software Bill of Materials (SBOM) lists every component and version in a build. The [SBOM Registry](https://www.crm-sync.dev/products/sbom-registry) builds one for you:
+>
+> - **Generated on every release**: a CycloneDX SBOM straight from your lockfile, pushed from CI with its own key, so it can't drift out of date.
+> - **One address per version**: registry-served and content-addressed (the ETag is the SHA-256), so whoever you share it with can check they hold the exact document.
+> - **Scanned for known vulnerabilities**: checked in place, and ready for Grype or Dependency-Track.
+> - **Private by default**: shown to authorities or customers on request, not posted for attackers.
+>
+> It is the *Find* step of [remediation](#assume-the-next-breach-randomise-then-remediate-fast): when a Zero Wire briefing or a KEV entry lands, you look up which releases carry the component instead of auditing every system.
+
+<a class="doc-button" href="https://www.crm-sync.dev/products/sbom-registry" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Get the SBOM Registry: a CycloneDX SBOM for every release →</a>
+
+
 ## What are signing keys, and where are they used?
 
 A signing key is a business's digital seal. It comes in two halves. The **private key** stays with whoever signs, like the stamp locked in a notary's drawer. The **public key** is shared with everyone, so anyone can check that a stamp is genuine without asking the signer. A valid signature proves two things: **who** signed, and that **nothing changed** after they signed. Change one character of a signed contract, firmware file or code release and the check fails.
@@ -297,7 +309,7 @@ NetScaler won't be the last appliance, and October's CA keys weren't the last we
 
 | Step | What it needs | Xano's role |
 |---|---|---|
-| **Find** what's affected | An SBOM per release and a certificate inventory, matched against the [Zero Wire feed](https://radar.cloudflare.com/security/zero-wire/rss) and CISA KEV | Which devices, services and tenants run which version and key |
+| **Find** what's affected | An [SBOM per release](https://www.crm-sync.dev/products/sbom-registry) and a certificate inventory, matched against the [Zero Wire feed](https://radar.cloudflare.com/security/zero-wire/rss) and CISA KEV | Which devices, services and tenants run which version and key |
 | **Contain** at the edge | A WAF rule or Access policy, and the kill switch on the release gate | The refusal written to the ledger, so containment is evidence too |
 | **Patch** with a way back | Signed builds, staged rollout, roll back by route | Release record: what went where, signed by whom |
 | **End sessions** | Every session and token issued before the patch revoked; patching doesn't end them | Grants checked live, so a revoked grant stops at once |
@@ -565,7 +577,7 @@ Move AI onto keys you own and grants you can revoke, without a lockout: inventor
 - [ ] **Secure the exit before the contract ends**: export the knowledge base, prompts, labelled data and adapters, and confirm the export opens
 - [ ] **Find writes around the gate**: plugins with hard-coded upserts, or running without memory safety
 - [ ] **List perimeter appliances**: gateways, VPNs and load balancers (NetScaler and the like), what each decrypts, and which device keys it holds
-- [ ] **Check build hardening**: PIE, stack protection and FORTIFY on the C and C++ you keep; an SBOM for every release
+- [ ] **Check build hardening**: PIE, stack protection and FORTIFY on the C and C++ you keep; an [SBOM for every release](https://www.crm-sync.dev/products/sbom-registry)
 
 ### Cutover window: switch
 

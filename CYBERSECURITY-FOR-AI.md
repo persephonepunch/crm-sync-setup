@@ -37,6 +37,18 @@ citation:
 
 ---
 
+> **SBOM Registry: a current parts list for every app release.** A Software Bill of Materials (SBOM) lists every component and version in a build. The [SBOM Registry](https://www.crm-sync.dev/products/sbom-registry) builds one for you:
+>
+> - **Generated on every release**: a CycloneDX SBOM straight from your lockfile, pushed from CI with its own key, so it can't drift out of date.
+> - **One address per version**: registry-served and content-addressed (the ETag is the SHA-256), so whoever you share it with can check they hold the exact document.
+> - **Scanned for known vulnerabilities**: checked in place, and ready for Grype or Dependency-Track.
+> - **Private by default**: shown to authorities or customers on request, not posted for attackers.
+>
+> When an agent ships code, the SBOM is how the CISO, CTO and DPO see what went out: one current document per release.
+
+<a class="doc-button" href="https://www.crm-sync.dev/products/sbom-registry" style="display:inline-block;background:#0a0a0a;color:#fff;padding:12px 20px;text-decoration:none;font-weight:600;border-radius:0">Get the SBOM Registry: a CycloneDX SBOM for every release →</a>
+
+
 ## What's at stake — and why now
 
 "This isn't how we did it last year" is exactly right. The playbook changed under everyone's feet, on three fronts at once:
