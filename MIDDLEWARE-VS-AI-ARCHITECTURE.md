@@ -3,7 +3,7 @@ title: "Middleware vs AI Architecture"
 description: "Why a Xano record plus a Cloudflare edge resolves identifier and consent drift that VM-hosted middleware cannot, what a GTIN check digit proves, and where cryptographic trust sits in a Channel Publish QR link."
 canonical: https://persephonepunch.github.io/crm-sync-setup/middleware-vs-ai-architecture.html
 category: "Specs"
-date: 2026-10-17
+date: 2026-11-04
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/MIDDLEWARE-VS-AI-ARCHITECTURE.md
 licence: CC-BY-4.0
 tags:
@@ -250,6 +250,50 @@ translating them again.
 | **ERP and warehouse** | Native connectors, usually the VM's strength. | A configurable projection channel to your ingestion endpoint (for example SAP S/4HANA OData). No warehouse naming map exists yet. | Partial | `index.ts:60413` |
 | **Credentials** | The VM holds standing credentials to every connected system — one breach reaches all of them. | Each destination's credential is scoped to that destination; permissions are rows, revocable one at a time. | Built | `verifyBearerOrTenantToken` — platform key, then revocable tenant-scoped tokens |
 | **Failure seen from outside** | A job that 200s with a stale consent value looks the same as a correct one. | A refusal is a ledger row with a reason. A boundary that is unreachable refuses — it does not wave payloads through. | Built | Fail-closed rule, `release-gate.ts` |
+
+### Comparison map: batch files vs one record behind an API
+
+The same data can move two ways. On the batch path, SAP ECC exports a CSV, Matrixify bulk-imports it into Shopify, a copy lands in Airtable, and GA4 exports to BigQuery where SQL joins it to CRM data later. Each step makes a copy, and each copy can be the one someone trusts. On the event path, each change is one event: a Cloudflare Worker checks it at the edge, D1 holds a derived queue or read model, Xano Postgres is the record behind a documented API, and every consumer reads from that API.
+
+![Comparison map: SAP ECC, CSV, Matrixify, Airtable and GA4 to BigQuery SQL loads, against a Cloudflare Worker, D1, Xano Postgres with a Swagger/OpenAPI API, and consumers by API; with hosting on the edge, VM-Docker or Kubernetes, and a matrix comparing the two paths](https://persephonepunch.github.io/crm-sync-setup/assets/batch-vs-api-comparison-map.svg)
+
+| Dimension | Batch and file (ECC → CSV → Matrixify, Airtable, GA4 → BigQuery) | Event and API (Workers + D1 → Xano Postgres) |
+|---|---|---|
+| **Unit moved** | A file of rows | One signed event |
+| **Latency** | 15 minutes to a day | Seconds |
+| **Contract** | Column headers | An OpenAPI (Swagger) schema per endpoint |
+| **Source of truth** | Whichever copy loaded last | Xano Postgres; D1 and every other copy derived and reconciled |
+| **Consent** | Lost in the export | Travels with the event, checked at the gate |
+| **Retry** | A re-import duplicates or overwrites | An idempotency key makes a retry safe |
+| **Deletion (DSR)** | Chase every file, base and table | Delete once, with a receipt from each consumer |
+| **Audit** | File names and job logs | Append-only ledger |
+| **Credential** | Airtable token: a bearer key to whole bases | Xano token: an encrypted, expiring identity; access decided per endpoint |
+| **Rate ceiling** | Airtable: 5 requests per second per base | Xano paid plans: no platform limit; your instance and your edge set it |
+| **Runs on** | Desktop exports, SaaS import jobs, scheduled SQL | Workers and D1 at the edge; Xano cloud, or self-hosted on a VM with Docker or on Kubernetes |
+
+The batch tools stay useful: Matrixify for a one-off migration, Airtable or Sheets as a view, BigQuery for analysis. The difference is which copy is the record.
+
+### Airtable vs Xano: keys and rate ceilings
+
+**The key is the point of difference.** An Airtable personal access token is a bearer secret: whoever holds it acts as the user, on every base and table the token's scopes and base list allow, and it doesn't expire by default, so it lasts until someone revokes it. (Airtable retired the older account-wide API keys in February 2024; OAuth integrations get short-lived access tokens with refresh tokens.) There is no per-record decision in between: if the token can read the table, it reads every row. A token pasted into a script, an automation or a no-code tool is a copy of the key to the whole base.
+
+A Xano authentication token is different in kind. It is a JWE, an encrypted token created by the workspace's own secret, so the client can't read or alter what's inside, and it carries an expiry you set. The token only says *who* is calling. Each endpoint then decides *what* they may do, in its own function stack: check the grant, the consent and the market at the system of record, and refuse otherwise. The secret that mints tokens stays in Xano, or in your own region if Xano is self-hosted, and is never handed to a client or a plugin.
+
+| | Airtable | Xano |
+|---|---|---|
+| **Credential** | Personal access token (scoped to bases and actions) or OAuth | JWE authentication token from the workspace secret; separate scoped tokens for the Metadata API |
+| **What holding it means** | Access to every record the scopes allow | An identity; each endpoint decides access per call |
+| **Expiry** | None by default for personal tokens; revoke by hand | Set when the token is created (an hour to a day is typical) |
+| **Row-level decisions** | Not in the API: access is per base and table | In the endpoint logic: grant, consent and market checked per record |
+| **Where the signing secret lives** | With Airtable | With Xano, or in your own region when self-hosted |
+| **Rate ceiling** | 5 requests per second per base; 50 per second across one user's tokens; a 429 then a 30-second wait | Free plan: 10 requests per 20 seconds. Paid plans: no platform-enforced limit |
+| **Monthly cap** | Free: 1,000 API calls; Team: 100,000; Business and Enterprise: none (per Airtable support) | None on paid plans |
+| **Write throughput** | Up to 10 records per create or update request, so about 50 records per second per base | Bounded by your instance's compute and database, not a quota |
+| **Who sets your limit** | Airtable | You: Xano's Redis *Rate Limit* function on dedicated plans, or Cloudflare rate-limiting rules at the edge |
+
+**What the ceiling means in practice.** At 5 requests per second, with 10 records per request, one Airtable base takes about 50 record writes per second at most, roughly 180,000 an hour if nothing else touches it. A catalogue sync, a webhook burst after a sale, or an agent retrying will hit the 429, and every request then fails for 30 seconds. That makes Airtable a good view of the data and a poor place to put it first. Xano on a paid plan has no platform quota, so the ceiling is the instance you pay for. Set your own limit deliberately, per tenant and per endpoint, at the Cloudflare edge before traffic reaches Xano, so a runaway agent is refused at the edge rather than slowing the record for everyone.
+
+Sources: [Airtable rate limits](https://airtable.com/developers/web/api/rate-limits), [Airtable API call limits](https://support.airtable.com/docs/en/managing-api-call-limits-in-airtable), [Xano API rate limit](https://docs.xano.com/api-rate-limit), [Xano Rate Limit function](https://docs.xano.com/working-with-data/functions/data-caching/rate-limit), [Xano: stateless authentication with JWE and JWS](https://www.xano.com/learn/stateless-authentication-xano-jwe-jws/). Limits as published on 4 November 2026; both vendors can change them.
 
 ### AI in the architecture: bindings and functions vs. bought middleware
 

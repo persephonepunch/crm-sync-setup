@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="1021" viewBox="-5 -5 1510 1021">
+<rect id="background" x="-5" y="-5" width="1510" height="1021" fill="#fff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="header">
+<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">Comparison map: batch files vs one record behind an API</text>
+<text x="37" y="80" font-family="Arial" font-size="14" fill="#222" text-anchor="start">Same data, two paths: SAP ECC, CSV, Matrixify, Airtable and GA4 to BigQuery SQL loads, against Cloudflare Workers and D1 with Xano Postgres behind a documented API.</text>
+</g>
+<g id="lane-batch">
+<text x="37" y="130" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Batch and file path</text>
+<rect x="231.6" y="115" width="146.4" height="20" rx="10" fill="#111"/>
+<text x="304.8" y="129" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">COPIES THAT DRIFT</text>
+<g id="lane-batch-node-1">
+<rect x="37.0" y="148" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="174" font-family="Arial" font-size="16" fill="#000" text-anchor="start">SAP ECC</text>
+<text x="51.0" y="198" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Export: CSV, IDoc or flat file</text>
+<text x="51.0" y="217" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Batch: 15 minutes to nightly</text>
+<text x="51.0" y="236" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Staff run or schedule it</text>
+</g>
+<line x1="291.0" y1="204.0" x2="330.5" y2="204.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-batch-node-2">
+<rect x="334.5" y="148" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="348.5" y="174" font-family="Arial" font-size="16" fill="#000" text-anchor="start">CSV file</text>
+<text x="348.5" y="198" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Column headers, not a schema</text>
+<text x="348.5" y="217" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">No consent, no signature</text>
+<text x="348.5" y="236" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Emailed, shared, copied</text>
+</g>
+<line x1="588.5" y1="204.0" x2="628.0" y2="204.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-batch-node-3">
+<rect x="632.0" y="148" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="646.0" y="174" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Matrixify → Shopify</text>
+<text x="646.0" y="198" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Bulk import job</text>
+<text x="646.0" y="217" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Overwrites what's there</text>
+<text x="646.0" y="236" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Re-run means re-apply</text>
+</g>
+<line x1="886.0" y1="204.0" x2="925.5" y2="204.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-batch-node-4">
+<rect x="929.5" y="148" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="943.5" y="174" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Airtable</text>
+<text x="943.5" y="198" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">CSV import into a base</text>
+<text x="943.5" y="217" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Another copy to keep in sync</text>
+<text x="943.5" y="236" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Edits don't flow back</text>
+</g>
+<line x1="1183.5" y1="204.0" x2="1223.0" y2="204.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-batch-node-5">
+<rect x="1227.0" y="148" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1241.0" y="174" font-family="Arial" font-size="16" fill="#000" text-anchor="start">GA4 → BigQuery</text>
+<text x="1241.0" y="198" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Daily or streaming export</text>
+<text x="1241.0" y="217" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">SQL loads, scheduled queries</text>
+<text x="1241.0" y="236" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Joined to CRM data later</text>
+</g>
+<text x="37" y="288" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Where it breaks: each copy drifts · a deletion is chased through every file, base and table · a re-import duplicates or overwrites · PII sits in files outside any gate</text>
+</g>
+<g id="lane-api">
+<text x="37" y="346" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Event and API path</text>
+<rect x="222.2" y="331" width="182.4" height="20" rx="10" fill="#111"/>
+<text x="313.40000000000003" y="345" font-family="Arial" font-size="10.5" fill="#fff" text-anchor="middle" letter-spacing="0.3">ONE RECORD, MANY VIEWS</text>
+<g id="lane-api-node-1">
+<rect x="37.0" y="364" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="51.0" y="390" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Event</text>
+<text x="51.0" y="414" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">ECC change, Shopify webhook,</text>
+<text x="51.0" y="433" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">form or agent action</text>
+<text x="51.0" y="452" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Idempotency key + consent</text>
+</g>
+<line x1="291.0" y1="420.0" x2="330.5" y2="420.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-api-node-2">
+<rect x="334.5" y="364" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="348.5" y="390" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Cloudflare Worker</text>
+<text x="348.5" y="414" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Edge: helmet, consent read</text>
+<text x="348.5" y="433" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Verify signature, typed parse</text>
+<text x="348.5" y="452" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Rust/Wasm or TypeScript</text>
+</g>
+<line x1="588.5" y1="420.0" x2="628.0" y2="420.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-api-node-3">
+<rect x="632.0" y="364" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="646.0" y="390" font-family="Arial" font-size="16" fill="#000" text-anchor="start">D1 (edge SQLite)</text>
+<text x="646.0" y="414" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Queue, cache, read model</text>
+<text x="646.0" y="433" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Derived, never the record</text>
+<text x="646.0" y="452" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Reconciled against Xano</text>
+</g>
+<line x1="886.0" y1="420.0" x2="925.5" y2="420.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-api-node-4">
+<rect x="929.5" y="364" width="250" height="112" rx="6" fill="#fff" stroke="#f22468" stroke-width="3"/>
+<text x="943.5" y="390" font-family="Arial" font-size="16" fill="#d01a57" text-anchor="start">Xano Postgres</text>
+<text x="943.5" y="414" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">System of record + ledger</text>
+<text x="943.5" y="433" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">REST API with Swagger/OpenAPI</text>
+<text x="943.5" y="452" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Grants, consent, residency</text>
+</g>
+<line x1="1183.5" y1="420.0" x2="1223.0" y2="420.0" stroke="#111" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g id="lane-api-node-5">
+<rect x="1227.0" y="364" width="250" height="112" rx="6" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="1241.0" y="390" font-family="Arial" font-size="16" fill="#000" text-anchor="start">Consumers by API</text>
+<text x="1241.0" y="414" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Shopify Admin GraphQL</text>
+<text x="1241.0" y="433" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">GA4 MP, BigQuery (consented)</text>
+<text x="1241.0" y="452" font-family="Arial" font-size="12.5" fill="#333" text-anchor="start">Airtable or Sheets as a view</text>
+</g>
+<text x="37" y="504" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">Why it holds: one record, every copy derived and reconciled · delete once, with a receipt from each consumer · retries are safe · data leaves only through the gate</text>
+</g>
+<g id="hosting">
+<rect x="37" y="526" width="1426" height="40" rx="6" fill="#f5f5f5"/>
+<text x="53" y="551" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Runs on:  Workers + D1 on Cloudflare's edge  ·  Xano on Xano cloud, or self-hosted on a VM with Docker or on Kubernetes, in the region each market requires</text>
+</g>
+<g id="matrix">
+<g id="matrix-header">
+<rect x="37" y="604" width="230" height="32" fill="#111"/>
+<text x="51" y="625" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Dimension</text>
+<rect x="267" y="604" width="598" height="32" fill="#111"/>
+<text x="281" y="625" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Batch and file</text>
+<rect x="865" y="604" width="598" height="32" fill="#111"/>
+<text x="879" y="625" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Event and API</text>
+<rect x="865" y="600" width="598" height="4" fill="#f22468"/>
+</g>
+<g id="matrix-row-1">
+<rect x="37" y="636" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="656" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Unit moved</text>
+<text x="281" y="656" font-family="Arial" font-size="13" fill="#333" text-anchor="start">A file of rows</text>
+<text x="879" y="656" font-family="Arial" font-size="13" fill="#000" text-anchor="start">One signed event</text>
+</g>
+<g id="matrix-row-2">
+<text x="51" y="686" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Latency</text>
+<text x="281" y="686" font-family="Arial" font-size="13" fill="#333" text-anchor="start">15 minutes to a day</text>
+<text x="879" y="686" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Seconds</text>
+</g>
+<g id="matrix-row-3">
+<rect x="37" y="696" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="716" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Contract</text>
+<text x="281" y="716" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Column headers</text>
+<text x="879" y="716" font-family="Arial" font-size="13" fill="#000" text-anchor="start">OpenAPI (Swagger) schema per endpoint</text>
+</g>
+<g id="matrix-row-4">
+<text x="51" y="746" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Source of truth</text>
+<text x="281" y="746" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Whichever copy loaded last</text>
+<text x="879" y="746" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Xano Postgres; D1 and every other copy derived</text>
+</g>
+<g id="matrix-row-5">
+<rect x="37" y="756" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="776" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Consent</text>
+<text x="281" y="776" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Lost in the export</text>
+<text x="879" y="776" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Travels with the event, checked at the gate</text>
+</g>
+<g id="matrix-row-6">
+<text x="51" y="806" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Retry</text>
+<text x="281" y="806" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Re-import duplicates or overwrites</text>
+<text x="879" y="806" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Idempotency key: a retry is safe</text>
+</g>
+<g id="matrix-row-7">
+<rect x="37" y="816" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="836" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Deletion (DSR)</text>
+<text x="281" y="836" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Chase every file, base and table</text>
+<text x="879" y="836" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Delete once; a receipt from each consumer</text>
+</g>
+<g id="matrix-row-8">
+<text x="51" y="866" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Audit</text>
+<text x="281" y="866" font-family="Arial" font-size="13" fill="#333" text-anchor="start">File names and job logs</text>
+<text x="879" y="866" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Append-only ledger</text>
+</g>
+<g id="matrix-row-9">
+<rect x="37" y="876" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="896" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Credential</text>
+<text x="281" y="896" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Airtable token: a bearer key to whole bases, no expiry by default</text>
+<text x="879" y="896" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Xano token: encrypted (JWE), expiring identity; access decided per endpoint</text>
+</g>
+<g id="matrix-row-10">
+<text x="51" y="926" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Rate ceiling</text>
+<text x="281" y="926" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Airtable: 5 req/s per base, 429 then a 30 s wait</text>
+<text x="879" y="926" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Xano paid plans: no platform limit; your instance and your edge set it</text>
+</g>
+<g id="matrix-row-11">
+<rect x="37" y="936" width="1426" height="30" fill="#fafafa"/>
+<text x="51" y="956" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Runs on</text>
+<text x="281" y="956" font-family="Arial" font-size="13" fill="#333" text-anchor="start">Desktop exports, SaaS import jobs, scheduled SQL</text>
+<text x="879" y="956" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Workers + D1 at the edge; Xano cloud, VM-Docker or Kubernetes</text>
+</g>
+<line x1="37" y1="966" x2="1463" y2="966" stroke="#111" stroke-width="1"/>
+</g>
+<g id="footer">
+<text x="37" y="996" font-family="Arial" font-size="12" fill="#555" text-anchor="start">Batch tools stay useful as views and one-off loads; the difference is which copy is the record. CRM Sync · Middleware vs AI Architecture</text>
+</g>
+</svg>
