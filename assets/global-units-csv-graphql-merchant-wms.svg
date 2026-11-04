@@ -2,7 +2,7 @@
 <rect id="background" x="-5" y="-5" width="1510" height="913" fill="#fff"/>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
 <g id="header">
-<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">One measurement, every market: product.csv to GraphQL, Merchant and the WMS</text>
+<text x="37" y="52" font-family="Arial" font-size="30" fill="#000" text-anchor="start">Globalization, GA4, SAP, Shopify + Vertex AI LLM Audience weighting</text>
 <text x="37" y="80" font-family="Arial" font-size="14" fill="#222" text-anchor="start">Weight, length, volume and distance kept once in SI with UN/ECE codes, converted exactly, and shown in each market's units only at the edge.</text>
 </g>
 <g id="column-headers">

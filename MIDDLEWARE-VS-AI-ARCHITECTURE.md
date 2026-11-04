@@ -377,11 +377,11 @@ These are patterns, not claims about any vendor: each tool does real work, and t
 
 More on how it works: [PIM Sync on crm-sync.dev](https://www.crm-sync.dev/pages/pim-sync).
 
-### One measurement, every market: units from product.csv to the WMS
+### Globalization, GA4, SAP, Shopify + Vertex AI LLM Audience weighting
 
 Going global changes the numbers as well as the words. A product's weight, dimensions, volume and the distances it travels have to mean the same thing in the ECC record, the storefront, Google Merchant Center and the warehouse, in every market. product.csv carries almost none of it: `Variant Grams` and a display `Variant Weight Unit`, and no dimensions, volume or distance at all.
 
-![One measurement, every market: weight, length, volume, distance and GTINs with parents, from ECC through product.csv, the Xano record, Shopify GraphQL and the Merchant API to the WMS; with the load order from consent to BigQuery and Vertex AI, and the rules that make it global](https://persephonepunch.github.io/crm-sync-setup/assets/global-units-csv-graphql-merchant-wms.svg)
+![Globalization, GA4, SAP, Shopify + Vertex AI LLM Audience weighting: weight, length, volume, distance and GTINs with parents, from ECC through product.csv, the Xano record, Shopify GraphQL and the Merchant API to the WMS; with the load order from consent to BigQuery and Vertex AI, and the rules that make it global](https://persephonepunch.github.io/crm-sync-setup/assets/global-units-csv-graphql-merchant-wms.svg)
 
 | Measure | ECC (SAP T006) | product.csv | Xano record | Shopify GraphQL | Merchant API JSON | WMS |
 |---|---|---|---|---|---|---|
