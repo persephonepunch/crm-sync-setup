@@ -399,7 +399,15 @@ Going global changes the numbers as well as the words. A product's weight, dimen
 4. **Each market is projected**: ISO 4217 currency, language (`contentLanguage`, ISO 639), units and rounding for that destination.
 5. **Channels** receive their projection: Shopify, the Merchant API, the WMS.
 6. **BigQuery and Vertex AI load after the channels**: audiences are built by location, and LLM weighting, embeddings and ranking use the language model for that locale, on consented rows only, deduplicated by the same idempotency key, so a retry never counts or weights a product twice.
-7. **The TypeScript event loader runs last**: once consent, the record and the audience's locale are known, the page's script loads and its events carry the right market, language and currency.
+7. **Jev weighting loads last, in TypeScript**: once consent, the record and the audience's locale are known, the decision model runs with the locale, market and currency passed in.
+
+**Jev loads too early.** [Jev](https://vercel.com/kb/jev-from-typesafe-ai), from TypeSafe AI, is a decision model: instead of writing text it returns typed choices, scores and probabilities, fast enough to weight options while a page loads. It is called from TypeScript, through the AI SDK and Vercel AI Gateway, Cloudflare Workers AI or TypeSafe's own SDK. That speed is the risk for global commerce. Imported at page start, it weights products, offers or routes before consent is read, before the market is projected and before the audience's locale is known, so it scores whatever context it was given, which is usually the English default copy. An APAC shopper's options get weighted in English. The fix is ordering, not a different model:
+
+- **Load it after steps 1 to 6.** Import the TypeScript only once consent, the idempotency key, the record, the market projection and the audience are settled.
+- **Pass the locale in.** Language (BCP 47), market, currency and units go into the context, with the copy in that language: translated with `m2m100`, or matched with `bge-m3`.
+- **No English fallback.** If the locale is unknown, fall back to the market's language, or make no decision, rather than deciding in English.
+- **No personal data in the context.** Product content and consented signals only.
+- **Record the decision.** Log each weighting with the same idempotency key, so a retry doesn't decide twice and BigQuery can audit it.
 
 **Not English by default.** The language model is chosen by locale, like the currency and the units, and the same rules apply to the AI strategy as to the data. A model trained mostly on English quietly degrades Korean, Japanese, Chinese, Thai or Vietnamese search and copy, and pivoting every translation through English loses meaning twice. For APAC in particular:
 
@@ -419,8 +427,8 @@ The guardrails don't change with the model: product content goes in, personal da
 - **Round only at the projection**, to what each destination accepts: Merchant takes up to 4 decimals and `in` or `cm`; Shopify takes its own units.
 - **Let the market choose the display**: `feedLabel` and `contentLanguage`, with ISO 3166 country, ISO 639 language and ISO 4217 currency.
 - **Keep GTINs and parents structured**: arrays and links, not a barcode cell and a parent flag.
-- **Load analytics and scripts last**: BigQuery and Vertex AI read consented, deduplicated rows after the record and the channels; the TypeScript event loader runs after them.
-- **Not English by default**: choose the language model by locale; for APAC, `bge-m3` for multilingual embeddings and `m2m100` for direct translation.
+- **Load analytics and weighting last**: BigQuery and Vertex AI read consented, deduplicated rows after the record and the channels; Jev weighting in TypeScript loads after them, with the locale passed in.
+- **Not English by default, and no English fallback**: choose the language model by locale; for APAC, `bge-m3` for multilingual embeddings and `m2m100` for direct translation.
 - **Keep pack levels apart**: each, case and pallet each carry their own weight, dimensions, volume and GTIN, so the WMS and the feed agree.
 
 Field names and unit lists are examples: check your SAP release, Shopify's metafield types and Google's [product data specification](https://support.google.com/merchants/answer/7052112).

@@ -190,8 +190,8 @@
 </g>
 <g id="load-step-7">
 <rect x="1271.3" y="548" width="191.7" height="50" fill="#fff" stroke="#f22468" stroke-width="2"/>
-<text x="1281.2857142857142" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">7 · TypeScript loader</text>
-<text x="1281.2857142857142" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">events load last, in locale</text>
+<text x="1281.2857142857142" y="569" font-family="Arial" font-size="13.5" fill="#d01a57" text-anchor="start">7 · Jev weighting (TS)</text>
+<text x="1281.2857142857142" y="587" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">last, with locale passed in</text>
 </g>
 </g>
 <g id="rules">
@@ -209,9 +209,9 @@
 <rect x="37" y="774" width="7" height="7" fill="#f22468"/>
 <text x="54" y="783" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">GTINs and parents aren't CSV-shaped: gtins is an array, variants nest (productSet) or share an itemGroupId (Merchant), and packs link child to parent</text>
 <rect x="37" y="797" width="7" height="7" fill="#f22468"/>
-<text x="54" y="806" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">BigQuery and Vertex AI load after the channels: consented rows only, deduplicated by the idempotency key; the TypeScript event loader runs last</text>
+<text x="54" y="806" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">BigQuery and Vertex AI load after the channels on consented, deduplicated rows; Jev weighting in TypeScript loads last, with the locale</text>
 <rect x="37" y="820" width="7" height="7" fill="#f22468"/>
-<text x="54" y="829" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Not English by default: choose the language model by locale; for APAC, bge-m3 multilingual embeddings and m2m100 direct translation</text>
+<text x="54" y="829" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Not English by default: no English fallback; choose the model by locale, and for APAC use bge-m3 embeddings and m2m100 translation</text>
 <rect x="37" y="843" width="7" height="7" fill="#f22468"/>
 <text x="54" y="852" font-family="Arial" font-size="13.5" fill="#000" text-anchor="start">Keep pack levels apart: each, case and pallet each carry weight, dimensions, volume and their own GTIN, so the WMS and the feed agree</text>
 </g>
