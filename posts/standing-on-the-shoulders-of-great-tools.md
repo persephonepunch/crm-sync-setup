@@ -50,9 +50,34 @@ PIM Sync answers a different question: which model should touch this merchant's 
 - **What the model may see.** A gateway passes along whatever the app sends. Here, data reaches a model only after the permission checks have run.
 - **Breadth.** Workers AI offers a smaller, open-model catalog. When a job needs a frontier model, Cloudflare AI Gateway can reach outside providers from the same Worker, with the same rules in front of it.
 
+[How does PIM Sync handle model weight and regional LLMs?](https://www.crm-sync.dev/pages/pim-sync#features-translation-models)
+
+![PIM Sync Translation models screen: Japanese and Korean each have four steps (reuse a reviewed translation, m2m100-1.2B, Qwen3 30B, keep English), a minimum bge-m3 quality score of 0.75 for each machine model, on switches, move up and down buttons, and a Save ladder button.](https://crm-sync.dev/pim/translation-models.jpg)
+
 ## Knowledge base segments, with nested rules
 
+![Shopify admin, Content, Metaobjects, faq entries: each FAQ row published from CRM Sync carries its question, category, category key, slug and locale (en-US, en-GB), added by the UCP Purchase Agent app.](https://raw.githubusercontent.com/persephonepunch/crm-sync-setup/master/assets/faq-metaobjects-shopify.jpg)
+
+*CRM Sync, not PIM Sync: FAQ rows published to Shopify as metaobjects, each with its category key, slug and locale.*
+
 A knowledge base for AI is only safe if each answer comes from rows the asker may see. CRM Sync segments its knowledge base the way it segments customers: identity, then consent, then entitlement, then segments. FAQ and article rows carry segments and a locale, and a question only searches rows in the asker's segment and language, so a French answer never bleeds into an English one and a partner-only answer never reaches a shopper.
+
+![One knowledge base, four type structures, one backend: the same support article (FAQ, category, tags and PDF) as a Webflow Collection, a Shopify metaobject definition, a Rust struct and the Xano record each type it, with how each checks shape, handles a missing value, resolves references and keeps a private article private. Xano holds the record and the Cloudflare Worker decides what each function returns to the search page and the chatbot.](https://persephonepunch.github.io/crm-sync-setup/assets/kb-type-structures-rma-ladder.svg)
+
+See it working:
+
+- [Knowledge base search demo](https://omenphase1-1.webflow.io/knowledge-base-search)
+- [Chatbot proof of concept](https://crm.story-story.ai/preview?shop=hx-stage.myshopify.com) (a demo store: you will not be able to purchase)
+
+A global chatbot is where this gets hardest. One widget lives across several Shopify deployments, one per market, and a single conversation can cross a return (RMA), a currency change and a stock check. Each answer touches a different system of record: the ERP for the order and refund, the CRM for the customer and their consent, the WMS for stock and the return label, and the storefront for the price in the shopper's currency. Keeping that answer right, in the right language and currency, for the right market, is only manageable when every system is read through the same segments and rules, not wired to the widget one by one.
+
+LLM automation is what makes the fallbacks practical. Each answer has three ladders, tried in order, and says plainly when it stepped down one:
+
+- **Currency.** The price in the shopper's market currency, from that market's price list; if there is none, the store's base currency, labeled as such. The model never converts a price itself: the number always comes from the record.
+- **Measurement.** Sizes, weights and capacities in the shopper's units, from the product's own unit records; if a unit is missing, the source unit, shown as it is.
+- **Language.** A reviewed answer in the shopper's language; then a machine translation that passed the quality checks; then English, with a note that it is English.
+
+The model does the wording and the choosing. The records supply every number.
 
 The rules nest. A store's rules sit inside the platform's rules, a team's inside the store's, and an agent's inside the team's, so each level can narrow what the one above allows but never widen it. The same rules decide which tools an AI agent may call: a tool call is one more request, checked against the same entitlement claims before it reaches Xano.
 
@@ -101,6 +126,8 @@ Most developer tooling assumes a computer-science background: branches, migratio
 - **Concept.** Changes start as drafts beside the live version: a preview deployment, a Xano branch, a draft post, a machine translation waiting in the queue. The live store, page or catalog is untouched.
 - **Review.** Each change is shown as it will appear before it ships. Translations reach a store only once someone marks them reviewed, pages and posts have a preview, and every publish can run as a dry run first.
 - **Publish.** Only then does the change go live, and the version before it is kept, so going back is a step, not a repair.
+
+Review has to test what actually runs, not only how it is configured. In our own consent audit work in September 2026, we withdrew a headline finding after runtime testing disproved what the configuration seemed to show. A setting read on its own is a hypothesis; a test of what the page actually loads, and when, is the evidence. That is why consent load order is tested on every release, not checked once.
 
 Security and scaling come with the stack rather than being added afterwards. Keys stay server-side in Cloudflare and Xano, never in a browser or a content editor. Permission rules run before data reaches a page, a person or a model. Cloudflare runs the app wherever requests arrive, so there are no servers to size and no database migrations between a reviewed change and a published one.
 
