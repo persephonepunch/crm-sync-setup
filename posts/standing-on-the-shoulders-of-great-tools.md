@@ -13,6 +13,21 @@ Every app we ship is built on someone else's good ideas. PIM Sync is no exceptio
 - **Vite**, for a build that does exactly what the source says, in the order it says it.
 - **Gadget**, and **Webflow with Wized**, for showing how fast a data app can come together. They are still great ways to build one.
 
+## The same problem on Shopify
+
+Both ran into the same problem on Shopify, and it is not a flaw in either tool. Shopify's own documentation says its storefront content delivery network is "backed by Cloudflare" ([Shopify: performance on the platform](https://shopify.dev/docs/storefronts/themes/best-practices/performance/platform)). An app whose data lives on Google Cloud or Firebase works, but every Shopify call then crosses from one cloud to another, and moving e-commerce data that includes personal (PII) or payment (PCI) data between clouds gets harder each year.
+
+Two Shopify changes make it sharper:
+
+- **IP allowlists.** Shopify now requires public apps to call it from listed IP ranges, enforced from November 20, 2026. The allowlist takes IP addresses, not a network's ASN, so an app on a shared cloud has to keep its ranges current, and every other cloud in the path is one more list to keep.
+- **Short-lived tokens.** Offline access tokens that never expire are being retired; public apps still using them are delisted on January 1, 2027. Expiring tokens have to be refreshed and stored safely wherever the app runs, so each cloud that holds one is another place a token can leak or go stale.
+
+Keeping the app, its tokens and its data on Cloudflare and Xano, in the market the data belongs to, keeps that path short: one network that already sits in front of Shopify, and one data layer with a home region.
+
+A year ago the same cross-cloud path carried less risk. AI has made development faster, and it has made attacks faster too: the same tools that write an integration in an afternoon can probe one just as quickly. So when data crosses channels, from Shopify to an app, from one cloud to another, from a store to an agent, encryption is mandatory, not a setting, and the token timeline needs a strategy of its own: how long each token lives, where it is stored, who refreshes it and what happens when it expires.
+
+Many of the plugins we are used to adding will no longer be needed. When the data is modeled securely from the start, with every hop over TLS between Cloudflare and Xano, permission rules on the rows and keys kept server-side, the jobs those plugins did, such as moving data, guarding it and syncing it between tools, are already done by the stack.
+
 ## Built just before AI
 
 Those tools came just before AI could live next to the data. Since Cloudflare's Workers AI binding arrived in 2023, a model runs in the same Worker as the request, beside KV and R2, instead of being a call out to another cloud.
@@ -42,6 +57,21 @@ A knowledge base for AI is only safe if each answer comes from rows the asker ma
 The rules nest. A store's rules sit inside the platform's rules, a team's inside the store's, and an agent's inside the team's, so each level can narrow what the one above allows but never widen it. The same rules decide which tools an AI agent may call: a tool call is one more request, checked against the same entitlement claims before it reaches Xano.
 
 Today PIM Sync's Rust crate, compiled to WebAssembly, enforces the product identity rules Google reads (product group ID, SKUs, check-digit-verified GTINs) at the edge. Rules compiled once in Rust and run as WebAssembly in the Worker are the pattern we are extending to these nested data permissions, so the same compiled rules run wherever the request does.
+
+## Your Xano, in your country
+
+**Bring your own Xano (Plus).** A merchant can connect their own Xano workspace, so the catalog stays in their account. If they leave PIM Sync, the data stays with them.
+
+The same pairing of Cloudflare and Xano meets local data-storage rules market by market, with a Xano instance and Cloudflare settings chosen for each:
+
+- **Korea (PIPA).** Korean personal data stays in a Xano instance hosted in Korea, and Korean identifiers leave the country only through the consent gate. Korea is a prior-consent market: nothing is tracked before the visitor agrees.
+- **China (PIPL).** Personal data is stored in mainland China, on an in-country database host, with Cloudflare's China network run through its local partner and an ICP license. This is a dedicated deployment, not a setting.
+- **Japan (APPI).** An Asia-region or in-country Xano instance, with the transfer basis documented for anything that leaves Japan.
+- **Germany (GDPR and BDSG).** An EU-region Xano instance and Cloudflare's Data Localization Suite for processing and storage.
+
+Each market's rules are checked by tests, so a release cannot quietly break them. Today those cover Korea's prior-consent rule and the Korean knowledge base; China, Japan and Germany get theirs as each deployment goes live.
+
+**Knowledge base fallback, curated.** When a question in Korean has no Korean answer, the knowledge base searches Korean content first, then falls back to English and says that it did, instead of guessing or mixing languages. Translated answers are curated per market, so each region's knowledge base carries only the answers reviewed for it.
 
 ## Curated, not blanket AI
 
