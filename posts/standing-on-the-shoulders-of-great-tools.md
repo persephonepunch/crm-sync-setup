@@ -111,7 +111,7 @@ All of it is tailored to stakeholder roles. A merchandiser, a compliance lead, a
 
 It is built for and with design-first principles of utility: every screen, rule and tool call has to make someone's job simpler, or it does not ship.
 
-Here is what that utility looks like. A small business in Korea can work effectively with a small creative agency in a small town in the USA. The agency writes the product copy and designs the pages in English; the owner reads the Korean translation, fixes any wording by hand and approves it before it reaches the store. Both work on the same catalog rows, each in their own language. Neither needs an enterprise team, an interpreter or a developer to stand between them, and each sees only the content, tools and controls their role needs.
+Here is what that utility looks like. A Korean company can reach Korean and American audiences, using AI as the intermediary and as the security and privacy gate. A small business in Korea can work effectively with a small creative agency in a small town in the USA. The agency writes the product copy and designs the pages in English; the owner reads the Korean translation, fixes any wording by hand and approves it before it reaches the store. Both work on the same catalog rows, each in their own language. Neither needs an enterprise team, an interpreter or a developer to stand between them, and each sees only the content, tools and controls their role needs.
 
 ## A pathway to success: discover, build, deploy
 
