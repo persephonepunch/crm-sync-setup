@@ -26,6 +26,12 @@ keywords:
 
 **Read the full playbook: [Build Over Buy](https://claude.ai/artifact/3ooeS962TpwgeQh1A8HJWX)** (English and Korean).
 
+**Related articles:** [ECC cutover: ECC direct to Google](https://ecc-rust-book.yoonsunlee150.workers.dev/ecc-direct-to-google) · [ECC to S/4HANA cutover checklist](https://crm-sync.dev/ai-cutover-checklist) · [PIM Sync](https://www.crm-sync.dev/pages/pim-sync) · [Migrate from Gadget to PIM Sync](https://www.crm-sync.dev/pages/pim-sync#pim-sync-migrate-from-gadget) · [Klaviyo migration](https://crm-sync.dev/products/klaviyo-data-migration) · [AI task runner (Claude Tool Runner)](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner)
+
+**Security:** [Xano claims and extras](https://docs.xano.com/building-backend-features/user-authentication-and-user-data/separating-user-data) · [Xano entitlements](https://docs.xano.com/building-backend-features/user-authentication-and-user-data) · [Shopify and SAP: Domain Is Not Identity](https://claude.ai/artifact/GXu85VqcrEkDRKpiLJxwBJ) · [Definitions: short token, long-run data stream, TLS](TRUST-VOCABULARY.md)
+
+![One knowledge base, four type structures, one backend: Webflow Collection, Shopify metaobject, Rust struct and GitHub Markdown mapped onto Xano, with the Cloudflare Worker as the gate](assets/mvc-collections.svg)
+
 Shopify public apps that still use non-expiring offline tokens are delisted on 1 January 2027, and their Admin API calls fail with 403 from 1 April 2027. The playbook uses that deadline as the moment to move off fee-based plugins to a build on Cloudflare, Xano and Webflow, one vendor at a time, with each vendor's history mirrored first.
 
 ## What it covers

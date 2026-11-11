@@ -1,9 +1,10 @@
 ---
 title: "The Trust Vocabulary — Every Term on One Page"
-description: "The working grammar of the platform: permission, privacy, license vs grant, receipt, record of consumption, fingerprint, vault, token vs session bookmark, key pair, mandate — each defined in one breath, with who acts on it and the confusions to avoid."
+description: "The working grammar of the platform: permission, privacy, license vs grant, receipt, record of consumption, fingerprint, vault, token vs session bookmark, short token, long-run data stream, TLS, key pair, mandate — each defined in one breath, with who acts on it and the confusions to avoid."
 canonical: https://persephonepunch.github.io/crm-sync-setup/trust-vocabulary.html
 category: "Security"
 date: 2026-07-29
+updated: 2026-11-11
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/TRUST-VOCABULARY.md
 licence: CC-BY-4.0
 tags:
@@ -19,6 +20,9 @@ keywords:
   - fingerprint
   - vault
   - token versus session bookmark
+  - short-lived token
+  - long-run data stream
+  - TLS
   - entitlement
   - consent
   - provenance
@@ -93,6 +97,21 @@ A sealed **credential you verify**: three base64url parts, signed by the platfor
 
 A **pointer you look up**: the UUID a consent event mints, naming one visit's record. Contains nothing, grants nothing — like a receipt number, it says *which* record; the server decides *who* may read it. **Never call a bookmark a key.**
 **Acts on it:** the data plane joins on it · role-holders dereference it.
+
+### Short token
+
+A **token built to die soon**: an access token that lives minutes or an hour, paired with a refresh token that buys the next one. Shopify's expiring offline tokens are the example: the access token lasts 1 hour, the refresh token is single-use and lasts 90 days, and every refresh returns a new pair and kills the old refresh token. A leaked short token is worth an hour, not a year. The cost is that exactly one process may refresh it, or two callers redeem the same refresh token and one of them is locked out.
+**Acts on it:** one refresher per store renews it · every caller reads the current one · nobody copies it into a `.env` file.
+
+### Long-run data stream
+
+A **job that outlives its token**: a bulk export, a backfill, an event stream or a 15-minute middleware cycle that keeps running across hours. It can't hold one token for the whole run, so it asks the refresher for a fresh one mid-run, keeps a cursor so it can stop and resume, and writes idempotently so a retried batch doesn't double a record. Short token, long run: the credential expires on schedule while the data keeps moving.
+**Acts on it:** the job keeps the cursor · the refresher hands it tokens · the system of record dedupes every write.
+
+### TLS
+
+The **sealed envelope for data in transit**: Transport Layer Security encrypts the connection and proves the server's identity with a certificate that chains to a root the client already trusts. It says *which server* you reached and that nobody read the wire; it says nothing about *who the caller is* or *what they may do* — that is the token's and the entitlement's job. When a certificate authority's intermediates are revoked or its root is distrusted, every site chaining to it fails in browsers at once, so the issuing CA is a supply-chain dependency to review, not a detail.
+**Acts on it:** the CA issues · the server presents · every client verifies · the edge terminates and re-encrypts to the origin.
 
 ### Key pair
 
