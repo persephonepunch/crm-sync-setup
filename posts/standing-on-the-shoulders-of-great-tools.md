@@ -5,6 +5,8 @@ summary: Remix became React Router 7, Vite builds exactly what the source says, 
 category: Specs
 hashtags: [content:kb/specs]
 ---
+**[Get PIM Sync on the Shopify App Store](https://apps.shopify.com/pim-sync)** · [PIM Sync features, pricing and FAQ](https://www.crm-sync.dev/pages/pim-sync) · Pro is $10 a month for six months with code **PRO10**.
+
 ## Thank you first
 
 Every app we ship is built on someone else's good ideas. PIM Sync is no exception.
