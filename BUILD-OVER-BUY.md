@@ -44,6 +44,7 @@ Shopify public apps that still use non-expiring offline tokens are delisted on 1
 - **Data layer and EDI:** why a sync can return 200 and still be broken, each EDI document (846, 850, 855, 940, 945, 856, 997) against its closest Shopify equivalent, a one-way scheduled feed such as Rithum versus event hooks that depend on permissions, and the signs a plugin, ERP or CRM sync has already stopped working.
 - **HTMLRewriter and serde for business analysts:** brand.com and a translation-plugin subdomain uk.brand.com as the example, one page rewritten per market as it's delivered, a check on every data package, and sign-in and app callbacks to brand.com only.
 - **One Worker in front of any origin:** Webflow, Magento, WordPress and WooCommerce, EmDash or a headless front end. The same code with a per-origin config: selectors, hosting in front (Adobe Commerce Cloud's Fastly, managed WordPress CDNs, hosts that won't take a proxy), checkout and account paths left unrewritten for PCI, cookies and cache, CSP, market mapping and non-expiring tokens.
+- **PTA Shopify vs Big Boy Pants Data:** the Zapier and Salesforce-plugin chain to SAP ECC and how it fails, Airtable as fine for a small catalog (under about 2,500 calls a sync), Shopify's rate-limit ceiling by plan, a field note on morning 404s while an ERP batch outran the bucket, and what Xano-level data handling changes.
 - **Consent, regulation by market, Korea, CRM platforms, ERP, and the Merchant API v1 migration.**
 - **What's built:** one dated checklist of what runs in production and what's still open.
 
