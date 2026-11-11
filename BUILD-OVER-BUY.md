@@ -41,6 +41,8 @@ Shopify public apps that still use non-expiring offline tokens are delisted on 1
 - **Why some credentials break against Shopify:** a `.env` file on disk, an SAP permanent token or Salesforce long-lived auth, and when middleware such as SAP CPI or MuleSoft handles client credentials fine.
 - **Bindings instead of keys:** Cloudflare's binding model, React Router 7 passing bindings to loaders, and why classic Prisma's compiled engine didn't fit Workers.
 - **Race conditions in a 15-minute middleware cycle,** and idempotent Xano functions as the fix.
+- **Data layer and EDI:** why a sync can return 200 and still be broken, each EDI document (846, 850, 855, 940, 945, 856, 997) against its closest Shopify equivalent, a one-way scheduled feed such as Rithum versus event hooks that depend on permissions, and the signs a plugin, ERP or CRM sync has already stopped working.
+- **HTMLRewriter and serde for business analysts:** brand.com and a translation-plugin subdomain uk.brand.com as the example, one page rewritten per market as it's delivered, a check on every data package, and sign-in and app callbacks to brand.com only.
 - **Consent, regulation by market, Korea, CRM platforms, ERP, and the Merchant API v1 migration.**
 - **What's built:** one dated checklist of what runs in production and what's still open.
 
