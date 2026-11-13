@@ -97,6 +97,7 @@ chapters:
       - CONSENTED-DATA-LAYER.md   # 2026-10-19 · From product.csv to Consented Conversions
       - CONSENTED-DATA-LAYER-TEST-HARNESS.md   # 2026-10-19 · Consented data layer test harness
       - HYPERSCALER-VS-DISTRIBUTED.md   # 2026-10-19 · Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
+      - GLOBAL-UNIT-DATA-LOADS.md   # 2026-11-13 · Global Unit Data Loads — 3D Commerce, WMS & Merchant Feed Spec
   - category: Compliance
     docs:
       - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08
