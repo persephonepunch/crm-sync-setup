@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1210 650" width="1210" height="650" font-family="Arial" role="img" aria-labelledby="t d">
+  <title id="t">How g:id links to the Shopify GID namespace</title>
+  <desc id="d">A Shopify product GID and variant GID give their numbers to the Google offer ID shopify_KR_product_variant; the Merchant API v1 adds content language and feed label to name the product. The offer ID splits back into both GIDs with no lookup table. A custom offer ID such as fo1-KR-0142 has no numbers to parse, so the canonical record stores the link.</desc>
+  <rect id="background" x="-5" y="-5" width="1210" height="650" fill="#ffffff"/>
+
+  <g id="heading">
+    <text x="0" y="30" font-size="26" fill="#0a0a0a">How g:id links to the Shopify GID namespace</text>
+    <text x="0" y="56" font-size="14" fill="#666666">The offer ID is a plain string; Shopify's Google channel builds it from the numbers at the end of each GID.</text>
+  </g>
+
+  <g id="shopify-gids">
+    <rect x="0" y="84" width="370" height="196" fill="#f4f4f4"/>
+    <text x="16" y="112" font-size="13" fill="#666666" letter-spacing="1">SHOPIFY ADMIN GRAPHQL</text>
+    <text x="16" y="146" font-size="15" fill="#0a0a0a">gid://shopify/Product/<tspan fill="#f22468">8123456789</tspan></text>
+    <text x="16" y="174" font-size="15" fill="#0a0a0a">gid://shopify/ProductVariant/<tspan fill="#0f9b8e">4455667788</tspan></text>
+    <text x="16" y="214" font-size="13" fill="#666666">Market</text>
+    <text x="16" y="236" font-size="15" fill="#0a0a0a">country <tspan fill="#0a0a0a">KR</tspan> · locale ko-KR</text>
+    <text x="16" y="262" font-size="13" fill="#666666">One variant, one offer per target country</text>
+  </g>
+
+  <g id="arrow-numbers">
+    <line x1="376" y1="182" x2="408" y2="182" stroke="#0a0a0a" stroke-width="1.5"/>
+    <path d="M408 177 L416 182 L408 187 Z" fill="#0a0a0a"/>
+  </g>
+
+  <g id="offer-id">
+    <rect x="420" y="84" width="370" height="196" fill="#f4f4f4"/>
+    <text x="436" y="112" font-size="13" fill="#666666" letter-spacing="1">GOOGLE OFFER ID · g:id</text>
+    <text x="436" y="148" font-size="17" fill="#0a0a0a">shopify_KR_<tspan fill="#f22468">8123456789</tspan>_<tspan fill="#0f9b8e">4455667788</tspan></text>
+    <text x="436" y="182" font-size="13" fill="#0a0a0a">shopify <tspan fill="#666666">fixed prefix</tspan></text>
+    <text x="436" y="202" font-size="13" fill="#0a0a0a">KR <tspan fill="#666666">target country, ISO 3166-1</tspan></text>
+    <text x="436" y="222" font-size="13" fill="#f22468">8123456789 <tspan fill="#666666">product number</tspan></text>
+    <text x="436" y="242" font-size="13" fill="#0f9b8e">4455667788 <tspan fill="#666666">variant number</tspan></text>
+    <text x="436" y="266" font-size="13" fill="#0a0a0a">item_group_id = <tspan fill="#f22468">8123456789</tspan></text>
+  </g>
+
+  <g id="arrow-resource">
+    <line x1="796" y1="182" x2="828" y2="182" stroke="#0a0a0a" stroke-width="1.5"/>
+    <path d="M828 177 L836 182 L828 187 Z" fill="#0a0a0a"/>
+  </g>
+
+  <g id="merchant-api-name">
+    <rect x="840" y="84" width="360" height="196" fill="#f4f4f4"/>
+    <text x="856" y="112" font-size="13" fill="#666666" letter-spacing="1">MERCHANT API V1 PRODUCT NAME</text>
+    <text x="856" y="146" font-size="14" fill="#0a0a0a">accounts/{merchantId}/products/</text>
+    <text x="856" y="172" font-size="14" fill="#0a0a0a">ko~KR~shopify_KR_<tspan fill="#f22468">8123456789</tspan>_<tspan fill="#0f9b8e">4455667788</tspan></text>
+    <text x="856" y="206" font-size="13" fill="#666666">contentLanguage ~ feedLabel ~ offerId</text>
+    <text x="856" y="236" font-size="13" fill="#0a0a0a">The full key is GID + language + feed label,</text>
+    <text x="856" y="256" font-size="13" fill="#0a0a0a">so ko and en offers of one variant stay apart.</text>
+  </g>
+
+  <g id="back-to-shopify">
+    <rect x="0" y="304" width="1200" height="120" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+    <text x="16" y="332" font-size="13" fill="#666666" letter-spacing="1">BACK TO SHOPIFY · NO LOOKUP TABLE</text>
+    <text x="16" y="366" font-size="16" fill="#0a0a0a">1  Split the offer ID on “_”</text>
+    <text x="300" y="366" font-size="16" fill="#0a0a0a">2  Last part → gid://shopify/ProductVariant/<tspan fill="#0f9b8e">4455667788</tspan></text>
+    <text x="300" y="396" font-size="16" fill="#0a0a0a">3  Second last → gid://shopify/Product/<tspan fill="#f22468">8123456789</tspan></text>
+    <text x="16" y="396" font-size="13" fill="#666666">Second part = country</text>
+    <text x="830" y="366" font-size="13" fill="#666666">Disapprovals and status changes from</text>
+    <text x="830" y="386" font-size="13" fill="#666666">the Merchant API route back to the</text>
+    <text x="830" y="406" font-size="13" fill="#666666">variant's field owner this way.</text>
+  </g>
+
+  <g id="custom-offer-id">
+    <rect x="0" y="448" width="590" height="192" fill="#f4f4f4"/>
+    <text x="16" y="476" font-size="13" fill="#666666" letter-spacing="1">CUSTOM FEED · e.g. fo1-KR-0142</text>
+    <text x="16" y="504" font-size="15" fill="#0a0a0a">No numbers to parse, so the canonical record keeps the link:</text>
+    <text x="16" y="536" font-size="14" fill="#0a0a0a">{ "gid": "gid://shopify/ProductVariant/<tspan fill="#0f9b8e">4455667788</tspan>",</text>
+    <text x="16" y="558" font-size="14" fill="#0a0a0a">  "offers": [{ "offerId": "<tspan fill="#f22468">fo1-KR-0142</tspan>",</text>
+    <text x="16" y="580" font-size="14" fill="#0a0a0a">  "feedLabel": "KR", "contentLanguage": "ko" }] }</text>
+    <text x="16" y="618" font-size="13" fill="#666666">Or use Shopify's format so a custom feed and the channel never make two offers.</text>
+  </g>
+
+  <g id="rules">
+    <rect x="610" y="448" width="590" height="192" fill="#0a0a0a"/>
+    <text x="626" y="476" font-size="13" fill="#f22468" letter-spacing="1">RULES</text>
+    <text x="626" y="510" font-size="15" fill="#ffffff">1  Never change a live offer ID. Google treats a new ID as</text>
+    <text x="646" y="532" font-size="15" fill="#ffffff">a new product and drops its history and approval.</text>
+    <text x="626" y="566" font-size="15" fill="#ffffff">2  Derive it from the variant GID, never the SKU or title.</text>
+    <text x="626" y="600" font-size="15" fill="#ffffff">3  One offer per variant per target country; up to 50</text>
+    <text x="646" y="622" font-size="15" fill="#ffffff">characters.</text>
+  </g>
+</svg>

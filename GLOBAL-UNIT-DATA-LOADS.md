@@ -18,6 +18,8 @@ tags:
 
 Nov 13, 2026 · Yoonsun Lee
 
+![How g:id links to the Shopify GID namespace. The Shopify product GID gid://shopify/Product/8123456789 and variant GID gid://shopify/ProductVariant/4455667788 give their numbers to the Google offer ID shopify_KR_8123456789_4455667788, with item_group_id 8123456789. The Merchant API v1 names the product accounts/{merchantId}/products/ko~KR~offerId, so the full key is GID plus content language plus feed label. Back to Shopify: split the offer ID on underscores; the last part rebuilds the variant GID and the second last the product GID, with no lookup table. A custom offer ID such as fo1-KR-0142 has no numbers to parse, so the canonical record stores the GID and its offers. Rules: never change a live offer ID, derive it from the variant GID, one offer per variant per target country, up to 50 characters.](https://persephonepunch.github.io/crm-sync-setup/assets/gid-to-offer-id.svg)
+
 **Related knowledge base:**
 [ECC direct to Google](https://ecc-rust-book.yoonsunlee150.workers.dev/ecc-direct-to-google) ·
 [ECC market prices and FX](https://ecc-rust-book.yoonsunlee150.workers.dev/ecc-direct-to-google#market-prices-and-fx-one-price-read-everywhere) ·
@@ -139,6 +141,12 @@ Example item (XML feed):
   </g:product_detail>
 </item>
 ```
+
+### How g:id links to the Shopify GID namespace
+
+The offer ID (`g:id`) is a plain string of up to 50 characters, not a GID. Shopify's Google channel builds it from the numbers at the end of the GIDs: `gid://shopify/Product/8123456789` and `gid://shopify/ProductVariant/4455667788` become `g:id` `shopify_KR_8123456789_4455667788` and `item_group_id` `8123456789`, one offer per variant per target country. The Merchant API v1 names the product `accounts/{merchantId}/products/{contentLanguage}~{feedLabel}~{offerId}`, so the full key is GID + language + feed label. Splitting the offer ID on `_` gives both GIDs back with no lookup table (see the diagram at the top).
+
+A custom offer ID such as `fo1-KR-0142` has nothing to parse, so the canonical record stores the link: `{ "gid": "gid://shopify/ProductVariant/4455667788", "offers": [{ "offerId": "fo1-KR-0142", "feedLabel": "KR", "contentLanguage": "ko" }] }`. Never change a live offer ID, since Google treats a new ID as a new product; derive it from the variant GID, never the SKU or title.
 
 ## product.csv vs. Shopify Catalog data layer vs. Google Merchant
 
