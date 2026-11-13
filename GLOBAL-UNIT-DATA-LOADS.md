@@ -27,6 +27,11 @@ Nov 13, 2026 · Yoonsun Lee
 [An alternative to a full S/4HANA upgrade](https://ecc-rust-book.yoonsunlee150.workers.dev/s4hana-alternative) ·
 [From product.csv to Consented Conversions](CONSENTED-DATA-LAYER.md)
 
+**Live on fo1.io (the first use case):**
+[Furnish a home](https://fo1.io/ko-kr/#furnish) (floor plan, budget and a 3D room in meters) ·
+[Configure in 3D](https://fo1.io/ko-kr/#configure) (made-to-measure pieces) ·
+[Portal](https://fo1.io/ko-kr/#portal) (clients and architects, demo)
+
 ## Overview
 
 Every physical quantity is stored once, in SI units with an ISO/UN code, and every surface converts from that record at its own edge. The 3D viewport, the WMS, Shopify, the Google Merchant feed and every migrated app read the same canonical unit record; none of them stores its own copy of a measurement.
