@@ -1,6 +1,6 @@
 ---
 title: "Global Unit Data Loads — 3D Commerce, WMS & Merchant Feed Spec"
-description: "Every physical quantity stored once, in SI units with an ISO/UN code, and converted at each surface's edge: the 3D viewport, the WMS, Shopify, the Google Merchant feed and every migrated app read the same canonical unit record. With the SAP and ECC break, GS1 identifiers, events and a six-step load pipeline."
+description: "Every physical quantity stored once, in SI units with an ISO/UN code, and converted at each surface's edge: the 3D viewport, the WMS, Shopify, the Google Merchant feed and every migrated app read the same canonical unit record. With the SAP and ECC break, GS1 identifiers, events, ISO and UTF-8 data for space, sea, air and LiDAR, AI scaling and security, non-browser data chains and a six-step load pipeline."
 canonical: https://crm-sync.dev/docs/global-unit-data-loads
 category: "Specs"
 date: 2026-11-13
@@ -12,6 +12,9 @@ tags:
   - google-merchant
   - sap
   - 3d
+  - geospatial
+  - lidar
+  - utf-8
 ---
 
 # Global Unit Data Loads — 3D Commerce, WMS & Merchant Feed Spec
@@ -383,6 +386,100 @@ Example placemark:
 </Placemark>
 ```
 
+## ISO data in UTF-8: space, sea, air and LiDAR
+
+KML is the display layer. Behind it, each domain has its own identifiers and source formats, and the canonical record keeps those as text in UTF-8 (RFC 3629, the encoding form of ISO/IEC 10646), with numbers stored as numbers. The table lists the codes each domain carries into the record. The same Digital Link URI is the `subject` throughout.
+
+| Domain | Identity | Position and reference system | Time | Source format (kept as is) | Display |
+|---|---|---|---|---|---|
+| Space | COSPAR ID (`1998-067A`), NORAD catalog number, GIAI for owned trackers | orbit in an inertial or Earth-fixed frame (GCRF, ITRF); ground track in WGS84 | UTC in ISO 8601; source time scale (UTC, TAI, GPS) recorded | CCSDS Orbit Data Messages (CCSDS 502.0, adopted as ISO 26900), OEM or OPM | derived ground track or position in KML (`absolute`) |
+| Sea | IMO ship number (7 digits), MMSI (9 digits; Korea uses MID 440 and 441), ISO 6346 container code (`CSQU3054383`, check digit), SSCC, UN/LOCODE ports | WGS84 lon/lat; depth as negative meters with its vertical datum | AIS report time in UTC, ISO 8601 | AIS messages (ITU-R M.1371), ISO 19848 shipboard sensor data, IHO S-100 for charts | KML `gx:clampToSeaFloor` / `gx:relativeToSeaFloor`, or `clampToGround` at the surface |
+| Air | ICAO 24-bit aircraft address, ICAO and IATA airport codes (`RKSI` / `ICN`), IATA air waybill (3-digit prefix + 8 digits, mod-7 check digit) | WGS84 lon/lat; barometric altitude (feet, flight level) and GNSS geometric height kept apart | UTC, ISO 8601 | ADS-B, cargo messages from the carrier | KML `absolute`, converted to meters with `source_unit` FOT kept |
+| LiDAR | Digital Link URI of the scanned item or site, GIAI of the scanner | CRS as WKT2 (ISO 19162) or an EPSG code, horizontal plus vertical (e.g. EPSG 5186 Korea 2000 Central Belt 2010 + a height datum); reprojected to WGS84 only for display | capture time, ISO 8601 | LAS 1.4 / LAZ (CRS in the WKT VLR), COPC for streaming, E57 (ASTM E2807) | derived mesh as GLB in the meter scene; footprint or point in KML |
+
+Rules for every domain:
+
+- **Coordinate order is not shared.** ISO 6709 text and most ERP and WMS fields put latitude first. KML, GeoJSON (RFC 7946) and WKT in WGS84 put longitude first. The canonical record stores named fields (`lat`, `lon`, `h`) and never a bare pair, so the order can't flip during a load.
+- **Heights carry their datum.** GNSS gives height above the WGS84 ellipsoid (EPSG 4979). KML `absolute` and charts use mean sea level, through a geoid model such as EGM2008 (EPSG 3855). In Korea the two differ by roughly 25–30 m. Record which one each height is, and convert with the geoid model, not with a constant.
+- **Precision is stated.** Seven decimal places of a degree is about 1 cm, and six is about 11 cm. A phone scan isn't 1 cm accurate, so its stated accuracy (ISO 19157 data quality) travels with the value.
+- **Space data stays in its frame.** Orbits are propagated from the CCSDS message. The KML point is a derived, timestamped display value, and it's never read back as the orbit.
+
+UTF-8 rules:
+
+- **One encoding and one normal form.** All text is UTF-8 without a BOM, normalized to NFC on load. Hangul matters here: a name typed on one system can arrive decomposed into jamo (NFD), for example a file name from older macOS storage. `부산` in NFD doesn't match `부산` in NFC, so a key lookup fails silently.
+- **Codes are ASCII, names are Unicode.** UN/LOCODE, ISO 6346, IMO, MMSI, ICAO, EPSG and ISO 4217 values are checked against `[A-Z0-9]` patterns plus their check digits. Place names, ship names and notes are free UTF-8 text kept next to the code, never instead of it.
+- **Numeric fields reject look-alikes.** Full-width digits (`１２９`), the minus sign U+2212 in place of `-`, a comma decimal (`129,04`), and the degree sign `°` U+00B0 confused with the ordinal `º` U+00BA all show up in pasted coordinates. NFKC is applied to numeric fields only, then they are parsed as numbers. A field that still fails is quarantined.
+- **Declare the encoding in each format.** KML and GML: `<?xml version="1.0" encoding="UTF-8"?>`. JSON and GeoJSON are UTF-8 by spec (RFC 8259). EDIFACT uses syntax identifier `UNOW` for UTF-8. CCSDS KVN and AIS payloads are ASCII-only, so names in them are transliterated, and the UTF-8 name lives in the canonical record.
+
+Example canonical record for one sea leg:
+
+```json
+{
+  "subject": "https://id.gs1.org/00/095060001343520011",
+  "container": "CSQU3054383",
+  "vessel": { "imo": "9074729", "mmsi": "440123456", "name": "한바다호" },
+  "from": "USNYC",
+  "to": "KRPUS",
+  "position": { "lat": 35.1000000, "lon": 129.0400000, "h": 0, "h_ref": "EPSG:3855", "accuracy_m": 10 },
+  "time": "2027-01-08T05:20:00Z",
+  "readings": [{ "n": "temp", "u": "Cel", "v": 21.5 }],
+  "source": { "format": "AIS", "spec": "ITU-R M.1371", "raw_ref": "r2://raw/ais/2027-01-08/…" }
+}
+```
+
+All identifiers above (SSCC, container, IMO, MMSI, vessel name) and the storage path are placeholders. `readings` uses SenML (RFC 8428) names and units.
+
+## AI scaling and security for geospatial data
+
+AI reads this data to summarize routes, flag QA failures, match scans to products and answer questions such as "where is order 0142?". It doesn't get the raw data. These are the requirements that keep it affordable and safe.
+
+### Scaling
+
+| Need | Rule |
+|---|---|
+| Point clouds are too large for a model | A survey scan is hundreds of millions of points (gigabytes), and even a phone room scan is megabytes. The model gets derived values: dimensions, accuracy, QA result and a thumbnail. Raw LAZ/COPC stays in R2 and is read by range, tile by tile, by code. |
+| Tracks are too long for a context window | A container's AIS track can be thousands of fixes. A Worker reduces it to legs (port to port, with times and the gaps), and the model reads the legs. |
+| Conversions must be exact | Unit, datum and coordinate conversions run in code with exact factors and the geoid model. The model never computes a conversion; it reads the converted record. |
+| Compact, coded input | Records go to the model as JSON with ISO and UN codes (`KRPUS`, `KGM`, `Cel`), not prose. That uses fewer tokens and gives less room to misread. |
+| Fan-out | Each scan, AIS batch or telemetry window is one Queue message. AI calls run per message with retries and a dead-letter queue, so a spike in scans doesn't become a spike of failed calls. |
+| Retrieval | Embeddings index the metadata (names, notes, QA text) keyed by Digital Link URI. Coordinates and measurements are queried exactly in Xano and never matched by similarity. |
+
+### Security
+
+| Risk | Rule |
+|---|---|
+| Location is personal data | Delivery addresses and live positions of a person (a driver, an installer, a customer's home) are personal data. In Korea, personal location information also falls under the Location Information Act as well as PIPA. Positions tied to a person are blurred (for example, to postal-code or 3-decimal precision) before any model sees them, and pass the per-subject consent check like any other personal field. |
+| Asset location is sensitive | A live container or tracker position is cargo-theft data. Only delayed or leg-level positions go to AI or to a public map. The live feed stays behind authenticated endpoints. |
+| Residency and export | Korean site scans and positions stay in APAC storage. Korea restricts taking high-precision survey map data out of the country, so check before a site-level LiDAR scan or a survey-grade model of a Korean site leaves the region. |
+| Text inside data is untrusted | Ship names, KML `description` and `ExtendedData`, scan notes and AIS free-text fields can contain instructions aimed at a model. They are passed to the model as quoted data, and model output can only propose (`agent.proposed`), never publish. |
+| Unicode tricks | Bidirectional control characters (the Trojan Source class, CVE-2021-42574) and confusable letters (Cyrillic `а` in place of Latin `a`) are stripped or rejected in identifiers, using the Unicode Security Mechanisms (UTS #39). They're allowed in display names only after the bidi controls are removed. |
+| Parser attacks | KML and GML are XML, so they're parsed with external entities and DTDs disabled (XXE). `NetworkLink` and remote `href` values are stripped on import, so a file can't make the server fetch a URL (SSRF). KMZ and LAZ are decompressed with a size limit to stop zip bombs. |
+| Tampered records | Each canonical row is signed (HMAC over the stored fields). A batch of position or QA changes that fails signature checks freezes sync instead of publishing, as with the integrity tripwire on the Xano side. |
+| Training | Customer positions, site scans and route history are not used to train or fine-tune shared models. Each agent call logs the agent ID, model, version and the input record IDs, not the raw coordinates. |
+
+## Non-browser data chains
+
+Most of this data never touches a browser: a scanner, an AIS receiver, a satellite IoT tracker, an ERP or a carrier's EDI. There's no cookie, no consent banner and no user session. So identity, consent and delivery guarantees have to be built into the chain itself.
+
+| Chain | Transport | Device or sender identity | Payload | What goes wrong |
+|---|---|---|---|---|
+| Scanner → edge | HTTPS upload, resumable | mTLS client certificate per scanner (GIAI), checked at Cloudflare | LAZ/E57 or USDZ plus a JSON sidecar | partial upload; the scan is attached to the wrong item |
+| Tracker or sensor → edge | MQTT 5 over TLS, or CoAP over DTLS | per-device certificate or key; device ID = GIAI | SenML in CBOR (RFC 8949), batched | offline at sea for days, then a burst; clock drift |
+| AIS / ADS-B feed → edge | provider API or stream | provider API key plus an IP allowlist | decoded messages with UTC times | duplicate and out-of-order reports |
+| Space data → edge | provider API | provider key | CCSDS OEM/OPM | wrong frame or time scale assumed |
+| ERP / carrier → edge | AS2 or SFTP for EDI, or a signed webhook | AS2 certificates, an SSH key, or an HMAC signature | EDIFACT (`UNOW`), X12 856/214, JSON | encoding not declared; a resent file is processed twice |
+| Edge → system of record | Queue → Xano | Worker service credential, scoped per workspace | canonical record | at-least-once delivery writes twice without a key |
+
+Rules for every chain:
+
+- **The path is fixed.** Every chain enters the same way: device or sender → Cloudflare (authentication, size limits, UTF-8 and code checks) → Queue → Xano as the system of record → derived outputs (KML, GeoJSON, GLB, Merchant API, AI summaries). Nothing writes to Xano directly from a device, and no output is read back as input.
+- **Machine identity replaces the browser session.** Each device has its own certificate or key, registered against its GIAI, and is revoked by itself. A shared fleet key is never used, because losing one tracker would then mean rotating all of them.
+- **Every message is idempotent.** An idempotency key is formed from device ID, sequence number and the source timestamp. Replays inside the window are dropped, and a resent EDI file with the same interchange control number is acknowledged but not processed again.
+- **Store-and-forward is expected.** Ships and remote sites batch readings while offline. The edge accepts late data, orders it by source time rather than arrival time, and marks gaps instead of interpolating them.
+- **Time comes from the source.** The record keeps the device's time, the arrival time, and the difference between them. A device whose clock is off by more than a set limit is flagged, and its readings are held for review.
+- **Consent is a legal basis, not a banner.** With no browser, consent can't be clicked. A person's position, such as a driver's phone or a wearable, needs a recorded legal basis per subject (contract, consent captured in the app, or employment terms) before it enters the chain. Equipment and cargo positions that aren't linked to a person don't.
+- **Raw is archived and the edge is stateless.** The raw payload is written unchanged to R2 (step 1 of the load pipeline) before parsing, so any record can be rebuilt. The Worker keeps no state between messages; ordering and deduplication live in the Queue and in Xano.
+
 ## Load pipeline and validation
 
 Every load, from an app migration or a daily feed, runs the same six steps, and a record that fails a check is quarantined rather than written.
@@ -411,6 +508,9 @@ Validation rules:
 - [ ] Is the FX rate source the ERP, Shopify Markets, or a bank feed, and how often does it refresh?
 - [ ] Do any fo1.io products need cold-chain handling, or is kelvin only for lighting specs?
 - [ ] Which markets launch first beyond US and KR?
+- [ ] Which tracker and AIS data providers are in scope, and do their devices support per-device certificates?
+- [ ] Which height datum does the Korea install team's scanner export (ellipsoidal or a local vertical datum)?
+- [ ] Does any LiDAR of Korean sites need to leave APAC (for example, for an offshore modeling vendor)?
 
 ## Sources
 
@@ -420,3 +520,10 @@ Validation rules:
 - Google Merchant API: product attributes reference
 - GS1 Australia: standards and v24 temperature AIs
 - RFC 8428: SenML
+- RFC 3629: UTF-8; RFC 8259: JSON; RFC 7946: GeoJSON; RFC 8949: CBOR
+- ISO 6709: standard representation of geographic point location by coordinates
+- ISO 19162: well-known text representation of coordinate reference systems; ISO 19157: data quality
+- CCSDS 502.0: Orbit Data Messages (ISO 26900)
+- ISO 6346: freight container coding; ITU-R M.1371: AIS; ISO 19848: shipboard data
+- ASPRS LAS 1.4; ASTM E2807 (E57); COPC
+- Unicode UTS #39: Unicode Security Mechanisms; CVE-2021-42574 (Trojan Source)
