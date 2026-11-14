@@ -99,6 +99,7 @@ chapters:
       - CONSENTED-DATA-LAYER-TEST-HARNESS.md   # 2026-10-19 · Consented data layer test harness
       - HYPERSCALER-VS-DISTRIBUTED.md   # 2026-10-19 · Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
       - GLOBAL-UNIT-DATA-LOADS.md   # 2026-11-13 · Global Unit Data Loads — 3D Commerce, WMS & Merchant Feed Spec
+      - COPPER-TO-FIBER-LEGACY-NETWORKS.md   # 2026-11-14 · Copper to Fiber: 2000s-Era Network Debt and Short-Term Paired Fixes
   - category: Compliance
     docs:
       - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08

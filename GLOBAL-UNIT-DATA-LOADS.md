@@ -30,7 +30,8 @@ Nov 13, 2026 · Yoonsun Lee
 [SAP to Google EDI](https://ecc-rust-book.yoonsunlee150.workers.dev/sap-to-google-edi) ·
 [SAP Fiori-style UI5 apps at the edge](https://ecc-rust-book.yoonsunlee150.workers.dev/s4hana-alternative#substitutes-at-the-edge) ·
 [An alternative to a full S/4HANA upgrade](https://ecc-rust-book.yoonsunlee150.workers.dev/s4hana-alternative) ·
-[From product.csv to Consented Conversions](CONSENTED-DATA-LAYER.md)
+[From product.csv to Consented Conversions](CONSENTED-DATA-LAYER.md) ·
+[Copper to Fiber: 2000s-Era Network Debt and Short-Term Paired Fixes](COPPER-TO-FIBER-LEGACY-NETWORKS.md)
 
 **Live on fo1.io (the first use case):**
 [Furnish a home](https://fo1.io/ko-kr/#furnish) (floor plan, budget and a 3D room in meters) ·
@@ -402,7 +403,7 @@ Rules for every domain:
 - **Coordinate order is not shared.** ISO 6709 text and most ERP and WMS fields put latitude first. KML, GeoJSON (RFC 7946) and WKT in WGS84 put longitude first. The canonical record stores named fields (`lat`, `lon`, `h`) and never a bare pair, so the order can't flip during a load.
 - **Heights carry their datum.** GNSS gives height above the WGS84 ellipsoid (EPSG 4979). KML `absolute` and charts use mean sea level, through a geoid model such as EGM2008 (EPSG 3855). In Korea the two differ by roughly 25–30 m. Record which one each height is, and convert with the geoid model, not with a constant.
 - **Precision is stated.** Seven decimal places of a degree is about 1 cm, and six is about 11 cm. A phone scan isn't 1 cm accurate, so its stated accuracy (ISO 19157 data quality) travels with the value.
-- **Air data sits on a legacy network.** US air traffic control still depends partly on a telecom network from the early 2000s, including copper circuits. Its failures have reached operations: the January 2023 NOTAM database outage, and in spring 2025 the loss of radar and radio links for Newark controllers working from Philadelphia. A multi-year replacement with fiber, wireless and satellite links is funded but not finished, and each facility cutover carries its own risk. Our air positions come from commercial ADS-B aggregators and carrier messages, not the FAA's internal network, so an outage there shows up as gaps or late bursts rather than wrong values. The rules: take air positions from at least two providers, keep the source time, mark gaps without filling them, and never let one feed's silence clear a shipment's ETA or status.
+- **Air data sits on a legacy network.** US air traffic control still depends partly on a telecom network from the early 2000s, including copper circuits. Its failures have reached operations: the January 2023 NOTAM database outage, and in spring 2025 the loss of radar and radio links for Newark controllers working from Philadelphia. A multi-year replacement with fiber, wireless and satellite links is funded but not finished, and each facility cutover carries its own risk. Our air positions come from commercial ADS-B aggregators and carrier messages, not the FAA's internal network, so an outage there shows up as gaps or late bursts rather than wrong values. The rules: take air positions from at least two providers, keep the source time, mark gaps without filling them, and never let one feed's silence clear a shipment's ETA or status. Background and short-term paired fixes: [Copper to Fiber: 2000s-Era Network Debt](COPPER-TO-FIBER-LEGACY-NETWORKS.md).
 - **Space data stays in its frame.** Orbits are propagated from the CCSDS message. The KML point is a derived, timestamped display value, and it's never read back as the orbit.
 
 UTF-8 rules:
