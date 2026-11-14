@@ -23,6 +23,9 @@ tags:
   - iot
   - lidar
   - orchestration
+  - ott
+  - ai
+  - gaming
 ---
 
 # Copper to Fiber: 2000s-Era Network Debt and Short-Term Paired Fixes
@@ -155,6 +158,55 @@ Two cautions:
 - **Chunking needs an order and an end.** Every chunk carries its position and the total count or a final marker, so the receiver knows when the message is whole, and a missing chunk is reported as a gap rather than silently skipped. That's the same rule as gap marking in the [non-browser data chains](GLOBAL-UNIT-DATA-LOADS.md).
 
 The result is a single budget line: the new link, the new processing model, and the staged path to switch from one to the other. Paying only for the link leaves the debt where it was, which is why a problem first scoped around 2007 was still producing outages in 2025.
+
+## OTT vs data streams
+
+OTT means **over-the-top**: video delivered over the public internet, "over the top" of the cable or satellite operator's own network instead of through a set-top box. HBO GO, Netflix, Disney+ and YouTube are OTT services.
+
+OTT and commerce or machine data streams share delivery mechanics, but the data has a different shape.
+
+| | OTT video streaming | Commerce and machine data streams |
+|---|---|---|
+| Direction | mostly one-to-many and downstream: the same file goes to millions of viewers | mostly many-to-one and upstream: millions of different messages arrive at one system of record |
+| Caching | highly cacheable; every viewer gets the same segments from the CDN | each message is unique, so it can't be cached on the way in; only outputs (preloaded reads) can |
+| Chunking | HLS or DASH segments of about 2–6 seconds, each in several bitrates | queue batches, multipart uploads, COPC tiles, SenML batches |
+| Under overload | adaptive bitrate lowers quality and the viewer keeps watching | every record matters, so nothing can be sent at "lower quality"; hold, coalesce or deprioritize instead (backpressure and load shedding) |
+| Order and loss | a late segment is skipped; a lost frame is barely noticed | order matters within a partition; a lost or duplicated message is a wrong stock count or a double order, so idempotency keys and gap marking are required |
+| Latency | video on demand buffers seconds ahead; live runs at about 2–30 seconds | depends on the source: under a second for radar and operations screens, minutes for feeds, hours for reconciliation |
+| Security | per session: DRM and signed URLs | per message: signatures, a key per device, a consent check |
+
+What carries over from OTT:
+
+- **The manifest.** An HLS playlist (`.m3u8`) or a DASH MPD lists the chunks, the renditions and their order, and the player follows it. The helm's per-flow manifest plays the same role for data.
+- **Chunks with a position and an end.** Every segment has a sequence number, the same rule this article sets for data chunks.
+- **Preloading to the edge.** CDNs position popular content before a premiere, which is Node preload applied to the catalog and entitlements.
+- **The HBO GO lesson.** In 2014 the video segments were already chunked and cached. What broke was the sign-in and entitlement path, the one part that behaved like a commerce data stream: unique per user, not cacheable, and blocking.
+
+OTT solved the outbound, identical-content problem about twenty years ago. Commerce and machine data is mostly the inbound, unique-message problem, so it borrows OTT's chunking, manifests and edge preload, and adds ordering, idempotency and per-message security.
+
+## Chunking compared: OTT, AI, gaming and data streams
+
+Chunking is the shared technique, but each field cuts at a different boundary and protects something different.
+
+| | OTT video | AI | Gaming | Commerce and machine data |
+|---|---|---|---|---|
+| Unit | a segment of a few seconds, per bitrate | a passage of a few hundred tokens for retrieval; a batch of requests for inference; a stream of tokens out | a world cell or level section; a texture mip level; a level-of-detail mesh; a network snapshot or delta per tick | one record change, a queue batch, a file part, a tile |
+| Where it's cut | at keyframes, so each segment plays on its own | at meaning (headings, paragraphs), with some overlap so context isn't cut mid-thought | by distance and visibility around the player | by partition key (tenant, market, product, device) and a size cap |
+| Budget it protects | network bandwidth and the playback buffer | the context window and token cost; GPU memory | the frame budget (16.6 ms at 60 fps) and GPU memory | queue depth, memory per task, API rate limits |
+| Loaded first | the next segments at the current bitrate | the highest-ranked chunks that the user is allowed to see | what's in view and near the player | changes ranked by priority: price and stock before descriptions |
+| Under overload | lower bitrate | fewer chunks, a smaller model, or a fallback with a flag | lower level of detail, lower-resolution textures, fewer far objects | coalesce, hold in the queue, shed low-priority work |
+| Manifest | the `.m3u8` or MPD playlist | the retrieval index and its metadata | the asset bundle or world-partition manifest | the helm's flow manifest |
+| Delta updates | new segments only | new or changed chunks re-embedded only | patches shipped as changed chunks only | hash-gated changes only |
+
+Rules all four share:
+
+- **Each chunk stands alone.** It can be checked, retried, cached or dropped without the rest. A video segment starts on a keyframe; a retrieval chunk carries its own source and heading; a world cell loads without the neighboring cell; a data batch is valid on its own.
+- **Each chunk carries its metadata.** For AI and data this includes permissions: a retrieval chunk carries its source, tier, consent and rights, so a model never reads a chunk its user may not see, and deleting the source row deletes its chunks.
+- **Load by priority within a budget.** Players, games, models and queues all decide what to load first from a fixed budget, and degrade the rest instead of failing.
+- **Update by delta, never by rebuild.** New segments, re-embedded changed chunks, game patches and hash-gated record changes all avoid reprocessing everything. That's the incremental A/B load in four forms.
+- **Preload before the peak.** CDNs before a premiere, games while the player is still in the previous area, AI caches of frequent answers, and the commerce edge cache before a drop.
+
+The game-engine frame budget as the origin of "bind before you allocate" is covered in [Hyperscaler vs Distributed](HYPERSCALER-VS-DISTRIBUTED.md); AI weighting and ranking of retrieved rows are in the same article.
 
 ## The approach: preload, background tasks and bounded memory
 
@@ -465,6 +517,7 @@ The FAA case is extreme, but the shape is familiar from the same era of enterpri
 - EUROCONTROL ASTERIX (categories 048 and 062)
 - ONVIF (video management interoperability)
 - PMTiles and COPC specifications
+- Apple HTTP Live Streaming (RFC 8216); MPEG-DASH (ISO/IEC 23009-1)
 - HBO statements on the HBO GO outage during the Game of Thrones season 4 premiere (April 2014)
 - Microsoft: estimate of Windows devices affected by the CrowdStrike update (July 2024)
 - CrowdStrike: preliminary post-incident review (July 2024)
