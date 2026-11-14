@@ -1094,6 +1094,14 @@ Start every decision at rung 0 and climb only when the *climb when* condition is
 | 3 | Xano, the system of record | Business rules, Postgres, the append-only ledger, one instance per region | One instance can't meet residency or load | Edge latency |
 | 4 | Hyperscaler or BYOC cluster | Xano Enterprise in your own AWS, Azure or Google Cloud account; warehouses; batch | A contract or a regulator requires it | Simplicity: you now run accounts, networks and licences |
 
+#### The helm: steering every flow across the rungs
+
+The ladder says where logic runs. The helm says how each flow is steered across those rungs: one manifest per flow sets its data direction, orchestration path, security and scaling, and is validated and rolled out in stages like any other data.
+
+![The helm: one manifest per flow steers four duties. Sources on the left (Shopify webhooks; ERP and WMS with EDI and batch files; machines such as radar, VMS, IoT, LiDAR and trackers; shoppers and agents; design surfaces, outbound only unless allowed) flow into the helm, a control layer with one manifest per flow, versioned in git, validated, canaried and rolled back by pointer. It sets four duties. Data direction: inbound, outbound or both per flow, undeclared directions refused, nothing sent out read back. Orchestration: request, event and scheduled paths; load, validate, canary, switch; idempotent jobs; reads serve the last good copy. Security: one key per flow and device, signed messages with size and type limits, consent checked before personal data moves, agents propose and people approve. Scaling: a partition key per flow, bounded queues with backpressure, a memory budget per task, more instances rather than a bigger machine. Outputs on the right: Xano as the system of record, the edge cache with preloaded reads and A/B slots, channels (Merchant API, Meta, Amazon, Shopify), operations screens and the R2 archive. The helm steers three paths: the request path with Node preload at the edge, the event path with a queue feeding Rust and Tokio tasks, and the scheduled path with Xano background tasks.](https://persephonepunch.github.io/crm-sync-setup/assets/helm-orchestration.svg)
+
+The full model, an example manifest and the rules for the helm itself are in [Copper to Fiber: Orchestration, the helm](COPPER-TO-FIBER-LEGACY-NETWORKS.md).
+
 ### AI binding: where the model runs, and what it may touch
 
 | Rung | Runs on | Use it for | Climb when… | What it gives up |
