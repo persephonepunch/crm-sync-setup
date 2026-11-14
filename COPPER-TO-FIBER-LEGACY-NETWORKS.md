@@ -125,6 +125,20 @@ The second outage is the important one: the backup existed, but it didn't surviv
 
 The lesson carries over directly: replacing the cable without replacing the endpoints and the data model moves the bottleneck instead of removing it.
 
+### The old endpoints: Compaq computers and floppy disks
+
+The "old endpoints" are literal. Reuters reported that the system relies on decades-old Compaq computers, with replacement parts bought on eBay, and the FAA says it will phase floppy disks out of hundreds of facilities by 2028. The FAA hasn't published how much memory these machines have. For scale, typical desktops of the Windows 95 and NT era shipped with about 16–128 MB of RAM, against 8 GB or more in a current phone.
+
+Memory isn't the main reason they can't take the new load, though. Radar track data is small by modern standards. The limits sit in the rest of the stack:
+
+- **Processor and operating system:** single-core CPUs, and 32-bit systems that can't address more than 4 GB however much memory is fitted. The operating systems no longer get security patches.
+- **Interfaces:** serial lines and old network cards built to match the copper circuits. That's why data arriving over new fiber is slowed down at the facility.
+- **Software written for a fixed load:** fixed buffers, fixed message rates and one-at-a-time processing. More data than the software expects overflows or stalls it, whatever the hardware.
+- **Certification lock-in:** the systems run around the clock and are safety-certified. Changing the hardware or operating system means recertifying, and they can't be taken offline, so they're kept alive with salvaged parts.
+- **Shrinking supply:** HP retired the Compaq brand in 2013, so every failure takes longer to repair.
+
+Adding RAM wouldn't fix it, which is why the FAA's plan replaces the computers and software along with the copper. It's the clearest case of tech debt that worked before data got big: each part was sound for the load it was certified for, and the load moved on.
+
 ## Too much data at once: Game of Thrones, Windows and the radar link
 
 Three outages from three industries share the same shape. In each, a component built for an earlier load took the new load as one large, blocking unit. When it choked, everything behind it stopped.
@@ -518,6 +532,8 @@ The FAA case is extreme, but the shape is familiar from the same era of enterpri
 - ONVIF (video management interoperability)
 - PMTiles and COPC specifications
 - Apple HTTP Live Streaming (RFC 8216); MPEG-DASH (ISO/IEC 23009-1)
+- Reuters: aging air traffic control system, Compaq computers and parts bought on eBay
+- FAA: floppy disk phase-out from air traffic control facilities by 2028 (as reported by Fox and GV Wire, November 2026)
 - HBO statements on the HBO GO outage during the Game of Thrones season 4 premiere (April 2014)
 - Microsoft: estimate of Windows devices affected by the CrowdStrike update (July 2024)
 - CrowdStrike: preliminary post-incident review (July 2024)
