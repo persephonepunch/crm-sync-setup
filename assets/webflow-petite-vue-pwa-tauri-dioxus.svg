@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1510 1290" width="1510" height="1290" font-family="Arial">
+<rect x="-5" y="-5" width="1510" height="1290" fill="#fff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="header">
+<text x="37.0" y="52.0" font-family="Arial" font-size="30" fill="#000" text-anchor="start">Webflow, petite-vue + UIkit, PWA, Tauri and Dioxus: one component, four builds</text>
+<text x="37.0" y="80.0" font-family="Arial" font-size="14" fill="#222" text-anchor="start">Designers keep Webflow. 11ty and Beautiful Soup turn its HTML into components; Cloudflare serves them with no compile step. Rust nests in only where it earns its build.</text>
+</g>
+<g id="source-lane">
+<text x="37.0" y="104.0" font-family="Arial" font-size="15" fill="#000" text-anchor="start">Shared source: one design, parsed once</text>
+<rect x="37.0" y="112.0" width="267.6" height="56" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="47.0" y="133.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Webflow Designer</text>
+<text x="47.0" y="150.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">classes, components, CMS</text>
+<line x1="306.6" y1="140.0" x2="324.6" y2="140.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="326.6" y="112.0" width="267.6" height="56" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="336.6" y="133.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Publish or export</text>
+<text x="336.6" y="150.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">static HTML, CSS, CMS CSV</text>
+<line x1="596.2" y1="140.0" x2="614.2" y2="140.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="616.2" y="112.0" width="267.6" height="56" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="626.2" y="133.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Beautiful Soup (Python)</text>
+<text x="626.2" y="150.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">parse classes, data-*, CMS rows</text>
+<line x1="885.8" y1="140.0" x2="903.8" y2="140.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="905.8" y="112.0" width="267.6" height="56" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="915.8" y="133.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">Component map (JSON)</text>
+<text x="915.8" y="150.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">class → uk-* → v-scope → rsx</text>
+<line x1="1175.4" y1="140.0" x2="1193.4" y2="140.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1195.4" y="112.0" width="267.6" height="56" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1205.4" y="133.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">11ty</text>
+<text x="1205.4" y="150.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Nunjucks partials + _data → HTML</text>
+</g>
+<g id="lane-1">
+<path d="M1039.6,170 L1039.6,206 L208.5,206 L208.5,228" fill="none" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="37.0" y="232" width="343.0" height="32" fill="#f22468"/>
+<text x="47.0" y="253.0" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">No compile: vanilla on the edge</text>
+<rect x="37.0" y="278.0" width="343.0" height="52" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="47.0" y="299.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">11ty HTML, as built</text>
+<text x="47.0" y="316.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">no bundler, no npm in the page</text>
+<line x1="208.5" y1="332.0" x2="208.5" y2="344.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="37.0" y="346.0" width="343.0" height="52" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="47.0" y="367.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">Cloudflare Worker + static assets</text>
+<text x="47.0" y="384.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">HTMLRewriter injects the helmet</text>
+<line x1="208.5" y1="400.0" x2="208.5" y2="412.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="37.0" y="414.0" width="343.0" height="52" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="47.0" y="435.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">petite-vue (~6 KB) + UIkit JS</text>
+<text x="47.0" y="452.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">v-scope islands, uk-* attributes</text>
+<line x1="208.5" y1="468.0" x2="208.5" y2="480.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="37.0" y="482.0" width="343.0" height="52" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="47.0" y="503.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">Browser</text>
+<text x="47.0" y="520.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">Data from Xano, the system of record</text>
+</g>
+<g id="lane-2">
+<path d="M1039.6,170 L1039.6,206 L569.5,206 L569.5,228" fill="none" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="398.0" y="232" width="343.0" height="32" fill="#111"/>
+<text x="408.0" y="253.0" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">PWA</text>
+<rect x="398.0" y="278.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="408.0" y="299.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Same 11ty HTML</text>
+<text x="408.0" y="316.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">plus manifest.webmanifest</text>
+<line x1="569.5" y1="332.0" x2="569.5" y2="344.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="398.0" y="346.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="408.0" y="367.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Service worker (sw.js)</text>
+<text x="408.0" y="384.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">shell cache-first, API network-first</text>
+<line x1="569.5" y1="400.0" x2="569.5" y2="412.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="398.0" y="414.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="408.0" y="435.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Cloudflare serves sw.js</text>
+<text x="408.0" y="452.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">cache rules, no build step</text>
+<line x1="569.5" y1="468.0" x2="569.5" y2="480.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="398.0" y="482.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="408.0" y="503.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Installed from the browser</text>
+<text x="408.0" y="520.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">offline shell, same components</text>
+</g>
+<g id="lane-3">
+<path d="M1039.6,170 L1039.6,206 L930.5,206 L930.5,228" fill="none" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="759.0" y="232" width="343.0" height="32" fill="#111"/>
+<text x="769.0" y="253.0" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Tauri: Rust nested under the page</text>
+<rect x="759.0" y="278.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="769.0" y="299.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Same 11ty HTML as frontend</text>
+<text x="769.0" y="316.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">in the system webview</text>
+<line x1="930.5" y1="332.0" x2="930.5" y2="344.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="759.0" y="346.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="769.0" y="367.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">invoke('get_product', { id })</text>
+<text x="769.0" y="384.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">the page calls the Rust core</text>
+<line x1="930.5" y1="400.0" x2="930.5" y2="412.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="759.0" y="414.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="769.0" y="435.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">#[tauri::command] in Rust</text>
+<text x="769.0" y="452.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">local network, files, OS keychain</text>
+<line x1="930.5" y1="468.0" x2="930.5" y2="480.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="759.0" y="482.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="769.0" y="503.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">cargo tauri build</text>
+<text x="769.0" y="520.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">signed installers + updater</text>
+</g>
+<g id="lane-4">
+<path d="M1039.6,170 L1039.6,206 L1291.5,206 L1291.5,228" fill="none" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1120.0" y="232" width="343.0" height="32" fill="#111"/>
+<text x="1130.0" y="253.0" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Dioxus: the components become Rust</text>
+<rect x="1120.0" y="278.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1130.0" y="299.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Component map → rsx!</text>
+<text x="1130.0" y="316.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">#[component] fn ProductCard</text>
+<line x1="1291.5" y1="332.0" x2="1291.5" y2="344.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1120.0" y="346.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1130.0" y="367.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">use_signal replaces v-scope state</text>
+<text x="1130.0" y="384.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">dx serve: hot reload while editing</text>
+<line x1="1291.5" y1="400.0" x2="1291.5" y2="412.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1120.0" y="414.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1130.0" y="435.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">dx build</text>
+<text x="1130.0" y="452.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">web (WASM), desktop, mobile</text>
+<line x1="1291.5" y1="468.0" x2="1291.5" y2="480.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1120.0" y="482.0" width="343.0" height="52" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1130.0" y="503.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Desktop uses wry + tao</text>
+<text x="1130.0" y="520.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">the same webview stack as Tauri</text>
+</g>
+<g id="revenue-endpoint">
+<line x1="208.5" y1="536.0" x2="208.5" y2="570.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="569.5" y1="536.0" x2="569.5" y2="570.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="930.5" y1="536.0" x2="930.5" y2="570.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="1291.5" y1="536.0" x2="1291.5" y2="570.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="208.5" y1="572" x2="1291.5" y2="572" stroke="#111" stroke-width="1.2"/>
+<line x1="208.5" y1="572.0" x2="208.5" y2="594.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+</g>
+<g id="revenue-lane">
+<rect x="37" y="598" width="1426" height="32" fill="#111"/>
+<text x="47.0" y="619.0" font-family="Arial" font-size="13.5" fill="#fff" text-anchor="start">Revenue endpoint: Google Merchant API + Vertex AI audience, server-side, after consent. Every build writes to Xano; none calls Google from the page</text>
+<rect x="37.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="47.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Xano record</text>
+<text x="47.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">system of record, every market</text>
+<line x1="229.0" y1="678.0" x2="241.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="243.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="253.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Consent + idempotency key</text>
+<text x="253.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">read first; one key per change</text>
+<line x1="435.0" y1="678.0" x2="447.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="449.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="459.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Merchant API v1</text>
+<text x="459.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">productInputs:insert</text>
+<text x="459.0" y="699.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">feedLabel, contentLanguage</text>
+<line x1="641.0" y1="678.0" x2="653.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="655.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="665.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">BigQuery</text>
+<text x="665.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">consented orders and events only</text>
+<line x1="847.0" y1="678.0" x2="859.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="861.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="871.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Vertex AI audience</text>
+<text x="871.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">by locale; not English by default</text>
+<line x1="1053.0" y1="678.0" x2="1065.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1067.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="1077.0" y="665.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Ads, YouTube, Shopping</text>
+<text x="1077.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">audiences + listings per market</text>
+<line x1="1259.0" y1="678.0" x2="1271.0" y2="678.0" stroke="#111" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="1273.0" y="644.0" width="190.0" height="68" fill="#fff" stroke="#f22468" stroke-width="2"/>
+<text x="1283.0" y="665.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">Revenue</text>
+<text x="1283.0" y="682.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start">conversions back, per market</text>
+<path d="M1368.0,714 L1368.0,734 L750.0,734 L750.0,716" fill="none" stroke="#f22468" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1059.0" y="750.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="middle">Conversions return to BigQuery, keyed by the same idempotency key, so revenue is counted once per market</text>
+</g>
+<g id="one-component">
+<text x="37.0" y="790.0" font-family="Arial" font-size="18" fill="#000" text-anchor="start">One component in each form</text>
+<rect x="37.0" y="804" width="343.0" height="104" fill="#f5f5f5" stroke="#f22468" stroke-width="2"/>
+<text x="47.0" y="824.0" font-family="Arial" font-size="13" fill="#d01a57" text-anchor="start">petite-vue + UIkit (no compile)</text>
+<text x="47.0" y="844.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">&lt;div class="uk-card uk-card-default"</text>
+<text x="47.0" y="860.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">     v-scope="Card({ id })"&gt;</text>
+<text x="47.0" y="876.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">  &lt;h3&gt;{{ title }}&lt;/h3&gt;</text>
+<text x="47.0" y="892.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">&lt;/div&gt;</text>
+<rect x="398.0" y="804" width="343.0" height="104" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="408.0" y="824.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">PWA</text>
+<text x="408.0" y="844.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">// registered once, in the helmet</text>
+<text x="408.0" y="860.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">navigator.serviceWorker</text>
+<text x="408.0" y="876.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">  .register('/sw.js')</text>
+<text x="408.0" y="892.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">// components unchanged</text>
+<rect x="759.0" y="804" width="343.0" height="104" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="769.0" y="824.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Tauri</text>
+<text x="769.0" y="844.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">// page</text>
+<text x="769.0" y="860.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">invoke('get_product', { id })</text>
+<text x="769.0" y="876.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">// Rust core</text>
+<text x="769.0" y="892.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">#[tauri::command] fn get_product(id: u32)</text>
+<rect x="1120.0" y="804" width="343.0" height="104" fill="#f5f5f5" stroke="none" stroke-width="2"/>
+<text x="1130.0" y="824.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Dioxus</text>
+<text x="1130.0" y="844.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">#[component]</text>
+<text x="1130.0" y="860.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">fn Card(title: String) -&gt; Element {</text>
+<text x="1130.0" y="876.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">  rsx! { div { class: "uk-card", "{title}" } }</text>
+<text x="1130.0" y="892.0" font-family="Arial" font-size="11.5" fill="#333" text-anchor="start" xml:space="preserve">}</text>
+</g>
+<g id="comparison">
+<text x="37.0" y="948.0" font-family="Arial" font-size="18" fill="#000" text-anchor="start">Compared</text>
+<rect x="227.0" y="962" width="309.0" height="30" fill="#f22468" stroke="#fff" stroke-width="1"/>
+<text x="237.0" y="982.0" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">No compile (vanilla)</text>
+<rect x="536.0" y="962" width="309.0" height="30" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="546.0" y="982.0" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">PWA</text>
+<rect x="845.0" y="962" width="309.0" height="30" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="855.0" y="982.0" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">Tauri</text>
+<rect x="1154.0" y="962" width="309.0" height="30" fill="#111" stroke="#fff" stroke-width="1"/>
+<text x="1164.0" y="982.0" font-family="Arial" font-size="13" fill="#fff" text-anchor="start">Dioxus</text>
+<g id="row-compile-step">
+<line x1="37" y1="1026" x2="1463" y2="1026" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1014.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Compile step</text>
+<text x="237.0" y="1014.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">None: 11ty renders, nothing bundles</text>
+<text x="546.0" y="1014.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">None</text>
+<text x="855.0" y="1014.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Rust core only; the page stays vanilla</text>
+<text x="1164.0" y="1014.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Everything: Rust to WASM and native</text>
+</g>
+<g id="row-who-edits">
+<line x1="37" y1="1060" x2="1463" y2="1060" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1048.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Who edits</text>
+<text x="237.0" y="1048.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Designers in Webflow</text>
+<text x="546.0" y="1048.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Designers in Webflow</text>
+<text x="855.0" y="1048.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Designers; Rust devs own the commands</text>
+<text x="1164.0" y="1048.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Rust devs; designers hand off the map</text>
+</g>
+<g id="row-shipped-to-the-browser">
+<line x1="37" y1="1094" x2="1463" y2="1094" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1082.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Shipped to the browser</text>
+<text x="237.0" y="1082.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">petite-vue + UIkit JS, HTML</text>
+<text x="546.0" y="1082.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">The same, plus sw.js</text>
+<text x="855.0" y="1082.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">The same, inside a webview</text>
+<text x="1164.0" y="1082.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">WASM bundle + small JS glue</text>
+</g>
+<g id="row-where-rust-runs">
+<line x1="37" y1="1128" x2="1463" y2="1128" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1116.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Where Rust runs</text>
+<text x="237.0" y="1116.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Behind the API (Workers, Xano)</text>
+<text x="546.0" y="1116.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Behind the API</text>
+<text x="855.0" y="1116.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">On the device, in the Tauri core</text>
+<text x="1164.0" y="1116.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">In the UI, and in #[server] functions</text>
+</g>
+<g id="row-cloudflare-load">
+<line x1="37" y1="1162" x2="1463" y2="1162" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1150.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Cloudflare load</text>
+<text x="237.0" y="1150.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Static assets + HTMLRewriter</text>
+<text x="546.0" y="1150.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Plus sw.js and cache rules</text>
+<text x="855.0" y="1150.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Updater files and installers from R2</text>
+<text x="1164.0" y="1150.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">WASM served as static assets</text>
+</g>
+<g id="row-revenue-path">
+<line x1="37" y1="1196" x2="1463" y2="1196" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1184.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Revenue path</text>
+<text x="237.0" y="1184.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">Server-side from Xano, never the page</text>
+<text x="546.0" y="1184.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Same; offline orders queue, then sync</text>
+<text x="855.0" y="1184.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Same; the Rust core posts to Xano</text>
+<text x="1164.0" y="1184.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Same; #[server] fn posts to Xano</text>
+</g>
+<g id="row-offline-and-install">
+<line x1="37" y1="1230" x2="1463" y2="1230" stroke="#ddd" stroke-width="1"/>
+<text x="37.0" y="1218.0" font-family="Arial" font-size="13" fill="#000" text-anchor="start">Offline and install</text>
+<text x="237.0" y="1218.0" font-family="Arial" font-size="12" fill="#d01a57" text-anchor="start">No</text>
+<text x="546.0" y="1218.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Yes, from the browser</text>
+<text x="855.0" y="1218.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Yes, native installer</text>
+<text x="1164.0" y="1218.0" font-family="Arial" font-size="12" fill="#222" text-anchor="start">Yes, desktop and mobile builds</text>
+</g>
+</g>
+<g id="rule">
+<text x="37.0" y="1260.0" font-family="Arial" font-size="13" fill="#222" text-anchor="start">Rule: start vanilla and add a build only for a reach the browser lacks. A PWA for offline, Tauri for the device, Dioxus when the whole UI should be Rust. The component map keeps all four in step.</text>
+</g>
+</svg>
