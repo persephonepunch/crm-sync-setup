@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1210 720" width="1210" height="720" font-family="Arial" role="img" aria-labelledby="t d">
+  <title id="t">The helm: one manifest per flow steers four duties</title>
+  <desc id="d">Sources on the left (Shopify webhooks, ERP and WMS, machines such as radar, VMS, IoT and LiDAR, shoppers and agents, design surfaces) flow into the helm, a control layer with one versioned manifest per flow. The helm sets four duties: data direction, orchestration, security and scaling. It steers three paths: the request path with Node preload, the event path with Rust and Tokio background tasks, and the scheduled path with Xano background tasks. Outputs on the right are Xano as the system of record, the edge cache, channels, operations screens and the R2 archive.</desc>
+  <rect id="background" x="-5" y="-5" width="1210" height="720" fill="#ffffff"/>
+
+  <g id="heading">
+    <text x="0" y="30" font-size="26" fill="#0a0a0a">The helm: one manifest per flow steers four duties</text>
+    <text x="0" y="56" font-size="14" fill="#666666">Direction, orchestration, security and scaling are declared per flow, then enforced at the edge, in the queues and in Xano.</text>
+  </g>
+
+  <g id="sources">
+    <rect x="0" y="90" width="250" height="380" fill="#f4f4f4"/>
+    <text x="16" y="116" font-size="12" fill="#666666" letter-spacing="1">SOURCES · INBOUND</text>
+    <text x="16" y="150" font-size="15" fill="#0a0a0a">Shopify webhooks</text>
+    <text x="16" y="170" font-size="12" fill="#666666">products, stock, orders</text>
+    <text x="16" y="210" font-size="15" fill="#0a0a0a">ERP and WMS</text>
+    <text x="16" y="230" font-size="12" fill="#666666">EDI, batch files</text>
+    <text x="16" y="270" font-size="15" fill="#0a0a0a">Machines</text>
+    <text x="16" y="290" font-size="12" fill="#666666">radar, VMS, IoT, LiDAR, trackers</text>
+    <text x="16" y="330" font-size="15" fill="#0a0a0a">Shoppers and agents</text>
+    <text x="16" y="350" font-size="12" fill="#666666">requests, carts, checkouts</text>
+    <text x="16" y="390" font-size="15" fill="#0a0a0a">Design surfaces</text>
+    <text x="16" y="410" font-size="12" fill="#666666">outbound only, unless allowed</text>
+  </g>
+
+  <g id="arrow-in">
+    <line x1="256" y1="280" x2="286" y2="280" stroke="#0a0a0a" stroke-width="1.5"/>
+    <path d="M286 275 L294 280 L286 285 Z" fill="#0a0a0a"/>
+  </g>
+
+  <g id="helm">
+    <rect x="300" y="90" width="600" height="64" fill="#f22468"/>
+    <text x="316" y="116" font-size="12" fill="#ffffff" letter-spacing="1">THE HELM</text>
+    <text x="316" y="140" font-size="14" fill="#ffffff">One manifest per flow · versioned in git · validated, canaried, rolled back by pointer</text>
+
+    <g id="duty-direction">
+      <rect x="300" y="162" width="296" height="150" fill="#f4f4f4"/>
+      <text x="316" y="188" font-size="12" fill="#f22468" letter-spacing="1">DATA DIRECTION</text>
+      <text x="316" y="214" font-size="13" fill="#0a0a0a">inbound, outbound or both, per flow</text>
+      <text x="316" y="236" font-size="13" fill="#0a0a0a">undeclared direction is refused</text>
+      <text x="316" y="258" font-size="13" fill="#0a0a0a">design surfaces outbound only</text>
+      <text x="316" y="280" font-size="13" fill="#0a0a0a">nothing sent out is read back</text>
+    </g>
+    <g id="duty-orchestration">
+      <rect x="604" y="162" width="296" height="150" fill="#f4f4f4"/>
+      <text x="620" y="188" font-size="12" fill="#f22468" letter-spacing="1">ORCHESTRATION</text>
+      <text x="620" y="214" font-size="13" fill="#0a0a0a">request · event · scheduled path</text>
+      <text x="620" y="236" font-size="13" fill="#0a0a0a">load → validate → canary → switch</text>
+      <text x="620" y="258" font-size="13" fill="#0a0a0a">idempotent jobs, one task per job</text>
+      <text x="620" y="280" font-size="13" fill="#0a0a0a">reads serve the last good copy</text>
+    </g>
+    <g id="duty-security">
+      <rect x="300" y="320" width="296" height="150" fill="#f4f4f4"/>
+      <text x="316" y="346" font-size="12" fill="#f22468" letter-spacing="1">SECURITY</text>
+      <text x="316" y="372" font-size="13" fill="#0a0a0a">one key per flow and per device</text>
+      <text x="316" y="394" font-size="13" fill="#0a0a0a">signed messages; size and type limits</text>
+      <text x="316" y="416" font-size="13" fill="#0a0a0a">consent checked before personal data</text>
+      <text x="316" y="438" font-size="13" fill="#0a0a0a">agents propose, people approve</text>
+    </g>
+    <g id="duty-scaling">
+      <rect x="604" y="320" width="296" height="150" fill="#f4f4f4"/>
+      <text x="620" y="346" font-size="12" fill="#f22468" letter-spacing="1">SCALING</text>
+      <text x="620" y="372" font-size="13" fill="#0a0a0a">partition key per flow</text>
+      <text x="620" y="394" font-size="13" fill="#0a0a0a">bounded queues with backpressure</text>
+      <text x="620" y="416" font-size="13" fill="#0a0a0a">memory budget per task</text>
+      <text x="620" y="438" font-size="13" fill="#0a0a0a">add instances, not a bigger machine</text>
+    </g>
+  </g>
+
+  <g id="arrow-out">
+    <line x1="906" y1="280" x2="936" y2="280" stroke="#0a0a0a" stroke-width="1.5"/>
+    <path d="M936 275 L944 280 L936 285 Z" fill="#0a0a0a"/>
+  </g>
+
+  <g id="outputs">
+    <rect x="950" y="90" width="250" height="380" fill="#f4f4f4"/>
+    <text x="966" y="116" font-size="12" fill="#666666" letter-spacing="1">OUTPUTS · OUTBOUND</text>
+    <text x="966" y="150" font-size="15" fill="#0a0a0a">Xano · system of record</text>
+    <text x="966" y="170" font-size="12" fill="#666666">batched upserts, reconciliation</text>
+    <text x="966" y="210" font-size="15" fill="#0a0a0a">Edge cache (KV)</text>
+    <text x="966" y="230" font-size="12" fill="#666666">preloaded reads, A/B slots</text>
+    <text x="966" y="270" font-size="15" fill="#0a0a0a">Channels</text>
+    <text x="966" y="290" font-size="12" fill="#666666">Merchant API, Meta, Amazon, Shopify</text>
+    <text x="966" y="330" font-size="15" fill="#0a0a0a">Operations screens</text>
+    <text x="966" y="350" font-size="12" fill="#666666">live tracks, alerts, queue depth</text>
+    <text x="966" y="390" font-size="15" fill="#0a0a0a">Archive (R2)</text>
+    <text x="966" y="410" font-size="12" fill="#666666">raw payloads, versioned files</text>
+  </g>
+
+  <g id="arrow-steers">
+    <line x1="600" y1="476" x2="600" y2="494" stroke="#0a0a0a" stroke-width="1.5"/>
+    <path d="M595 494 L600 502 L605 494 Z" fill="#0a0a0a"/>
+    <text x="612" y="492" font-size="12" fill="#666666">steers three paths</text>
+  </g>
+
+  <g id="paths">
+    <g id="path-request">
+      <rect x="0" y="508" width="390" height="116" fill="#f4f4f4"/>
+      <text x="16" y="534" font-size="12" fill="#f22468" letter-spacing="1">REQUEST PATH</text>
+      <text x="16" y="560" font-size="15" fill="#0a0a0a">Node preload at the edge</text>
+      <text x="16" y="582" font-size="13" fill="#0a0a0a">answers from warmed cache only</text>
+      <text x="16" y="604" font-size="13" fill="#666666">shoppers, agents, screens</text>
+    </g>
+    <g id="path-event">
+      <rect x="405" y="508" width="390" height="116" fill="#f4f4f4"/>
+      <text x="421" y="534" font-size="12" fill="#f22468" letter-spacing="1">EVENT PATH</text>
+      <text x="421" y="560" font-size="15" fill="#0a0a0a">Queue → Rust and Tokio tasks</text>
+      <text x="421" y="582" font-size="13" fill="#0a0a0a">streaming parse, bounded memory</text>
+      <text x="421" y="604" font-size="13" fill="#666666">hash-gate, coalesce, batch</text>
+    </g>
+    <g id="path-scheduled">
+      <rect x="810" y="508" width="390" height="116" fill="#f4f4f4"/>
+      <text x="826" y="534" font-size="12" fill="#f22468" letter-spacing="1">SCHEDULED PATH</text>
+      <text x="826" y="560" font-size="15" fill="#0a0a0a">Xano background tasks</text>
+      <text x="826" y="582" font-size="13" fill="#0a0a0a">reconcile, retry, snapshot</text>
+      <text x="826" y="604" font-size="13" fill="#666666">rebuild the preload cache</text>
+    </g>
+  </g>
+
+  <g id="rules">
+    <text x="0" y="656" font-size="13" fill="#0a0a0a">No flow without a manifest. The helm's own configuration gets the same checks, canary and rollback as data.</text>
+    <text x="0" y="678" font-size="13" fill="#0a0a0a">Each flow sets its own safe default: reads serve the last good copy; writes to the system of record wait in the queue.</text>
+    <text x="0" y="704" font-size="11" fill="#666666">crm-sync.dev/docs/copper-to-fiber-legacy-networks</text>
+  </g>
+</svg>
