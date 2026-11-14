@@ -137,6 +137,31 @@ Memory isn't the main reason they can't take the new load, though. Radar track d
 - **Certification lock-in:** the systems run around the clock and are safety-certified. Changing the hardware or operating system means recertifying, and they can't be taken offline, so they're kept alive with salvaged parts.
 - **Shrinking supply:** HP retired the Compaq brand in 2013, so every failure takes longer to repair.
 
+#### Airports, facilities and units
+
+How big is the replacement in units? Smaller than it sounds for computers, and much larger for everything around them.
+
+| Count | Approximate number |
+|---|---|
+| Public-use airports in the US | about 5,000 (about 19,000–20,000 including private airfields) |
+| Airports with a control tower | about 520: roughly 260 run by the FAA and roughly 260 contract towers |
+| Approach control facilities (TRACONs) | about 147 |
+| En-route centers (ARTCCs) | about 21 |
+| Facilities reported to run Compaq computers | 313, from a single lightly sourced report; unconfirmed |
+| Compaq machines, estimated | low thousands (313 facilities × a handful each ≈ 1,000–2,000); the FAA hasn't published a count |
+
+What the rebuild buys, as reported:
+
+| Item | Count |
+|---|---|
+| Radios | 27,625 |
+| Network connections (fiber, satellite, wireless) | 5,170 |
+| Radars | 612 |
+| Digital voice switches | 462 |
+| New surface radars | 44 airports |
+
+The computers are a rounding error. At about $5,000 each, 2,000 new machines cost around $10 million, less than 0.1% of the $12.5 billion already funded. The money and the years go to radios, radars, the network and new software, and above all to certifying that software for safety, integrating it with radar, ADS-B and voice, training controllers, and switching each facility over while it stays live around the clock.
+
 Adding RAM wouldn't fix it, which is why the FAA's plan replaces the computers and software along with the copper. It's the clearest case of tech debt that worked before data got big: each part was sound for the load it was certified for, and the load moved on.
 
 ## Too much data at once: Game of Thrones, Windows and the radar link
