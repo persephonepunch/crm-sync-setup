@@ -26,6 +26,7 @@ tags:
   - ott
   - ai
   - gaming
+  - air-gap
 ---
 
 # Copper to Fiber: 2000s-Era Network Debt and Short-Term Paired Fixes
@@ -163,6 +164,45 @@ What the rebuild buys, as reported:
 The computers are a rounding error. At about $5,000 each, 2,000 new machines cost around $10 million, less than 0.1% of the $12.5 billion already funded. The money and the years go to radios, radars, the network and new software, and above all to certifying that software for safety, integrating it with radar, ADS-B and voice, training controllers, and switching each facility over while it stays live around the clock.
 
 Adding RAM wouldn't fix it, which is why the FAA's plan replaces the computers and software along with the copper. It's the clearest case of tech debt that worked before data got big: each part was sound for the load it was certified for, and the load moved on.
+
+#### From copper to floppy: the two paths
+
+Live copper data doesn't go to a floppy disk. The two are separate paths, and the floppy sits where systems can't talk to each other over a network.
+
+| Path | Route | Speed | Carries |
+|---|---|---|---|
+| Live | radar site → digitized track data → telecom circuit (copper or fiber) → modem or serial interface → automation computer → controller's display | continuous, seconds | positions, tracks, voice |
+| Batch | data arrives at or is produced on one computer → copied to a 1.44 MB floppy → carried by hand to a machine with no network link, or only a floppy drive → loaded | manual, hours or days | weather and other periodic information; typically maps, sector boundaries, frequency tables and software or configuration updates |
+
+The batch path is "sneakernet": a person carrying data between systems that can't connect, sometimes on purpose, as an air gap. The FAA hasn't published the workflow for each facility, so the route above is the general pattern, not a documented procedure.
+
+It survives because the receiving machines are certified with a floppy drive as their only input, and because an air gap keeps network faults away from the safety system. It no longer fits because:
+
+- **1.44 MB is tiny.** One 1080p camera at 4 Mbps fills a floppy in about 3 seconds, and a modern weather radar mosaic is many times larger.
+- **Every update is a manual step**, and the wrong or an old disk can be loaded.
+- **Media wears out**, and new drives haven't been made for years.
+- **Nothing verifies the disk.** Typically there's no signature or validation step; whatever is on it is loaded.
+
+The commerce equivalent is the nightly CSV export or the spreadsheet emailed to the warehouse. The fix in both cases is to keep the separation but replace the hand-carried copy with a declared, verified flow.
+
+#### An air gap that is AI-secure
+
+An air gap is worth keeping for safety systems, and AI raises the bar for what crosses it. Attackers can generate malicious files, convincing documents and injected instructions faster than before, and an AI agent with access on both sides would be a bridge across the gap. A modern gap is one-way, verified and closed to agents:
+
+| Control | What it does | Why it matters for AI |
+|---|---|---|
+| One-way transfer | a data diode or unidirectional gateway, enforced in hardware, carries data into the safe side; nothing can travel back | an agent or malware on the outside can't reach in to read, steer or exfiltrate |
+| Allow-listed formats only | only declared data formats cross (for example a weather grid, a sector map, a signed update package); executables, macros, scripts and free-form documents are refused | AI-generated payloads hide in formats with active content; a fixed format has nowhere to hide them |
+| Content disarm and reconstruction | each file is parsed and rebuilt from its data fields only, discarding everything else | strips hidden content without needing to recognize it, so new AI-made variants are handled the same as old ones |
+| Signed manifest | every transfer carries a manifest of files, sizes and hashes, signed with a key held by a named person or a hardware module, never by an AI agent | an agent can propose a change but can't authorize it |
+| Deterministic validation | schema, range and size checks run in a memory-safe parser (Rust) on the receiving side; a failure quarantines the transfer | rejects oversized, malformed or out-of-range data before it's loaded, the failure mode behind the 2024 and 2025 outages |
+| Text treated as data | free-text fields (notes, NOTAM text, descriptions) are length-limited, stripped of control characters and never executed or passed to a model as instructions | blocks prompt injection riding inside routine data |
+| A/B load with human sign-off | the transfer loads into an inactive slot, is checked, and is switched live only after a named person approves; the previous slot stays for rollback | a bad transfer never reaches the live system, and recovery takes one switch |
+| No agents on the safe side | no AI agent holds credentials on the safe side; any model used there is a fixed, hash-pinned version with no network access and no ability to change its own inputs | a compromised or confused model can't widen its own reach |
+| Nothing flows back to train | data from the safe side isn't used to train or tune outside models; any reporting out goes through its own one-way path with redaction | the safe side's data can't leak through a model |
+| Full audit trail | every transfer, check, approval and switch is logged with who, what and the hashes | an incident can be traced to one transfer and one approver |
+
+This is the helm applied to an air gap: one declared flow, inbound only, with its own keys, size limits, validation and staged switch. People approve, machines verify, and AI may propose but never carry or authorize anything across.
 
 ## Too much data at once: Game of Thrones, Windows and the radar link
 
@@ -558,6 +598,8 @@ The FAA case is extreme, but the shape is familiar from the same era of enterpri
 - PMTiles and COPC specifications
 - Apple HTTP Live Streaming (RFC 8216); MPEG-DASH (ISO/IEC 23009-1)
 - Reuters: aging air traffic control system, Compaq computers and parts bought on eBay
+- NIST SP 800-82: guide to operational technology security (unidirectional gateways)
+- IEC 62443: security for industrial automation and control systems
 - FAA: floppy disk phase-out from air traffic control facilities by 2028 (as reported by Fox and GV Wire, November 2026)
 - HBO statements on the HBO GO outage during the Game of Thrones season 4 premiere (April 2014)
 - Microsoft: estimate of Windows devices affected by the CrowdStrike update (July 2024)
