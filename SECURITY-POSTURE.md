@@ -3,7 +3,7 @@ title: "CRM Sync — Security & Compliance Posture"
 description: "Encrypted per-tenant credentials, scoped revocable tokens, fail-closed consent, offline-verifiable agent mandates, and a public, dated list of open findings."
 canonical: https://persephonepunch.github.io/crm-sync-setup/security-posture.html
 category: "Security"
-date: 2026-08-16
+date: 2026-11-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SECURITY-POSTURE.md
 licence: CC-BY-4.0
 tags:
@@ -16,7 +16,7 @@ tags:
 # CRM Sync — Security & Compliance Posture
 
 **For:** compliance officers, security auditors, DPOs, and risk-assessment teams.
-**Last updated:** 2026-07-14 · This document is versioned and public.
+**Last updated:** 2026-11-22 · This document is versioned and public.
 **Companion:** the [CISO / DPO FAQ](CISO-DPO-FAQ.md) answers the same ground in question form. If you
 only read one section here, read **Known Limitations** at the bottom — it is dated and honest.
 
@@ -135,6 +135,10 @@ Agent authority to transact does not rest on trusting our API. Every agent purch
   in the same tool.
 - **Spend caps are enforced fail-closed** at the data plane before any checkout executes; an
   over-cap attempt is refused (covered by an automated end-to-end test).
+- **A second check inside Shopify checkout is built and in review, not yet deployed.** A cart and
+  checkout validation Function blocks an agent checkout unless the entitlement is active, AP2 is granted,
+  the total is within the cap in the mandate's currency, the mandate is active and consent is recorded.
+  It runs inside Shopify with no network call, reading a projection of the entitlement.
 - **The refusal is in the tool boundary, not a prompt.** Agents call the same server-side gate as any
   client; the gate holds when you swap the model. A prompt is guidance; this is a control.
 
@@ -147,7 +151,7 @@ Four independent mechanisms; compromising one does not compromise the others.
 | Layer | Protects | How |
 |-------|----------|-----|
 | **Bearer token** | Admin + sync endpoints | Secret key per request; per-tenant admin keys checked first, platform key as fallback (see Known Limitations on disabling the platform key) |
-| **JWT session** | Customer features (profile, consent, tags) | A **signed (HMAC-SHA256) cookie** — tamper-evident, auto-expiring. *Signed, not encrypted*: it carries no secret payload, it proves the session wasn't forged |
+| **JWT session** | Customer features (profile, consent, tags) | A **signed (HMAC-SHA256) cookie** — tamper-evident, auto-expiring. *Signed, not encrypted*: it proves the session wasn't forged, but anyone holding the cookie can read its payload, which today includes the user's email and name (see Known limitations) |
 | **HMAC signature** | Shopify webhooks + GDPR handlers | Shopify signs each request; the Worker verifies |
 | **Cloudflare Access** | Browser admin pages | Email OTP before any admin page loads |
 
@@ -204,6 +208,7 @@ receive **SHA-256 hashes**; GA4 receives **no PII** — only tag categories and 
 | Consent writes are best-effort idempotent, **not** exactly-once (duplicate records possible under retry) | High | Sprint 2 |
 | Sync conflict resolution is most-recent-write-wins — wrong for consent, where a later sync could overwrite an earlier withdrawal (correcting to last-intent-wins) | High | Sprint 2 |
 | Consent Mode v2: `ad_storage` / `ad_user_data` / `ad_personalization` are driven by one marketing flag, not separately electable | Medium | Planned |
+| The session cookie's payload carries the user's email and name for 7 days. It is signed, not encrypted, so anyone holding the cookie can read them | Medium | Open — fix in review: new tokens carry only the user id, sign-in provider and shop. A shorter expiry follows separately |
 | Platform admin key authenticates tenant routes and cannot yet be disabled per tenant | Medium | Sprint 2 |
 | Ed25519 signing private key resides in Cloudflare KV, not a dedicated secrets vault | Medium | Sprint 2 |
 | Config-envelope master secret defaults to `JWT_SECRET` when `ENVELOPE_MASTER_KEY` is unset — so **rotating `JWT_SECRET` makes every config document undecryptable** unless `ENVELOPE_MASTER_KEY_PREVIOUS` is set and a `rewrap` is run. Two previously independent credentials are now coupled | High | Open — set a dedicated `ENVELOPE_MASTER_KEY` before the first sweep to decouple permanently |
@@ -212,7 +217,7 @@ receive **SHA-256 hashes**; GA4 receives **no PII** — only tag categories and 
 | No version history or rollback for the KV config blob. A valid-but-wrong overwrite is provable via the ledger but not reversible (the data and content tiers carry rolling ~15-min restore; the config blob does not) | Medium | Planned |
 | Tenant keys can expire but cannot be **renewed** — an expiring key is replaced by rotating, not extended | Low | Planned |
 | Envelope covers secret-classed fields via a maintained list; a new credential field added to the config type and not to `SECRET_CONFIG_FIELDS` would be stored plaintext. Guarded by a build-failing harness test (`CFG-G02`), not by the type system | Low | Mitigated |
-| No revocation of a signed mandate faster than its expiry (mandates are short-lived + scoped) | Medium | Planned |
+| No revocation of a signed mandate faster than its expiry (mandates are short-lived + scoped) | Medium | Planned — the in-checkout Function (section 4) reads mandate state, so a revocation will reach checkout once the entitlement projection to Shopify ships |
 | CSP headers on embedded pages | Low | Open |
 | `X-Content-Type-Options: nosniff` on JSON responses | Low | Open |
 

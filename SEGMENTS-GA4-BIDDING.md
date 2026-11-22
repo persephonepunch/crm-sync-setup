@@ -3,7 +3,7 @@ title: "Marketing was built on the page view. The funnel now pays for the consen
 description: "For: Marketing ops, performance media, and analytics engineering Status: Built (GA4 push + audiences) · Direct Google Ads push pending Ads API credentials Date: 2026-07-07 Depen…"
 canonical: https://persephonepunch.github.io/crm-sync-setup/segments-ga4-bidding.html
 category: "Shopify"
-date: 2026-07-22
+date: 2026-11-22
 source: https://github.com/persephonepunch/crm-sync-setup/blob/master/SEGMENTS-GA4-BIDDING.md
 licence: CC-BY-4.0
 tags:
@@ -133,6 +133,7 @@ JIT keeps the bidding signal fresh to the event, while the cron sweep guarantees
 | Revenue-weighted band (`crm_revenue_band`) | **Live** |
 | JIT membership via Shopify Customer Events | **Live** |
 | **Direct** push to Google Ads Customer Match / offline conversions | **Planned** — via the Data Manager API ([plan](segments-google-connect.html)) |
+| Conversion funnel in BigQuery: YouTube video → conversion, keyed by a pseudonymous ID, consent-gated, no service-account keys, no ad spend | **Built, in review** — not deployed |
 
 The direct path (Customer Match audiences + value-based conversion ingestion, hashed first-party identifiers under consent) is the next increment — and it no longer runs through the Google Ads API. Google disabled Ads API Customer Match uploads on April 1, 2026; the successor channel is the **Data Manager API**, planned in [`SEGMENTS-GOOGLE-CONNECT.md`](segments-google-connect.html). Until that ships, GA4's native audience share carries the signal.
 
