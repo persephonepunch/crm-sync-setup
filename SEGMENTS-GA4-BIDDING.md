@@ -133,7 +133,7 @@ JIT keeps the bidding signal fresh to the event, while the cron sweep guarantees
 | Revenue-weighted band (`crm_revenue_band`) | **Live** |
 | JIT membership via Shopify Customer Events | **Live** |
 | **Direct** push to Google Ads Customer Match / offline conversions | **Planned** — via the Data Manager API ([plan](segments-google-connect.html)) |
-| Conversion funnel in BigQuery: YouTube video → conversion, keyed by a pseudonymous ID, consent-gated, no service-account keys, no ad spend | **Built, in review** — not deployed |
+| Conversion funnel in BigQuery: YouTube video → conversion, keyed by the identity spine's ID, consent-gated, no ad spend | **Shipped, off** — enabled per store once its BigQuery tables and Pub/Sub topic exist |
 
 The direct path (Customer Match audiences + value-based conversion ingestion, hashed first-party identifiers under consent) is the next increment — and it no longer runs through the Google Ads API. Google disabled Ads API Customer Match uploads on April 1, 2026; the successor channel is the **Data Manager API**, planned in [`SEGMENTS-GOOGLE-CONNECT.md`](segments-google-connect.html). Until that ships, GA4's native audience share carries the signal.
 
