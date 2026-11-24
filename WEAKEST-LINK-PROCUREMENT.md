@@ -38,9 +38,9 @@ keywords:
 
 ## The diagram
 
-[![WMS + dark factory: the weakest link is procurement; workshop vs factory vs lights-out; one task per agent; risks; human-in-the-loop escalation and enterprise compliance; small-business tools against the enterprise ceiling; the JVM blocker that becomes a backdoor; SaaS fee blockers](https://persephonepunch.github.io/crm-sync-setup/assets/wms-dark-factory-agentic-data.svg)](https://persephonepunch.github.io/crm-sync-setup/assets/wms-dark-factory-agentic-data.svg)
+[![WMS + dark factory: the weakest link is procurement; workshop vs factory vs lights-out; one task per agent; risks; human-in-the-loop escalation and enterprise compliance; small-business tools against the enterprise ceiling; the JVM blocker that becomes a backdoor; SaaS fee blockers](https://crm-sync.dev/kb/media/docs/wms-dark-factory-agentic-data.svg)](https://crm-sync.dev/kb/media/docs/wms-dark-factory-agentic-data.svg)
 
-Download: [SVG](https://persephonepunch.github.io/crm-sync-setup/assets/wms-dark-factory-agentic-data.svg) · [PNG](https://persephonepunch.github.io/crm-sync-setup/assets/wms-dark-factory-agentic-data.png) · [PDF](https://persephonepunch.github.io/crm-sync-setup/assets/wms-dark-factory-agentic-data.pdf)
+Download: [SVG](https://crm-sync.dev/kb/media/docs/wms-dark-factory-agentic-data.svg) · [PNG](https://crm-sync.dev/kb/media/docs/wms-dark-factory-agentic-data.png) · [PDF](https://crm-sync.dev/kb/media/docs/wms-dark-factory-agentic-data.pdf)
 
 ## Where the risk really is
 
