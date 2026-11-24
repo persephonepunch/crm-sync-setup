@@ -226,6 +226,41 @@ What changes from one row to the next is only **how the request is proved**. Tha
 edge rules, the tenant config, the Xano release gate, the consent ledger and the in-house attestations are shared.
 Adding a platform means adding one arm, not another security stack.
 
+### Same head and footer code, same function
+
+In the browser, a Webflow page and a Shopify page are both just HTML. If the head and footer code is identical, the
+same script loads from the same Worker URL and runs in the same browser runtime, and the function behaves the same on
+either platform.
+
+| | Webflow | Shopify |
+|---|---|---|
+| **Head** | Site settings → Custom code → Head code (or per page) | `theme.liquid` before `</head>`, or an app embed block |
+| **Footer** | Site settings → Custom code → Footer code | `theme.liquid` before `</body>`, or an app embed block |
+| **The line** (example path) | `<script src="https://<your-worker>/stack.js" data-tenant="…" defer></script>` | The same line |
+
+**Keep the head and footer to that one loader line.** The Worker serves the code behind it, so a change ships once to
+every platform, with nothing to re-paste. WordPress, Magento, Drupal and a Next.js, Astro or Vue app load the same line
+in their own head and footer.
+
+**What still differs is what the script finds on the page.** Each difference is a small check inside the same script,
+not a second script:
+
+- **Platform objects:** Shopify has `window.Shopify` and the Customer Privacy API for consent; Webflow has `Webflow` and
+  no built-in consent API.
+- **Markup:** class names, form markup and where product data sits.
+- **Forms:** a Webflow form posts to Webflow (with Turnstile built in), a Shopify form posts to Shopify. A form that
+  posts to the Worker behaves the same on both.
+
+**Where identical head and footer code doesn't reach:**
+
+- **Shopify checkout** doesn't run theme head or footer code. There, the restricted blocks take over: checkout UI
+  extensions for the screen, Shopify Functions for the decision (see
+  [Stack, heap and runtime](#stack-heap-and-runtime-shopify-blocks-vs-the-worker)).
+- **Server-side work**, meaning signatures, keys, R2 and the ledger, stays in the Worker.
+
+So there are three layers: **the browser layer** is one script, loaded the same way everywhere; **the checkout layer**
+is Shopify's blocks; **the server layer** is the Worker.
+
 ### Shopify and Webflow side by side
 
 Compared layer by layer, the two differ only in the format each platform uses to sign a request, and both use
@@ -285,6 +320,42 @@ show which version a past export, order or decision used, and a migration that g
 each platform reads. Fine-tuning becomes a new version the gate points at, and rolling back means pointing it at the
 old one, with no restore and no migration. The platform's own store still holds its working copy for its pages, but
 the record, the keys and the history stay with you.
+
+### Stack, heap and runtime: Shopify blocks vs the Worker
+
+"Stack" above means the **tech stack**: framework, build, ORM and host. In memory terms, the stack and the heap are two
+areas inside the **runtime**, and neither is the logic itself:
+
+| Term | What it is | In a Worker |
+|---|---|---|
+| **Runtime** | Runs the compiled code and provides its memory | The V8 isolate, with WebAssembly inside it (PHP for WordPress, Node for Firebase Functions) |
+| **Logic / function** | The compiled instructions | `verifyShopifyHmac`, `release_gate`, the Rust `.wasm` |
+| **Stack** | Short-lived memory per function call, freed when the call returns | The frame of `shopify_webhook_ok` while it runs: flags, lengths, timestamps |
+| **Heap** | Memory that grows as needed and lives as long as its owner | Everything **loaded**: the request body, an R2 file, parsed CSV rows, a decrypted record |
+
+A decrypted row or a loaded key sits on the heap. In Rust, ownership frees it the moment its owner goes out of scope,
+and `zeroize` wipes the bytes first. In JavaScript or PHP the garbage collector frees it later, unwiped.
+
+**A Shopify block is a restricted slot in Shopify's runtime.** A Shopify Function (discounts, delivery and payment
+customisations, cart and checkout validation) is your logic compiled to WebAssembly and run by Shopify with a small,
+fixed memory and instruction budget. Theme app blocks and checkout UI extensions are the same idea for the screen: they
+render in a slot Shopify controls, from a limited set of components, in a sandbox.
+
+| | Shopify Function (a block) | The Worker |
+|---|---|---|
+| **Runtime** | Shopify's, running your `.wasm` | Cloudflare's V8 isolate, deployed by you |
+| **Logic** | One function, with a strict size limit | The whole gate: any number of routes and functions |
+| **Stack and heap** | Small and fixed, with an instruction budget per run; exceed either and the function fails and Shopify falls back | Roughly 128 MB per isolate, CPU time you configure |
+| **Load** | Only what the input query asks for; Shopify loads it and hands it in | Anything: R2, Xano, KV, Shopify, Webflow |
+| **Network** | None | Yes |
+| **Output** | Operations Shopify applies: a discount, hide this option, block this checkout | Any response, write or signed receipt |
+| **Keys** | None inside the function | Your secrets and your `kid` |
+
+**The split:** the block holds the small, fast decision that must happen inside checkout. The Worker holds everything
+that needs keys, network, files or history: signatures, the release gate, R2, the ledger. The same Rust crate compiles
+to both, so the rule is written once (see [Rust or Javy for a Shopify Function](https://ecc-rust-book.yoonsunlee150.workers.dev/parsing-at-the-gate#rust-or-javy-for-a-shopify-function)).
+Shopify revises the Function limits; check the [Shopify Functions reference](https://shopify.dev/docs/api/functions)
+for current figures before relying on one.
 
 ## One store for every file type: R2 behind the same gate
 
