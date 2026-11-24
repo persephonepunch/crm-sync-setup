@@ -57,6 +57,7 @@ chapters:
       - DESIGN-SECURE-REVENUE-PROJECTION.md   # 2026-10-24 · Design for Secure Revenue Projection
       - docs/SIGNING-KEYS-BY-PROXY.md   # 2026-11-04 · Signing Keys by Proxy: AI Security, Globalization, Tools and Permissions
       - BRINGING-SECURITY-IN-HOUSE.md   # 2026-11-13 · Bringing Security and Data In House
+      - WEAKEST-LINK-PROCUREMENT.md   # 2026-11-24 · The weakest link is procurement
   - category: Specs
     docs:
       - ARCHITECTURE.md   # 2026-05-26 · CRM Sync — Why This Architecture Is Safer

@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1420 3260" width="1420" height="3260">
+<rect id="background" x="-5" y="-5" width="1420" height="3260" fill="#fff"/>
+<g id="title">
+<text x="45" y="57" font-family="'Times New Roman', Times, serif" font-size="26" fill="#1f1f1f" text-anchor="start">WMS + Dark Factory — Agentic Data Models, Risks, and the Fees That Block Agent Access</text>
+<text x="45" y="83" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">Workshop (human-led) vs factory (agent-led) vs lights-out: where the control lives when nobody is on shift, which records an agent may read, and what stops it today</text>
+<rect x="45" y="97" width="120" height="4" fill="#f22468"/>
+<a href="https://www.crm-sync.dev/pages/knowledge-base" target="_blank">
+<text x="1365" y="57" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="end">Knowledge Base · crm-sync.dev</text>
+</a>
+</g>
+<g id="thesis-weakest-link-procurement">
+<rect x="45" y="124" width="1320" height="186" fill="#fff" stroke="#f22468"/>
+<text x="65" y="150" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">THE WEAKEST LINK · NOT THE AI SWARM, THE PROCUREMENT DECISION</text>
+<text x="65" y="174" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">Plugin and SaaS data that crosses channels with no gate is the weakest link, not swarms of anthropomorphized AI bots</text>
+<text x="65" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A form add-on that posts to the CRM, a base that syncs to Shopify, a zap that writes to the ERP: each was</text>
+<text x="65" y="216" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">bought for its features and its price, and each moves data between channels with no signature, no timestamp,</text>
+<text x="65" y="232" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">no escalation and no ledger. An agent doesn't create that path. It inherits it. Gate the crossing and the agent has</text>
+<text x="65" y="248" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">nothing more to reach; leave it open and no AI policy closes it.</text>
+<text x="705" y="200" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Procurement gate · ask before buying</text>
+<rect x="705" y="213" width="7" height="7" fill="#f22468"/>
+<text x="721" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Does its data cross a channel, and through what transport?</text>
+<rect x="705" y="230" width="7" height="7" fill="#f22468"/>
+<text x="721" y="239" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Is every crossing signed, timestamped and logged?</text>
+<rect x="705" y="247" width="7" height="7" fill="#f22468"/>
+<text x="721" y="256" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Can a failure escalate into SAP, Dynamics, Salesforce or the WMS?</text>
+<rect x="705" y="264" width="7" height="7" fill="#f22468"/>
+<text x="721" y="273" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Scoped, expiring token, or one key to everything?</text>
+<rect x="705" y="281" width="7" height="7" fill="#f22468"/>
+<text x="721" y="290" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">What happens at the rate limit, and how do we leave with our data?</text>
+<rect x="685" y="190" width="1" height="106" fill="#ededed"/>
+</g>
+<g id="layer-column-heads">
+<text x="45" y="350" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">LAYER</text>
+<text x="245" y="350" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">WORKSHOP · HUMAN-LED DEVOPS</text>
+<text x="585" y="350" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">FACTORY · AGENT-LED</text>
+<text x="955" y="350" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">DARK WAREHOUSE · LIGHTS-OUT</text>
+<rect x="45" y="360" width="1320" height="1" fill="#d6d6d6"/>
+</g>
+<g id="layer-who-acts">
+<text x="45" y="386" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Who acts</text>
+<text x="245" y="386" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A developer with their own login</text>
+<text x="585" y="386" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Many agents in parallel, each with a workload identity</text>
+<text x="955" y="386" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Robots, scanners and firmware fetching machine to machine; nobody on</text>
+<text x="955" y="401" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">shift</text>
+</g>
+<rect x="45" y="416" width="1320" height="1" fill="#ededed"/>
+<g id="layer-main-control">
+<text x="45" y="435" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Main control</text>
+<text x="245" y="435" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Human review: PR approval, click to deploy</text>
+<text x="585" y="435" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Policy as code the pipeline enforces with no person</text>
+<text x="585" y="450" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">involved</text>
+<text x="955" y="435" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A scoped, expiring mandate per task, checked on every call, revoked when</text>
+<text x="955" y="450" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">the shift ends</text>
+</g>
+<rect x="45" y="465" width="1320" height="1" fill="#ededed"/>
+<g id="layer-identity">
+<text x="45" y="484" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Identity</text>
+<text x="245" y="484" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Long-lived user credentials, RBAC</text>
+<text x="585" y="484" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Short-lived, scoped credentials or bindings for each task</text>
+<text x="955" y="484" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Device attestation: the grant engine's fifth subject, beside invitation,</text>
+<text x="955" y="499" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">purchase, commission, agent</text>
+</g>
+<rect x="45" y="514" width="1320" height="1" fill="#ededed"/>
+<g id="layer-where-code-runs">
+<text x="45" y="533" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Where code runs</text>
+<text x="245" y="533" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Developer laptop, shared CI</text>
+<text x="585" y="533" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Isolated sandbox or VM for each agent run</text>
+<text x="955" y="533" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A Worker isolate at the edge; credentials stay bindings, never with the</text>
+<text x="955" y="548" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">agent or robot</text>
+</g>
+<rect x="45" y="563" width="1320" height="1" fill="#ededed"/>
+<g id="layer-blast-radius">
+<text x="45" y="582" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Blast radius</text>
+<text x="245" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One person's mistake</text>
+<text x="585" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One bad dependency or over-privileged agent, repeated</text>
+<text x="585" y="597" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">across every agent</text>
+<text x="955" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A whole line or building: the highest blast radius in commerce</text>
+</g>
+<rect x="45" y="612" width="1320" height="1" fill="#ededed"/>
+<g id="layer-evidence">
+<text x="45" y="631" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Evidence</text>
+<text x="245" y="631" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Logs, plus whatever reviewers remember</text>
+<text x="585" y="631" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Provenance and attestation (SLSA, SBOMs) recorded for</text>
+<text x="585" y="646" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">every artifact</text>
+<text x="955" y="631" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A ledger row per scan and per call; EU CRA Art. 14 exploit reporting from</text>
+<text x="955" y="646" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">11 Sep 2026</text>
+</g>
+<rect x="45" y="661" width="1320" height="1" fill="#ededed"/>
+<g id="layer-main-failure">
+<text x="45" y="680" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Main failure</text>
+<text x="245" y="680" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Human error, credential theft</text>
+<text x="585" y="680" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Prompt injection, privilege creep, a compromised supply</text>
+<text x="585" y="695" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">chain</text>
+<text x="955" y="680" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Lookalike firmware, shared vendor VPN logins, last night's batch acted on</text>
+<text x="955" y="695" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">with confidence</text>
+</g>
+<rect x="45" y="710" width="1320" height="1" fill="#ededed"/>
+<text x="45" y="731" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">The workshop's controls don't vanish in a factory; they stop being gates, because the gate was the person, not the layer (LaunchDarkly). Treating the approval prompt as the control is the most common factory-security mistake (Warp). A lights-out site is the factory model</text>
+<text x="45" y="745" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">taken all the way: bindings, signed provenance, consent gates and edge policy are what still protect it.</text>
+<g id="agentic-data-model">
+<rect x="45" y="777" width="1320" height="336" fill="#fde7f3" stroke="#f7b6da"/>
+<text x="65" y="803" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">AGENTIC DATA MODEL · AN AGENT RECEIVES ONE TASK, NOT ONE PLATFORM</text>
+<text x="65" y="825" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">Cloudflare binds, Xano grants, Rust checks, the WMS stays the system of record, and every yes and no leaves a ledger row</text>
+<rect x="65" y="845" width="190" height="118" fill="#fff" stroke="#cfcfcf"/>
+<text x="77" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">1 · Signed event</text>
+<text x="77" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">QR scan · EDI 856 · webhook</text>
+<text x="77" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">GS1 Digital Link on the item;</text>
+<text x="77" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">EventBridge, Pub/Sub or Service</text>
+<text x="77" y="939" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">Bus delivery</text>
+<path d="M257 902.5 L269 902.5 L269 899 L277 904 L269 909 L269 905.5 L257 905.5 Z" fill="#f22468"/>
+<rect x="279" y="845" width="190" height="118" fill="#fff" stroke="#f22468"/>
+<text x="291" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">2 · Worker</text>
+<text x="291" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Edge gate</text>
+<text x="291" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">checks the signature on the raw</text>
+<text x="291" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">body; idempotency key from the</text>
+<text x="291" y="939" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">event ID; holds every credential</text>
+<path d="M471 902.5 L483 902.5 L483 899 L491 904 L483 909 L483 905.5 L471 905.5 Z" fill="#f22468"/>
+<rect x="493" y="845" width="190" height="118" fill="#fff" stroke="#f22468"/>
+<text x="505" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">3 · Xano grant</text>
+<text x="505" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One task, as a row</text>
+<text x="505" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">record IDs, purpose, region,</text>
+<text x="505" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">expiry; revoke is a write, audit is a</text>
+<text x="505" y="939" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">read</text>
+<path d="M685 902.5 L697 902.5 L697 899 L705 904 L697 909 L697 905.5 L685 905.5 Z" fill="#f22468"/>
+<rect x="707" y="845" width="190" height="118" fill="#fff" stroke="#f22468"/>
+<text x="719" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">4 · Rust check</text>
+<text x="719" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Shape in, shape out</text>
+<text x="719" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">a tool the program doesn't declare</text>
+<text x="719" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">can't be constructed; typed</text>
+<text x="719" y="939" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">records only</text>
+<path d="M899 902.5 L911 902.5 L911 899 L919 904 L911 909 L911 905.5 L899 905.5 Z" fill="#f22468"/>
+<rect x="921" y="845" width="190" height="118" fill="#fff" stroke="#cfcfcf"/>
+<text x="933" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">5 · WMS / ERP</text>
+<text x="933" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">System of record</text>
+<text x="933" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">Blue Yonder (JDA), Manhattan,</text>
+<text x="933" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">SAP EWM, Dynamics;</text>
+<text x="933" y="939" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">unchanged, read by ID</text>
+<path d="M1113 902.5 L1125 902.5 L1125 899 L1133 904 L1125 909 L1125 905.5 L1113 905.5 Z" fill="#f22468"/>
+<rect x="1135" y="845" width="190" height="118" fill="#fff" stroke="#cfcfcf"/>
+<text x="1147" y="869" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">6 · Ledger</text>
+<text x="1147" y="891" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Append-only</text>
+<text x="1147" y="911" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">grant, task, bytes returned; the</text>
+<text x="1147" y="925" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">evidence the CRA report needs</text>
+<text x="65" y="995" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">RECORDS AN AGENT MAY READ</text>
+<text x="65" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Grant / mandate</text>
+<text x="65" y="1041" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Subject, task, record IDs, caps, purpose, region, expiry. The</text>
+<text x="65" y="1055" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">grant ceiling is the injection ceiling: an agent can't be talked</text>
+<text x="65" y="1069" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">into a tool it was never granted.</text>
+<text x="387" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Envelope</text>
+<text x="387" y="1041" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">An inert, searchable head (name, version, provenance,</text>
+<text x="387" y="1055" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">licence, hash) and a payload behind a short-lived, per-grant</text>
+<text x="387" y="1069" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">signed URL. Per-row keys: possession is not access.</text>
+<text x="709" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Canonical unit record</text>
+<text x="709" y="1041" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Every measure once, as a UN/CEFACT code (KGM, MTR,</text>
+<text x="709" y="1055" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">MTQ, KEL); WMS UoM mapped to it; GS1 AIs on everything</text>
+<text x="709" y="1069" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">that ships; FX rate dated.</text>
+<text x="1031" y="1021" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Transaction record</text>
+<text x="1031" y="1041" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">X12 850 / 856 / 810 typed by a Rust parser into JSON with a</text>
+<text x="1031" y="1055" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">published schema. The agent reads the record, never the</text>
+<text x="1031" y="1069" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">raw positional file.</text>
+<rect x="377" y="1009" width="1" height="110" fill="#f7b6da"/>
+<rect x="699" y="1009" width="1" height="110" fill="#f7b6da"/>
+<rect x="1021" y="1009" width="1" height="110" fill="#f7b6da"/>
+</g>
+<g id="risk-column-heads">
+<text x="45" y="1147" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">RISK</text>
+<text x="245" y="1147" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">HOW IT SHOWS IN A WMS OR DARK FACTORY</text>
+<text x="655" y="1147" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">CONTROL</text>
+<text x="1065" y="1147" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">KNOWLEDGE BASE</text>
+<rect x="45" y="1157" width="1320" height="1" fill="#d6d6d6"/>
+</g>
+<g id="risk-prompt-injection">
+<text x="45" y="1183" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Prompt injection</text>
+<text x="245" y="1183" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A label, ASN note or supplier PDF carries text an agent obeys</text>
+<text x="655" y="1183" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Tools declared in code, not in the prompt; grant scope enforced at the</text>
+<text x="655" y="1198" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">data plane</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/capability-not-perimeter.html" target="_blank">
+<text x="1065" y="1183" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Capability, not perimeter</text>
+</a>
+</g>
+<rect x="45" y="1213" width="1320" height="1" fill="#ededed"/>
+<g id="risk-privilege-creep">
+<text x="45" y="1232" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Privilege creep</text>
+<text x="245" y="1232" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">An ERP copilot runs as a service principal with ERP-wide roles</text>
+<text x="655" y="1232" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One task, listed record IDs, an expiry; renewals are new grants</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/agent-authority-brief.html" target="_blank">
+<text x="1065" y="1232" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Agent authority brief</text>
+</a>
+</g>
+<rect x="45" y="1247" width="1320" height="1" fill="#ededed"/>
+<g id="risk-supply-chain">
+<text x="45" y="1266" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Supply chain</text>
+<text x="245" y="1266" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Lookalike firmware or a poisoned dependency reaches every robot</text>
+<text x="655" y="1266" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Signing ceremony, published hashes, SBOM; attestation before fetch</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html" target="_blank">
+<text x="1065" y="1266" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Entitlement security</text>
+</a>
+</g>
+<rect x="45" y="1281" width="1320" height="1" fill="#ededed"/>
+<g id="risk-fleet-blast-radius">
+<text x="45" y="1300" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Fleet blast radius</text>
+<text x="245" y="1300" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One over-permissioned agent copied across a fleet of pickers</text>
+<text x="655" y="1300" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Isolate per run, caps per grant, a kill switch that can only stop</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html" target="_blank">
+<text x="1065" y="1300" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Grant impact on machine endpoints</text>
+</a>
+</g>
+<rect x="45" y="1315" width="1320" height="1" fill="#ededed"/>
+<g id="risk-stale-data">
+<text x="45" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Stale data</text>
+<text x="245" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">EDI daily windows, IDoc nightly runs, CDP 12–24 h refresh: the agent</text>
+<text x="245" y="1349" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">answers from last night</text>
+<text x="655" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Event in, row out, same cycle; IDs on the queue, not documents</text>
+<a href="https://crm-sync.dev/share/bim-fortress-event-socket" target="_blank">
+<text x="1065" y="1334" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">BIM fortress vs event socket</text>
+</a>
+</g>
+<rect x="45" y="1364" width="1320" height="1" fill="#ededed"/>
+<g id="risk-wrong-shape">
+<text x="45" y="1383" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Wrong shape</text>
+<text x="245" y="1383" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">An LLM reads raw X12 or a vendor blob and guesses positions</text>
+<text x="655" y="1383" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Typed records with a schema; units converted at each surface's edge</text>
+<a href="https://crm-sync.dev/docs/global-unit-data-loads" target="_blank">
+<text x="1065" y="1383" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Global unit data loads · WMS</text>
+</a>
+</g>
+<rect x="45" y="1398" width="1320" height="1" fill="#ededed"/>
+<g id="risk-workaround-backdoor">
+<text x="45" y="1417" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Workaround backdoor</text>
+<text x="245" y="1417" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A transport blocked by JVM security rules is routed around with an</text>
+<text x="245" y="1432" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">exception, shared drop or personal token; it multiplies across the</text>
+<text x="245" y="1447" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">organization</text>
+<text x="655" y="1417" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">One reinforced path for every tool: signed, timestamped, escalated,</text>
+<text x="655" y="1432" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">logged; exceptions closed and audited</text>
+<a href="https://crm-sync.dev/docs/hyperscaler-vs-distributed" target="_blank">
+<text x="1065" y="1417" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Hyperscaler vs distributed</text>
+</a>
+</g>
+<rect x="45" y="1462" width="1320" height="1" fill="#ededed"/>
+<g id="risk-can't-see-can't-report">
+<text x="45" y="1481" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Can't see, can't report</text>
+<text x="245" y="1481" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">CRA Art. 14: report actively exploited vulnerabilities from 11 Sep 2026</text>
+<text x="655" y="1481" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Ledger row per decision; evidence produced as a side effect</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/cybersecurity-for-ai.html" target="_blank">
+<text x="1065" y="1481" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">Cybersecurity for AI</text>
+</a>
+</g>
+<rect x="45" y="1496" width="1320" height="1" fill="#ededed"/>
+<g id="hitl-escalation-compliance">
+<rect x="45" y="1529" width="1320" height="361" fill="#fde7f3" stroke="#f7b6da"/>
+<text x="65" y="1555" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">HUMAN IN THE LOOP · ESCALATION LADDER AND ENTERPRISE COMPLIANCE RISK</text>
+<text x="65" y="1577" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">Automation may stop a crossing, but never approve one: the agent escalates on named conditions to a named role</text>
+<rect x="65" y="1595" width="238" height="100" fill="#fff" stroke="#cfcfcf"/>
+<text x="77" y="1619" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">0 · Run</text>
+<text x="77" y="1639" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Inside the grant</text>
+<text x="77" y="1659" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">task, records, caps and expiry all match;</text>
+<text x="77" y="1673" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ledger row written</text>
+<path d="M305 1643.5 L317 1643.5 L317 1640 L325 1645 L317 1650 L317 1646.5 L305 1646.5 Z" fill="#f22468"/>
+<rect x="327" y="1595" width="238" height="100" fill="#fff" stroke="#cfcfcf"/>
+<text x="339" y="1619" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">1 · Stop</text>
+<text x="339" y="1639" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Automatic, no person</text>
+<text x="339" y="1659" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">a check fails or a cap is hit; the agent halts</text>
+<text x="339" y="1673" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">and holds state</text>
+<path d="M567 1643.5 L579 1643.5 L579 1640 L587 1645 L579 1650 L579 1646.5 L567 1646.5 Z" fill="#f22468"/>
+<rect x="589" y="1595" width="238" height="100" fill="#fff" stroke="#f22468"/>
+<text x="601" y="1619" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">2 · Escalate</text>
+<text x="601" y="1639" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Named role, with a clock</text>
+<text x="601" y="1659" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">quarantine, exception, new host, new field,</text>
+<text x="601" y="1673" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">new purpose</text>
+<path d="M829 1643.5 L841 1643.5 L841 1640 L849 1645 L841 1650 L841 1646.5 L829 1646.5 Z" fill="#f22468"/>
+<rect x="851" y="1595" width="238" height="100" fill="#fff" stroke="#f22468"/>
+<text x="863" y="1619" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">3 · Decide</text>
+<text x="863" y="1639" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Approve, refuse, condition</text>
+<text x="863" y="1659" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">a signed record with a review date; renewal</text>
+<text x="863" y="1673" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">= new grant</text>
+<path d="M1091 1643.5 L1103 1643.5 L1103 1640 L1111 1645 L1103 1650 L1103 1646.5 L1091 1646.5 Z" fill="#f22468"/>
+<rect x="1113" y="1595" width="238" height="100" fill="#fff" stroke="#cfcfcf"/>
+<text x="1125" y="1619" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">4 · Report</text>
+<text x="1125" y="1639" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Outside the company</text>
+<text x="1125" y="1659" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">CRA, GDPR breach, PCI or SOX evidence</text>
+<text x="1125" y="1673" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">from the ledger</text>
+<text x="65" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ESCALATE WHEN</text>
+<rect x="65" y="1738" width="7" height="7" fill="#f22468"/>
+<text x="81" y="1747" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A pick, count or ship touches a record outside the grant's IDs</text>
+<rect x="65" y="1756" width="7" height="7" fill="#f22468"/>
+<text x="81" y="1765" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Personal, payment or health data appears where the purpose didn't list it</text>
+<rect x="65" y="1774" width="7" height="7" fill="#f22468"/>
+<text x="81" y="1783" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A device fails attestation, or firmware's hash isn't on the published list</text>
+<rect x="65" y="1792" width="7" height="7" fill="#f22468"/>
+<text x="81" y="1801" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Quantities, totals or units disagree between WMS, ERP and the EDI record</text>
+<rect x="65" y="1810" width="7" height="7" fill="#f22468"/>
+<text x="81" y="1819" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A model's answer would change a price, a credit, a refund or a person's account</text>
+<text x="705" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ENTERPRISE COMPLIANCE RISK</text>
+<text x="1035" y="1725" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">WHAT THE HUMAN OWNS</text>
+<text x="705" y="1747" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">GDPR Art. 22</text>
+<text x="820" y="1747" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">decisions with legal or similar effect,</text>
+<text x="820" y="1760" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">made solely by automation</text>
+<text x="1035" y="1747" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">a person able to review and overturn</text>
+<text x="705" y="1780" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">EU AI Act Art. 14</text>
+<text x="820" y="1780" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">human oversight for high-risk AI systems</text>
+<text x="1035" y="1780" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">an operator who can stop and override</text>
+<text x="705" y="1800" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">SOX</text>
+<text x="820" y="1800" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">change control and segregation of duties</text>
+<text x="820" y="1813" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">on ERP data</text>
+<text x="1035" y="1800" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">approver separate from the author</text>
+<text x="705" y="1833" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">PCI DSS v4.0</text>
+<text x="820" y="1833" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">6.4.3 script inventory, 11.6.1 change</text>
+<text x="820" y="1846" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">detection</text>
+<text x="1035" y="1833" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">authorising each payment-page script</text>
+<text x="705" y="1866" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">EU CRA Art. 14</text>
+<text x="820" y="1866" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">report actively exploited vulnerabilities</text>
+<text x="1035" y="1866" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">the report itself, from ledger evidence</text>
+<rect x="685" y="1715" width="1" height="161" fill="#f7b6da"/>
+</g>
+<g id="small-business-tools-enterprise-ceiling">
+<rect x="45" y="1912" width="1320" height="836" fill="#fff" stroke="#cfcfcf"/>
+<text x="65" y="1938" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">SMALL BUSINESS → ENTERPRISE · CONTACT FORM 7, GRAVITY FORMS, MATRIXIFY, AIRTABLE, NOTION, ZAPIER</text>
+<text x="65" y="1960" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">Suitable and effective for a small business. At enterprise scale they fail twice: at the rate-limit ceiling, and at security rules for JVM data transport</text>
+<rect x="65" y="1974" width="167" height="18" fill="#f22468"/>
+<text x="148" y="1987" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">SMALL BUSINESS · USE THEM</text>
+<rect x="239.9921875" y="1974" width="191" height="18" fill="#1f1f1f"/>
+<text x="335" y="1987" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">ENTERPRISE · RATE-LIMIT CEILING</text>
+<rect x="438.9765625" y="1974" width="228" height="18" fill="#1f1f1f"/>
+<text x="553" y="1987" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">ENTERPRISE · JVM TRANSPORT BLOCKED</text>
+<rect x="675.21484375" y="1974" width="380" height="18" fill="#1f1f1f"/>
+<text x="865" y="1987" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">SAP · DYNAMICS · SALESFORCE · WMS: NO TIMESTAMP, NO ESCALATION</text>
+<text x="65" y="2018" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">TOOL</text>
+<text x="210" y="2018" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">SMALL BUSINESS: WHY IT WORKS</text>
+<text x="485" y="2018" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ENTERPRISE: RATE-LIMIT CEILING</text>
+<text x="760" y="2018" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ENTERPRISE: BLOCKED BY JVM TRANSPORT RULES</text>
+<text x="1075" y="2018" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ENTERPRISE PATH</text>
+<rect x="65" y="2026" width="1280" height="1" fill="#d6d6d6"/>
+<text x="65" y="2046" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Contact Form 7</text>
+<text x="210" y="2046" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Free, simple, in the editor; a submission becomes an</text>
+<text x="210" y="2060" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">email the owner reads</text>
+<text x="485" y="2046" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">No queue or retry: one PHP request and one email</text>
+<text x="485" y="2060" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">per submission; a spam flood or mail outage loses</text>
+<text x="485" y="2074" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">leads</text>
+<text x="760" y="2046" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Email or an unsigned POST from shared hosting can't enter</text>
+<text x="760" y="2060" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">middleware that requires mTLS, a signed payload and a</text>
+<text x="760" y="2074" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">schema contract</text>
+<text x="1075" y="2046" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">POST to a Worker: Turnstile, MX, HMAC; Xano stores;</text>
+<text x="1075" y="2060" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">events out</text>
+<rect x="65" y="2086" width="1280" height="1" fill="#ededed"/>
+<text x="65" y="2104" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Gravity Forms</text>
+<text x="210" y="2104" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Entries, conditional logic and add-on feeds without a</text>
+<text x="210" y="2118" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">developer</text>
+<text x="485" y="2104" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Feeds call the CRM inside the same PHP request;</text>
+<text x="485" y="2118" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">vendor API throttling drops or delays entries</text>
+<text x="760" y="2104" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Feeds leave from a hosting IP with no fixed egress or client</text>
+<text x="760" y="2118" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">certificate, so the integration platform's allowlist rejects them</text>
+<text x="1075" y="2104" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Same gateway; entries purged after hand-off</text>
+<rect x="65" y="2130" width="1280" height="1" fill="#ededed"/>
+<text x="65" y="2148" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Matrixify</text>
+<text x="210" y="2148" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Whole-store bulk edits from a spreadsheet; the</text>
+<text x="210" y="2162" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">fastest way to move a catalogue</text>
+<text x="485" y="2148" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Jobs queue behind Shopify Admin API limits; a large</text>
+<text x="485" y="2162" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">file runs for hours and partial runs need reconciling</text>
+<text x="760" y="2148" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Files moved by hand, drive or FTP carry no signed</text>
+<text x="760" y="2162" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">provenance or schema version; ERP and MDM intake won't</text>
+<text x="760" y="2176" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">accept them</text>
+<text x="1075" y="2148" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">csv-gate, then Xano; productSet keyed by handle</text>
+<rect x="65" y="2188" width="1280" height="1" fill="#ededed"/>
+<text x="65" y="2206" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Airtable · Notion</text>
+<text x="210" y="2206" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A shared workspace anyone can edit; views, forms</text>
+<text x="210" y="2220" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">and simple automations</text>
+<text x="485" y="2206" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Per-base and per-integration request limits (Airtable</text>
+<text x="485" y="2220" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">5 a second per base; Notion about 3) force polling</text>
+<text x="485" y="2234" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">and exports</text>
+<text x="760" y="2206" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A long-lived token and an open polling connection to a</text>
+<text x="760" y="2220" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">third-party SaaS fail egress policy; the connection can't be</text>
+<text x="760" y="2234" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">reinforced</text>
+<text x="1075" y="2206" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Read scopes; import to staging; Xano TLS transform</text>
+<rect x="65" y="2246" width="1280" height="1" fill="#ededed"/>
+<text x="65" y="2264" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Zapier</text>
+<text x="210" y="2264" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">No-code glue between hundreds of apps; running in</text>
+<text x="210" y="2278" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">an afternoon</text>
+<text x="485" y="2264" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Task quotas per plan and polling intervals; volume</text>
+<text x="485" y="2278" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">spikes stall or bill as overage</text>
+<text x="760" y="2264" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Shared multi-tenant IPs, a third party holding both ends'</text>
+<text x="760" y="2278" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">credentials, and payloads kept in task history fail vendor</text>
+<text x="760" y="2292" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">review</text>
+<text x="1075" y="2264" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Signed events to a Worker; IDs, not records; ledger</text>
+<rect x="65" y="2304" width="1280" height="1" fill="#ededed"/>
+<text x="65" y="2328" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">SAP, Dynamics 365, Salesforce and the WMS can't take these updates with</text>
+<rect x="65" y="2344" width="7" height="7" fill="#1f1f1f"/>
+<text x="81" y="2352" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A timestamp</text>
+<text x="81" y="2370" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Updates arrive with the tool's time, not the event's: a zap's run time, a CSV's export</text>
+<text x="81" y="2384" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">time, Airtable's last-modified, an email's send time. SAP IDoc and OData,</text>
+<text x="81" y="2398" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Dataverse and Service Bus, Salesforce Platform Events and the WMS's ASN and</text>
+<text x="81" y="2412" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">EDI feeds can't order them, can't settle a last-write conflict, and can't prove when</text>
+<text x="81" y="2426" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">consent was given.</text>
+<rect x="495" y="2344" width="7" height="7" fill="#1f1f1f"/>
+<text x="511" y="2352" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">A security escalation</text>
+<text x="511" y="2370" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">The tool has no channel to raise severity in the system of record. A failed check, a</text>
+<text x="511" y="2384" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">suspicious row or a revoked token can't become an SAP block, a Dynamics</text>
+<text x="511" y="2398" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">workflow, a Salesforce case or a WMS inventory hold; it stays an email or a failed</text>
+<text x="511" y="2412" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">zap nobody owns.</text>
+<rect x="925" y="2344" width="7" height="7" fill="#f22468"/>
+<text x="941" y="2352" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#d01a57" text-anchor="start">The enterprise path</text>
+<text x="941" y="2370" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">The Worker stamps event time, receipt time and an idempotency key; Xano keeps</text>
+<text x="941" y="2384" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">the source and a ledger row; an escalation becomes a held record and a</text>
+<text x="941" y="2398" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">named-role task; SAP, Dynamics, Salesforce or the WMS receives a signed event</text>
+<text x="941" y="2412" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">carrying the timestamp and the status.</text>
+<rect x="65" y="2438" width="1280" height="1" fill="#ededed"/>
+<rect x="65" y="2460" width="1280" height="212" fill="#fde7f3" stroke="#f22468"/>
+<text x="85" y="2486" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">RISK · THE JVM BLOCKER BECOMES THE BACKDOOR</text>
+<text x="85" y="2508" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">Blocked at the bus, teams route around it, and each workaround is a data transport with no reinforcement</text>
+<rect x="85" y="2522" width="202" height="18" fill="#f22468"/>
+<text x="186" y="2535" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">CATASTROPHIC · LOSE EVERYTHING</text>
+<text x="85" y="2566" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">1 · Blocked</text>
+<text x="85" y="2586" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">The JVM bus rejects the tool: no mTLS, no signature,</text>
+<text x="85" y="2600" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">no timestamp, no escalation</text>
+<path d="M367 2560.5 L379 2560.5 L379 2557 L387 2562 L379 2567 L379 2563.5 L367 2563.5 Z" fill="#f22468"/>
+<text x="399" y="2566" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">2 · Routed around</text>
+<text x="399" y="2586" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">A broad service account, a firewall exception, a shared</text>
+<text x="399" y="2600" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">FTP drop, a personal token in a zap, an emailed export</text>
+<path d="M681 2560.5 L693 2560.5 L693 2557 L701 2562 L693 2567 L693 2563.5 L681 2563.5 Z" fill="#f22468"/>
+<text x="713" y="2566" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">3 · Multiplied</text>
+<text x="713" y="2586" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Every team, tool and market adds its own path: tools ×</text>
+<text x="713" y="2600" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">systems, each holding full-copy credentials</text>
+<path d="M995 2560.5 L1007 2560.5 L1007 2557 L1015 2562 L1007 2567 L1007 2563.5 L995 2563.5 Z" fill="#f22468"/>
+<text x="1027" y="2566" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#d01a57" text-anchor="start">4 · One key, everything</text>
+<text x="1027" y="2586" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">One stolen token reaches SAP, Dynamics, Salesforce</text>
+<text x="1027" y="2600" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">and the WMS at once: catalogue, customers, orders,</text>
+<text x="1027" y="2614" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">stock</text>
+<text x="85" y="2642" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">Why it's total: with no timestamp nobody can tell what changed or when, and with no escalation nobody was told, so there is no clean point to restore to and nothing to report. The fix is one reinforced transport every path must pass (Worker gate, Xano grant,</text>
+<text x="85" y="2656" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">ledger) with the exceptions closed.</text>
+<text x="65" y="2698" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">Why the ceiling becomes a security gap: the workaround for a rate limit is almost always another copy (a bulk export, a cache, one token shared across zaps, a retry that replays a payload). Fortify before the ceiling: keep the tool as the screen, move the record</text>
+<text x="65" y="2712" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">behind the gate.</text>
+<a href="https://files.ysl150.com/books/php-to-ai-data-layers/long-poll-sources.html" target="_blank">
+<text x="65" y="2734" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Book: Every CSV goes through the gate · Long-poll sources · Plugin evaluation</text>
+</a>
+</g>
+<g id="ba-brief-saas-fee-blockers">
+<rect x="45" y="2770" width="1320" height="300" fill="#fde7f3" stroke="#f7b6da"/>
+<text x="65" y="2796" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">BUSINESS ANALYST BRIEF · TECH DEBT: SAAS FEE BLOCKERS FOR AI AGENT DATA ACCESS</text>
+<text x="65" y="2818" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start">The debt is in the contract, not the code: systems priced for people logging in now decide whether an agent may read</text>
+<text x="65" y="2844" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">Most WMS, ERP, PIM and CRM subscriptions were priced per seat or per user. When an agent needs the same</text>
+<text x="65" y="2860" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">data, the fee schedule, not the technology, sets whether it can have it and at what cost. Teams ration access,</text>
+<text x="65" y="2876" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">export spreadsheets around the governed system, and the agent works from stale or partial copies. Each fee</text>
+<text x="65" y="2892" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start">blocker is technical debt with an interest rate: paid every month, and due at renewal.</text>
+<rect x="65" y="2930" width="70" height="18" fill="#1f1f1f"/>
+<text x="100" y="2943" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">SEAT</text>
+<text x="169" y="2943" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">An agent must hold a licensed human</text>
+<text x="169" y="2956" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">seat: automation billed at headcount</text>
+<text x="169" y="2969" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">rates</text>
+<rect x="365" y="2930" width="70" height="18" fill="#f22468"/>
+<text x="400" y="2943" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" text-anchor="middle">METERED</text>
+<text x="469" y="2943" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Per API call or per record: the bill</text>
+<text x="469" y="2956" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">rises as the automation is used</text>
+<rect x="65" y="2978" width="93" height="18" fill="#f7b6da"/>
+<text x="111" y="2991" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle">PREMIUM TIER</text>
+<text x="169" y="2991" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Real-time or hourly refresh sold as an</text>
+<text x="169" y="3004" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">upgrade over a 12–24 h batch</text>
+<rect x="365" y="2978" width="99" height="18" fill="#ededed"/>
+<text x="415" y="2991" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle">ACCESS TERMS</text>
+<text x="469" y="2991" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Rate caps, AI add-on SKUs or</text>
+<text x="469" y="3004" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">contract terms on automated access</text>
+<rect x="65" y="3026" width="78" height="18" fill="#ededed"/>
+<text x="104" y="3039" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle">COPY ONLY</text>
+<text x="169" y="3039" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Data reachable only as an export or a</text>
+<text x="169" y="3052" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">vendor's own synced copy</text>
+<text x="705" y="2844" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">What the analyst does</text>
+<rect x="705" y="2859" width="7" height="7" fill="#f22468"/>
+<text x="721" y="2868" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Inventory every system an agent must read: owner, pricing unit, renewal date, data residency</text>
+<rect x="705" y="2879" width="7" height="7" fill="#f22468"/>
+<text x="721" y="2888" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Ask in procurement: can an automated caller do this without a human seat, and what does 1,000 calls cost?</text>
+<rect x="705" y="2899" width="7" height="7" fill="#f22468"/>
+<text x="721" y="2908" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Price the capability, not the chair: one grant-scoped edge integration serves many agents</text>
+<rect x="705" y="2919" width="7" height="7" fill="#f22468"/>
+<text x="721" y="2928" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Log each blocker as debt with a payoff date, usually the renewal; compare BYO cost per call</text>
+<rect x="705" y="2939" width="7" height="7" fill="#f22468"/>
+<text x="721" y="2948" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1f1f1f" text-anchor="start">Keep the vendor as system of record; move only the gate and the ledger. Coexistence, not replacement</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/from-plugins-to-mandates.html" target="_blank">
+<text x="705" y="2972" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">From plugins to mandates (per-seat problem)</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/byo-xano-bigquery-vs-google-agent-costs.html" target="_blank">
+<text x="1025" y="2972" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">BYO Xano + BigQuery vs agent cost per call</text>
+</a>
+<rect x="685" y="2834" width="1" height="220" fill="#f7b6da"/>
+</g>
+<g id="knowledge-base-links">
+<text x="45" y="3100" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start">Knowledge Base</text>
+<text x="45" y="3117" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666" text-anchor="start">crm-sync.dev articles behind this page</text>
+<a href="https://persephonepunch.github.io/crm-sync-setup/entitlement-security.html" target="_blank">
+<text x="245" y="3100" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Entitlement security · the dark factory</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/capability-not-perimeter.html" target="_blank">
+<text x="620" y="3100" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Capability, not perimeter · dark warehouse, GS1 Sunrise 2027</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/machine-endpoint-grant-impact.html" target="_blank">
+<text x="995" y="3100" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Paired permissions and grant impact on machine endpoints</text>
+</a>
+<a href="https://crm-sync.dev/docs/global-unit-data-loads" target="_blank">
+<text x="245" y="3122" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Global unit data loads · 3D, WMS and Merchant feed</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/agent-authority-brief.html" target="_blank">
+<text x="620" y="3122" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Agent authority · technical brief</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/book/rma-ladder-spec/" target="_blank">
+<text x="995" y="3122" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Decision ladder · RMA functional and data spec</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/middleware-vs-ai-architecture.html" target="_blank">
+<text x="245" y="3144" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Middleware vs AI architecture</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/from-plugins-to-mandates.html" target="_blank">
+<text x="620" y="3144" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">From plugins to mandates · per-seat fees</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/byo-xano-bigquery-vs-google-agent-costs.html" target="_blank">
+<text x="995" y="3144" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">BYO Xano + BigQuery vs Google agent costs</text>
+</a>
+<a href="https://persephonepunch.github.io/crm-sync-setup/logging-and-trace-fees.html" target="_blank">
+<text x="245" y="3166" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Logging and trace fees</text>
+</a>
+<a href="https://files.ysl150.com/books/php-to-ai-data-layers/selective-factory.html" target="_blank">
+<text x="620" y="3166" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Book · Selective factory: where the workshop takes over</text>
+</a>
+<a href="https://files.ysl150.com/books/php-to-ai-data-layers/plugin-evaluation.html" target="_blank">
+<text x="995" y="3166" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#d01a57" text-anchor="start">Book · Evaluating plugins, apps and widgets</text>
+</a>
+</g>
+<g id="sources">
+<rect x="45" y="3198" width="1320" height="1" fill="#d6d6d6"/>
+<text x="45" y="3216" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#666" text-anchor="start">Sources: workshop vs factory comparison as reported by LaunchDarkly, Warp and TechTarget · EU Cyber Resilience Act, Regulation (EU) 2024/2847 (Art. 14 reporting 11 Sep 2026; full application 11 Dec 2027) · GS1 US Sunrise 2027 · GS1 General Specifications (AIs 310n–4333) · AWS B2B Data</text>
+<text x="45" y="3230" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#666" text-anchor="start">Interchange · crm-sync.dev Knowledge Base (CC-BY-4.0) · CVE-2026-135202 (wpconnectco plugins) · Fee blocker types are categories for analysis, not quotes of any one vendor's price list; check each contract.</text>
+</g>
+</svg>
