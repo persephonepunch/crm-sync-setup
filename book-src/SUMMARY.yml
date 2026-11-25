@@ -101,6 +101,7 @@ chapters:
       - HYPERSCALER-VS-DISTRIBUTED.md   # 2026-10-19 · Hyperscaler vs Distributed: Webflow, Xano and Cloudflare Decision Ladders
       - GLOBAL-UNIT-DATA-LOADS.md   # 2026-11-13 · Global Unit Data Loads — 3D Commerce, WMS & Merchant Feed Spec
       - COPPER-TO-FIBER-LEGACY-NETWORKS.md   # 2026-11-14 · Copper to Fiber: 2000s-Era Network Debt and Short-Term Paired Fixes
+      - CHUNK-ENCODE-LOAD.md   # 2026-11-25 · Chunk to the consumer, encode at the edge
   - category: Compliance
     docs:
       - CONSENT-GATE-ATTESTATION.md   # 2026-09-08 · Consent gate attestation — crm-sync.dev, 2026-09-08

@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1230 890" width="1230" height="890" role="img" aria-labelledby="svg-title svg-desc">
+<title id="svg-title">Data loads: from chunk to inference</title>
+<desc id="svg-desc">Five stages left to right: chunk by consumer (CPU, GPU, proximity), encode at the edge (binary, Base64, UTF-8 vs ASCII), load dynamically (Base64 SWF then, WASM now), orchestrate in YAML (Kubernetes, placement, front matter), infer by reader (humans, agents, machines).</desc>
+<rect id="background" x="-5" y="-5" width="1230" height="890" fill="#ffffff"/>
+<g id="header">
+<text x="30" y="52" font-family="Times New Roman, Times, serif" font-size="32" font-weight="normal" fill="#0a0a0a" text-anchor="start">Data loads: from chunk to inference</text>
+<text x="30" y="84" font-family="Arial" font-size="13" font-weight="normal" fill="#5c5c5c" text-anchor="start">GPU / CPU / proximity chunking → Base64 and UTF-8 at the edge → dynamic load → Kubernetes YAML → inference for people, agents and machines</text>
+<rect x="30" y="104" width="1160" height="2" fill="#f22468"/>
+</g>
+<g id="stage-chunk">
+<rect x="30" y="120" width="208" height="28" fill="#0a0a0a"/>
+<text x="42" y="139" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">1 · CHUNK BY CONSUMER</text>
+<g id="card-chunk-cpu">
+<rect x="30" y="160" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="42" y="184" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">CPU</text>
+<text x="42" y="206" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">64-byte cache lines</text>
+<text x="42" y="223" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">(128 B on Apple M-series)</text>
+<text x="42" y="240" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">SIMD lanes: 16–64 B per op</text>
+<text x="42" y="257" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Chunk = lines that fit L2</text>
+</g>
+<g id="card-chunk-gpu">
+<rect x="30" y="296" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="42" y="320" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">GPU</text>
+<text x="42" y="342" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Warp = 32 threads</text>
+<text x="42" y="359" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Coalesced 32 B sectors,</text>
+<text x="42" y="376" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">128 B lines</text>
+<text x="42" y="393" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">KV cache pages of 16 tokens</text>
+</g>
+<g id="card-chunk-proximity">
+<rect x="30" y="432" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="42" y="456" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">PROXIMITY</text>
+<text x="42" y="478" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">NUMA · rack · zone · edge PoP</text>
+<text x="42" y="495" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Move compute to the chunk,</text>
+<text x="42" y="512" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">not the chunk to compute</text>
+<text x="42" y="529" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">KML / GeoJSON: lon,lat,alt</text>
+</g>
+</g>
+<g id="stage-encode">
+<rect x="268" y="120" width="208" height="28" fill="#0a0a0a"/>
+<text x="280" y="139" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">2 · ENCODE AT THE EDGE</text>
+<g id="card-encode-binary">
+<rect x="268" y="160" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="280" y="184" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">BINARY  (THE DATA)</text>
+<text x="280" y="206" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">PNG · EXR · SWF · GLB · WASM</text>
+<text x="280" y="223" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">GLB: 12 B header, JSON chunk,</text>
+<text x="280" y="240" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">BIN chunk → GPU buffers</text>
+<text x="280" y="257" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">safetensors: same idea</text>
+</g>
+<g id="card-encode-base64">
+<rect x="268" y="296" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="280" y="320" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">BASE64</text>
+<text x="280" y="342" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">3 bytes → 4 ASCII chars</text>
+<text x="280" y="359" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">+33% size, exact round trip</text>
+<text x="280" y="376" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Split on 3-byte multiples</text>
+</g>
+<g id="card-encode-utf8">
+<rect x="268" y="432" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="280" y="456" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">UTF-8 VS ASCII</text>
+<text x="280" y="478" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">ASCII: 128 chars, English</text>
+<text x="280" y="495" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">UTF-8: 1–4 bytes, all scripts</text>
+<text x="280" y="512" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Same first 128 characters</text>
+<text x="280" y="529" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Never split mid-character</text>
+</g>
+</g>
+<g id="stage-load">
+<rect x="506" y="120" width="208" height="28" fill="#0a0a0a"/>
+<text x="518" y="139" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">3 · LOAD DYNAMICALLY</text>
+<g id="card-load-base64">
+<rect x="506" y="160" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="518" y="184" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">BASE64 SWF  (2000s)</text>
+<text x="518" y="206" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Base64 string → ByteArray</text>
+<text x="518" y="223" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Loader.loadBytes(bytes)</text>
+<text x="518" y="240" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">FWS · CWS (zlib) · ZWS (LZMA)</text>
+</g>
+<g id="card-load-wasm">
+<rect x="506" y="296" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="518" y="320" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">WASM + GLB  (NOW)</text>
+<text x="518" y="342" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">fetch bytes →</text>
+<text x="518" y="359" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">WebAssembly.instantiate()</text>
+<text x="518" y="376" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Ruffle: Rust → WASM plays SWF</text>
+<text x="518" y="393" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">GLB BIN → WebGL / WebGPU</text>
+</g>
+<g id="card-load-why">
+<rect x="506" y="432" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="518" y="456" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">WHY BASE64 THEN</text>
+<text x="518" y="478" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Text-only pipes: HTML, XML,</text>
+<text x="518" y="495" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">JSON, email, data: URIs</text>
+<text x="518" y="512" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Flash end of life: 31 Dec 2020</text>
+</g>
+</g>
+<g id="stage-orchestrate">
+<rect x="744" y="120" width="208" height="28" fill="#0a0a0a"/>
+<text x="756" y="139" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">4 · ORCHESTRATE IN YAML</text>
+<g id="card-orchestrate-kubernetes">
+<rect x="744" y="160" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="756" y="184" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">KUBERNETES</text>
+<text x="756" y="206" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Secret.data and ConfigMap</text>
+<text x="756" y="223" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">.binaryData hold Base64</text>
+<text x="756" y="240" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Each object ≤ 1 MiB</text>
+<text x="756" y="257" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Base64 is encoding, not secrecy</text>
+</g>
+<g id="card-orchestrate-placement">
+<rect x="744" y="296" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="756" y="320" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">PLACEMENT</text>
+<text x="756" y="342" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">limits: nvidia.com/gpu: 1</text>
+<text x="756" y="359" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">topology.kubernetes.io/zone</text>
+<text x="756" y="376" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Topology Manager policy:</text>
+<text x="756" y="393" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">single-numa-node</text>
+</g>
+<g id="card-orchestrate-yaml">
+<rect x="744" y="432" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="756" y="456" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">YAML FRONT MATTER</text>
+<text x="756" y="478" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">---  id · encoding · bytes</text>
+<text x="756" y="495" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">sha256 · chunk 3 of 8  ---</text>
+<text x="756" y="512" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">YAML !!binary is Base64</text>
+<text x="756" y="529" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">SVG: CDATA holds JS, CSS, JSON</text>
+</g>
+</g>
+<g id="stage-infer">
+<rect x="982" y="120" width="208" height="28" fill="#0a0a0a"/>
+<text x="994" y="139" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">5 · INFER BY READER</text>
+<g id="card-infer-humans">
+<rect x="982" y="160" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="994" y="184" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">HUMANS</text>
+<text x="994" y="206" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">See the render as text:</text>
+<text x="994" y="223" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">ASCII ramp or UTF-8 blocks</text>
+<text x="994" y="240" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Lossy preview</text>
+</g>
+<g id="card-infer-agents">
+<rect x="982" y="296" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="994" y="320" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">AGENTS</text>
+<text x="994" y="342" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Read front matter + summary</text>
+<text x="994" y="359" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Get a URI and a hash,</text>
+<text x="994" y="376" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">not Base64 tokens</text>
+</g>
+<g id="card-infer-machines">
+<rect x="982" y="432" width="208" height="124" fill="#ffffff" stroke="#0a0a0a" stroke-width="1"/>
+<text x="994" y="456" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">MACHINES</text>
+<text x="994" y="478" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Take exact bytes,</text>
+<text x="994" y="495" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">chunk-aligned, hash-checked</text>
+<text x="994" y="512" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Binary on the wire</text>
+</g>
+</g>
+<g id="arrows">
+<path d="M241 220 L256 220 L256 216 L265 222 L256 228 L256 224 L241 224 Z" fill="#f22468"/>
+<path d="M241 356 L256 356 L256 352 L265 358 L256 364 L256 360 L241 360 Z" fill="#f22468"/>
+<path d="M241 492 L256 492 L256 488 L265 494 L256 500 L256 496 L241 496 Z" fill="#f22468"/>
+<path d="M479 220 L494 220 L494 216 L503 222 L494 228 L494 224 L479 224 Z" fill="#f22468"/>
+<path d="M479 356 L494 356 L494 352 L503 358 L494 364 L494 360 L479 360 Z" fill="#f22468"/>
+<path d="M479 492 L494 492 L494 488 L503 494 L494 500 L494 496 L479 496 Z" fill="#f22468"/>
+<path d="M717 220 L732 220 L732 216 L741 222 L732 228 L732 224 L717 224 Z" fill="#f22468"/>
+<path d="M717 356 L732 356 L732 352 L741 358 L732 364 L732 360 L717 360 Z" fill="#f22468"/>
+<path d="M717 492 L732 492 L732 488 L741 494 L732 500 L732 496 L717 496 Z" fill="#f22468"/>
+<path d="M955 220 L970 220 L970 216 L979 222 L970 228 L970 224 L955 224 Z" fill="#f22468"/>
+<path d="M955 356 L970 356 L970 352 L979 358 L970 364 L970 360 L955 360 Z" fill="#f22468"/>
+<path d="M955 492 L970 492 L970 488 L979 494 L970 500 L970 496 L955 496 Z" fill="#f22468"/>
+</g>
+<g id="hotel">
+<rect x="30" y="580" width="1160" height="28" fill="#0a0a0a"/>
+<text x="42" y="599" font-family="Arial" font-size="11.5" font-weight="normal" fill="#ffffff" text-anchor="start" letter-spacing="1.2">THE HOTEL VERSION  ·  CHUNKS TRAVEL LIKE GUESTS: PACKED TO FIT, TAGGED, KEYED, CHECKED AT EVERY DOOR, CHECKED OUT CLEANLY</text>
+<g id="hotel-suitcase">
+<rect x="30" y="620" width="208" height="124" fill="#ffffff" stroke="#f22468" stroke-width="1.5"/>
+<text x="42" y="644" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">SUITCASE</text>
+<text x="42" y="666" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">A change of clothes, not</text>
+<text x="42" y="683" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">the wardrobe: pack to the</text>
+<text x="42" y="700" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">strictest limit on the route</text>
+<text x="42" y="717" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">The rest stays home</text>
+<text x="42" y="734" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">(the source of truth)</text>
+</g>
+<g id="hotel-tag">
+<rect x="268" y="620" width="208" height="124" fill="#ffffff" stroke="#f22468" stroke-width="1.5"/>
+<text x="280" y="644" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">LUGGAGE TAG</text>
+<text x="280" y="666" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Front matter on the bag:</text>
+<text x="280" y="683" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">id · bytes · sha256</text>
+<text x="280" y="700" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Every door reads the tag</text>
+<text x="280" y="717" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">without opening the bag</text>
+</g>
+<g id="hotel-door">
+<rect x="506" y="620" width="208" height="124" fill="#ffffff" stroke="#f22468" stroke-width="1.5"/>
+<text x="518" y="644" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">THE DOOR</text>
+<text x="518" y="666" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Gateway · API · ingress ·</text>
+<text x="518" y="683" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">agent tool call · bucket</text>
+<text x="518" y="700" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Checks the key on</text>
+<text x="518" y="717" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">every chunk, every time</text>
+</g>
+<g id="hotel-keycard">
+<rect x="744" y="620" width="208" height="124" fill="#ffffff" stroke="#f22468" stroke-width="1.5"/>
+<text x="756" y="644" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">KEYCARD</text>
+<text x="756" y="666" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">aud = one room</text>
+<text x="756" y="683" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">sub + scope = one guest</text>
+<text x="756" y="700" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">exp = checkout time</text>
+<text x="756" y="717" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">nonce = used once</text>
+<text x="756" y="734" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">sig = can't be forged</text>
+</g>
+<g id="hotel-checkout">
+<rect x="982" y="620" width="208" height="124" fill="#ffffff" stroke="#f22468" stroke-width="1.5"/>
+<text x="994" y="644" font-family="Arial" font-size="12" font-weight="normal" fill="#d01a57" text-anchor="start" letter-spacing="0.8">CHECKOUT</text>
+<text x="994" y="666" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Key expires; remove pointers</text>
+<text x="994" y="683" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">before the room is freed</text>
+<text x="994" y="700" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Old card = use after free</text>
+<text x="994" y="717" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Booked twice = double free</text>
+<text x="994" y="734" font-family="Arial" font-size="12" font-weight="normal" fill="#0a0a0a" text-anchor="start">Swapped sign = hijack</text>
+</g>
+<path d="M241 680 L256 680 L256 676 L265 682 L256 688 L256 684 L241 684 Z" fill="#f22468"/>
+<path d="M479 680 L494 680 L494 676 L503 682 L494 688 L494 684 L479 684 Z" fill="#f22468"/>
+<path d="M717 680 L732 680 L732 676 L741 682 L732 688 L732 684 L717 684 Z" fill="#f22468"/>
+<path d="M955 680 L970 680 L970 676 L979 682 L970 688 L970 684 L955 684 Z" fill="#f22468"/>
+</g>
+<g id="rule">
+<rect x="30" y="772" width="1160" height="2" fill="#f22468"/>
+<text x="30" y="802" font-family="Arial" font-size="16" font-weight="normal" fill="#0a0a0a" text-anchor="start">Binary holds the data. UTF-8 and Base64 are adapters at text-only boundaries.</text>
+<text x="30" y="826" font-family="Arial" font-size="13" font-weight="normal" fill="#5c5c5c" text-anchor="start">Chunk to the consumer's natural unit, encode only at the edge, and describe every chunk in front matter so agents read the description and machines fetch the bytes.</text>
+<text x="30" y="856" font-family="Arial" font-size="12" font-weight="normal" fill="#5c5c5c" text-anchor="start">ASCII ⊂ UTF-8: every ASCII byte is valid UTF-8, and the Base64 alphabet (A–Z a–z 0–9 + / =) is ASCII, so Base64 passes through any UTF-8 channel unchanged.</text>
+</g>
+</svg>
