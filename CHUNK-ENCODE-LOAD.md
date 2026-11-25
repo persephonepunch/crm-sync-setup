@@ -1,6 +1,6 @@
 ---
 title: "Chunk to the consumer, encode at the edge"
-description: "How GPU, CPU and proximity chunking connect to Base64 SWF dynamic loading, Kubernetes manifests and YAML front matter, and what each reader of a data load (person, agent, machine) actually needs. Covers UTF-8 vs ASCII, SWF, GLB and Rust binaries, SVG CDATA and KML location data, bandwidth allocation for business readers, use after free in plain terms, and the hotel version: chunks that carry their own key through every door."
+description: "How GPU, CPU and proximity chunking connect to Base64 SWF dynamic loading, Kubernetes manifests and YAML front matter, and what each reader of a data load (person, agent, machine) actually needs. Covers UTF-8 vs ASCII, SWF, GLB and Rust binaries, SVG CDATA and KML location data, bandwidth allocation for business readers, use after free in plain terms, memory safety as DRM for data access, and the hotel version: chunks that carry their own key through every door."
 canonical: https://persephonepunch.github.io/crm-sync-setup/chunk-encode-load.html
 category: "Specs"
 date: 2026-11-25
@@ -323,6 +323,21 @@ Picture memory as a hotel. Rooms are memory, a **pointer** is a keycard or a roo
 | Pointer hijack | Stored address overwritten; the program jumps where the attacker chose | The lobby sign is swapped to point to the wrong room | Subdomain takeover: customers follow your link to the attacker's site |
 
 **Defences.** Rust's ownership rules stop the first two at compile time: each piece of memory has one owner, it is freed exactly once, and no keycard can outlive the stay. In C, set the pointer to null after freeing. Hardened allocators catch double frees, pointer authentication on Apple M-series and newer Arm chips signs stored addresses so a swapped sign fails the check, and address randomization (ASLR) makes the attacker guess where the rooms are.
+
+### Memory safe means no key outlives its permission
+
+Every bug above has the same shape: **a key that lives longer than the permission it was issued for.** Memory safety is the guarantee that this can't happen. Good data access works like DRM for your own data: the key expires, is bound to one reader, is checked every time it is used and can be revoked.
+
+|  | Permission | Key | Gap when the key outlives it |
+|----|----|----|----|
+| Memory | The allocation (room 412 is yours until checkout) | The pointer | Use after free |
+| Hotel | The stay | The keycard | An old card opens a room that is now someone else's |
+| Data access | The grant (this service may read this data until a set time) | A token or API key | A departed vendor's key still works |
+| DRM | The licence (rent this film for 48 hours) | The content key | The film still plays after the rental ends |
+
+**How each keeps the key in line.** Rust enforces it before the program runs: every reference has a lifetime tied to its owner, and the compiler refuses code where a reference could outlive what it points to, as if the hotel would not open until it proved no keycard can outlast its stay. DRM enforces it at runtime: the licence expires, is bound to one device, is checked on every play and can be revoked from the licence server. Data access done well does the same, which is the chunk key below (`aud`, `exp`, `nonce`, `sig`). CHERI hardware (Arm's Morello research chip) makes it literal: pointers become capabilities that carry their own bounds and permissions, and the processor refuses any access outside them.
+
+**Where the DRM comparison breaks, and why that helps.** DRM tries to control a copy on a device someone else owns, and it fails once the content is decrypted and recorded (the "analog hole"). Data access is stronger because you own the door. So the business rule is: **keep data behind doors you control and hand out keys, not copies.** A key can expire or be revoked; a copy cannot be taken back.
 
 ### Chunks through the door: key data for every piece
 

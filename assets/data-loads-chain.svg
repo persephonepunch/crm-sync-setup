@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1230 890" width="1230" height="890" role="img" aria-labelledby="svg-title svg-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 1230 922" width="1230" height="922" role="img" aria-labelledby="svg-title svg-desc">
 <title id="svg-title">Data loads: from chunk to inference</title>
 <desc id="svg-desc">Five stages left to right: chunk by consumer (CPU, GPU, proximity), encode at the edge (binary, Base64, UTF-8 vs ASCII), load dynamically (Base64 SWF then, WASM now), orchestrate in YAML (Kubernetes, placement, front matter), infer by reader (humans, agents, machines).</desc>
-<rect id="background" x="-5" y="-5" width="1230" height="890" fill="#ffffff"/>
+<rect id="background" x="-5" y="-5" width="1230" height="922" fill="#ffffff"/>
 <g id="header">
 <text x="30" y="52" font-family="Times New Roman, Times, serif" font-size="32" font-weight="normal" fill="#0a0a0a" text-anchor="start">Data loads: from chunk to inference</text>
 <text x="30" y="84" font-family="Arial" font-size="13" font-weight="normal" fill="#5c5c5c" text-anchor="start">GPU / CPU / proximity chunking → Base64 and UTF-8 at the edge → dynamic load → Kubernetes YAML → inference for people, agents and machines</text>
@@ -206,10 +206,14 @@
 <path d="M717 680 L732 680 L732 676 L741 682 L732 688 L732 684 L717 684 Z" fill="#f22468"/>
 <path d="M955 680 L970 680 L970 676 L979 682 L970 688 L970 684 L955 684 Z" fill="#f22468"/>
 </g>
+<g id="memory-safe">
+<text x="30" y="774" font-family="Arial" font-size="14" font-weight="normal" fill="#d01a57" text-anchor="start">Memory safe = no key outlives its permission.</text>
+<text x="330" y="774" font-family="Arial" font-size="12.5" font-weight="normal" fill="#0a0a0a" text-anchor="start">Like DRM for data access: the key expires, is bound to one reader, is checked at every door and can be revoked. Hand out keys, not copies.</text>
+</g>
 <g id="rule">
-<rect x="30" y="772" width="1160" height="2" fill="#f22468"/>
-<text x="30" y="802" font-family="Arial" font-size="16" font-weight="normal" fill="#0a0a0a" text-anchor="start">Binary holds the data. UTF-8 and Base64 are adapters at text-only boundaries.</text>
-<text x="30" y="826" font-family="Arial" font-size="13" font-weight="normal" fill="#5c5c5c" text-anchor="start">Chunk to the consumer's natural unit, encode only at the edge, and describe every chunk in front matter so agents read the description and machines fetch the bytes.</text>
-<text x="30" y="856" font-family="Arial" font-size="12" font-weight="normal" fill="#5c5c5c" text-anchor="start">ASCII ⊂ UTF-8: every ASCII byte is valid UTF-8, and the Base64 alphabet (A–Z a–z 0–9 + / =) is ASCII, so Base64 passes through any UTF-8 channel unchanged.</text>
+<rect x="30" y="804" width="1160" height="2" fill="#f22468"/>
+<text x="30" y="834" font-family="Arial" font-size="16" font-weight="normal" fill="#0a0a0a" text-anchor="start">Binary holds the data. UTF-8 and Base64 are adapters at text-only boundaries.</text>
+<text x="30" y="858" font-family="Arial" font-size="13" font-weight="normal" fill="#5c5c5c" text-anchor="start">Chunk to the consumer's natural unit, encode only at the edge, and describe every chunk in front matter so agents read the description and machines fetch the bytes.</text>
+<text x="30" y="888" font-family="Arial" font-size="12" font-weight="normal" fill="#5c5c5c" text-anchor="start">ASCII ⊂ UTF-8: every ASCII byte is valid UTF-8, and the Base64 alphabet (A–Z a–z 0–9 + / =) is ASCII, so Base64 passes through any UTF-8 channel unchanged.</text>
 </g>
 </svg>
