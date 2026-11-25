@@ -107,9 +107,9 @@ Native machine code (ELF, PE or Mach-O) or a `.wasm` module. The type system kee
 
 ## From chunk to inference
 
-[![Data loads: from chunk to inference. Five stages (chunk by consumer, encode at the edge, load dynamically, orchestrate in YAML, infer by reader) with the hotel version underneath: suitcase, luggage tag, door, keycard, checkout](assets/data-loads-chain.svg)](assets/data-loads-chain.svg)
+[![Data loads: from chunk to inference. Five stages (chunk by consumer, encode at the edge, load dynamically, orchestrate in YAML, infer by reader) with the hotel version underneath: suitcase, luggage tag, door, keycard, checkout](https://crm-sync.dev/kb/media/docs/data-loads-chain.svg)](https://crm-sync.dev/kb/media/docs/data-loads-chain.svg)
 
-Download: [SVG](assets/data-loads-chain.svg) · [PNG](assets/data-loads-chain.png)
+Download: [SVG](https://crm-sync.dev/kb/media/docs/data-loads-chain.svg) · [PNG](https://crm-sync.dev/kb/media/docs/data-loads-chain.png)
 
 Figure 1. Five stages. Each column's three rows line up with the matching rows in the next. The pink row underneath is the hotel version of the same chain. Scroll sideways on a phone.
 
