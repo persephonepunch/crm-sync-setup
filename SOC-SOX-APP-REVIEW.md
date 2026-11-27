@@ -215,6 +215,33 @@ The foundation here inverts each failure mode into a standing management discipl
 
 Go-live is when management starts, not when the project ends. The controls above hold afterward because the same plane that runs the business produces the evidence — in real time, on every change, in systems you own.
 
+## Calendar and runbooks
+
+A review is only current until the next platform deadline or breach. Check the calendars before each review cycle, and work any new item through the runbook beside it.
+
+**Calendars**
+
+| Calendar | What it tracks | Use it in the review for |
+| --- | --- | --- |
+| [Commerce API migration calendar](https://www.crm-sync.dev/pages/difference#calendar) | Shopify, Google and EU deadlines as dated events, each with its source. It includes **1 December 2026**: apps that run code on the online store must declare their network access, or submissions, updates and deployments are blocked ([Shopify changelog](https://shopify.dev/changelog/posts/network-access-declarations-are-now-required-for-apps-that-run-on-the-online-store)) | ITGC 2 · change management, and Dependency & failover |
+| [Breaches calendar](https://docs.ysl150.com/#calendar) | Breaches and vulnerabilities, each linked to its mitigation; also page 14 of the [keys and tokens deck](https://docs.ysl150.com/keys-tokens/calendar) | ITGC 3 · operations, and the trust-network section above |
+
+**Runbooks**
+
+| Runbook | What it covers | ITGC domain |
+| --- | --- | --- |
+| [Server-only rules for reads, crawlers, regions and CSP](https://files.ysl150.com/runbooks/ai-security-middleware/#runbook-server-only-rules-for-reads-crawlers-regions-and-csp) | A read-only data route, robots.txt and noindex, hreflang from a versioned edge map, market profiles (French, Portuguese and Chinese markets), CSP sent by the server, and security.txt | ITGC 1 · access, ITGC 2 · change |
+| [CSP with AI, placed before every metered SaaS](https://files.ysl150.com/runbooks/ai-security-middleware/#runbook-csp-with-ai-placed-before-every-metered-saas) | A gate and your own count in front of each fee-bearing dependency; report-only for 14 days, then enforce | ITGC 3 · operations |
+| [CSP from the edge: Cloudflare headers, Hydrogen nonces, reports in Xano](https://persephonepunch.github.io/crm-sync-setup/csp-cloudflare-xano-reports.html) | Where a CSP can be set, nonces per response, collecting violation reports, and enforcing one route group at a time | ITGC 2 · change, ITGC 3 · operations |
+| [Page-level script risk](https://files.ysl150.com/runbooks/script-privilege/) | Third-party scripts on the storefront, the [1 December network access declaration](https://files.ysl150.com/runbooks/script-privilege/#network-access), and the token horizon | ITGC 4 · acquisition, Dependency & failover |
+| [Data layer runbook](https://files.ysl150.com/runbooks/data-layer/) | Delisted apps, edge rate limits, certificates and data-layer conversion funnels | Dependency & failover |
+| [Gadget migration runbook](https://files.ysl150.com/runbooks/gadget-migration/) | Moving a Shopify app off Gadget before 31 March 2027, with edge gating | ITGC 4 · acquisition |
+
+**Live evidence on crm-sync.dev**, for the access and operations walk-through:
+
+- [Security headers on every response](https://crm-sync.dev/start#step-headers): HSTS, Referrer-Policy and Permissions-Policy on every response; CSP enforced on Your Keys and report-only everywhere else, with violations collected for review.
+- [security.txt](https://crm-sync.dev/.well-known/security.txt): where to report a vulnerability (RFC 9116).
+
 ---
 
 *Related: [The Wrong-Size Tool](https://www.crm-sync.dev/pages/knowledge-base#wrong-size-tool) · [Cybersecurity for AI](https://www.crm-sync.dev/pages/knowledge-base#cybersecurity-for-ai) · [Security & Compliance Posture](https://www.crm-sync.dev/pages/knowledge-base#security-posture) · [The dangers of probably-working software — NDC London 2026](https://youtu.be/DZpR0GojoWQ) · Print this page for the PDF edition.*
