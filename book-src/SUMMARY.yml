@@ -58,6 +58,7 @@ chapters:
       - docs/SIGNING-KEYS-BY-PROXY.md   # 2026-11-04 · Signing Keys by Proxy: AI Security, Globalization, Tools and Permissions
       - BRINGING-SECURITY-IN-HOUSE.md   # 2026-11-13 · Bringing Security and Data In House
       - WEAKEST-LINK-PROCUREMENT.md   # 2026-11-24 · The weakest link is procurement
+      - CSP-CLOUDFLARE-XANO-REPORTS.md   # 2026-11-26 · CSP from the edge: Cloudflare headers, Hydrogen nonces, reports in Xano
   - category: Specs
     docs:
       - ARCHITECTURE.md   # 2026-05-26 · CRM Sync — Why This Architecture Is Safer
